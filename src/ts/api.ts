@@ -9,9 +9,14 @@ const API_URL = "https://api.narrowroad-model.com";
 export async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
     const token = localStorage.getItem("authToken");
 
+    // ✅ 현재 페이지가 로그인 페이지(`index.html`)이면 `fetchWithAuth()` 실행 X
     if (!token) {
-        console.error("❌ 토큰이 없습니다. 로그인 페이지로 이동합니다.");
-        window.location.href = "../../index.html"; // ✅ 로그인 페이지로 리디렉트
+        const isLoginPage = window.location.pathname.includes("index.html") || window.location.pathname === "/";
+
+        if (!isLoginPage) {
+            console.log("❌ 토큰이 없습니다. 로그인 페이지로 이동합니다.");
+            window.location.href = "index.html"; // ✅ 로그인 페이지로 이동
+        }
         return null;
     }
 
