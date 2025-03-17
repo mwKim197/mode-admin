@@ -5,16 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>카카오 로그인 처리 중...</title>
   <script>
-    (async function () {
+    (function () {
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get("code");
 
       if (code) {
-        // ✅ 부모 창에 `code` 전달
-        window.opener.postMessage({ code }, "http://model-web-admin.s3-website.ap-northeast-2.amazonaws.com");
-
-        // ✅ 1초 후 창 닫기
-        setTimeout(() => window.close(), 1000);
+        // ✅ 부모 창이 있으면 `code`를 전달
+        if (window.opener) {
+          window.opener.postMessage({ code }, "http://model-web-admin.s3-website.ap-northeast-2.amazonaws.com");
+          window.close(); // ✅ 로그인 창 닫기
+        } else {
+          // ✅ 팝업이 아니라면 직접 페이지 이동
+          window.location.href = "http://model-web-admin.s3-website.ap-northeast-2.amazonaws.com";
+        }
       }
     })();
   </script>
