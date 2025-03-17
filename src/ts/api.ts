@@ -15,7 +15,7 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
 
         if (!isLoginPage) {
             console.log("❌ 토큰이 없습니다. 로그인 페이지로 이동합니다.");
-            window.location.href = "../../index.html"; // ✅ 로그인 페이지로 이동
+            window.location.href = "/index.html"; // ✅ 로그인 페이지로 이동
         }
         return null;
     }
@@ -38,7 +38,7 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
             console.error("❌ 인증 실패: 토큰이 만료되었습니다.");
             localStorage.removeItem("authToken");
             alert("세션이 만료되었습니다. 다시 로그인하세요.");
-            window.location.href = "../../index.html"; // ✅ 로그인 페이지로 리디렉트
+            window.location.href = "/index.html"; // ✅ 로그인 페이지로 리디렉트
             return null;
         }
 

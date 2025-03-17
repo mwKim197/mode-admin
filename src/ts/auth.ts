@@ -18,5 +18,5 @@ export async function getUserData() {
  */
 export function logout() {
     localStorage.removeItem("authToken");
-    window.location.href = "../../index.html";
+    window.location.href = "/index.html";
 }

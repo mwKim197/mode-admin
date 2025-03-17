@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.log("✅ 로그인 성공 → 토큰 저장 완료!");
 
                 // ✅ 로그인 성공 시 페이지 이동
-                window.location.href = "../../public/html/main.html";
+                window.location.href = "/html/main.html";
             } else {
                 alert(result.message || "로그인 실패. 다시 시도하세요.");
             }
