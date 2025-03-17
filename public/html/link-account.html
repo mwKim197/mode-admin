@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>계정 연동</title>
+    <title>계정연동</title>
+    <script type="module" defer src="/src/main.ts"></script> <!-- ✅ type="module" 추가 -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -53,18 +55,26 @@
     </script>
 </head>
 <body>
-<h1>카카오 계정 연동</h1>
-<p>카카오 계정을 기존 계정과 연동하세요.</p>
+<div class="flex items-center justify-center h-screen bg-gray-200">
+    <div class="bg-white p-6 rounded-lg shadow-md w-80">
+        <h1>카카오 계정 연동</h1>
+        <p>카카오 계정을 기존 계정과 연동하세요.</p>
 
-<form onsubmit="linkAccount(event)">
-    <input type="hidden" id="kakaoId">
-    <label for="userId">기존 계정 ID:</label>
-    <input type="text" id="userId" required>
-
-    <label for="password">비밀번호:</label>
-    <input type="password" id="password" required>
-
-    <button type="submit">연동하기</button>
-</form>
+        <form onsubmit="linkAccount(event)">
+            <input type="hidden" id="kakaoId">
+            <div class="mb-4">
+                <label for="userId" class="block text-sm font-medium text-gray-700">기존 계정</label>
+                <input type="text" id="userId" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+            </div>
+            <div class="mb-4">
+                <label for="password" class="block text-sm font-medium text-gray-700">비밀번호</label>
+                <input type="password" id="password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+            </div>
+            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">
+                연동하기
+            </button>
+        </form>
+    </div>
+</div>
 </body>
 </html>
