@@ -1,10 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>계정 연동</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const kakaoId = urlParams.get("kakaoId");
+
+            if (!kakaoId) {
+                alert("잘못된 접근입니다.");
+                window.location.href = "/index.html";
+                return;
+            }
+
+            document.getElementById("kakaoId").value = kakaoId;
+        });
+
+        async function linkAccount(event) {
+            event.preventDefault();
+
+            const userId = document.getElementById("userId").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const kakaoId = document.getElementById("kakaoId").value;
+
+            if (!userId || !password) {
+                alert("아이디와 비밀번호를 입력해주세요.");
+                return;
+            }
+
+            try {
+                const response = await fetch("https://api.narrowroad-model.com/model_admin_login?func=link-account", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ userId, password, kakaoId }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert("✅ 계정 연동이 완료되었습니다!");
+                    window.location.href = "/html/main.html";
+                } else {
+                    alert(result.message || "연동 실패. 다시 시도하세요.");
+                }
+            } catch (error) {
+                console.error("❌ 연동 오류:", error);
+                alert("서버 오류가 발생했습니다. 다시 시도하세요.");
+            }
+        }
+    </script>
 </head>
 <body>
-    <p>연동입니다</p>
+<h1>카카오 계정 연동</h1>
+<p>카카오 계정을 기존 계정과 연동하세요.</p>
+
+<form onsubmit="linkAccount(event)">
+    <input type="hidden" id="kakaoId">
+    <label for="userId">기존 계정 ID:</label>
+    <input type="text" id="userId" required>
+
+    <label for="password">비밀번호:</label>
+    <input type="password" id="password" required>
+
+    <button type="submit">연동하기</button>
+</form>
 </body>
 </html>
