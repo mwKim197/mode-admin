@@ -9,7 +9,7 @@ export async function getUserData() {
     if (userData) {
         console.log("✅ 사용자 정보:", userData);
     } else {
-        console.error("❌ 사용자 정보를 가져오지 못했습니다.");
+        console.log("❌ 사용자 정보를 가져오지 못했습니다.");
     }
 }
 
