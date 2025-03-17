@@ -8,8 +8,10 @@
     (function () {
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get("code");
-
-      if (code) {
+      console.log("urlParams", urlParams);
+      console.log("code", code);
+      console.log("window.opener", window.opener);
+      /*if (code) {
         // ✅ 팝업 창 여부 정확하게 판별
         if (window.opener && !window.opener.closed) {
           console.log("✅ 팝업 창에서 로그인 완료 → 부모 창으로 code 전달");
@@ -28,7 +30,7 @@
         }
       } else {
         console.error("❌ 카카오 로그인 코드 없음");
-      }
+      }*/
     })();
   </script>
 </head>
