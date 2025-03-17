@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (response.ok) {
                 // ✅ 로그인 성공 시 토큰 저장
                 localStorage.setItem("authToken", result.token);
-                console.log("✅ 로그인 성공 → 토큰 저장 완료");
+                console.log("✅ 로그인 성공 → 토큰 저장 완료!");
 
                 // ✅ 로그인 성공 시 페이지 이동
                 window.location.href = "../../public/html/main.html";
