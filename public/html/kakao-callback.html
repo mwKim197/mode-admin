@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>카카오 로그인 처리 중...</title>
+  <script>
+    (async function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get("code");
+
+      if (code) {
+        try {
+          const response = await fetch("https://api.narrowroad-model.com/model_admin_login?func=kakao-login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code }),
+          });
+
+          const result = await response.json();
+          localStorage.setItem("authToken", result.token);
+          window.location.href = "/html/main.html";
+        } catch (error) {
+          console.error("❌ 카카오 로그인 오류:", error);
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+<p>카카오 로그인 처리 중...</p>
+</body>
+</html>
