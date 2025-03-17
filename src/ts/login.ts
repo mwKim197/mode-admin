@@ -77,12 +77,15 @@ document.getElementById("kakao-login-btn")?.addEventListener("click", () => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ code }),
             })
-              .then(response => response.json())
-              .then(result => {
-                  if (result.token) {
-                      localStorage.setItem("authToken", result.token);
+              .then(response => response.json().then(result => ({ status: response.status, body: result })))
+              .then(({ body }) => {
+                  if (body.token) {
+                      localStorage.setItem("authToken", body.token);
                       console.log("✅ 로그인 성공 → 토큰 저장 완료!");
                       window.location.href = "/html/main.html";
+                  } else if (body.redirectUrl) {
+                      console.log("✅ 신규 사용자 → 연동 페이지로 이동:", body.redirectUrl);
+                      window.location.href = body.redirectUrl;
                   } else {
                       alert("카카오 로그인 실패. 다시 시도하세요.");
                   }
