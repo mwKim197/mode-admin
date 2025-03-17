@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // ✅ 카카오 로그인 처리
 document.getElementById("kakao-login-btn")?.addEventListener("click", () => {
     const KAKAO_CLIENT_ID = "240886095629b93f9655026145a39487";
-    const KAKAO_REDIRECT_URI = "http://model-web-admin.s3-website.ap-northeast-2.amazonaws.com/kakao-callback.html";
+    const KAKAO_REDIRECT_URI = "http://model-web-admin.s3-website.ap-northeast-2.amazonaws.com/html/kakao-callback.html";
 
     const kakaoAuthURL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KAKAO_CLIENT_ID}&redirect_uri=${KAKAO_REDIRECT_URI}`;
 
