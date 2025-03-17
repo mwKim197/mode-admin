@@ -17,14 +17,14 @@
           // ✅ 부모 창으로 인증 코드 전달
           window.opener.postMessage(
                   { code },
-                  "http://model-web-admin.s3-website.ap-northeast-2.amazonaws.com"
+                  "http://model-web-admin.s3-website.ap-northeast-2.amazonaws.com/index.html"
           );
 
           // ✅ 팝업 창 닫기
           window.close();
         } else {
           console.log("✅ 팝업 창이 아님 → 직접 메인 페이지로 이동");
-          window.location.href = "http://model-web-admin.s3-website.ap-northeast-2.amazonaws.com";
+          window.location.href = "http://model-web-admin.s3-website.ap-northeast-2.amazonaws.com/index.html";
         }
       } else {
         console.error("❌ 카카오 로그인 코드 없음");
