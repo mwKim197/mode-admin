@@ -16,10 +16,10 @@ document.addEventListener("DOMContentLoaded", () => {
     loginForm.addEventListener("submit", async (event) => {
         event.preventDefault(); // ✅ 폼 제출 동작 방지
 
-        const userId = (document.getElementById("userId") as HTMLInputElement).value.trim();
+        const adminId = (document.getElementById("adminId") as HTMLInputElement).value.trim();
         const password = (document.getElementById("password") as HTMLInputElement).value.trim();
 
-        if (!userId || !password) {
+        if (!adminId || !password) {
             alert("아이디와 비밀번호를 입력해주세요.");
             return;
         }
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(`${API_URL}/model_admin_login?func=login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId, password }),
+                body: JSON.stringify({ adminId, password }),
                 mode: "cors",
             });
 
