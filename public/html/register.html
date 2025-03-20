@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <script type="module" defer src="/src/main.ts"></script>
+    <script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind CDN -->
+</head>
+<body class="flex items-center justify-center h-screen bg-gray-100">
+<div class="bg-white p-6 rounded-lg shadow-md w-80">
+    <h1 class="text-2xl font-bold text-center mb-4">회원가입</h1>
+    <form id="register-form" class="space-y-3">
+        <div>
+            <label for="adminId" class="block text-sm font-medium text-gray-700">아이디</label>
+            <input type="text" id="adminId" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+
+        <div>
+            <label for="password" class="block text-sm font-medium text-gray-700">비밀번호</label>
+            <input type="password" id="password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+
+        <div>
+            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">비밀번호 확인</label>
+            <input type="password" id="confirmPassword" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+
+        <button type="submit" class="w-full py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500">계정 생성</button>
+    </form>
+
+    <p id="message" class="mt-3 text-center text-sm"></p> <!-- 결과 메시지 -->
+</div>
+</body>
+</html>
