@@ -5,7 +5,7 @@
     "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
-
+    "types": ["node"], // ✅ 여기에 node 타입 명시
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
