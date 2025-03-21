@@ -17,7 +17,11 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
             console.log("❌ 토큰이 없습니다. 로그인 페이지로 이동합니다.");
             window.location.href = "/index.html"; // ✅ 로그인 페이지로 이동
         }
-        return null;
+        return {
+            ok: false,
+            status: 401,
+            json: async () => ({ message: "인증 토큰이 없습니다." }),
+        };
     }
 
     // ✅ 기본 옵션 설정 (토큰 자동 추가)
@@ -39,16 +43,24 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
             localStorage.removeItem("authToken");
             alert("세션이 만료되었습니다. 다시 로그인하세요.");
             window.location.href = "/index.html"; // ✅ 로그인 페이지로 리디렉트
-            return null;
+            return {
+                ok: false,
+                status: 401,
+                json: async () => ({ message: "인증 실패: 토큰이 만료되었습니다." }),
+            };
         }
 
         if (!response.ok) {
             throw new Error(`❌ 요청 실패: ${response.statusText}`);
         }
 
-        return await response.json();
+        return response;
     } catch (error) {
         console.error("❌ API 요청 오류:", error);
-        return null;
+        return {
+            ok: false,
+            status: 500,
+            json: async () => ({ message: "❌ API 요청 오류" }),
+        };
     }
 }
