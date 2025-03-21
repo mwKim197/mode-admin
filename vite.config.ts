@@ -23,6 +23,9 @@ export default defineConfig({
                 main: resolve(__dirname, 'index.html'),                         // 기본 페이지
                 notice: resolve(__dirname, 'html/notice.html'),         // ✅ 공지 페이지
                 register: resolve(__dirname, 'html/register.html'),     // 추가: 회원가입 페이지
+                dashboard: resolve(__dirname, 'html/dashboard.html'),     // 추가: 데시보드
+                kakao: resolve(__dirname, 'html/kakao-callback.html'),     // 추가: 카카오 콜백
+                account: resolve(__dirname, 'html/link-account.html'),     // 추가: 연동
                 // 다른 html들도 여기에 추가 가능
             },
         },
