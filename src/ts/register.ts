@@ -1,4 +1,4 @@
-const API_URL = "https://api.narrowroad-model.com"; // ✅ 전역 충돌 방지
+import {fetchWithAuth} from "./api.ts";
 
 export function initRegister() {
     console.log("✅ register.ts 로드됨");
@@ -33,19 +33,18 @@ export function initRegister() {
 
         try {
             // ✅ 회원가입 API 호출
-            const response = await fetch(`${API_URL}/model_admin_login?func=register-admin`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ adminId, password }),
-                mode: "cors",
-            });
+            const response = await fetchWithAuth("/model_admin_login?func=register-admin", {
+                  method: "POST",
+                  body: JSON.stringify({ adminId, password }),
+                  mode: "cors",
+              });
 
             const result = await response.json();
 
             if (response.ok) {
                 console.log("✅ 회원가입 성공 → 로그인 페이지로 이동");
                 alert("✅ 회원가입 성공! 로그인 페이지로 이동합니다.");
-                window.location.href = "../../index.html";
+                window.location.href = "../index.html";
             } else {
                 alert(result.message || "회원가입 실패. 다시 시도하세요.");
             }

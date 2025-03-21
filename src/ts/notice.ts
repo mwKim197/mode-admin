@@ -1,6 +1,8 @@
 import SunEditor from "suneditor";
 import "suneditor/dist/css/suneditor.min.css";
 import plugins from "suneditor/src/plugins";
+import {fetchWithAuth} from "./api.ts";
+
 
 export function initNotice() {
   console.log("✅ notice.ts 로드됨");
@@ -26,7 +28,7 @@ export function initNotice() {
   });
 
   // ✅ 저장 버튼 이벤트 등록
-  saveButton.addEventListener("click", () => {
+  saveButton.addEventListener("click", async () => {
     const title = titleInput.value.trim();
     const contentHtml = editor.getContents(false); // 전체 HTML 가져오기
 
@@ -59,11 +61,8 @@ export function initNotice() {
     console.log("📦 전송 payload", payload);
 
     // ✅ API 전송
-    fetch("https://api.narrowroad-model.com/model_home_page?func=get-posts&contentType=notice", {
+    await fetchWithAuth("model_home_page?func=create-posts&contentType=notice", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify(payload),
     })
       .then(async (res) => {
