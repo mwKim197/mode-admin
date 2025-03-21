@@ -50,10 +50,6 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
             };
         }
 
-        if (!response.ok) {
-            throw new Error(`❌ 요청 실패: ${response.statusText}`);
-        }
-
         return response;
     } catch (error) {
         console.error("❌ API 요청 오류:", error);
