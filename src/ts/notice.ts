@@ -56,6 +56,7 @@ export function initNotice() {
       title,
       content: contentHtml,
       images: base64Images,
+      contentType: "notice",
     };
 
     console.log("📦 전송 payload", payload);
