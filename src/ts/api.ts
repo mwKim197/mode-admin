@@ -31,7 +31,7 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
     };
 
     try {
-        const response = await fetch(`${API_URL}/model_admin_login${endpoint}`, fetchOptions);
+        const response = await fetch(`${API_URL}${endpoint}`, fetchOptions);
 
         // ✅ 401 Unauthorized (토큰 만료) → 자동 로그아웃 처리
         if (response.status === 401) {

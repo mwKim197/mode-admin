@@ -4,7 +4,7 @@ import { fetchWithAuth } from "./api";
  * ✅ 로그인된 사용자 정보 가져오기
  */
 export async function getUserData() {
-    const userData = await fetchWithAuth("?func=me");
+    const userData = await fetchWithAuth("/model_admin_login?func=me");
 
     if (userData) {
         console.log("✅ 사용자 정보:", userData);
