@@ -61,7 +61,7 @@ export function initNotice() {
     console.log("📦 전송 payload", payload);
 
     // ✅ API 전송
-    await fetchWithAuth("/model_home_page?func=create-posts&contentType=notice", {
+    await fetchWithAuth("/model_home_page?func=create-post&contentType=notice", {
       method: "POST",
       body: JSON.stringify(payload),
     })
