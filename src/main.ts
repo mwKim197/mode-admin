@@ -1,5 +1,5 @@
 import { getUserData } from "./ts/auth";
-import "./ts/login"; // ✅ 로그인 관련 스크립트 불러오기
+import "./ts/login";
 
 // 📌 main.ts (불필요한 코드 로딩 방지)
 document.addEventListener("DOMContentLoaded", async () => {
@@ -17,6 +17,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.log("📌 회원가입 페이지 - register.ts 로드");
         import("./ts/register").then((module) => {
             module.initRegister();
+        });
+    } else if (path === "/html/notice.html") {
+        console.log("📌 공지사항등록 - notice.ts 로드");
+        import("./ts/notice").then((module) => {
+            module.initNotice();
         });
     }  else {
         console.log("📌 기본 페이지");
