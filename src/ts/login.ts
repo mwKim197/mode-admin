@@ -38,7 +38,7 @@ export function initLogin() {
             if (response.ok) {
                 localStorage.setItem("authToken", result.token);
                 console.log("✅ 로그인 성공 → 토큰 저장 완료!");
-                window.location.href = "/html/main.html";
+                window.location.href = "../../html/main.html";
             } else {
                 alert(result.message || "로그인 실패. 다시 시도하세요.");
             }
@@ -92,7 +92,7 @@ function handleKakaoLogin() {
 
                             localStorage.setItem("authToken", body.token);
                             console.log("✅ 로그인 성공 → 토큰 저장 완료!");
-                            window.location.href = "/html/main.html";
+                            window.location.href = "../../html/main.html";
                         } else if (body.redirectUrl) {
                             console.log("✅ 신규 사용자 → 연동 페이지로 이동:", body.redirectUrl);
                             window.location.href = body.redirectUrl;
