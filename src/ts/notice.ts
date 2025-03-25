@@ -1,82 +1,98 @@
-import SunEditor from "suneditor";
-import "suneditor/dist/css/suneditor.min.css";
-import plugins from "suneditor/src/plugins";
-import {fetchWithAuth} from "./api.ts";
-
-
 export function initNotice() {
   console.log("✅ notice.ts 로드됨");
 
-  const editorTarget = document.getElementById("notice-editor");
-  const saveButton = document.getElementById("save-button");
-  const titleInput = document.getElementById("notice-title") as HTMLInputElement;
+  //데쉬보드로 이동
+  document.getElementById("dashboard-button")?.addEventListener("click", () => {
+    location.href = "/html/dashboard.html"; // 데쉬보드로 이동
+  });
+  const listContainer = document.getElementById("notice-list");
 
-  if (!editorTarget || !saveButton) {
-    console.error("❌ 요소를 찾을 수 없습니다.");
+  if (!listContainer) {
+    console.error("❌ 필수 요소가 없습니다.");
     return;
   }
 
-  // ✅ 에디터 인스턴스 생성
-  const editor = SunEditor.create(editorTarget, {
-    height: "400px",
-    plugins,
-    buttonList: [
-      ["undo", "redo"],
-      ["bold", "underline", "italic"],
-      ["image"],
-    ],
-  });
+  // ✅ 목록 렌더링
+  function renderList(data: any[]) {
 
-  // ✅ 저장 버튼 이벤트 등록
-  saveButton.addEventListener("click", async () => {
-    const title = titleInput.value.trim();
-    const contentHtml = editor.getContents(false); // 전체 HTML 가져오기
+    if (listContainer === null) return;
+    listContainer.innerHTML = ""; // 초기화
 
-    if (!title || !contentHtml) {
-      alert("⚠️ 제목과 내용을 모두 입력해주세요.");
-      return;
+    data.forEach((notice) => {
+      const div = document.createElement("div");
+      div.className = "p-4 border rounded mb-2 hover:bg-gray-100 flex justify-between items-center";
+      div.setAttribute("data-id", notice.contentId);
+
+      const date = new Date(notice.timestamp).toLocaleDateString("ko-KR");
+
+      div.innerHTML = `
+        <div>
+          <div class="font-bold">${notice.title}</div>
+          <div class="text-sm text-gray-500">${date} / 작성자: ${notice.userId}</div>
+        </div>
+        <div class="flex space-x-2">
+            <button class="edit-btn text-blue-600 underline" data-id="${notice.contentId}">수정</button>
+            <button class="delete-btn text-red-600 underline" data-id="${notice.contentId}">삭제</button>
+        </div>
+      `;
+
+      listContainer.appendChild(div);
+    });
+  }
+
+  // ✅ 공지 데이터 가져온 후 이벤트도 바인딩
+  async function fetchNotices() {
+    try {
+      const res = await fetch("https://api.narrowroad-model.com/model_home_page?func=get-posts&contentType=notice");
+      const data = await res.json();
+      renderList(data);
+      bindActionButtons(); // ✅ 버튼 이벤트 등록
+    } catch (err) {
+      console.error("❌ 공지사항 불러오기 실패", err);
     }
-    const dom = new DOMParser().parseFromString(contentHtml, "text/html");
-    const imgTags = Array.from(dom.querySelectorAll("img"));
+  }
 
-    const base64Images: string[] = [];
-
-    for (const img of imgTags) {
-      const src = img.getAttribute("src");
-      if (src && src.startsWith("data:image")) {
-        // 👉 "data:image/jpeg;base64," 부분 제거
-        const base64Only = src.split(",")[1]; // 콤마 기준으로 base64 데이터만 추출
-        if (base64Only) {
-          base64Images.push(base64Only);
-        }
-      }
-    }
-
-    const payload = {
-      title,
-      content: contentHtml,
-      images: base64Images,
-      contentType: "notice",
-    };
-
-    console.log("📦 전송 payload", payload);
-
-    // ✅ API 전송
-    await fetchWithAuth("/model_home_page?func=create-post&contentType=notice", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    })
-      .then(async (res) => {
-        if (res.ok) {
-          alert("✅ 공지사항 저장 완료!");
-        } else {
-          const err = await res.json();
-          alert(`❌ 저장 실패: ${err.message}`);
-        }
-      })
-      .catch((err) => {
-        console.error("❌ 저장 중 오류:", err);
-        alert("서버 오류로 저장에 실패했습니다.");
+// ✅ 수정/삭제 버튼 이벤트 등록
+  function bindActionButtons() {
+    // 수정
+    document.querySelectorAll(".edit-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation(); // 부모 클릭 막기
+        const id = (e.target as HTMLElement).getAttribute("data-id");
+        if (id) location.href = `/html/notice-edit.html?id=${id}`;
       });
-  });
+    });
+
+    // 삭제
+    document.querySelectorAll(".delete-btn").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation(); // 부모 클릭 막기
+        const id = (e.target as HTMLElement).getAttribute("data-id");
+        if (!id) return;
+
+        const confirmDelete = confirm("정말 삭제하시겠습니까?");
+        if (!confirmDelete) return;
+
+        try {
+          // 실제 삭제 처리 (DELETE API로 바꿔줘야 함)
+          const res = await fetch(`https://api.narrowroad-model.com/model_home_page?func=delete-post&contentType=notice&contentId=${id}`, {
+            method: "DELETE",
+          });
+
+          if (res.ok) {
+            alert("삭제 완료");
+            fetchNotices(); // 목록 다시 불러오기
+          } else {
+            alert("삭제 실패");
+          }
+        } catch (err) {
+          console.error("❌ 삭제 요청 실패", err);
+        }
+      });
+    });
+  }
+
+
+  // ✅ 페이지 로드시 공지사항 가져오기
+  fetchNotices();
 }

@@ -19,9 +19,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             module.initRegister();
         });
     } else if (path === "/html/notice.html") {
-        console.log("📌 공지사항등록 - notice.ts 로드");
-        import("./ts/notice").then((module) => {
+        console.log("📌 공지사항 - notice.ts 로드");
+        import("./ts/notice.ts").then((module) => {
             module.initNotice();
+        });
+    } else if (path === "/html/notice-edit.html") {
+        console.log("📌 공지사항등록 - notice-edit.ts 로드");
+        import("./ts/notice-edit.ts").then((module) => {
+            module.initNoticeEdit();
         });
     }  else {
         console.log("📌 기본 페이지");

@@ -21,7 +21,7 @@ export default defineConfig({
         rollupOptions: {
             input: {
                 main: resolve(__dirname, 'index.html'),                         // 기본 페이지
-                notice: resolve(__dirname, 'html/notice.html'),         // ✅ 공지 페이지
+                notice: resolve(__dirname, 'html/notice-edit.html'),         // ✅ 공지 페이지
                 register: resolve(__dirname, 'html/register.html'),     // 추가: 회원가입 페이지
                 dashboard: resolve(__dirname, 'html/dashboard.html'),     // 추가: 데시보드
                 kakao: resolve(__dirname, 'html/kakao-callback.html'),     // 추가: 카카오 콜백
