@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 📌 현재 페이지 URL 확인
     const path = window.location.pathname;
     console.log("path: ", path);
-    if (path === "/index.html") {
+    if (path === "/index.html" || path === "/") {
         console.log("📌 로그인 페이지 - login.ts 로드");
         import("./ts/login").then((module) => {
             module.initLogin(); // login.ts의 함수 실행
