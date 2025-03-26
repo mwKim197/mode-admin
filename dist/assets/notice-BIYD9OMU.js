@@ -1,0 +1,10 @@
+function f(){var i;console.log("✅ notice.ts 로드됨"),(i=document.getElementById("dashboard-button"))==null||i.addEventListener("click",()=>{location.href="/html/dashboard.html"});const o=document.getElementById("notice-list");if(!o){console.error("❌ 필수 요소가 없습니다.");return}function l(t){return new URLSearchParams(window.location.search).get(t)}const r=l("type")||"notice",a=document.getElementById("page-title");if(a){let t="";switch(r){case"notice":t="공지사항 목록";break;case"store":t="설치 매장 목록";break;case"news":t="언론 보도 목록";break;case"machine":t="머신 설명서 목록";break;default:t="게시글 작성"}a.textContent=t}function m(t){o!==null&&(o.innerHTML="",t.forEach(e=>{const n=document.createElement("div");n.className="p-4 border rounded mb-2 hover:bg-gray-100 flex justify-between items-center",n.setAttribute("data-id",e.contentId);const d=new Date(e.timestamp).toLocaleDateString("ko-KR");n.innerHTML=`
+        <div>
+          <div class="font-bold">${e.title}</div>
+          <div class="text-sm text-gray-500">${d} / 작성자: ${e.userId}</div>
+        </div>
+        <div class="flex space-x-2">
+            <button class="edit-btn text-blue-600 underline" data-id="${e.contentId}">수정</button>
+            <button class="delete-btn text-red-600 underline" data-id="${e.contentId}">삭제</button>
+        </div>
+      `,o.appendChild(n)}))}async function c(){try{const e=await(await fetch(`https://api.narrowroad-model.com/model_home_page?func=get-posts&contentType=${r}`)).json();m(e),u()}catch(t){console.error("❌ 공지사항 불러오기 실패",t)}}function u(){document.querySelectorAll(".edit-btn").forEach(t=>{t.addEventListener("click",e=>{e.stopPropagation();const n=e.target.getAttribute("data-id");n&&(location.href=`/html/notice-edit.html?type=${r}&id=${n}`)})}),document.querySelectorAll(".delete-btn").forEach(t=>{t.addEventListener("click",async e=>{e.stopPropagation();const n=e.target.getAttribute("data-id");if(!(!n||!confirm("정말 삭제하시겠습니까?")))try{(await fetch(`https://api.narrowroad-model.com/model_home_page?func=delete-post&contentType=${r}&contentId=${n}`,{method:"DELETE"})).ok?(alert("삭제 완료"),c()):alert("삭제 실패")}catch(s){console.error("❌ 삭제 요청 실패",s)}})})}c()}export{f as initNotice};
