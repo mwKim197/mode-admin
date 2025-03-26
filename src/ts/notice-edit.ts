@@ -3,16 +3,53 @@ import "suneditor/dist/css/suneditor.min.css";
 import plugins from "suneditor/src/plugins";
 import {fetchWithAuth} from "./api.ts";
 
-
 export function initNoticeEdit() {
   console.log("✅ notice-edit.ts 로드됨");
   const editorTarget = document.getElementById("notice-editor");
   const saveButton = document.getElementById("save-button");
   const titleInput = document.getElementById("notice-title") as HTMLInputElement;
 
+  // 파라미터 가져오기
+  function getParamId(key: string): string | null {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(key);
+  }
+
+  const postId = getParamId("id");
+  const boardType  = getParamId("type") || "notice";
+
+  const titleElement = document.getElementById("page-title");
+
+  if (titleElement) {
+    let titleText = "";
+    switch (boardType) {
+      case "notice":
+        titleText = "공지사항 등록";
+        break;
+      case "store":
+        titleText = "설치 매장 등록";
+        break;
+      case "news":
+        titleText = "언론 보도 등록";
+        break;
+      case "machine":
+        titleText = "머신 설명서 등록";
+        break;
+      default:
+        titleText = "게시글 등록";
+    }
+
+    titleElement.textContent = titleText;
+  }
+
   // 공지사항 목록으로 이동버튼
   document.getElementById("list-button")?.addEventListener("click", () => {
-    location.href = "/html/notice.html"; // 실제 목록 페이지 경로로 설정
+    location.href = `/html/notice.html?type=${boardType}`; // 실제 목록 페이지 경로로 설정
+  });
+
+  //데쉬보드로 이동
+  document.getElementById("dashboard-button")?.addEventListener("click", () => {
+    location.href = "/html/dashboard.html"; // 데쉬보드로 이동
   });
 
   if (!editorTarget || !saveButton) {
@@ -20,17 +57,9 @@ export function initNoticeEdit() {
     return;
   }
 
-  // 파라미터 가져오기
-  function getParamId(): string | null {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("id");
-  }
-
-  const postId = getParamId();
-
   if (postId) {
     // 수정 모드
-    fetchWithAuth(`/model_home_page?func=get-post&contentType=notice&contentId=${postId}`)
+    fetchWithAuth(`/model_home_page?func=get-post&contentType=${boardType}&contentId=${postId}`)
         .then(res => res.json())
         .then(notice => {
           if (!notice) {
@@ -87,19 +116,19 @@ export function initNoticeEdit() {
       title,
       content: contentHtml,
       images: base64Images,
-      contentType: "notice",
+      contentType: boardType,
       ...(postId && { contentId: Number(postId) }),
     };
 
     try {
-      const res = await fetchWithAuth(`/model_home_page?func=${func}&contentType=notice`, {
+      const res = await fetchWithAuth(`/model_home_page?func=${func}&contentType=${boardType}`, {
         method: methodType,
         body: JSON.stringify(payload),
       });
 
       if (res.ok) {
         alert("✅ 저장 완료!");
-        location.href = "/html/notice.html";
+        location.href = `/html/notice.html?type=${boardType}`;
       } else {
         const err = await res.json();
         alert(`❌ 저장 실패: ${err.message}`);

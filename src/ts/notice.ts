@@ -5,11 +5,43 @@ export function initNotice() {
   document.getElementById("dashboard-button")?.addEventListener("click", () => {
     location.href = "/html/dashboard.html"; // 데쉬보드로 이동
   });
+
   const listContainer = document.getElementById("notice-list");
 
   if (!listContainer) {
     console.error("❌ 필수 요소가 없습니다.");
     return;
+  }
+
+  // 파라미터 가져오기
+  function getParamId(key: string): string | null {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(key);
+  }
+
+  const boardType  = getParamId("type") || "notice";
+  const titleElement = document.getElementById("page-title");
+
+  if (titleElement) {
+    let titleText = "";
+    switch (boardType) {
+      case "notice":
+        titleText = "공지사항 목록";
+        break;
+      case "store":
+        titleText = "설치 매장 목록";
+        break;
+      case "news":
+        titleText = "언론 보도 목록";
+        break;
+      case "machine":
+        titleText = "머신 설명서 목록";
+        break;
+      default:
+        titleText = "게시글 작성";
+    }
+
+    titleElement.textContent = titleText;
   }
 
   // ✅ 목록 렌더링
@@ -43,7 +75,7 @@ export function initNotice() {
   // ✅ 공지 데이터 가져온 후 이벤트도 바인딩
   async function fetchNotices() {
     try {
-      const res = await fetch("https://api.narrowroad-model.com/model_home_page?func=get-posts&contentType=notice");
+      const res = await fetch(`https://api.narrowroad-model.com/model_home_page?func=get-posts&contentType=${boardType}`);
       const data = await res.json();
       renderList(data);
       bindActionButtons(); // ✅ 버튼 이벤트 등록
@@ -59,7 +91,7 @@ export function initNotice() {
       btn.addEventListener("click", (e) => {
         e.stopPropagation(); // 부모 클릭 막기
         const id = (e.target as HTMLElement).getAttribute("data-id");
-        if (id) location.href = `/html/notice-edit.html?id=${id}`;
+        if (id) location.href = `/html/notice-edit.html?type=${boardType}&id=${id}`;
       });
     });
 
@@ -75,7 +107,7 @@ export function initNotice() {
 
         try {
           // 실제 삭제 처리 (DELETE API로 바꿔줘야 함)
-          const res = await fetch(`https://api.narrowroad-model.com/model_home_page?func=delete-post&contentType=notice&contentId=${id}`, {
+          const res = await fetch(`https://api.narrowroad-model.com/model_home_page?func=delete-post&contentType=${boardType}&contentId=${id}`, {
             method: "DELETE",
           });
 
