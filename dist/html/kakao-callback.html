@@ -45,7 +45,7 @@
                     if (window.opener && !window.opener.closed) {
                       window.opener.postMessage({ token: result.token }, "http://model-web-admin.s3-website.ap-northeast-2.amazonaws.com");
                     } else {
-                      window.location.href = "main.html"; // 직접 이동
+                      window.location.href = "/html/dashboard.html"; // 직접 이동
                     }
                   } else if (result.redirectUrl) {
                     console.log("✅ 신규 사용자 → 부모 창에서 연동 페이지 이동");
