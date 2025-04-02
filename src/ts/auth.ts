@@ -6,17 +6,20 @@ import { fetchWithAuth } from "./api";
 export async function getUserData() {
     const res = await fetchWithAuth("/model_admin_login?func=me");
 
-    if (!res.ok) return;
+    if (!res.ok) {
+        console.warn("❌ 사용자 정보 요청 실패:", res.status);
+        return;
+    }
 
     const data = await res.json();
+    console.log("✅ 사용자 정보:", data);
+
     const grade = data?.grade;
 
     if (!grade) {
         console.warn("❌ 사용자 grade 정보가 없습니다.");
         return;
     }
-
-    console.log("✅ 사용자 정보:", data);
 
     // ✅ 권한별 접근 허용 페이지 정의
     const pageAccess: Record<string, number[]> = {
