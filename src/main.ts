@@ -28,6 +28,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         import("./ts/notice-edit.ts").then((module) => {
             module.initNoticeEdit();
         });
+    } else if (path === "/html/franchise_dashboard.html") {
+        console.log("🏘️ 프랜차이즈 - franchise.ts 로드");
+        import("./ts/franchise.ts").then((module) => {
+            module.franchiseEdit();
+        });
+    } else if (path === "/html/store_dashboard.html") {
+        console.log("📌 공지사항등록 - store_dashboard.ts 로드");
+        import("./ts/store.ts").then((module) => {
+            module.storeEdit();
+        });
     }  else {
         console.log("📌 기본 페이지");
 
