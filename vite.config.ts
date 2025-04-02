@@ -27,6 +27,8 @@ export default defineConfig({
                 notice: resolve(__dirname, 'html/notice.html'),                         // ✅ 공지 페이지
                 noticeEdit: resolve(__dirname, 'html/notice-edit.html'),                // ✅ 공지 등록
                 register: resolve(__dirname, 'html/register.html'),                     // 추가: 회원가입 페이지
+                franchise: resolve(__dirname, 'html/franchise_dashboard.html'),         // 추가: 회원가입 페이지
+                store: resolve(__dirname, 'html/store_dashboard.html'),                 // 추가: 회원가입 페이지
                 // 다른 html들도 여기에 추가 가능
             },
         },
