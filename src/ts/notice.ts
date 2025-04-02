@@ -60,7 +60,7 @@ export function initNotice() {
       div.innerHTML = `
         <div>
           <div class="font-bold">${notice.title}</div>
-          <div class="text-sm text-gray-500">${date} / 작성자: ${notice.userId}</div>
+          <div class="text-sm text-gray-500">${date} / 작성자: ${notice.adminId}</div>
         </div>
         <div class="flex space-x-2">
             <button class="edit-btn text-blue-600 underline" data-id="${notice.contentId}">수정</button>
