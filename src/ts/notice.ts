@@ -1,3 +1,5 @@
+import {fetchWithAuth} from "./api.ts";
+
 export function initNotice() {
   console.log("✅ notice.ts 로드됨");
 
@@ -107,7 +109,7 @@ export function initNotice() {
 
         try {
           // 실제 삭제 처리 (DELETE API로 바꿔줘야 함)
-          const res = await fetch(`https://api.narrowroad-model.com/model_home_page?func=delete-post&contentType=${boardType}&contentId=${id}`, {
+          const res = await fetchWithAuth(`https://api.narrowroad-model.com/model_home_page?func=delete-post&contentType=${boardType}&contentId=${id}`, {
             method: "DELETE",
           });
 
