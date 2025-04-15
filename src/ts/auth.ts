@@ -5,7 +5,7 @@ import { fetchWithAuth } from "./api";
  */
 export async function getUserData() {
     const res = await fetchWithAuth("/model_admin_login?func=me");
-
+    console.log("res: ", res);
     if (res.status === 401 || res.status === 403) {
         console.warn("🚫 인증 실패 - 로그인 페이지로 이동");
         localStorage.removeItem("authToken");
