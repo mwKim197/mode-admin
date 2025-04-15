@@ -6,8 +6,10 @@ import { fetchWithAuth } from "./api";
 export async function getUserData() {
     const res = await fetchWithAuth("/model_admin_login?func=me");
 
-    if (!res.ok) {
-        console.warn("❌ 사용자 정보 요청 실패:", res.status);
+    if (res.status === 401 || res.status === 403) {
+        console.warn("🚫 인증 실패 - 로그인 페이지로 이동");
+        localStorage.removeItem("authToken");
+        window.location.href = "/index.html";
         return;
     }
 
