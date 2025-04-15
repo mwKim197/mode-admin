@@ -7,16 +7,24 @@ const API_URL = "https://api.narrowroad-model.com";
  * @returns 응답 JSON 데이터 (자동으로 토큰 추가 & 만료 시 로그아웃)
  */
 export async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
+    const isLoginPage =
+        window.location.pathname.includes("index.html") ||
+        window.location.pathname === "/";
+
+    // ✅ 로그인 페이지에서는 실행하지 않음
+    if (isLoginPage) {
+        return {
+            ok: false,
+            status: 200,
+            json: async () => ({ message: "로그인 페이지에서는 인증 요청을 하지 않습니다." }),
+        };
+    }
+
     const token = localStorage.getItem("authToken");
 
-    // ✅ 현재 페이지가 로그인 페이지(`index.html`)이면 `fetchWithAuth()` 실행 X
     if (!token) {
-        const isLoginPage = window.location.pathname.includes("index.html") || window.location.pathname === "/";
-
-        if (!isLoginPage) {
-            console.log("❌ 토큰이 없습니다. 로그인 페이지로 이동합니다.");
-            window.location.href = "/index.html"; // ✅ 로그인 페이지로 이동
-        }
+        console.log("❌ 토큰이 없습니다. 로그인 페이지로 이동합니다.");
+        window.location.href = "/index.html";
         return {
             ok: false,
             status: 401,
