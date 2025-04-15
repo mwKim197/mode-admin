@@ -80,7 +80,7 @@ export function initNoticeEdit() {
 
   // ✅ 에디터 인스턴스 생성
   const editor = SunEditor.create(editorTarget, {
-    height: "400px",
+    height: "1200px",
     plugins,
     buttonList: [
       ["undo", "redo"],
