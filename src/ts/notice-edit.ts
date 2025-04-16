@@ -2,6 +2,7 @@ import SunEditor from "suneditor";
 import "suneditor/dist/css/suneditor.min.css";
 import plugins from "suneditor/src/plugins";
 import {fetchWithAuth} from "./api.ts";
+import {addClickDelay} from "./common.ts";
 
 export function initNoticeEdit() {
   console.log("✅ notice-edit.ts 로드됨");
@@ -89,8 +90,12 @@ export function initNoticeEdit() {
     ],
   });
 
-  // 저장버튼 동작
-  saveButton.addEventListener("click", async () => {
+  if (!saveButton) {
+    console.error("❌ save-button 요소를 찾을 수 없습니다.");
+    return;
+  }
+
+  addClickDelay(saveButton as HTMLButtonElement, async () => {
     const title = titleInput.value.trim();
     const contentHtml = editor.getContents(false);
 
@@ -138,4 +143,54 @@ export function initNoticeEdit() {
       alert("서버 오류로 저장에 실패했습니다.");
     }
   });
+
+ /* // 저장버튼 동작
+  saveButton.addEventListener("click", async () => {
+    const title = titleInput.value.trim();
+    const contentHtml = editor.getContents(false);
+
+    if (!title || !contentHtml) {
+      alert("⚠️ 제목과 내용을 모두 입력해주세요.");
+      return;
+    }
+
+    const dom = new DOMParser().parseFromString(contentHtml, "text/html");
+    const imgTags = Array.from(dom.querySelectorAll("img"));
+    const base64Images: string[] = [];
+
+    for (const img of imgTags) {
+      const src = img.getAttribute("src");
+      if (src?.startsWith("data:image")) {
+        base64Images.push(src.split(",")[1]);
+      }
+    }
+
+    const func = postId ? `update-post&contentId=${postId}` : "create-post";
+    const methodType = postId ? "PUT" : "POST";
+    const payload = {
+      title,
+      content: contentHtml,
+      images: base64Images,
+      contentType: boardType,
+      ...(postId && { contentId: Number(postId) }),
+    };
+
+    try {
+      const res = await fetchWithAuth(`/model_home_page?func=${func}&contentType=${boardType}`, {
+        method: methodType,
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        alert("✅ 저장 완료!");
+        location.href = `/html/notice.html?type=${boardType}`;
+      } else {
+        const err = await res.json();
+        alert(`❌ 저장 실패: ${err.message}`);
+      }
+    } catch (err) {
+      console.error("❌ 저장 오류:", err);
+      alert("서버 오류로 저장에 실패했습니다.");
+    }
+  });*/
 }

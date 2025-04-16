@@ -1,4 +1,5 @@
 import {fetchWithAuth} from "./api.ts";
+import {addClickDelayToSelector} from "./common.ts";
 
 export function initNotice() {
   console.log("✅ notice.ts 로드됨");
@@ -88,16 +89,50 @@ export function initNotice() {
 
 // ✅ 수정/삭제 버튼 이벤트 등록
   function bindActionButtons() {
+
+    // 수정공통처리
+    addClickDelayToSelector(".edit-btn", async (e) => {
+      e.stopPropagation(); // 부모 클릭 막기
+      const id = (e.target as HTMLElement).getAttribute("data-id");
+      if (id) location.href = `/html/notice-edit.html?type=${boardType}&id=${id}`;
+    });
+
+    // 삭제 공통처리
+    addClickDelayToSelector(".delete-btn", async (e) => {
+      e.stopPropagation(); // 부모 클릭 막기
+      const id = (e.target as HTMLElement).getAttribute("data-id");
+      if (!id) return;
+
+      const confirmDelete = confirm("정말 삭제하시겠습니까?");
+      if (!confirmDelete) return;
+
+      try {
+        // 실제 삭제 처리 (DELETE API로 바꿔줘야 함)
+        const res = await fetchWithAuth(`/model_home_page?func=delete-post&contentType=${boardType}&contentId=${id}`, {
+          method: "DELETE",
+        });
+
+        if (res.ok) {
+          alert("삭제 완료");
+          await fetchNotices(); // 목록 다시 불러오기
+        } else {
+          alert("삭제 실패");
+        }
+      } catch (err) {
+        console.error("❌ 삭제 요청 실패", err);
+      }
+    });
+
     // 수정
-    document.querySelectorAll(".edit-btn").forEach((btn) => {
+    /*document.querySelectorAll(".edit-btn").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation(); // 부모 클릭 막기
         const id = (e.target as HTMLElement).getAttribute("data-id");
         if (id) location.href = `/html/notice-edit.html?type=${boardType}&id=${id}`;
       });
-    });
+    });*/
 
-    // 삭제
+    /*// 삭제
     document.querySelectorAll(".delete-btn").forEach((btn) => {
       btn.addEventListener("click", async (e) => {
         e.stopPropagation(); // 부모 클릭 막기
@@ -123,9 +158,8 @@ export function initNotice() {
           console.error("❌ 삭제 요청 실패", err);
         }
       });
-    });
+    });*/
   }
-
 
   // ✅ 페이지 로드시 공지사항 가져오기
   fetchNotices();
