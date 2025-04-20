@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Model Zero login</title>
+    <link rel="stylesheet" href="../src/css/reset.css">
+    <link rel="stylesheet" href="../src/css/common.css">
+    <link rel="stylesheet" href="../src/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <script src="../src/js/jquery-3.6.0.js"></script>
+    <script type="module" defer src="/src/main.ts"></script> <!-- ✅ type="module" 추가-->
+</head>
+<body>
+    <!-- 메인 -->
+    <div id="main-content">
+
+      <div class="custom-cursor"></div> <!-- 마우스따라다니는 원 -->
+      
+      <button id="topButton" style="display: none;"><img src="../public/img/arrow.svg" alt="">Top</button> <!-- 탑버튼 -->
+
+      <!-- header -->
+      <header>
+        <a href="index.html">
+          <div class="logoWrap"><span>Model Zero</span></div>
+        </a>
+      </header>
+    
+      <section class="logWrap">
+        <div class="section4 boxStyle">
+          <h2>Model Zero 관리자 페이지</h2>
+
+          <form id="login-form">
+            <div class="input_box">
+              <p>아이디</p>
+              <input type="text" id="adminId" />
+          </div>
+          <div class="input_box">
+              <p>비밀번호</p>
+              <div class="password-container">
+                  <input type="password" id="password" placeholder="Enter Password">
+                  <div class="eyes"><i class="fa-regular fa-eye"></i></div>
+              </div>
+          </div>
+
+            <div class="privacy mb30">                  
+                <input type="checkbox" id="agree" name="agree">
+                <label for="agree">자동로그인</label>
+            </div>
+
+            <div class="btnWrap">
+              <button type="submit" class="btnStyle mb10">로그인
+                <img src="../public/img/buttom_effect.png" alt="">
+                <p>로그인</p>
+              </button>
+            </div>
+          </form>
+            <button class="btn kakao" id="kakao-login-btn">
+                <img src="../public/img/kakaoLog.png" alt="">카카오톡 로그인
+            </button>
+        </div>
+      </section>
+
+    </div>
+
+  </body>
+  <!--<script src="../src/js/common.js"></script>-->
+  <script>
+      document.addEventListener("DOMContentLoaded", function () {
+          $('.eyes').on('click', function () {
+              $(this).toggleClass('active');
+
+              const passwordField = $(this).closest('.password-container').find('#password');
+
+              if ($(this).hasClass('active')) {
+                  $(this).find('i').attr('class', "fa-regular fa-eye-slash");
+                  passwordField.attr('type', "text");
+              } else {
+                  $(this).find('i').attr('class', "fa-regular fa-eye");
+                  passwordField.attr('type', 'password');
+              }
+          });
+      });
+</script>
+</html>

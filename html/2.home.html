@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Model Zero home</title>
+  <script defer type="text/javascript" src="../src/js/common.js"></script>
+  <script src="../src/js/jquery-3.6.0.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="../src/css/reset.css">
+  <link rel="stylesheet" href="../src/css/common.css">
+  <link rel="stylesheet" href="../src/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">  
+</head>
+
+<body>
+  <!-- 메인 -->
+  <div id="main-content">
+
+    <div class="custom-cursor"></div> <!-- 마우스따라다니는 원 -->
+
+    <!-- header -->
+    <header>
+      <a href="index.html">
+        <div class="logoWrap"><span>Model Zero</span></div>
+      </a>
+      <div class="menuWrap">
+        <button class="hamburger" id="menuToggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <!-- <img src="../public/img/menu.svg" alt=""> -->
+        <div class="sidemenu">
+          <ul class="menu">
+            <li>
+              <a href="./2.home.html">
+                <p>Home</p>
+              </a>
+            </li>
+            <li>
+              <a href="./7.product.html">
+                <p>상품</p>
+              </a>
+            </li>
+
+            <li>
+              <a href="./3.sales.html">
+                <p>매출</p>
+              </a>
+            </li>
+
+            <li>
+              <a href="./4.device manage.html">
+                <p>기기관리</p>
+              </a>
+            </li>
+
+            <li>
+              <a href="./5.point.html">
+                <p>포인트</p>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <p>쇼핑몰</p>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <p>A/S접수</p>
+              </a>
+            </li>
+            <li>
+              <a href="./6.normalSet.html">
+                <p>일반설정</p>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <p>Zero 멤버스</p>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="user-menuWrap">
+        <button class="ani-1">
+          <img src="../public/img/usermenu.svg" alt="메뉴 버튼">
+        </button>
+        <div class="user-setBox hidden">
+          <div class="popup-header">
+            <h2>원격조정</h2>
+            <button class="close-btn">×</button>
+          </div>
+          <div class="popup-body">
+            <select class="popup-select">
+              <option value="option1">St0086Cm0090</option>
+              <option value="option2">옵션 2</option>
+            </select>
+            <div class="button-grid">
+              <button><span><img src="../public/img/menu-set-icon01.svg" alt=""></span><span>기기 세척</span></button>
+              <button><span><img src="../public/img/menu-set-icon02.svg" alt=""></span><span>컵 디스펜서</span></button>
+              <button><span><img src="../public/img/menu-set-icon03.svg" alt=""></span><span>제빙기</span></button>
+              <button><span><img src="../public/img/menu-set-icon04.svg" alt=""></span><span>프로그램 재시작</span></button>
+              <button><span><img src="../public/img/menu-set-icon05.svg" alt=""></span><span>프로그램 종료</span></button>
+              <button><span><img src="../public/img/menu-set-icon06.svg" alt=""></span><span>재부팅</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- 커피봇 -->
+    <section class="mt8">
+      <div class="inner">
+        <div class="user-flex">
+          <div class="user">
+            <i class="fa-regular fa-circle-user"></i>
+            <p>커피봇 일산점 님</p>
+            <label class="label"><span>일반회원</span></label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 당월매출 -->
+    <section class="pb20">
+      <div class="inner">
+        <div class="notice-slider-wrapper overflow-hidden">
+          <div class="notice-slider" id="noticeSlider">
+            <div class="notice-item box flex gap-1 mb20">
+              <img src="../public/img/notice_icon.svg" alt="">
+              <label class="tag red none-bg">긴급</label>
+              <p>02-23 / <br class="br-s">2.01버전 패치사항 안내</p>
+            </div>
+            <div class="notice-item box flex gap-1 mb20">
+              <img src="../public/img/notice_icon.svg" alt="">
+              <label class="tag blue none-bg">패치</label>
+              <p>03-01 / <br class="br-s">신규 기능 추가 안내</p>
+            </div>
+            <div class="notice-item box flex gap-1 mb20">
+              <img src="../public/img/notice_icon.svg" alt="">
+              <label class="tag org none-bg">이벤트</label>
+              <p>04-10 / <br class="br-s">봄맞이 이벤트 시작</p>
+            </div>
+          </div>
+        </div>
+        
+          <div class="boxStyle bl">
+            <div class="countArea">
+              <div class="countbox mb10">
+                <p>당일 매출</p>
+                <h4 data-target="87000"><span class="number">0000000</span><small>원</small></h4>
+              </div>
+              <div class="countbox">
+                <p>전일 매출</p>
+                <h4 data-target="240000"><span class="number">0000000</span><small>원</small></h4>
+              </div>
+              <hr class="borderSt-dot">
+              <div class="flex">
+                <div class="countbox St2">
+                  <p>당월 매출</p>
+                  <h4 data-target="2600000"><span class="number">0000000</span><small>원</small></h4>
+                </div>
+                <div class="countbox St2">
+                  <p>최고 매출</p>
+                  <h4 data-target="250000"><span class="number">0000000</span><small>원</small></h4>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+    </section>
+
+    <!-- 빠른재고 -->
+    <section>
+      <div class="inner">
+        <div class=" boxStyle wt">
+
+          <div class="title-flex mb20">
+            <h2>빠른재고</h2>
+            <button class="btn-outline">전체채우기</button>
+          </div>
+          <div class="progress-container">
+            <div class="protext">가루차1</div>
+            <div class="progress-bar">
+              <div class="progress-fill fill1">0%</div>
+            </div>
+            <button class="refresh-btn" onclick="replayAnimation(0)"><img src="../public/img/refresh.svg" alt=""></button>
+          </div>
+
+          <div class="progress-container">
+            <div class="protext">액상2</div>
+            <div class="progress-bar">
+              <div class="progress-fill fill2">0%</div>
+            </div>
+            <button class="refresh-btn" onclick="replayAnimation(1)"><img src="../public/img/refresh.svg" alt=""></button>
+          </div>
+
+          <div class="progress-container">
+            <div class="protext">액상3</div>
+            <div class="progress-bar">
+              <div class="progress-fill fill3">0%</div>
+            </div>
+            <button class="refresh-btn" onclick="replayAnimation(2)"><img src="../public/img/refresh.svg" alt=""></button>
+          </div>
+
+          <div class="progress-container">
+            <div class="protext">플라스틱컵</div>
+            <div class="progress-bar">
+              <div class="progress-fill fill4">0%</div>
+            </div>
+            <button class="refresh-btn" onclick="replayAnimation(3)"><img src="../public/img/refresh.svg" alt=""></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 공지사항 -->
+    <section>
+      <div class="inner">
+        <div class=" boxStyle wt mb20">
+          <h2 class="ta-c mb20">공지사항</h2>
+          <div class="notice-flex">
+            <div class="box">
+              <div class="num">1</div>
+              <label class="tag red">긴급</label>
+              <div class="textBox">
+                <h4>[소프트웨어] 2월 18일 (화) 업데이트 공지</h4>
+                <span>2024.12.10 11:11:11</span>
+              </div>
+            </div>
+            <div class="box">
+              <div class="num">2</div>
+              <label class="tag blue">패치</label>
+              <div class="textBox">
+                <h4>2025년 메일빈 제품별 변동 사항관련 공지
+                </h4>
+                <span>2024.12.10 11:11:11</span>
+              </div>
+            </div>
+            <div class="box">
+              <div class="num">3</div>
+              <label class="tag org">이벤트</label>
+              <div class="textBox">
+                <h4>당사 건물 화재로 인한 전화 응대관련 공지</h4>
+                <span>2024.12.10 11:11:11</span>
+              </div>
+            </div>
+            <div class="box">
+              <div class="num">4</div>
+              <label class="tag">안내</label>
+              <div class="textBox">
+                <h4>크리스마스 및 연말 배송 안내 관련 공지</h4>
+                <span>2024.12.10 11:11:11</span>
+              </div>
+            </div>
+            <div class="box">
+              <div class="num">5</div>
+              <label class="tag red">긴급</label>
+              <div class="textBox">
+                <h4>[소프트웨어] 2월 18일 (화) 업데이트 공지</h4>
+                <span>2024.12.10 11:11:11</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</body>
+
+<script>
+// 매출 카운팅
+document.addEventListener("DOMContentLoaded", () => {
+  const counters = document.querySelectorAll(".countbox h4");
+
+  counters.forEach((counter) => {
+    const target = +counter.getAttribute("data-target").replace(/,/g, "");
+    const numberSpan = counter.querySelector(".number");
+
+    const totalDigits = target.toLocaleString().replace(/,/g, "").length;
+
+    const updateCount = () => {
+      let current = +numberSpan.innerText.replace(/[^0-9]/g, "") || 0;
+      const increment = Math.ceil(target / 100);
+
+      if (current < target) {
+        current += increment;
+        if (current > target) current = target;
+
+        numberSpan.innerText = formatWithPadding(current, totalDigits);
+        setTimeout(updateCount, 20);
+      } else {
+        numberSpan.innerText = formatWithPadding(target, totalDigits);
+      }
+    };
+
+    const formatWithPadding = (num, width) => {
+      const numStr = num.toLocaleString(); // adds commas
+      const plainNum = num.toString().padStart(width, "0");
+      return plainNum.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
+    updateCount();
+  });
+});
+
+// notice 스와이퍼
+const slider = document.getElementById('noticeSlider');
+  const items = slider.children;
+  const totalItems = items.length;
+
+  let index = 0;
+
+  // 복제 첫 슬라이드 (무한 루프용)
+  const firstClone = items[0].cloneNode(true);
+  slider.appendChild(firstClone);
+
+  function slideNext() {
+    index++;
+    slider.style.transition = "transform 0.5s ease-in-out";
+    slider.style.transform = `translateX(-${index * 100}%)`;
+
+    // 마지막 복제 슬라이드까지 갔을 때 처음으로 리셋
+    if (index === totalItems) {
+      setTimeout(() => {
+        slider.style.transition = "none";
+        slider.style.transform = "translateX(0)";
+        index = 0;
+      }, 600); // transition 시간보다 살짝 길게
+    }
+  }
+
+  setInterval(slideNext, 5000); // 3초마다 전환
+</script>
+
+</html>

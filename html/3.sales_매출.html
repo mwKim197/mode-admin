@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Model Zero_sales</title>
+  <script defer type="text/javascript" src="../src/js/common.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="../src/css/reset.css">
+  <link rel="stylesheet" href="../src/css/common.css">
+  <link rel="stylesheet" href="../src/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <script src="../src/js/jquery-3.6.0.js"></script>
+</head>
+
+<body>
+  <!-- 메인 -->
+  <div id="main-content">
+
+    <div class="custom-cursor"></div> <!-- 마우스따라다니는 원 -->
+    <!-- header -->
+    <header>
+      <a href="index.html">
+        <div class="logoWrap"><span>Model Zero</span></div>
+      </a>
+      <div class="menuWrap">
+        <button class="hamburger" id="menuToggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <!-- <img src="../public/img/menu.svg" alt=""> -->
+        <div class="sidemenu">
+          <ul class="menu">
+            <li>
+              <a href="./2.home.html"><p>Home</p></a>
+            </li>
+            <li>
+              <a href="./7.product.html"><p>상품</p></a>
+            </li>
+            
+            <li>
+              <a href="./3.sales.html"><p>매출</p></a>
+            </li>
+            
+            <li>
+              <a href="./4.device manage.html"><p>기기관리</p></a>
+            </li>
+            
+            <li>
+              <a href="./5.point.html"><p>포인트</p></a>
+            </li>
+            <li>
+              <a href="#"><p>쇼핑몰</p></a>
+            </li>
+            <li>
+              <a href="#"><p>A/S접수</p></a>
+            </li>
+            <li>
+              <a href="./6.normalSet.html"><p>일반설정</p></a>
+            </li>
+            <li>
+              <a href="#"><p>Zero 멤버스</p></a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="user-menuWrap">
+        <button class="ani-1">
+          <img src="../public/img/usermenu.svg" alt="메뉴 버튼">
+        </button>
+        <div class="user-setBox hidden">
+          <div class="popup-header">
+            <h2>원격조정</h2>
+            <button class="close-btn">×</button>
+          </div>
+          <div class="popup-body">
+            <select class="popup-select">
+              <option value="option1">St0086Cm0090</option>
+              <option value="option2">옵션 2</option>
+            </select>
+            <div class="button-grid">
+              <button><span><img src="../public/img/menu-set-icon01.svg" alt=""></span><span>기기 세척</span></button>
+              <button><span><img src="../public/img/menu-set-icon02.svg" alt=""></span><span>컵 디스펜서</span></button>
+              <button><span><img src="../public/img/menu-set-icon03.svg" alt=""></span><span>제빙기</span></button>
+              <button><span><img src="../public/img/menu-set-icon04.svg" alt=""></span><span>프로그램 재시작</span></button>
+              <button><span><img src="../public/img/menu-set-icon05.svg" alt=""></span><span>프로그램 종료</span></button>
+              <button><span><img src="../public/img/menu-set-icon06.svg" alt=""></span><span>재부팅</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="mt80">
+      <div class="inner">
+        <div class="boxStyle gr">
+          <h2 class="ta-c mb20">매출</h2>
+          <!-- 날짜 인풋 2개 + 버튼 -->
+          <div class="input-group">
+            <input type="date">
+            <span>~</span>
+            <input type="date">
+            <button class="btn-i search"><img src="../public/img/search.svg" alt=""></button>
+            <button class="btn-i reset"><img src="../public/img/refresh_icon.svg" alt=""></button>
+          </div>
+
+          <!-- 상세 설정 -->
+          <div class="radioBox">
+            <div class="details">
+              <p>상세 설정</p>
+              <div class="radio-group">
+                <label><input type="radio" name="detail-option"> 전체</label>
+                <label><input type="radio" name="detail-option"> 당일</label>
+                <label><input type="radio" name="detail-option"> 전일</label>
+                <label><input type="radio" name="detail-option"> 당월</label>
+                <label><input type="radio" name="detail-option"> 전월</label>
+              </div>
+            </div>
+            <div class="details">
+              <p>결제</p>
+              <div class="radio-group">
+                <label><input type="radio" name="detail-option"> 전체</label>
+                <label><input type="radio" name="detail-option"> 카드</label>
+                <label><input type="radio" name="detail-option"> 포인트</label>
+              </div>
+            </div>
+            <div class="details">
+              <p>상태</p>
+              <div class="radio-group">
+                <label><input type="radio" name="detail-option"> 전체</label>
+                <label><input type="radio" name="detail-option"> 완료</label>
+                <label><input type="radio" name="detail-option"> 환불</label>
+              </div>
+            </div>
+            <div class="details">
+              <p>매출 구분</p>
+              <div class="radio-group">
+                <label><input type="radio" name="detail-option"> 건별</label>
+                <label><input type="radio" name="detail-option"> 상품별</label>
+              </div>
+            </div>
+            <div class="flex gap-1">
+              <p>연락처</p>
+              <input type="text" name="" placeholder="01012345678">
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 매출 -->
+    <section>
+      <div class="inner">
+        <div class="boxStyle bl ta-c">
+          <div class="countArea mb20">
+            <div class="countbox mb10">
+              <p>총 매출</p>
+              <h4 data-target="87,000">0<small>원</small></h4>
+            </div>
+            <div class="countbox mb10">
+              <p>총 판매량</p>
+              <h4 data-target="87,000">00<small>원</small></h4>
+            </div>
+            <div class="countbox mb10">
+              <p>포인트 매출</p>
+              <h4 data-target="87,000">0<small>원</small></h4>
+            </div>
+            <div class="countbox">
+              <p>포인트 결제건</p>
+              <h4 data-target="240,000">00<small>원</small></h4>
+            </div>
+          </div>
+          <button class="btn wt">엑셀다운로드</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- table -->
+    <section class="pb20">
+      <div class="inner">
+        <div class="tableArea">
+          <table>
+            <colgroup>
+              <col width="10%">
+              <col width="20%">
+              <col width="40%">
+              <col width="15%">
+              <col width="15%">
+            </colgroup>
+           
+            <thead>
+              <tr>
+                <th>순서</th>
+                <th>일자</th>
+                <th>상품</th>
+                <th>가격</th>
+                <th>상태</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="on-popup">
+                <td>1</td>
+                <td>2024-12-31 <br class="br-s">11:08</td>
+                <td class="rel"><span>진한 <br>아메리카노</span> <label class="plus">+1</label></td>
+                <td>2,600원</td>
+                <td class="blue">완료</td>
+              </tr>
+              <tr class="on-popup">
+                <td>2</td>
+                <td>2024-12-31 <br class="br-s">11:08</td>
+                <td>진한 <br>아메리카노</td>
+                <td>2,600원</td>
+                <td class="red">환불</td>
+              </tr>
+            </tbody>
+          </table>
+            <!-- 페이지네이션 -->
+            <div class="pagination" data-type="table">
+              <button class="page-first"><img src="../public/img/page_first.svg" alt="처음으로"></button>
+              <button class="page-prev"><img src="../public/img/page_prev.svg" alt="이전"></button>
+              <span class="page-numbers"></span>
+              <button class="page-next"><img src="../public/img/page_next.svg" alt="다음"></button>
+              <button class="page-last"><img src="../public/img/page_last.svg" alt="끝으로"></button>
+            </div>
+
+            <!-- popup -->
+            <div class="popup-overlay" style="display:none;">
+              <div class="popup">
+                <!-- 헤더 -->
+                <div class="popup-header ta-c">
+                  <h2>결제 정보</h2>
+                  <button class="close-btn" onclick="closePopup()">&times;</button>
+                </div>
+    
+                <!-- 이미지 저장 버튼 -->
+                <div class="popup-body">
+                  <button class="btn save-img"><img src="../public/img/image_icon.svg" alt="">이미지 저장</button>
+    
+                  <!-- 내역 내용 -->
+                  <ul class="history">
+                    <li>
+                      <div>
+                        <h5>주문상품</h5>
+                        <p>프리미엄 아이스 아메리카노 2개
+                        </p>
+                      </div>
+                    </li>
+                    <li>
+                      <div>
+                        <h5>매장명</h5>
+                        <p>행금길 14</p>
+                      </div>
+                      <div>
+                        <h5>매장 연락처</h5>
+                        <p>010-1234-5678</p>
+                      </div>
+                      <div>
+                        <h5>사업자 등록번호</h5>
+                        <p>123-45-67890</p>
+                      </div>
+                    </li>
+                    <li>
+                      <div>
+                        <h5>결제 금액</h5>
+                        <p>3,000원</p>
+                      </div>
+                      <div>
+                        <h5>결제 일자</h5>
+                        <p>24-12-30 21:35:35</p>
+                      </div>
+                      <div>
+                        <h5>승인번호</h5>
+                        <p>12345678</p>
+                      </div>
+                      
+                      <div>
+                        <h5>결제 수단</h5>
+                        <p>카드</p>
+                      </div>
+                      <div>
+                        <h5>결제 카드</h5>
+                        <p>KB 국민마스타체크</p>
+                      </div>
+                      <div>
+                        <h5>카드 번호</h5>
+                        <p>12345678********</p>
+                      </div>
+                      
+                      <div>
+                        <h5>포인트 연락처</h5>
+                        <p>카드</p>
+                      </div>
+                      <div>
+                        <h5>사용 포인트</h5>
+                        <p>0P</p>
+                      </div>
+                      <div>
+                        <h5>적립 포인트</h5>
+                        <p>0P</p>
+                      </div>
+                    </li>
+                    <!-- 필요한 만큼 추가 -->
+                  </ul>
+    
+                  <!-- 하단 버튼 -->
+                  <div class="popup-footer">
+                    <button class="btn blue">환불</button>
+                    <button class="btn red">삭제</button>
+                    <button class="btn gr">취소</button>
+                  </div>
+                </div>
+              </div>
+            </div>        
+        </div>
+      </div>
+    </section>
+  </div>
+
+</body>
+<script>
+  const excelBtns = document.querySelectorAll(".on-popup");
+  const popupOverlay = document.querySelector(".popup-overlay");
+  const cancelBtn = document.querySelector(".popup-footer .gr");
+
+  // 각각의 버튼에 이벤트 등록
+  excelBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      popupOverlay.style.display = "flex";
+    });
+  });
+
+  function closePopup() {
+    popupOverlay.style.display = "none";
+  }
+
+  // 취소 버튼에도 팝업 닫기 기능 추가
+  cancelBtn.addEventListener("click", closePopup);
+</script>
+</html>

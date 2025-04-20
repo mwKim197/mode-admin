@@ -1,0 +1,251 @@
+@charset "utf-8";
+@import url('https://fonts.googleapis.com/css2?family=Tilt+Warp&display=swap');
+/* font-family: "Tilt Warp", serif; */
+
+
+/* color */
+:root {
+    --main_color: #0F0F0F;
+    --main-gradient: linear-gradient(to right, #8EFFC7 0%, #3ECDED 50%, #1673E8 100%);
+    --stoke-gray: #9F9F9F;
+    --point-color: #005ED4;
+}
+
+
+section {margin-top: 13rem;}
+/* header {background-color: #000;}  */
+
+
+
+
+
+
+
+/* ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ 문의하기 ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ */
+
+.contact h2 {font-size: 2.4rem; margin-bottom: 1.6rem;}
+.contact h3 {font-size: 3.6rem; margin-bottom: 8rem; font-weight: bold;}
+.section4 {padding-top: 0;}
+
+
+
+
+
+
+
+
+
+/* ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ 자주묻는질문 ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ */
+.faq-container {text-align: center; font-weight: bold;}
+.faq-container h2 {font-size: 2.4rem; margin-bottom: 1.6rem;}
+.faq-container h1 {font-size: 3.6rem; margin-bottom: 8rem;}
+
+.faq-list {text-align: left;}
+
+.faq-item {
+    border: 1px solid #fff;
+    margin-bottom: 3rem;
+    cursor: pointer;
+    border-radius: 5rem;
+    font-weight: normal;
+}
+
+.question {
+    padding: 3rem;
+    /* background: #222; */
+    font-size: 18px;
+    transition: background 0.3s;
+    font-size: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+}
+
+.answer {
+    display: none;
+    padding: 1rem 3rem 3rem 3rem;
+    /* background: #333; */
+    font-size: 1.6rem;
+    line-height: 1.5;
+}
+
+.faq-item.active {
+    background: #007bff; /* 클릭 시 파란색 */
+}
+.faq-item.active img {transform: rotate(180deg);}
+.faq-item.active .question {padding: 3rem 3rem 1rem 3rem;}
+
+
+
+
+
+
+
+
+/* ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ 공지사항 ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ */
+/* 🔍 검색 및 필터 */
+.notice-filter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 7rem;
+}
+
+.notice-container {text-align: center; font-weight: bold;}
+.notice-container h2 {font-size: 2.4rem; margin-bottom: 1.6rem;}
+.notice-container h1 {font-size: 3.6rem; margin-bottom: 8rem;}
+
+
+
+
+.notice-filter select, .notice-filter input, .notice-filter button {
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    background: transparent;
+}
+#categoryFilter {outline: none; background: transparent; border-bottom: 1px solid #fff;}
+.notice-filter option {color: #fff; background-color: #000; border: none;}
+.notice-filter .search {border-bottom: 1px solid #fff;}
+
+.notice-filter select {width: 80px;}
+.notice-filter input {
+    width: 200px;
+}
+
+.notice-filter button {cursor: pointer;}
+
+/* 🔹 공지사항 목록 */
+.notice-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-around;
+}
+
+.notice-item {
+    width: 30%;
+    /* background: #222; */
+    padding: 15px;
+    border-radius: 10px;
+    text-align: left;
+    margin-bottom: 2rem;
+}
+
+.notice-item>img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 2rem;
+}
+
+.notice-item p {
+    margin-bottom: 1.5rem; font-size: 1.6rem;
+    font-weight: normal;
+    
+}
+.notice-txt {
+    height: 80px; /* 최대 높이 */
+    max-height: 80px; /* 높이 초과 방지 */
+    overflow: hidden; /* 넘치는 텍스트 숨기기 */
+    text-overflow: ellipsis; /* ...으로 표시 */
+    display: -webkit-box;
+    -webkit-line-clamp: 5; /* 최대 줄 수 설정 (5줄까지 표시) */
+    -webkit-box-orient: vertical;
+    line-height: 20px; /* 줄 높이 설정 (4줄 × 20px = 80px) */
+    word-wrap: break-word
+}
+    
+.notice-item p.notice-title {font-size: 2rem; font-weight: bold;}
+
+.notice-meta {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #fff;
+    margin-top: 10px;
+}
+
+.notice-meta p {margin-right: 2rem;}
+
+.view-count {
+    font-size: 14px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+}
+.view-count img {margin-right: 1rem;}
+
+
+
+/* 🔹 페이지네이션 */
+.pagination {
+    margin-top: 8rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+
+.pagination button {
+    color: white;
+    border: none;
+    padding: 12px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.pagination button:hover {
+    background: var(--point-color);
+}
+
+.pagination .page-numbers {
+    
+    color: #007bff;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+/* 각페이지 넘버 설정 */
+.pagination .page-number { padding: 15px 18px; border-radius: 5px;
+    transition: 0.3s;}
+.pagination .page-number:hover {
+    background: #007bff;
+    color: white;
+}
+
+.pagination .page-number.active {
+    background: #007bff; /* 현재 페이지 배경 색 */
+    color: var(--main_color);
+    font-weight: bold;
+}
+
+.pagination button:disabled {
+    /* background: #ccc; */
+    cursor: not-allowed;
+}
+
+
+
+
+
+
+/* 화면너비조정 */
+section {max-width: 1200px; width: 100%; margin: 13rem auto 10rem auto;}
+
+
+
+
+
+
+
+
+
+
+
+
+

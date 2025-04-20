@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Model Zero login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <script src="../src/js/jquery-3.6.0.js"></script> <!-- ✅ type="module" 추가-->
+  <script type="module" crossorigin src="../assets/main-Dt6ep3wI.js"></script>
+  <link rel="stylesheet" crossorigin href="../assets/login-Com21BNo.css">
+</head>
+<body>
+    <!-- 메인 -->
+    <div id="main-content">
+
+      <div class="custom-cursor"></div> <!-- 마우스따라다니는 원 -->
+      
+      <button id="topButton" style="display: none;"><img src="data:image/svg+xml,%3csvg%20width='19'%20height='10'%20viewBox='0%200%2019%2010'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3e%3cpath%20d='M1.46875%201L9.46875%209L17.4688%201'%20stroke='white'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3e%3c/svg%3e" alt="">Top</button> <!-- 탑버튼 -->
+
+      <!-- header -->
+      <header>
+        <a href="index.html">
+          <div class="logoWrap"><span>Model Zero</span></div>
+        </a>
+      </header>
+    
+      <section class="logWrap">
+        <div class="section4 boxStyle">
+          <h2>Model Zero 관리자 페이지</h2>
+
+          <form id="login-form">
+            <div class="input_box">
+              <p>아이디</p>
+              <input type="text" id="adminId" />
+          </div>
+          <div class="input_box">
+              <p>비밀번호</p>
+              <div class="password-container">
+                  <input type="password" id="password" placeholder="Enter Password">
+                  <div class="eyes"><i class="fa-regular fa-eye"></i></div>
+              </div>
+          </div>
+
+            <div class="privacy mb30">                  
+                <input type="checkbox" id="agree" name="agree">
+                <label for="agree">자동로그인</label>
+            </div>
+
+            <div class="btnWrap">
+              <button type="submit" class="btnStyle mb10">로그인
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAArwAAAAtCAYAAABMH7iMAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAI1SURBVHgB7d3dbdswFIBRaoJ2g2qDZv+nbNB2g3aDbNBIgBXIMhNJAcXw5xzggrLhAT4YxNXwfxIAgN68TPN3M/+W52EYXgI0YhC8AECEIKYZghcA+AxBTDUELwBwBUFMMQQvAPAVBDHZCF4AoESCmGQELwBQI0HMYYIXAGiRIOaN4AUAehQL4j/L94K4LYIXAODRHLy/w30YC+JKCV4AgPMEcUUELwBAeoK4IIIXACA/QZyR4AUAKI8gTkjwAgDURxCfIHgBANojiFcELwBAf7oKYsELAMBWU0EseAEAOKuqIBa8AACkVlQQz8H7azqfAgAA5JE1iIflYQrf79Pxc5r5fNqc4+0EAICrJQ3i4egPN0E8RkYQAwCQw6kgPhy8e25BPE7zIzyG8PJPMQAAXG0dxM/JgnfPKoi/hccrE4IYAIAr5AveI6YonsN3DuLxNus7xGMAAIBzygrePZEg3g4AAKzVFbx7piBe7g8v1yTGzWcAAPrSVvDuiQTx9gQAoC19Be+ed1av2UUMAFAvwXvGB6vXlhHEAABlEbwpRVavjcEuYgCAryR4c1ttmoi9vnkMAACkJHhLY/UaAEBSgrc2q00T27FpAgDgkeBtjdVrAAB3BG9vrF4DADojeLn3ThCvRxADADURvJxj9RoAUBnBS1qRII7dJQYAyEXwkl9k9ZpdxADAVQQv5flg9doyAABHCV7qE1m9Nga7iAGAOMFLezabJmKvcHaPGAD68RwAAKBlr6JJelixA1CIAAAAAElFTkSuQmCC" alt="">
+                <p>로그인</p>
+              </button>
+            </div>
+          </form>
+            <button class="btn kakao" id="kakao-login-btn">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAUCAYAAACJfM0wAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAINSURBVHgBrZRBThsxGIU/e5oItSBNpULTVekN0l2X4QSFE5Tsuqt6gsIJgBskJ6BddtV01x1zA2bHCCp1KtEqImGGZ2cSEjKJCOFJlu1f9vPv/z3bMAO1FzRyw3sDdQybCrlGDqnJidRH6r8lv+mU7TdlhIp+UWtwD4gg6uc0Ly6IxuPBBOmGJ2wVGd4XNWv4uPoMLv/xc4rYk8IeD0dj7Snh5X++j4hr6+wqy0OWheHd2ip/lfkvU2R7ykCc+M7STS8WhG4yPh6fu37AS6iWnp3z3HqxCsUz+Hyds9O94q0mTa+81Rj2i41Hw7FLwmTsONIsZ0sO+VocFjpOi71V38KxanOwUmFbkx9O8SyjroPKy9QndqSBbKlTd0cVCahb5iGjrQXblYpulE/7NUmJez2VL5+0Zp4TWgXjGbRxty9vXrEX9HTdzJdhAu7Kut2xLNAc1nmQD5Ht9ga1GZ1mCnGUoTYdUOXUVDmRV1PFXuugltqbvKipf0gZH4Y1drBW2rjBq3UORfiJx0ErOafpicOQcEVZwUIvrgyxRN9KEmIvXprqmgrAzHovROomI1e4gPcvtFkQqveR2zskdTBlC19ucOK/y3lkeDHbTrSyr3OKuKj3nzGGjrOalPZu0Ti110TOw8zBk7uBajAwu8tIFtvXu3/Q5zRFHOiJq2YdPcvmWbKUmJOo1Za2nMcNfE3BJTnEz2oAAAAASUVORK5CYII=" alt="">카카오톡 로그인
+            </button>
+        </div>
+      </section>
+
+    </div>
+
+  </body>
+  <!--<script src="../src/js/common.js"></script>-->
+  <script>
+      document.addEventListener("DOMContentLoaded", function () {
+          $('.eyes').on('click', function () {
+              $(this).toggleClass('active');
+
+              const passwordField = $(this).closest('.password-container').find('#password');
+
+              if ($(this).hasClass('active')) {
+                  $(this).find('i').attr('class', "fa-regular fa-eye-slash");
+                  passwordField.attr('type', "text");
+              } else {
+                  $(this).find('i').attr('class', "fa-regular fa-eye");
+                  passwordField.attr('type', 'password');
+              }
+          });
+      });
+</script>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Model Zero_point</title>
+  <link rel="stylesheet" href="../src/css/reset.css">
+  <link rel="stylesheet" href="../src/css/common.css">
+  <link rel="stylesheet" href="../src/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <script src="../src/js/jquery-3.6.0.js"></script>
+</head>
+
+<body>
+  <!-- 메인 -->
+  <div id="main-content">
+    <div class="custom-cursor"></div> <!-- 마우스따라다니는 원 -->
+    <!-- header -->
+    <header>
+      <a href="index.html">
+        <div class="logoWrap"><span>Model Zero</span></div>
+      </a>
+      <div class="menuWrap">
+        <button class="hamburger" id="menuToggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <!-- <img src="../public/img/menu.svg" alt=""> -->
+        <div class="sidemenu">
+          <ul class="menu">
+            <li>
+              <a href="./2.home.html"><p>Home</p></a>
+            </li>
+            <li>
+              <a href="./7.product.html"><p>상품</p></a>
+            </li>
+            
+            <li>
+              <a href="./3.sales.html"><p>매출</p></a>
+            </li>
+            
+            <li>
+              <a href="./4.device manage.html"><p>기기관리</p></a>
+            </li>
+            
+            <li>
+              <a href="./5.point.html"><p>포인트</p></a>
+            </li>
+            <li>
+              <a href="#"><p>쇼핑몰</p></a>
+            </li>
+            <li>
+              <a href="#"><p>A/S접수</p></a>
+            </li>
+            <li>
+              <a href="./6.normalSet.html"><p>일반설정</p></a>
+            </li>
+            <li>
+              <a href="#"><p>Zero 멤버스</p></a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="user-menuWrap">
+        <button class="ani-1">
+          <img src="../public/img/usermenu.svg" alt="메뉴 버튼">
+        </button>
+        <div class="user-setBox hidden">
+          <div class="popup-header">
+            <h2>원격조정</h2>
+            <button class="close-btn">×</button>
+          </div>
+          <div class="popup-body">
+            <select class="popup-select">
+              <option value="option1">St0086Cm0090</option>
+              <option value="option2">옵션 2</option>
+            </select>
+            <div class="button-grid">
+              <button><span><img src="../public/img/menu-set-icon01.svg" alt=""></span><span>기기 세척</span></button>
+              <button><span><img src="../public/img/menu-set-icon02.svg" alt=""></span><span>컵 디스펜서</span></button>
+              <button><span><img src="../public/img/menu-set-icon03.svg" alt=""></span><span>제빙기</span></button>
+              <button><span><img src="../public/img/menu-set-icon04.svg" alt=""></span><span>프로그램 재시작</span></button>
+              <button><span><img src="../public/img/menu-set-icon05.svg" alt=""></span><span>프로그램 종료</span></button>
+              <button><span><img src="../public/img/menu-set-icon06.svg" alt=""></span><span>재부팅</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="mt80">
+      <div class="inner">
+          <div class="pointWrap">
+            <h2 class="ta-c mb20">포인트</h2>
+          <div class="input-group in-1">
+            <div class="in-box">
+              <input type="text" name="" placeholder="적립율%">              
+              <span>연락처</span>
+            </div>
+            <div class="in-box">              
+              <span>고객번호</span>
+              <input type="text" name="" placeholder="4-12"> 
+            </div>
+            <div class="in-box">
+              <span>or 휴대번호</span>
+              <input type="checkbox" id="agree" name="agree">
+            </div>
+            <button class="btn-outline">저장</button>
+          </div>
+          <div class="input-group">
+            <input type="text" placeholder="고객번호 or 연락처를 입력해주세요.">
+            <button class="btn-i search"><img src="../public/img/search.svg" alt=""></button>
+            <button class="btn-i reset"><img src="../public/img/refresh_icon.svg" alt=""></button>
+          </div>
+        </div>
+          </div>
+    </section>
+
+    <!-- table -->
+    <section>
+      <div class="inner">
+        <div class="tableArea">
+          <table>
+            <button id="selectAllBtn" class="btn-s mb10">전체선택  </button>
+            <tbody>
+              <tr class="on-popup" style="">
+                <td><input type="checkbox" name="" id=""></td>
+                <td>1</td>
+                <td>010-1234-5678</td>
+                <td>2,600원</td>
+                <td class=""><span class="tag red">삭제</span></td>
+              </tr>
+              <tr class="on-popup">
+                <td><input type="checkbox" name="" id=""></td>
+                <td>2</td>
+                <td>010-1234-5678</td>
+                <td>2,600원</td>
+                <td class=""><span class="tag red">삭제</span></td>
+              </tr>
+            </tbody>
+          </table>
+            <!-- 페이지네이션 -->
+            <div class="pagination" data-type="table">
+              <button class="page-first" disabled=""><img src="../public/img/page_first.svg" alt="처음으로"></button>
+              <button class="page-prev" disabled=""><img src="../public/img/page_prev.svg" alt="이전"></button>
+              <span class="page-numbers"><button class="page-number active" data-page="1">1</button></span>
+              <button class="page-next" disabled=""><img src="../public/img/page_next.svg" alt="다음"></button>
+              <button class="page-last" disabled=""><img src="../public/img/page_last.svg" alt="끝으로"></button>
+            </div>
+        </div>
+
+        <div class="btnFlex">
+          <button class="btn blue">신규등록</button>
+          <button class="btn red">삭제</button>
+        </div>
+
+        <!-- popup -->
+        <div class="popup-overlay" style="display:none;">
+          <div class="popup">
+            <div class="popup-header ta-c">
+              <h2>고객정보</h2>
+              <button class="close-btn" onclick="closePopup()">&times;</button>
+            </div>
+
+            <!-- popup-body -->
+            <div class="popup-body">
+              <div class="history">
+                <div class="inputWrap">
+                  <div class="data_input">
+                    <p>고객번호</p>
+                    <input type="text" id="player-id" name="player-id" placeholder="010-1234-5678" disabled="">
+                  </div>
+                  <div class="data_input">
+                    <p>비밀번호</p>
+                    <input type="password" id="player-id" name="player-id" value="mypass#123" disabled="">
+                  </div>
+                  <div class="data_input">
+                    <p>누적 이용 횟수</p>
+                    <input type="text" id="player-id" name="player-id" placeholder="1">
+                  </div>
+                  <div class="data_input">
+                    <p>보유 포인트</p>
+                    <input type="text" id="player-id" name="player-id" placeholder="550" disabled="">
+                  </div>
+                  <div class="data_input">
+                    <p>수정 포인트</p>
+                    <input type="text" id="player-id" name="player-id" placeholder="550">
+                  </div>
+                  <div class="data_input">
+                    <p>연락처</p>
+                    <input type="text" id="player-id" name="player-id" placeholder="010-1234-5678" disabled="">
+                  </div>
+                  <div class="text_input">
+                    <p>메모</p>
+                    <textarea id="myTextarea" maxlength="200" rows="4" cols="50" placeholder="내용을 입력해주세요"></textarea>
+                  </div>
+                </div>
+                <hr class="borderSt-dot">
+                <h2 class="mb20">이용 내역</h2>
+                <div class="tableArea">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>순서</th>
+                        <th>일자</th>
+                        <th>시간</th>
+                        <th>결제<br>금액</th>
+                        <th>사용<br>포인트</th>                      
+                        <th>잔여<br>포인트</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>1</td>
+                        <td>2024-12-31</td>                      
+                        <td>11:08:14</td>
+                        <td>2,600원</td>
+                        <td>550p</td>                      
+                        <td>550p</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- 하단 버튼 -->
+              <div class="popup-footer">
+                <button class="btn blue">환불</button>
+                <button class="btn gr">취소</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</body>
+<script defer type="text/javascript" src="../src/js/common.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+  const excelBtns = document.querySelectorAll(".on-popup, .btn.blue");
+  const popupOverlay = document.querySelector(".popup-overlay");
+  const cancelBtn = document.querySelector(".popup-footer .gr");
+
+  // 각각의 버튼에 이벤트 등록
+  excelBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      popupOverlay.style.display = "flex";
+    });
+  });
+
+  function closePopup() {
+    popupOverlay.style.display = "none";
+  }
+  // 취소 버튼에도 팝업 닫기 기능 추가
+  cancelBtn.addEventListener("click", closePopup);
+  
+
+  // 체크박스 전체선택
+document.addEventListener('DOMContentLoaded', function () {
+  const selectAllBtn = document.getElementById('selectAllBtn');
+  if (!selectAllBtn) return;
+
+  let allChecked = false;
+
+  selectAllBtn.addEventListener('click', function () {
+    allChecked = !allChecked;
+    const checkboxes = document.querySelectorAll('table input[type="checkbox"]');
+    checkboxes.forEach(checkbox => checkbox.checked = allChecked);
+    selectAllBtn.textContent = allChecked ? '전체해제' : '전체선택';
+  });
+});
+</script>
+</html>

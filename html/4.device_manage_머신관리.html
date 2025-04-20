@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Model Zero_기기관리</title>
+  <link rel="stylesheet" href="../src/css/reset.css">
+  <link rel="stylesheet" href="../src/css/common.css">
+  <link rel="stylesheet" href="../src/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <script src="../src/js/jquery-3.6.0.js"></script>
+</head>
+
+<body>
+  <!-- 메인 -->
+  <div id="main-content">
+    <div class="custom-cursor"></div> <!-- 마우스따라다니는 원 -->
+
+    <!-- header -->
+    <header>
+      <a href="index.html">
+        <div class="logoWrap"><span>Model Zero</span></div>
+      </a>
+      <div class="menuWrap">
+        <button class="hamburger" id="menuToggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <!-- <img src="../public/img/menu.svg" alt=""> -->
+        <div class="sidemenu">
+          <ul class="menu">
+            <li>
+              <a href="./2.home.html"><p>Home</p></a>
+            </li>
+            <li>
+              <a href="./7.product.html"><p>상품</p></a>
+            </li>
+            
+            <li>
+              <a href="./3.sales.html"><p>매출</p></a>
+            </li>
+            
+            <li>
+              <a href="./4.device manage.html"><p>기기관리</p></a>
+            </li>
+            
+            <li>
+              <a href="./5.point.html"><p>포인트</p></a>
+            </li>
+            <li>
+              <a href="#"><p>쇼핑몰</p></a>
+            </li>
+            <li>
+              <a href="#"><p>A/S접수</p></a>
+            </li>
+            <li>
+              <a href="./6.normalSet.html"><p>일반설정</p></a>
+            </li>
+            <li>
+              <a href="#"><p>Zero 멤버스</p></a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="user-menuWrap">
+        <button class="ani-1">
+          <img src="../public/img/usermenu.svg" alt="메뉴 버튼">
+        </button>
+        <div class="user-setBox hidden">
+          <div class="popup-header">
+            <h2>원격조정</h2>
+            <button class="close-btn">×</button>
+          </div>
+          <div class="popup-body">
+            <select class="popup-select">
+              <option value="option1">St0086Cm0090</option>
+              <option value="option2">옵션 2</option>
+            </select>
+            <div class="button-grid">
+              <button><span><img src="../public/img/menu-set-icon01.svg" alt=""></span><span>기기 세척</span></button>
+              <button><span><img src="../public/img/menu-set-icon02.svg" alt=""></span><span>컵 디스펜서</span></button>
+              <button><span><img src="../public/img/menu-set-icon03.svg" alt=""></span><span>제빙기</span></button>
+              <button><span><img src="../public/img/menu-set-icon04.svg" alt=""></span><span>프로그램 재시작</span></button>
+              <button><span><img src="../public/img/menu-set-icon05.svg" alt=""></span><span>프로그램 종료</span></button>
+              <button><span><img src="../public/img/menu-set-icon06.svg" alt=""></span><span>재부팅</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- 커피봇 -->
+    <section class="mt8">
+      <div class="inner">
+        <div class="user-flex">
+          <div class="user">
+            <i class="fa-regular fa-circle-user"></i>
+            <p>커피봇 일산점 님</p>
+            <label class="label"><span>일반회원</span></label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 기기관리 -->
+    <section class="pb20">
+      <div class="inner ">
+        <div class="deviceWrap">
+          <div class="divice-type">
+            <h2 class="mb20">기기관리</h2>
+            <div class="grid col3">
+              <a href="#" class="label full">프로그램 재시작</a>
+              <a href="#" class="label full">프로그램 종료</a>
+              <a href="#" class="label full">새로고침</a>
+              <a href="#" class="label full">새로고침</a>
+              <a href="#" class="label full">종이컵 투출</a>
+              <a href="#" class="label full">업데이트</a>
+              <a href="#" class="label full">전체 세척</a>
+              <a href="#" class="label full">커피세척</a>
+              <a href="#" class="label full">원점</a>
+            </div>
+          </div>
+          <hr class="borderSt-dot ">
+
+          <div class="clean-type">
+            <h2 class="mb20">부분세척</h2>
+            <div class="clean-box">
+              <div class="flex gap-1 js mb10">
+                <p class="text-st">가루차</p>
+                <div class="grid col6">
+                  <label class="label full">1번</label>
+                  <label class="label full">2번</label>
+                  <label class="label full">3번</label>
+                  <label class="label full">4번</label>
+                  <label class="label full">5번</label>
+                  <label class="label full">6번</label>
+                </div>
+              </div>
+              <div class="flex gap-1 js mb10">
+                <p class="text-st">액상</p>
+                <div class="grid col6">
+                  <label class="label full">1번</label>
+                  <label class="label full">2번</label>
+                  <label class="label full">3번</label>
+                  <label class="label full">4번</label>
+                  <label class="label full">5번</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr class="borderSt-dot ">
+          <div class="inventory-Wrap">
+            <div class="grid col3 ai-c mb20">
+              <h2>재고관리</h2>
+              <button class="btn-outline">전체채우기</button>
+              <button class="btn-outline">변경사항 저장</button>
+            </div>
+
+            <div class="grid col2">
+              <div class="progress-container">
+                <div class="flex type">
+                  <div class="protext">플라스틱컵</div>
+                  <div class="toggle-flex">
+                    <p>품절</p>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="progress-bar">
+                    <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
+                  </div>
+                  <button class="refresh-btn"><img src="../public/img/refresh.svg"
+                      alt=""></button>
+                </div>
+              </div>
+              <div class="progress-container">
+                <div class="flex type">
+                  <div class="protext">종이컵</div>
+                  <div class="toggle-flex">
+                    <p>품절</p>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="progress-bar">
+                    <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
+                  </div>
+                  <button class="refresh-btn"><img src="../public/img/refresh.svg"
+                      alt=""></button>
+                </div>
+              </div>
+
+              <div class="progress-container">
+                <div class="flex type">
+                  <div class="protext">원두</div>
+                  <div class="toggle-flex">
+                    <p>품절</p>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="progress-bar">
+                    <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
+                  </div>
+                  <button class="refresh-btn"><img src="../public/img/refresh.svg"
+                      alt=""></button>
+                </div>
+              </div>
+              <div class="progress-container">
+                <div class="flex type">
+                  <div class="protext">원두2</div>
+                  <div class="toggle-flex">
+                    <p>품절</p>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="progress-bar">
+                    <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
+                  </div>
+                  <button class="refresh-btn"><img src="../public/img/refresh.svg"
+                      alt=""></button>
+                </div>
+              </div>
+
+              <div class="progress-container">
+                <div class="flex type">
+                  <div class="protext">가루차1</div>
+                  <div class="toggle-flex">
+                    <p>품절</p>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="progress-bar">
+                    <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
+                  </div>
+                  <button class="refresh-btn"><img src="../public/img/refresh.svg"
+                      alt=""></button>
+                </div>
+              </div>
+              <div class="progress-container">
+                <div class="flex type">
+                  <div class="protext">가루차2</div>
+                  <div class="toggle-flex">
+                    <p>품절</p>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="progress-bar">
+                    <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
+                  </div>
+                  <button class="refresh-btn"><img src="../public/img/refresh.svg"
+                      alt=""></button>
+                </div>
+              </div>
+
+              <div class="progress-container">
+                <div class="flex type">
+                  <div class="protext">가루차3</div>
+                  <div class="toggle-flex">
+                    <p>품절</p>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="progress-bar">
+                    <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
+                  </div>
+                  <button class="refresh-btn"><img src="../public/img/refresh.svg"
+                      alt=""></button>
+                </div>
+              </div>
+              <div class="progress-container">
+                <div class="flex type">
+                  <div class="protext">가루차4</div>
+                  <div class="toggle-flex">
+                    <p>품절</p>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="progress-bar">
+                    <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
+                  </div>
+                  <button class="refresh-btn"><img src="../public/img/refresh.svg"
+                      alt=""></button>
+                </div>
+              </div>
+
+              <div class="progress-container">
+                <div class="flex type">
+                  <div class="protext">가루차5</div>
+                  <div class="toggle-flex">
+                    <p>품절</p>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="progress-bar">
+                    <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
+                  </div>
+                  <button class="refresh-btn"><img src="../public/img/refresh.svg"
+                      alt=""></button>
+                </div>
+              </div>
+              <div class="progress-container">
+                <div class="flex type">
+                  <div class="protext">가루차6</div>
+                  <div class="toggle-flex">
+                    <p>품절</p>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="progress-bar">
+                    <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
+                  </div>
+                  <button class="refresh-btn"><img src="../public/img/refresh.svg"
+                      alt=""></button>
+                </div>
+              </div>
+
+              <div class="progress-container">
+                <div class="flex type">
+                  <div class="protext">액상1</div>
+                  <div class="toggle-flex">
+                    <p>품절</p>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="progress-bar">
+                    <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
+                  </div>
+                  <button class="refresh-btn"><img src="../public/img/refresh.svg"
+                      alt=""></button>
+                </div>
+              </div>
+              <div class="progress-container">
+                <div class="flex type">
+                  <div class="protext">액상2</div>
+                  <div class="toggle-flex">
+                    <p>품절</p>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="progress-bar">
+                    <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
+                  </div>
+                  <button class="refresh-btn"><img src="../public/img/refresh.svg"
+                      alt=""></button>
+                </div>
+              </div>
+              <div class="progress-container">
+                <div class="flex type">
+                  <div class="protext">액상3</div>
+                  <div class="toggle-flex">
+                    <p>품절</p>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="progress-bar">
+                    <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
+                  </div>
+                  <button class="refresh-btn"><img src="../public/img/refresh.svg"
+                      alt=""></button>
+                </div>
+              </div>
+              <div class="progress-container">
+                <div class="flex type">
+                  <div class="protext">액상4</div>
+                  <div class="toggle-flex">
+                    <p>품절</p>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="progress-bar">
+                    <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
+                  </div>
+                  <button class="refresh-btn"><img src="../public/img/refresh.svg"
+                      alt=""></button>
+                </div>
+              </div>
+
+              
+              <div class="progress-container">
+                <div class="flex type">
+                  <div class="protext">액상5</div>
+                  <div class="toggle-flex">
+                    <p>품절</p>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="progress-bar">
+                    <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
+                  </div>
+                  <button class="refresh-btn"><img src="../public/img/refresh.svg"
+                      alt=""></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+</body>
+<script defer type="text/javascript" src="../src/js/common.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<script>
+  //-------- 프로그래스바 이벤트 --------
+  const fills = document.querySelectorAll(".progress-fill");
+const buttons = document.querySelectorAll(".refresh-btn");
+const values = Array.from({ length: fills.length }, () => 50); // 초기 50%
+
+function animateProgress(index, value, changeColor = false) {
+  const fill = fills[index];
+
+  // 초기화
+  fill.style.transition = "none";
+  fill.style.width = "0%";
+  fill.textContent = "0%";
+  fill.style.backgroundColor = ""; // 색상 초기화
+
+  // 강제 리렌더링
+  void fill.offsetWidth;
+
+  // 애니메이션 시작
+  fill.style.transition = "width 1s ease";
+  fill.style.width = value + "%";
+
+  setTimeout(() => {
+    fill.textContent = value + "%";
+    if (changeColor) {
+      fill.style.backgroundColor = "#2B7FE8"; // 파란색으로
+    }
+  }, 1000);
+}
+
+function replayAnimation(index) {
+  animateProgress(index, 100, true);
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  // 초기 렌더링
+  values.forEach((val, idx) => {
+    animateProgress(idx, val);
+  });
+
+  // 각 버튼에 이벤트 연결
+  buttons.forEach((btn, index) => {
+    btn.addEventListener("click", () => {
+      replayAnimation(index);
+    });
+  });
+});
+
+</script>
+
+</html>
