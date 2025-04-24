@@ -1,4 +1,4 @@
-import {fetchWithAuth} from "./api.ts";
+import {fetchWithAuth} from "../api/api.ts";
 
 export function initRegister() {
     console.log("✅ register.ts 로드됨");
@@ -76,7 +76,7 @@ export function initRegister() {
             if (response.ok) {
                 console.log("✅ 회원가입 성공 → 로그인 페이지로 이동");
                 alert("✅ 회원가입 성공! 로그인 페이지로 이동합니다.");
-                window.location.href = "../index.html";
+                window.location.href = "../../../index.html";
             } else {
                 alert(result.message || "회원가입 실패. 다시 시도하세요.");
             }

@@ -1,4 +1,4 @@
-// ts/common.ts
+// ts/click.ts
 export function addClickDelay(
   button: HTMLButtonElement,
   callback: (e: Event) => void,

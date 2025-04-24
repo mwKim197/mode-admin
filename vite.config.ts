@@ -27,6 +27,8 @@ export default defineConfig({
                 account: resolve(__dirname, 'html/link-account.html'),                  // 추가: 연동
                 notice: resolve(__dirname, 'html/notice.html'),                         // ✅ 공지 페이지
                 noticeEdit: resolve(__dirname, 'html/notice-edit.html'),                // ✅ 공지 등록
+                adminNotice: resolve(__dirname, 'html/admin-notice.html'),              // ✅ 관리자 공지 등록
+                empowerment: resolve(__dirname, 'html/empowerment.html'),               // 추가: 권한관리
                 register: resolve(__dirname, 'html/register.html'),                     // 추가: 회원가입 페이지
                 franchise: resolve(__dirname, 'html/franchise_dashboard.html'),         // 추가: 회원가입 페이지
                 store: resolve(__dirname, 'html/store_dashboard.html'),                 // 추가: 회원가입 페이지

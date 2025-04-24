@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="/src/css/reset.css">
+  <link rel="stylesheet" href="/src/css/common.css">
+  <link rel="stylesheet" href="/src/css/style.css">
+  <script type="module" src="/src/main.ts"></script> <!-- ✅ 메인 진입 -->
+</head>
+
+<body>
+  <!-- 메인 -->
+  <div id="main-content">
+
+    <!--상품관리-->
+    <section class="mt80">
+      <div class="inner">
+        <div class="user-flex">
+          <div class="user">
+            <i class="fa-regular fa-circle-user"></i>
+            <p>커피봇 일산점 님</p>
+            <label class="label"><span>일반회원</span></label>
+          </div>
+        </div>          
+      </div>
+    </section>
+
+    <!-- table -->
+    <section class="pb20">
+      <div class="inner">
+        <h2 class="mb20">상품</h2>
+        <div class="tableArea">
+          <table>
+            <thead>
+              <tr>
+                <th>순서</th>
+                <th>이미지</th>
+                <th>상품명</th>
+                <th>가격</th>
+                <th>진열</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="window.open('./8.product_Set02.html', '_blank')">
+                <td>1</td>
+                <td><img src="/img/ice-coffee.svg" alt=""></td>
+                <td>아이스 <br>아메리카노</td>
+                <td>2,600</td>
+                <td>
+                  <label class="toggle-switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                  </label>
+                </td>
+                <td>
+                  <span class="tag blue">제조</span>
+                  <span class="tag red">삭제</span>
+                </td>
+              </tr>
+              <tr  onclick="window.open('./8.product_Set02.html', '_blank')">
+                <td>2</td>
+                <td><img src="/img/ice-coffee.svg" alt=""></td>
+                <td>아이스 <br>아메리카노</td>
+                <td>2,600</td>
+                <td>
+                  <label class="toggle-switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                  </label>
+                </td>
+                <td>
+                  <span class="tag blue">제조</span>
+                  <span class="tag red">삭제</span>
+                </td>
+              </tr>
+              <tr  onclick="window.open('./8.product_Set02.html', '_blank')">
+                <td>3</td>
+                <td><img src="/img/ice-coffee.svg" alt=""></td>
+                <td>아이스 <br>아메리카노</td>
+                <td>2,600</td>
+                <td>
+                  <label class="toggle-switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                  </label>
+                </td>
+                <td>
+                  <span class="tag blue">제조</span>
+                  <span class="tag red">삭제</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>            
+        </div>
+        <div class="btnFlex">
+          <button class="btn-outline">변경사항 저장</button>
+          <button class="btn blue"><a href="./8.projuct_Set01.html">상품 추가</a></button>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+<script>
+  document.querySelectorAll(".clickable-row").forEach(row => {
+    row.addEventListener("click", function(e) {
+      // toggle-switch, input 클릭 시는 무시
+      if (e.target.closest('.toggle-switch') || e.target.tagName === 'INPUT') return;
+      window.open(this.dataset.href, '_blank');
+    });
+  });
+</script>
+</html>

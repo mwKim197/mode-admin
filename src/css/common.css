@@ -92,8 +92,8 @@ body>* {
 }
 
 /* grid */
-.grid {
-    display: -webkit-grid; display: grid; 
+  .grid {
+    display: grid;
   }
   .grid.col2 {
     -webkit-grid-template-columns: repeat(2, 1fr);grid-template-columns: repeat(2, 1fr);
@@ -401,7 +401,6 @@ label.plus {
     position:absolute;
     top: 25%;
     right: 15%;
-    transform: (-50%,-50%);
 }
 .label.full {
     background: var(--point-color);    
@@ -417,7 +416,7 @@ input[type="text"],input[type="password"]{
     padding: 1rem 1.4rem;
     border-radius: .5rem;
     border: 1px solid rgba(255, 255, 255, 0.6);
-    color: light-dark(rgb(84, 84, 84), rgb(170, 170, 170));
+    color: rgb(84, 84, 84);
     font-size: 1.4rem;
     background-color: white;
     position: relative;
@@ -425,6 +424,7 @@ input[type="text"],input[type="password"]{
 input[type="date"] {
     width: 30%;
     padding: 10px;
+    color: rgb(84, 84, 84);
     border: 1px solid #ccc;
     border-radius: .4rem;
     font-size: 14px;

@@ -7,16 +7,16 @@
     <title>Model Zero login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <script src="../src/js/jquery-3.6.0.js"></script> <!-- ✅ type="module" 추가-->
-  <script type="module" crossorigin src="../assets/main-Dt6ep3wI.js"></script>
-  <link rel="stylesheet" crossorigin href="../assets/login-Com21BNo.css">
+  <script type="module" crossorigin src="../assets/main-Q4uSd2WT.js"></script>
+  <link rel="stylesheet" crossorigin href="../assets/style-BB0SnVr8.css">
 </head>
 <body>
     <!-- 메인 -->
     <div id="main-content">
 
       <div class="custom-cursor"></div> <!-- 마우스따라다니는 원 -->
-      
-      <button id="topButton" style="display: none;"><img src="data:image/svg+xml,%3csvg%20width='19'%20height='10'%20viewBox='0%200%2019%2010'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3e%3cpath%20d='M1.46875%201L9.46875%209L17.4688%201'%20stroke='white'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3e%3c/svg%3e" alt="">Top</button> <!-- 탑버튼 -->
+
+        <button id="topButton" style="display: none;"><img src="data:image/svg+xml,%3csvg%20width='19'%20height='10'%20viewBox='0%200%2019%2010'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3e%3cpath%20d='M1.46875%201L9.46875%209L17.4688%201'%20stroke='white'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3e%3c/svg%3e" alt="">Top</button> <!-- 탑버튼 -->
 
       <!-- header -->
       <header>
@@ -63,7 +63,6 @@
     </div>
 
   </body>
-  <!--<script src="../src/js/common.js"></script>-->
   <script>
       document.addEventListener("DOMContentLoaded", function () {
           $('.eyes').on('click', function () {
@@ -79,6 +78,24 @@
                   passwordField.attr('type', 'password');
               }
           });
+      });
+
+      //-------- mouseCursor 이벤트 --------
+      const cursor = document.querySelector(".custom-cursor");
+
+      //-------- 마우스 이동 시 커서 따라다니기 --------
+      document.addEventListener("mousemove", function (e) {
+          cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+      });
+
+      //-------- 클릭 시 원 확대 효과 --------
+      document.addEventListener("click", function () {
+          cursor.style.width = "60px";
+          cursor.style.height = "60px";
+          setTimeout(() => {
+              cursor.style.width = "40px";
+              cursor.style.height = "40px";
+          }, 200);
       });
 </script>
 </html>

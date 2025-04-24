@@ -9,6 +9,10 @@
 form input,.in-box span ,
 section textarea,.history li p {font-weight: 200;}
 
+#main-content {
+    max-width: 450px;
+    margin: 0 auto;
+}
 
 /* -----------------------------------
 logWrap

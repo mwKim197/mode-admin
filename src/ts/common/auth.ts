@@ -1,9 +1,10 @@
-import { fetchWithAuth } from "./api";
+import { fetchWithAuth } from "../api/api.ts";
+import {UserInfo} from "../types/user.ts";
 
 /**
- * ✅ 로그인된 사용자 정보 가져오기
+ * ✅ 로그인된 사용자 권한 확인
  */
-export async function getUserData() {
+export async function checkUserAccess() {
     const res = await fetchWithAuth("/model_admin_login?func=me");
 
     if (res.status === 401 || res.status === 403) {
@@ -43,6 +44,22 @@ export async function getUserData() {
         alert("이 페이지에 접근할 수 있는 권한이 없습니다.");
         window.location.href = gradeHome[grade] || "/index.html";
     }
+}
+
+export async function getUserData(): Promise<UserInfo | null> {
+    const res = await fetchWithAuth("/model_admin_login?func=me");
+
+    if (!res.ok) {
+        console.warn("❌ 사용자 정보를 가져오지 못했습니다.");
+        return null;
+    }
+
+    const data = await res.json();
+    return {
+        adminId: data.adminId,
+        name: data.name,
+        grade: data.grade,
+    };
 }
 
 /**

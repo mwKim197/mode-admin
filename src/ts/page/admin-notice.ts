@@ -1,11 +1,11 @@
 import SunEditor from "suneditor";
 import "suneditor/dist/css/suneditor.min.css";
 import plugins from "suneditor/src/plugins";
-import {fetchWithAuth} from "./api.ts";
-import {addClickDelay} from "./common.ts";
+import {fetchWithAuth} from "../api/api.ts";
+import {addClickDelay} from "../utils/click.ts";
 
-export function initNoticeEdit() {
-  console.log("✅ notice-edit.ts 로드됨");
+export function initAdminNoticeEdit() {
+  console.log("✅ admin-notice.ts 로드됨");
   const editorTarget = document.getElementById("notice-editor");
   const saveButton = document.getElementById("save-button");
   const titleInput = document.getElementById("notice-title") as HTMLInputElement;
@@ -45,12 +45,12 @@ export function initNoticeEdit() {
 
   // 공지사항 목록으로 이동버튼
   document.getElementById("list-button")?.addEventListener("click", () => {
-    location.href = `/html/notice.html?type=${boardType}`; // 실제 목록 페이지 경로로 설정
+    location.href = `../../../html/notice.html`; // 실제 목록 페이지 경로로 설정
   });
 
   //데쉬보드로 이동
   document.getElementById("dashboard-button")?.addEventListener("click", () => {
-    location.href = "/html/dashboard.html"; // 데쉬보드로 이동
+    location.href = "../../../html/dashboard.html"; // 데쉬보드로 이동
   });
 
   if (!editorTarget || !saveButton) {
@@ -133,7 +133,7 @@ export function initNoticeEdit() {
 
       if (res.ok) {
         alert("✅ 저장 완료!");
-        location.href = `/html/notice.html?type=${boardType}`;
+        location.href = `../../../html/notice.html`;
       } else {
         const err = await res.json();
         alert(`❌ 저장 실패: ${err.message}`);

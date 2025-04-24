@@ -3,115 +3,16 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Model Zero home</title>
-  <script defer type="text/javascript" src="../src/js/common.js"></script>
-  <script src="../src/js/jquery-3.6.0.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <link rel="stylesheet" href="../src/css/reset.css">
-  <link rel="stylesheet" href="../src/css/common.css">
-  <link rel="stylesheet" href="../src/css/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">  
+  <link rel="stylesheet" href="/src/css/reset.css">
+  <link rel="stylesheet" href="/src/css/common.css">
+  <link rel="stylesheet" href="/src/css/style.css">
+  <script type="module" src="/src/main.ts"></script> <!-- ✅ 메인 진입 -->
 </head>
 
 <body>
   <!-- 메인 -->
   <div id="main-content">
 
-    <div class="custom-cursor"></div> <!-- 마우스따라다니는 원 -->
-
-    <!-- header -->
-    <header>
-      <a href="index.html">
-        <div class="logoWrap"><span>Model Zero</span></div>
-      </a>
-      <div class="menuWrap">
-        <button class="hamburger" id="menuToggle">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-        <!-- <img src="../public/img/menu.svg" alt=""> -->
-        <div class="sidemenu">
-          <ul class="menu">
-            <li>
-              <a href="./2.home.html">
-                <p>Home</p>
-              </a>
-            </li>
-            <li>
-              <a href="./7.product.html">
-                <p>상품</p>
-              </a>
-            </li>
-
-            <li>
-              <a href="./3.sales.html">
-                <p>매출</p>
-              </a>
-            </li>
-
-            <li>
-              <a href="./4.device manage.html">
-                <p>기기관리</p>
-              </a>
-            </li>
-
-            <li>
-              <a href="./5.point.html">
-                <p>포인트</p>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <p>쇼핑몰</p>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <p>A/S접수</p>
-              </a>
-            </li>
-            <li>
-              <a href="./6.normalSet.html">
-                <p>일반설정</p>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <p>Zero 멤버스</p>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div class="user-menuWrap">
-        <button class="ani-1">
-          <img src="../public/img/usermenu.svg" alt="메뉴 버튼">
-        </button>
-        <div class="user-setBox hidden">
-          <div class="popup-header">
-            <h2>원격조정</h2>
-            <button class="close-btn">×</button>
-          </div>
-          <div class="popup-body">
-            <select class="popup-select">
-              <option value="option1">St0086Cm0090</option>
-              <option value="option2">옵션 2</option>
-            </select>
-            <div class="button-grid">
-              <button><span><img src="../public/img/menu-set-icon01.svg" alt=""></span><span>기기 세척</span></button>
-              <button><span><img src="../public/img/menu-set-icon02.svg" alt=""></span><span>컵 디스펜서</span></button>
-              <button><span><img src="../public/img/menu-set-icon03.svg" alt=""></span><span>제빙기</span></button>
-              <button><span><img src="../public/img/menu-set-icon04.svg" alt=""></span><span>프로그램 재시작</span></button>
-              <button><span><img src="../public/img/menu-set-icon05.svg" alt=""></span><span>프로그램 종료</span></button>
-              <button><span><img src="../public/img/menu-set-icon06.svg" alt=""></span><span>재부팅</span></button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </header>
     <!-- 커피봇 -->
     <section class="mt8">
       <div class="inner">
@@ -131,17 +32,17 @@
         <div class="notice-slider-wrapper overflow-hidden">
           <div class="notice-slider" id="noticeSlider">
             <div class="notice-item box flex gap-1 mb20">
-              <img src="../public/img/notice_icon.svg" alt="">
+              <img src="/img/notice_icon.svg" alt="">
               <label class="tag red none-bg">긴급</label>
               <p>02-23 / <br class="br-s">2.01버전 패치사항 안내</p>
             </div>
             <div class="notice-item box flex gap-1 mb20">
-              <img src="../public/img/notice_icon.svg" alt="">
+              <img src="/img/notice_icon.svg" alt="">
               <label class="tag blue none-bg">패치</label>
               <p>03-01 / <br class="br-s">신규 기능 추가 안내</p>
             </div>
             <div class="notice-item box flex gap-1 mb20">
-              <img src="../public/img/notice_icon.svg" alt="">
+              <img src="/img/notice_icon.svg" alt="">
               <label class="tag org none-bg">이벤트</label>
               <p>04-10 / <br class="br-s">봄맞이 이벤트 시작</p>
             </div>
@@ -189,7 +90,7 @@
             <div class="progress-bar">
               <div class="progress-fill fill1">0%</div>
             </div>
-            <button class="refresh-btn" onclick="replayAnimation(0)"><img src="../public/img/refresh.svg" alt=""></button>
+            <button class="refresh-btn" onclick="replayAnimation(0)"><img src="/img/refresh.svg" alt=""></button>
           </div>
 
           <div class="progress-container">
@@ -197,7 +98,7 @@
             <div class="progress-bar">
               <div class="progress-fill fill2">0%</div>
             </div>
-            <button class="refresh-btn" onclick="replayAnimation(1)"><img src="../public/img/refresh.svg" alt=""></button>
+            <button class="refresh-btn" onclick="replayAnimation(1)"><img src="/img/refresh.svg" alt=""></button>
           </div>
 
           <div class="progress-container">
@@ -205,7 +106,7 @@
             <div class="progress-bar">
               <div class="progress-fill fill3">0%</div>
             </div>
-            <button class="refresh-btn" onclick="replayAnimation(2)"><img src="../public/img/refresh.svg" alt=""></button>
+            <button class="refresh-btn" onclick="replayAnimation(2)"><img src="/img/refresh.svg" alt=""></button>
           </div>
 
           <div class="progress-container">
@@ -213,7 +114,7 @@
             <div class="progress-bar">
               <div class="progress-fill fill4">0%</div>
             </div>
-            <button class="refresh-btn" onclick="replayAnimation(3)"><img src="../public/img/refresh.svg" alt=""></button>
+            <button class="refresh-btn" onclick="replayAnimation(3)"><img src="/img/refresh.svg" alt=""></button>
           </div>
         </div>
       </div>

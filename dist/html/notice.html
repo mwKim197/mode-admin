@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>공지사항</title>
-    <script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind CDN -->
-  <script type="module" crossorigin src="../assets/main-Dt6ep3wI.js"></script>
+    <meta charset="UTF-8" /> <!-- ✅ 메인 진입 -->
+  <script type="module" crossorigin src="../assets/main-Q4uSd2WT.js"></script>
+  <link rel="stylesheet" crossorigin href="../assets/style-BB0SnVr8.css">
 </head>
 <body>
-<h1 id="page-title">공지사항 목록</h1>
-<div class="mt-4 space-x-2">
-    <button id="dashboard-button" class="bg-gray-300 text-black px-4 py-2 mb-2 rounded">메인으로</button>
-</div>
-<div id="notice-list"></div>
-
+<!-- layoutLoader.ts가 head, layout, header 자동 삽입 -->
+<main id="main-content">
+    <!-- 페이지 고유 콘텐츠는 여기 작성 -->
+    <section class="mt80">
+        <div class="inner">
+            <div class="boxStyle gr">
+                <h2 class="ta-c mb20">공지사항 목록</h2>
+                <div class="mt-4 space-x-2">
+                    <button id="dashboard-button" class="bg-gray-300 text-black px-4 py-2 rounded">
+                        메인으로
+                    </button>
+                </div>
+                <div id="notice-list" class="mt-4 space-y-2"></div>
+            </div>
+        </div>
+    </section>
+</main>
 </body>
 </html>

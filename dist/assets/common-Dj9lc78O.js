@@ -1,1 +1,0 @@
-function l(e,a,i=500){e&&e.addEventListener("click",s=>{e.disabled||(e.disabled=!0,e.classList.add("opacity-50","pointer-events-none"),a(s),setTimeout(()=>{e.disabled=!1,e.classList.remove("opacity-50","pointer-events-none")},i))})}function r(e,a,i=500){document.querySelectorAll(e).forEach(s=>{const c=s;l(c,d=>a(d,c),i)})}export{r as a,l as b};

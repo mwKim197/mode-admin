@@ -1,12 +1,12 @@
-import {fetchWithAuth} from "./api.ts";
-import {addClickDelayToSelector} from "./common.ts";
+import {fetchWithAuth} from "../api/api.ts";
+import {addClickDelayToSelector} from "../utils/click.ts";
 
 export function initNotice() {
   console.log("✅ notice.ts 로드됨");
 
   //데쉬보드로 이동
   document.getElementById("dashboard-button")?.addEventListener("click", () => {
-    location.href = "/html/dashboard.html"; // 데쉬보드로 이동
+    location.href = "../../../html/dashboard.html"; // 데쉬보드로 이동
   });
 
   const listContainer = document.getElementById("notice-list");
@@ -94,7 +94,7 @@ export function initNotice() {
     addClickDelayToSelector(".edit-btn", async (e) => {
       e.stopPropagation(); // 부모 클릭 막기
       const id = (e.target as HTMLElement).getAttribute("data-id");
-      if (id) location.href = `/html/notice-edit.html?type=${boardType}&id=${id}`;
+      if (id) location.href = `../../../html/notice-edit.html`;
     });
 
     // 삭제 공통처리

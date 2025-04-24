@@ -8,7 +8,7 @@ const API_URL = "https://api.narrowroad-model.com";
  */
 export async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
     const isLoginPage =
-        window.location.pathname.includes("index.html") ||
+        window.location.pathname.includes("/html/log.html") ||
         window.location.pathname === "/";
 
     // ✅ 로그인 페이지에서는 실행하지 않음

@@ -1,22 +1,31 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>공지사항</title>
-    <script type="module" src="/src/main.ts"></script>
-    <script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind CDN -->
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/css/reset.css">
+    <link rel="stylesheet" href="/src/css/common.css">
+    <link rel="stylesheet" href="/src/css/style.css">
+    <script type="module" src="/src/main.ts"></script> <!-- ✅ 메인 진입 -->
 </head>
 <body>
-<h1 id="page-title">공지사항 작성</h1>
-<label for="notice-title">제목: </label>
-<input type="text" id="notice-title" placeholder="제목을 입력하세요" />
-<div id="notice-editor"></div>
-<div class="mt-4 space-x-2">
-    <button id="save-button" class="bg-blue-500 text-white px-4 py-2 rounded">저장하기</button>
-    <button id="list-button" class="bg-gray-300 text-black px-4 py-2 rounded">목록으로</button>
-    <button id="dashboard-button" class="bg-gray-300 text-black px-4 py-2 mb-2 rounded">메인으로</button>
-</div>
+<main id="main-content">
+    <!-- 페이지 고유 콘텐츠는 여기 작성 -->
+    <section class="mt80">
+        <div class="inner">
+            <div class="boxStyle gr">
+                <h2 class="ta-c mb20">공지사항 작성</h2>
+                <label for="notice-title">제목: </label>
+                <input type="text" id="notice-title" placeholder="제목을 입력하세요" />
+                <div id="notice-editor"></div>
+                <div class="mt-4 space-x-2">
+                    <button id="save-button" class="bg-blue-500 text-white px-4 py-2 rounded">저장하기</button>
+                    <button id="list-button" class="bg-gray-300 text-black px-4 py-2 rounded">목록으로</button>
+                    <button id="dashboard-button" class="bg-gray-300 text-black px-4 py-2 mb-2 rounded">메인으로</button>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
 
 </body>
 </html>
