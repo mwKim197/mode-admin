@@ -15,6 +15,8 @@ export function initLogin() {
 
         // ✅ 기존 토큰 삭제
         localStorage.removeItem("authToken");
+        // ✅ 기존 유저정보 삭제
+        localStorage.removeItem("userInfo");
         console.log("🗑️ 기존 로그인 토큰 삭제됨");
 
         const adminId = (document.getElementById("adminId") as HTMLInputElement).value.trim();
@@ -38,6 +40,46 @@ export function initLogin() {
             if (response.ok) {
                 localStorage.setItem("authToken", result.token);
                 console.log("✅ 로그인 성공 → 토큰 저장 완료!");
+
+                const meRes = await fetch(`${API_URL}/model_admin_login?func=me`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("authToken")}` // 🔐 꼭 필요
+                    },
+                    mode: "cors",
+                });
+
+                if (!meRes.ok) {
+                    alert("유저 정보를 불러오지 못했습니다.");
+                    return;
+                }
+
+                const userInfo = await meRes.json(); // ✅ 실제 userInfo 파싱
+
+                if (userInfo.grade === 4) {
+                    const res = await fetch(`${API_URL}/model_user_setting?func=get-user&userId=${userInfo.userId}`, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${localStorage.getItem("authToken")}`
+                        },
+                        mode: "cors",
+                    });
+
+                    if (res.ok) {
+                        const { user } = await res.json();
+                        localStorage.setItem("userInfo", JSON.stringify(user));
+                        console.log("✅ 사용자 정보 저장 완료");
+                    } else {
+                        const errorBody = await res.text();
+                        console.error("❌ 사용자 정보 조회 실패:", res.status, errorBody);
+                        alert("사용자 정보를 불러오지 못했습니다.");
+                        return;
+                    }
+                }
+
+                // 대시보드로 이동
                 window.location.href = "../../../html/dashboard.html";
             } else {
                 alert(result.message || "로그인 실패. 다시 시도하세요.");

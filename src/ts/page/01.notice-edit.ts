@@ -4,8 +4,8 @@ import plugins from "suneditor/src/plugins";
 import {fetchWithAuth} from "../api/api.ts";
 import {addClickDelay} from "../utils/click.ts";
 
-export function initAdminNoticeEdit() {
-  console.log("✅ admin-notice.ts 로드됨");
+export function initNoticeEdit() {
+  console.log("✅ 01.notice-edit.ts 로드됨");
   const editorTarget = document.getElementById("notice-editor");
   const saveButton = document.getElementById("save-button");
   const titleInput = document.getElementById("notice-title") as HTMLInputElement;
@@ -45,7 +45,7 @@ export function initAdminNoticeEdit() {
 
   // 공지사항 목록으로 이동버튼
   document.getElementById("list-button")?.addEventListener("click", () => {
-    location.href = `../../../html/notice.html`; // 실제 목록 페이지 경로로 설정
+    location.href = `../../../html/01.notice.html`; // 실제 목록 페이지 경로로 설정
   });
 
   //데쉬보드로 이동
@@ -133,7 +133,7 @@ export function initAdminNoticeEdit() {
 
       if (res.ok) {
         alert("✅ 저장 완료!");
-        location.href = `../../../html/notice.html`;
+        location.href = `../../../html/01.notice.html`;
       } else {
         const err = await res.json();
         alert(`❌ 저장 실패: ${err.message}`);
@@ -183,7 +183,7 @@ export function initAdminNoticeEdit() {
 
       if (res.ok) {
         alert("✅ 저장 완료!");
-        location.href = `/html/notice.html?type=${boardType}`;
+        location.href = `/html/01.notice.html?type=${boardType}`;
       } else {
         const err = await res.json();
         alert(`❌ 저장 실패: ${err.message}`);

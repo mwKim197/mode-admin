@@ -15,12 +15,39 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const userInfo = await getUserData();
-    console.log(userInfo);
+
+    if (userInfo) {
+        const userNameEl = document.getElementById("user-name");
+        const userGradeEl = document.getElementById("user-grade");
+
+        if (userNameEl) {
+            userNameEl.textContent = `${userInfo.adminId} 님`;
+        }
+
+        if (userGradeEl) {
+            const gradeText = {
+                1: "총괄관리자",
+                2: "운영관리자",
+                3: "프랜차이즈",
+                4: "스토어",
+            }[userInfo.grade] || "일반";
+
+            userGradeEl.innerHTML = `<span>${gradeText}</span>`;
+            userGradeEl.classList.remove("manager", "franchise", "store"); // 필요 시
+            if (userInfo.grade === 1) userGradeEl.classList.add("manager");
+            if (userInfo.grade === 3) userGradeEl.classList.add("franchise");
+            if (userInfo.grade === 4) userGradeEl.classList.add("store");
+        }
+    }
+
     if (userInfo && userInfo.grade <= 2) {
         const menuList = document.querySelector(".sidemenu .menu");
         const adminMenus = [
-            { href: "/html/admin-notice.html", label: "관리자 공지사항" },
-            { href: "/html/notice.html", label: "공지사항 관리" },
+            { href: "/html/notice.html?type=admin", label: "관리자 공지사항" },
+            { href: "/html/notice.html?type=notice", label: "홈페이지 공지사항" },
+            { href: "/html/notice.html?type=store", label: "설치매장" },
+            { href: "/html/notice.html?type=news", label: "언론보도" },
+            { href: "/html/notice.html?type=machine", label: "머신사용설명" },
             { href: "/html/empowerment.html", label: "권한 관리" }
         ];
 
@@ -43,25 +70,30 @@ document.addEventListener("DOMContentLoaded", async () => {
         import("./ts/page/home.ts").then((module) => {
             module.initHome();
         });
+    } else if (path === "/html/point.html") {
+        console.log("📌 포인트 - point.ts 로드");
+        import("./ts/page/point.ts").then((module) => {
+            module.initPoint();
+        });
     } else if (path === "/html/register.html") {
         console.log("📌 회원가입 페이지 - register.ts 로드");
         import("./ts/page/register.ts").then((module) => {
             module.initRegister();
         });
-    } else if (path === "/html/notice.html") {
-        console.log("📌 공지사항 - notice.ts 로드");
-        import("./ts/page/notice.ts").then((module) => {
+    } else if (path === "/html/01.notice.html") {
+        console.log("📌 공지사항 - 01.notice.ts 로드");
+        import("./ts/page/01.notice.ts").then((module) => {
             module.initNotice();
         });
-    } else if (path === "/html/notice-edit.html") {
-        console.log("📌 공지사항등록 - notice-edit.ts 로드");
-        import("./ts/page/notice-edit.ts").then((module) => {
+    } else if (path === "/html/01.notice-edit.html") {
+        console.log("📌 공지사항등록 - 01.notice-edit.ts 로드");
+        import("./ts/page/01.notice-edit.ts").then((module) => {
             module.initNoticeEdit();
         });
-    } else if (path === "/html/admin-notice.html") {
-        console.log("📌 관리자 공지사항등록 - admin-notice.ts 로드");
-        import("./ts/page/admin-notice.ts").then((module) => {
-            module.initAdminNoticeEdit();
+    } else if (path === "/html/notice.html") {
+        console.log("📌 관리자 공지사항등록 - admin-01.notice.ts 로드");
+        import("./ts/page/notice.ts").then((module) => {
+            module.initNotice();
         });
     } else if (path === "/html/franchise_dashboard.html") {
         console.log("🏘️ 프랜차이즈 - franchise.ts 로드");

@@ -617,6 +617,25 @@ input[type="radio"] {
     cursor: not-allowed;
 }
 
+
+#historyPagination button.active {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+}
+#historyPagination button {
+    border: 1px solid #ccc;
+    margin: 0 2px;
+    padding: 4px 8px;
+    background: white;
+    cursor: pointer;
+    color: black;
+}
+#historyPagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 /* -----------------------------------
 divice 
 -----------------------------------*/

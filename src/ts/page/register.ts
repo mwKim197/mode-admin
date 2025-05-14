@@ -57,7 +57,7 @@ export function initRegister() {
 
         try {
             // ✅ 회원가입 API 호출
-            const response = await fetchWithAuth("/model_admin_login?func=register-admin", {
+            const response = await fetchWithAuth("/model_admin_user?func=register-admin", {
                   method: "POST",
                   body: JSON.stringify({
                       adminId,

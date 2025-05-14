@@ -19,23 +19,23 @@
             <h2 class="ta-c mb20">포인트</h2>
           <div class="input-group in-1">
             <div class="in-box">
-              <input type="text" name="" placeholder="적립율%">              
+              <input id="earnMileage" type="text" name="" placeholder="적립율%">
               <span>연락처</span>
             </div>
             <div class="in-box">              
               <span>고객번호</span>
-              <input type="text" name="" placeholder="4-12"> 
+              <input id="mileageNumber" type="text" name="" placeholder="4-12">
             </div>
             <div class="in-box">
               <span>or 휴대번호</span>
-              <input type="checkbox" id="agree" name="agree">
+              <input type="checkbox" id="isPhone" name="isPhone">
             </div>
-            <button class="btn-outline">저장</button>
+            <button id="pointInfoSave" class="btn-outline">저장</button>
           </div>
           <div class="input-group">
-            <input type="text" placeholder="고객번호 or 연락처를 입력해주세요.">
-            <button class="btn-i search"><img src="/img/search.svg" alt=""></button>
-            <button class="btn-i reset"><img src="/img/refresh_icon.svg" alt=""></button>
+            <input id="searchNumber" type="text" placeholder="고객번호 or 연락처를 입력해주세요.">
+            <button id="searchButton" class="btn-i search"><img src="/img/search.svg" alt=""></button>
+            <button id="searchReset" class="btn-i reset"><img src="/img/refresh_icon.svg" alt=""></button>
           </div>
         </div>
           </div>
@@ -46,26 +46,15 @@
       <div class="inner">
         <div class="tableArea">
           <table>
-            <button id="selectAllBtn" class="btn-s mb10">전체선택  </button>
+            <button id="selectAllBtn" class="btn-s mb10">전체선택</button>
             <tbody>
-              <tr class="on-popup" style="">
-                <td><input type="checkbox" name="" id=""></td>
-                <td>1</td>
-                <td>010-1234-5678</td>
-                <td>2,600원</td>
-                <td class=""><span class="tag red">삭제</span></td>
-              </tr>
               <tr class="on-popup">
-                <td><input type="checkbox" name="" id=""></td>
-                <td>2</td>
-                <td>010-1234-5678</td>
-                <td>2,600원</td>
-                <td class=""><span class="tag red">삭제</span></td>
+                <td colspan="5" style="padding:2rem 0 0;">표시할 마일리지가 없습니다.</td>
               </tr>
             </tbody>
           </table>
             <!-- 페이지네이션 -->
-            <div class="pagination" data-type="table">
+            <div id="pagination" class="pagination" data-type="table">
               <button class="page-first" disabled=""><img src="/img/page_first.svg" alt="처음으로"></button>
               <button class="page-prev" disabled=""><img src="/img/page_prev.svg" alt="이전"></button>
               <span class="page-numbers"><button class="page-number active" data-page="1">1</button></span>
@@ -75,7 +64,7 @@
         </div>
 
         <div class="btnFlex">
-          <button class="btn blue">신규등록</button>
+          <button id="createPointBtn" class="btn blue">신규등록</button>
           <button class="btn red">삭제</button>
         </div>
 
@@ -84,7 +73,7 @@
           <div class="popup">
             <div class="popup-header ta-c">
               <h2>고객정보</h2>
-              <button class="close-btn" onclick="closePopup()">&times;</button>
+              <button class="close-btn popupCloseBtn">&times;</button>
             </div>
 
             <!-- popup-body -->
@@ -93,27 +82,27 @@
                 <div class="inputWrap">
                   <div class="data_input">
                     <p>고객번호</p>
-                    <input type="text" id="player-id" name="player-id" placeholder="010-1234-5678" disabled="">
+                    <input type="text" id="mileageNo" name="mileageNo" placeholder="010-1234-5678">
                   </div>
                   <div class="data_input">
                     <p>비밀번호</p>
-                    <input type="password" id="player-id" name="player-id" value="mypass#123" disabled="">
+                    <input type="password" id="popupPassword" name="popupPassword">
                   </div>
                   <div class="data_input">
                     <p>누적 이용 횟수</p>
-                    <input type="text" id="player-id" name="player-id" placeholder="1">
+                    <input type="text" id="popupCount" name="popupCount" placeholder="0">
                   </div>
                   <div class="data_input">
                     <p>보유 포인트</p>
-                    <input type="text" id="player-id" name="player-id" placeholder="550" disabled="">
+                    <input type="text" id="popupMileage" name="popupMileage" placeholder="0" disabled="">
                   </div>
                   <div class="data_input">
                     <p>수정 포인트</p>
-                    <input type="text" id="player-id" name="player-id" placeholder="550">
+                    <input type="text" id="popupAmount" name="popupAmount" placeholder="0">
                   </div>
                   <div class="data_input">
                     <p>연락처</p>
-                    <input type="text" id="player-id" name="player-id" placeholder="010-1234-5678" disabled="">
+                    <input type="text" id="popupTel" name="popupTel" placeholder="010-1234-5678">
                   </div>
                   <div class="text_input">
                     <p>메모</p>
@@ -134,24 +123,17 @@
                         <th>잔여<br>포인트</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      <tr>
-                        <td>1</td>
-                        <td>2024-12-31</td>                      
-                        <td>11:08:14</td>
-                        <td>2,600원</td>
-                        <td>550p</td>                      
-                        <td>550p</td>
-                      </tr>
+                    <tbody id="historyTableBody">
+                    <!-- JS에서 렌더링 -->
                     </tbody>
                   </table>
                 </div>
+                <div id="historyPagination" class="pagination" data-type="table"></div>
               </div>
-
               <!-- 하단 버튼 -->
               <div class="popup-footer">
-                <button class="btn blue">환불</button>
-                <button class="btn gr">취소</button>
+                <button id="saveButton" class="btn blue">저장</button>
+                <button class="btn gr popupCloseBtn">취소</button>
               </div>
             </div>
           </div>
@@ -162,7 +144,7 @@
 
 </body>
 <script>
-  const excelBtns = document.querySelectorAll(".on-popup, .btn.blue");
+  /*const excelBtns = document.querySelectorAll(".on-popup, .btn.blue");
   const popupOverlay = document.querySelector(".popup-overlay");
   const cancelBtn = document.querySelector(".popup-footer .gr");
 
@@ -177,22 +159,7 @@
     popupOverlay.style.display = "none";
   }
   // 취소 버튼에도 팝업 닫기 기능 추가
-  cancelBtn.addEventListener("click", closePopup);
-  
+  cancelBtn.addEventListener("click", closePopup);*/
 
-  // 체크박스 전체선택
-document.addEventListener('DOMContentLoaded', function () {
-  const selectAllBtn = document.getElementById('selectAllBtn');
-  if (!selectAllBtn) return;
-
-  let allChecked = false;
-
-  selectAllBtn.addEventListener('click', function () {
-    allChecked = !allChecked;
-    const checkboxes = document.querySelectorAll('table input[type="checkbox"]');
-    checkboxes.forEach(checkbox => checkbox.checked = allChecked);
-    selectAllBtn.textContent = allChecked ? '전체해제' : '전체선택';
-  });
-});
 </script>
 </html>

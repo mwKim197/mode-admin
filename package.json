@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.758.0",
+    "jwt-decode": "^4.0.0",
     "suneditor": "^2.47.5"
   }
 }

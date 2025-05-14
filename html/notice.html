@@ -1,29 +1,97 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="/src/css/reset.css">
-    <link rel="stylesheet" href="/src/css/common.css">
-    <link rel="stylesheet" href="/src/css/style.css">
-    <script type="module" src="/src/main.ts"></script> <!-- ✅ 메인 진입 -->
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="/src/css/reset.css">
+  <link rel="stylesheet" href="/src/css/common.css">
+  <link rel="stylesheet" href="/src/css/style.css">
+  <script type="module" src="/src/main.ts"></script> <!-- ✅ 메인 진입 -->
 </head>
+<!--관리자 공지사항-->
 <body>
-<!-- layoutLoader.ts가 head, layout, header 자동 삽입 -->
-<main id="main-content">
-    <!-- 페이지 고유 콘텐츠는 여기 작성 -->
-    <section class="mt80">
-        <div class="inner">
-            <div class="boxStyle gr">
-                <h2 class="ta-c mb20">공지사항 목록</h2>
-                <div class="mt-4 space-x-2">
-                    <button id="dashboard-button" class="bg-gray-300 text-black px-4 py-2 rounded">
-                        메인으로
-                    </button>
-                </div>
-                <div id="notice-list" class="mt-4 space-y-2"></div>
-            </div>
-        </div>
+  <!-- 메인 -->
+  <div id="main-content">
+
+    <!-- 커피봇 -->
+    <section class="mt8">
+      <div class="inner">
+        <div class="user-flex">
+          <div class="user">
+            <i class="fa-regular fa-circle-user"></i>
+            <p id="user-name">zero001 님</p>
+            <label class="label manager" id="user-grade"><span>총괄관리자</span></label>
+          </div>
+        </div>          
+      </div>
     </section>
-</main>
+
+    <!-- table -->
+    <section class="pb20">
+      <div class="inner">
+        <div class="flex jc mb20 gap-1">
+          <img src="/img/notice_icon_color.svg" alt="">
+          <h2 id="page-title">공지사항</h2>
+        </div>
+        <h2 class="mb10">공지사항 입력</h2>
+          <div class="inputWrap noticeArea">
+            <div class="text_input">
+              <p>제목</p>
+              <input type="text" name="" id="notice-title" placeholder="제목을 입력해주세요">
+            </div>
+            <div class="input-group">
+              <span class="fs14">시작날짜</span>
+              <input type="date" id="start-date">
+              <span class="fs14">종료날짜</span>
+              <input type="date" id="end-date">
+            </div>
+            <div class="text_input">
+              <p>메모</p>
+              <div id="notice-editor"></div>
+            </div>
+          </div>
+          
+          <button id="save-button" class="btn blue">등록</button>
+      </div>
+    </section>
+
+    <section class="pb20">
+      <div class="inner">
+        <div class="boxStyle gr mb30">
+          <div class="input-group col">
+            <div>
+              <p class="fs14">시작날짜</p>
+            <input id="start-list-date" type="date">
+            </div>
+            <div>
+              <p class="fs14">종료날짜</p>
+            <input id="end-list-date" type="date">
+            </div>
+            <button id="list-button" class="btn-i search"><img src="/img/search.svg" alt=""></button>
+          </div>
+        </div>
+        <div class="tableArea">
+          <table>
+            <thead>
+              <tr>
+                <th>제목</th>
+                <th>시작일</th>
+                <th>종료일</th>
+                <th>등록일</th>
+                <th>수정</th>
+                <th>삭제</th>
+              </tr>
+            </thead>
+            <tbody id="notice-list">
+              <tr>
+                <td colspan="7" style="padding:2rem 0 0;">표시할 공지사항이 없습니다.</td>
+              </tr>
+            </tbody>
+          </table>            
+        </div>
+      </div>
+    </section>
+  </div>
+
 </body>
 </html>

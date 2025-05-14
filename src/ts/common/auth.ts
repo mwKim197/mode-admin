@@ -1,5 +1,21 @@
-import { fetchWithAuth } from "../api/api.ts";
-import {UserInfo} from "../types/user.ts";
+import {fetchWithAuth} from "../api/api.ts";
+import {DecodedToken, AdminUserInfo} from "../types/adminUser.ts";
+import {jwtDecode} from "jwt-decode";
+
+/**
+ * ✅ 토큰 사용자 권한 확인
+ */
+export function getUserFromToken(): DecodedToken | null {
+    const token = localStorage.getItem("authToken");
+    if (!token) return null;
+
+    try {
+        return jwtDecode<DecodedToken>(token);
+    } catch (err) {
+        console.error("❌ 토큰 디코딩 실패:", err);
+        return null;
+    }
+}
 
 /**
  * ✅ 로그인된 사용자 권한 확인
@@ -26,8 +42,9 @@ export async function checkUserAccess() {
 
     // ✅ 권한별 접근 허용 페이지 정의
     const pageAccess: Record<string, number[]> = {
+        "/html/01.notice.html": [1, 2],
+        "/html/01.notice-edit.html": [1, 2],
         "/html/notice.html": [1, 2],
-        "/html/notice-edit.html": [1, 2],
     };
 
     const gradeHome: Record<number, string> = {
@@ -46,7 +63,10 @@ export async function checkUserAccess() {
     }
 }
 
-export async function getUserData(): Promise<UserInfo | null> {
+/**
+ * ✅ 로그인된 사용자 정보 확인
+ */
+export async function getUserData(): Promise<AdminUserInfo | null> {
     const res = await fetchWithAuth("/model_admin_login?func=me");
 
     if (!res.ok) {
