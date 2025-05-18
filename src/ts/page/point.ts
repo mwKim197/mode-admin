@@ -1,6 +1,6 @@
 import { Pagination } from "../utils/pagination";
 import {MileageHistoryItem, PageKey, PointItem} from "../types/point.ts";
-import {apiDelete, apiGet, apiPut} from "../api/apiHelpers.ts";
+import {apiDelete, apiGet, apiPost, apiPut} from "../api/apiHelpers.ts";
 import { getStoredUser } from "../utils/userStorage.ts";
 import {getUserData} from "../common/auth.ts";
 import {renderClassicPagination} from "../utils/paginationServer.ts";
@@ -12,6 +12,8 @@ let selectedItem: PointItem | undefined;
 let currentHistoryPage = 1;
 const historyLimit = 10;
 let pageKeyMap: { [page: number]: PageKey } = {};
+let isEditMode = false; // 신규등록
+type PointMode = "create" | "update"; // 포인트 저장, 수정
 
 // 클래스 import
 export async function initPoint() {
@@ -23,6 +25,13 @@ export async function initPoint() {
         alert("사용자 정보가 없습니다.");
         return;
     }
+
+    // mileageNo 포멧 적용 user.isPhone
+    applyMileageNoInputBehavior(user?.isPhone ?? true);
+
+    // tel 포멧 적용
+    const telInput = document.getElementById("popupTel") as HTMLInputElement;
+    if (telInput) applyPhoneInputFormat(telInput);
 
     //--- 마일리지 기본정보 세팅 ---//
     (document.getElementById("earnMileage") as HTMLInputElement).value = String(user.earnMileage ?? "");
@@ -111,34 +120,94 @@ export async function initPoint() {
             closePopup();
         })
     })
+    
     const saveButton = document.getElementById('saveButton') as HTMLButtonElement;
     saveButton.addEventListener("click", async () => {
-        await putPoint();
+        if (isEditMode) {
+            await savePoint("update"); // 포인트 수정
+        } else {
+            await savePoint("create"); // 포인트 등록
+        }
     })
     //--- 마일리지 상세 세팅 ---//
     //--- 마일리지 등록 세팅 ---//
     const createPointBtn = document.getElementById('createPointBtn') as HTMLButtonElement;
     createPointBtn.addEventListener("click", () => {
         selectedItem = undefined; // 신규 등록으로 간주
+        isEditMode = false;
         openPopup(); // 초기화된 빈 팝업 열기
     });
     //--- 마일리지 등록 세팅 ---//
+    //--- 마일리지 삭제 세팅 ---//
+    const deleteButton = document.getElementById('deleteButton') as HTMLButtonElement;
 
+    if (deleteButton) {
+        deleteButton.addEventListener('click', async () => {
+            const checkboxes = document.querySelectorAll<HTMLInputElement>('input.row-checkbox:checked');
+
+            if (checkboxes.length === 0) {
+                alert("삭제할 항목을 선택해주세요.");
+                return;
+            }
+
+            const confirmDelete = confirm(`선택한 ${checkboxes.length}개 항목을 삭제하시겠습니까?`);
+            if (!confirmDelete) return;
+
+            const user = getStoredUser();
+            if (!user) {
+                alert("사용자 정보가 없습니다.");
+                return;
+            }
+
+            const userId = user.userId;
+
+            let failed = 0;
+
+            for (const checkbox of checkboxes) {
+                const uniqueMileageNo = checkbox.dataset.id;
+                if (!uniqueMileageNo) continue;
+
+                const res = await apiDelete(`/model_admin_mileage?func=mileage-delete&userId=${userId}&uniqueMileageNo=${uniqueMileageNo}`);
+
+                if (!res.ok) {
+                    failed++;
+                    console.error(`❌ 삭제 실패: ${uniqueMileageNo}`);
+                }
+            }
+
+            if (failed > 0) {
+                alert(`❌ ${failed}건 삭제 실패`);
+            } else {
+                alert("✅ 선택된 마일리지를 모두 삭제했습니다.");
+            }
+
+            await getPointList(); // 목록 갱신
+        });
+    }
+
+    //--- 마일리지 삭제 세팅 ---//
     getPointList();
 }
 
-function openPopup() {
+// 팝업 오픈
+function openPopup(detail?: PointItem) {
     const popupOverlay = document.querySelector(".popup-overlay") as HTMLElement;
     popupOverlay.style.display = "flex";
 
-    // ✅ 필드 초기화
-    (document.getElementById('mileageNo') as HTMLInputElement).value = "";
-    (document.getElementById('popupTel') as HTMLInputElement).value = "";
-    (document.getElementById('popupPassword') as HTMLInputElement).value = "";
-    (document.getElementById('popupMileage') as HTMLInputElement).value = "";
-    (document.getElementById('popupCount') as HTMLInputElement).value = "";
-    (document.getElementById('popupAmount') as HTMLInputElement).value = "";
-    (document.getElementById('myTextarea') as HTMLTextAreaElement).value = "";
+    // 버튼 라벨 처리
+    const saveButton = document.getElementById("saveButton") as HTMLButtonElement;
+    saveButton.textContent = isEditMode ? "수정" : "저장";
+
+    if (!detail) {
+        // 신규 등록 초기화
+        (document.getElementById('mileageNo') as HTMLInputElement).value = "";
+        (document.getElementById('popupTel') as HTMLInputElement).value = "";
+        (document.getElementById('popupPassword') as HTMLInputElement).value = "";
+        (document.getElementById('popupMileage') as HTMLInputElement).value = "";
+        (document.getElementById('popupCount') as HTMLInputElement).value = "";
+        (document.getElementById('popupAmount') as HTMLInputElement).value = "";
+        (document.getElementById('myTextarea') as HTMLTextAreaElement).value = "";
+    }
 }
 
 function closePopup() {
@@ -197,7 +266,6 @@ async function setPointInfo() {
 async function getPointList() {
     // localstorage에 저장된 user 정보를 불러옴
     const user = getStoredUser();
-    console.log("user :", user);
     if (!user) {
         alert("사용자 정보가 없습니다.");
         return;
@@ -211,11 +279,8 @@ async function getPointList() {
     }
 
     const body: { items: PointItem[] } = await res.json(); // ✅ 타입 지정
-    console.log("[DEBUG] body:", body);
 
     items = body.items || []; // ✅ items 배열 꺼내기
-    console.log("[DEBUG] items:", items);
-
     await renderTable(items);
 }
 
@@ -241,7 +306,7 @@ async function renderTable(data: PointItem[]) {
                 tr.innerHTML = `
                   <td><input type="checkbox" class="row-checkbox" data-id="${item.uniqueMileageNo}"></td>
                   <td>${index + 1 + (page - 1) * 10}</td>
-                  <td>${item.mileageNo}</td>
+                  <td>${formatPhoneNumber(item.mileageNo)}</td>
                   <td>${Number(amount).toLocaleString()}원</td>
                   <td><button class="btn-delete" data-id="${item.uniqueMileageNo}">삭제</button></td>
                 `;
@@ -254,15 +319,14 @@ async function renderTable(data: PointItem[]) {
                         return;
                     }
 
-                    const detail = item; // item은 PointItem
+                    const detail = item;
                     selectedItem = detail;
-                    openPopup();
+                    isEditMode = true; // ✅ 수정 모드 지정
+                    openPopup(detail); // ← 상세 데이터 전달
 
-                    // 팝업 상세 조회
                     await loadMileageHistory(selectedItem, currentHistoryPage);
-                    // 고객 정보 세팅
-                    (document.getElementById('mileageNo') as HTMLInputElement).value = detail.mileageNo ?? "";
-                    (document.getElementById('popupTel') as HTMLInputElement).value = detail.tel ?? "";
+                    (document.getElementById('mileageNo') as HTMLInputElement).value = formatPhoneNumber(detail.mileageNo ?? "");
+                    (document.getElementById('popupTel') as HTMLInputElement).value = formatPhoneNumber(detail.tel ?? "");
                     (document.getElementById('popupPassword') as HTMLInputElement).value = detail.password ?? "";
                     (document.getElementById('popupMileage') as HTMLInputElement).value = String(Number(amount).toLocaleString() ?? "0") + " 원";
                     (document.getElementById('popupCount') as HTMLInputElement).value = "";
@@ -298,99 +362,114 @@ async function renderTable(data: PointItem[]) {
     });
 }
 
-// 상세 포인트 수정
-async function putPoint() {
+// 마일리지 정보 저장
+async function savePoint(mode: PointMode) {
     try {
+        const mileageNoRaw = (document.getElementById("mileageNo") as HTMLInputElement).value.trim();
+        const tel = (document.getElementById("popupTel") as HTMLInputElement).value.trim();
+        const password = (document.getElementById("popupPassword") as HTMLInputElement).value.trim();
+        const pointStr = (document.getElementById("popupAmount") as HTMLInputElement).value.trim();
+        const note = (document.getElementById("myTextarea") as HTMLTextAreaElement).value.trim();
 
-        if (!selectedItem) {
-            alert("선택된 항목이 없습니다.");
-            return;
-        }
-
-        // localstorage에 저장된 user 정보를 불러옴
         const user = getStoredUser();
-
         if (!user) {
             alert("사용자 정보가 없습니다.");
             return;
         }
 
-        const userId = user.userId;
-        const mileageNo = (document.getElementById("mileageNo") as HTMLInputElement).value;
-        const tel = (document.getElementById("popupTel") as HTMLInputElement).value;
-        const pointsStr = (document.getElementById("popupAmount") as HTMLInputElement).value;
-        const password = (document.getElementById("popupPassword") as HTMLInputElement).value;
-        const note = (document.getElementById("myTextarea") as HTMLTextAreaElement).value;
-        const uniqueMileageNo = selectedItem?.uniqueMileageNo; // ← 이전에 선택한 데이터에서 저장된 값
+        const { userId, isPhone, mileageNumber } = user;
 
-        if (!userId || !tel || !uniqueMileageNo || !mileageNo) {
-            alert("필수 정보(userId, mileageNo, tel, uniqueMileageNo)가 누락되었습니다.");
+        if (!userId || isPhone === undefined || mileageNumber === undefined) {
+            alert("📌 고객번호 설정이 누락되었습니다.\n[휴대폰 여부 / 자릿수] 정보를 먼저 등록해주세요.");
             return;
         }
 
-        let newPassword: string | undefined = undefined;
-
-        if (password && password.trim() !== "") {
-            const passwordTrimmed = password.trim();
-
-            // 숫자만으로 구성되어 있는지 정규식으로 검사
-            if (!/^\d+$/.test(passwordTrimmed)) {
-                alert("비밀번호는 숫자만 입력해주세요.");
-                return;
-            }
-
-            newPassword = passwordTrimmed;
+        // mileage 번호 유효성 검사
+        const msg = validateMileageNo(mileageNoRaw, isPhone, mileageNumber);
+        if (msg) {
+            alert(msg);
+            return;
         }
 
-        // 숫자 변환
-        let points: string | undefined = undefined;
+        const mileageNo = isPhone ? mileageNoRaw.replace(/-/g, "") : mileageNoRaw;
 
-        if (pointsStr && pointsStr.trim() !== "") {
-            const pointsTrimmed = pointsStr.trim();
 
-            // 숫자만으로 구성되어 있는지 정규식으로 검사
-            if (!/^\d+$/.test(pointsTrimmed)) {
+        if (mode === "create") {
+            // 필수 필드 검사
+            if (!tel || !password || !pointStr) {
+                alert("필수 항목을 모두 입력해주세요.");
+                return;
+            }
+        } else {
+            // 필수 필드 검사
+            if (!tel || !password) {
+                alert("필수 항목을 모두 입력해주세요.");
+                return;
+            }
+        }
+
+        if (!/^\d+$/.test(password)) {
+            alert("비밀번호는 숫자만 입력해주세요.");
+            return;
+        }
+
+        if (pointStr) {
+
+            if (!/^\d+$/.test(pointStr)) {
                 alert("포인트는 숫자만 입력해주세요.");
                 return;
             }
-
-            points = pointsTrimmed;
         }
 
         // payload 구성
         const payload: Record<string, any> = {
             userId,
-            uniqueMileageNo,
+            mileageNo,
+            password,
+            amount: pointStr,
             tel,
         };
 
-        if (points) {
-            payload.points = points;
+        if (note) payload.note = note;
+
+        // 수정일 경우 uniqueMileageNo 포함, password는 newPassword로 변경
+        if (mode === "update") {
+            if (!selectedItem?.uniqueMileageNo) {
+                alert("선택된 항목이 없습니다.");
+                return;
+            }
+
+            payload.uniqueMileageNo = selectedItem.uniqueMileageNo;
+            payload.newPassword = password;
+            delete payload.password;
         }
 
-        if (note && note.trim() !== "") {
-            payload.note = note.trim();
-        }
+        const url = mode === "create"
+            ? `/model_admin_mileage?userId=${userId}&func=mileage-add`
+            : `/model_admin_mileage?func=mileage-update`;
 
-        if (newPassword) {
-            payload.newPassword = newPassword;
-        }
-
-
-        const res = await apiPut(`/model_admin_mileage?func=mileage-update`, payload);
+        const res = mode === "create"
+            ? await apiPost(url, payload)
+            : await apiPut(url, payload);
 
         if (!res.ok) {
-            alert("❌ 마일리지 수정 실패");
+            try {
+                const errorBody = await res.json();
+                const errorMessage = errorBody?.message ?? `${mode === "create" ? "등록" : "수정"} 중 오류가 발생했습니다.`;
+                alert(`❌ ${errorMessage}`);
+            } catch (e) {
+                alert(`❌ ${mode === "create" ? "등록" : "수정"} 실패`);
+            }
             return;
         }
 
-        alert("✅ 수정 완료");
+        alert(`✅ ${mode === "create" ? "등록" : "수정"} 완료`);
         closePopup();
+        await getPointList();
 
-        await getPointList(); // <-- 이거 한 줄 추가 추천!
     } catch (e) {
-        console.error("❌ putPoint 오류:", e);
-        alert("서버 오류로 수정에 실패했습니다.");
+        console.error(`❌ ${mode} 오류:`, e);
+        alert(`서버 오류로 ${mode === "create" ? "등록" : "수정"}에 실패했습니다.`);
     }
 }
 
@@ -460,4 +539,63 @@ async function loadMileageHistory(point: PointItem, page = 1) {
     });
 }
 
+// 마일리지넘버 체크
+function validateMileageNo(mileageNo: string, isPhone: boolean, requiredLength: number): string | null {
+    const raw = mileageNo.trim();
+    const cleaned = isPhone ? raw.replace(/-/g, "") : raw;
 
+    if (!/^\d+$/.test(cleaned)) {
+        return "포인트 번호는 숫자만 입력해주세요.";
+    }
+
+    if (cleaned.length !== requiredLength) {
+        return `포인트 번호는 ${requiredLength}자리여야 합니다.`;
+    }
+
+    return null;
+}
+
+// mileageNo 휴대폰 or 숫자 포멧 적용
+function applyMileageNoInputBehavior(isPhone: boolean) {
+    const input = document.getElementById("mileageNo") as HTMLInputElement;
+    if (!input) return;
+
+    input.value = ""; // 초기화
+    input.placeholder = isPhone ? "010-1234-5678" : "숫자만 입력";
+
+    input.addEventListener("input", (e) => {
+        let value = (e.target as HTMLInputElement).value.replace(/\D/g, ""); // 숫자만
+
+        if (isPhone) {
+            // 휴대폰 번호 포맷: 010-XXXX-XXXX
+            applyPhoneInputFormat(input);
+        } else {
+            // 숫자만
+            input.value = value;
+        }
+    });
+}
+
+// 전화번호 입력 시 포맷 적용 (ex: 01012345678 → 010-1234-5678)
+export function applyPhoneInputFormat(input: HTMLInputElement) {
+    input.addEventListener("input", () => {
+        const value = input.value.replace(/\D/g, "").slice(0, 11); // 숫자만, 최대 11자리
+
+        if (value.length <= 3) {
+            input.value = value;
+        } else if (value.length <= 7) {
+            input.value = `${value.slice(0, 3)}-${value.slice(3)}`;
+        } else {
+            input.value = `${value.slice(0, 3)}-${value.slice(3, 7)}-${value.slice(7)}`;
+        }
+    });
+}
+
+// 휴대폰 포멧
+function formatPhoneNumber(number: string): string {
+    const cleaned = number.replace(/\D/g, "");
+    if (cleaned.length === 11) {
+        return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7)}`;
+    }
+    return cleaned; // 형식이 안 맞으면 그대로 반환
+}
