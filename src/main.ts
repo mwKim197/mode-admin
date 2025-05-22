@@ -80,18 +80,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         import("./ts/page/register.ts").then((module) => {
             module.initRegister();
         });
-    } else if (path === "/html/01.notice.html") {
-        console.log("📌 공지사항 - 01.notice.ts 로드");
-        import("./ts/page/01.notice.ts").then((module) => {
-            module.initNotice();
-        });
-    } else if (path === "/html/01.notice-edit.html") {
-        console.log("📌 공지사항등록 - 01.notice-edit.ts 로드");
-        import("./ts/page/01.notice-edit.ts").then((module) => {
-            module.initNoticeEdit();
-        });
     } else if (path === "/html/notice.html") {
-        console.log("📌 관리자 공지사항등록 - admin-01.notice.ts 로드");
+        console.log("📌 관리자 공지사항등록 - notice.ts 로드");
         import("./ts/page/notice.ts").then((module) => {
             module.initNotice();
         });
