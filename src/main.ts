@@ -29,8 +29,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 1: "총괄관리자",
                 2: "운영관리자",
                 3: "프랜차이즈",
-                4: "스토어",
-            }[userInfo.grade] || "일반";
+                4: "일반회원",
+            }[userInfo.grade] || "일반회원";
 
             userGradeEl.innerHTML = `<span>${gradeText}</span>`;
             userGradeEl.classList.remove("manager", "franchise", "store"); // 필요 시

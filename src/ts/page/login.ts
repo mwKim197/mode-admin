@@ -28,6 +28,8 @@ export function initLogin() {
         }
 
         try {
+            console.log("🚀 로그인 요청 시작:", { adminId, password }); // [TODO]⚠️ 테스트 후 비밀번호는 지워도 됨
+
             const response = await fetch(`${API_URL}/model_admin_login?func=login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -36,7 +38,7 @@ export function initLogin() {
             });
 
             const result = await response.json();
-
+            console.log("📥 로그인 응답:", response.status, result); // ✅ 응답 전체 출력
             if (response.ok) {
                 localStorage.setItem("authToken", result.token);
                 console.log("✅ 로그인 성공 → 토큰 저장 완료!");
@@ -85,7 +87,7 @@ export function initLogin() {
                 alert(result.message || "로그인 실패. 다시 시도하세요.");
             }
         } catch (error) {
-            console.error("❌ 로그인 오류:", error);
+            console.error("❌ 로그인 요청 중 오류 발생:", error);
             alert("서버 오류가 발생했습니다. 다시 시도하세요.");
         }
     });
