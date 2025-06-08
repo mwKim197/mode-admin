@@ -80,6 +80,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         import("./ts/page/product.ts").then((module) => {
             module.initProduct();
         });
+    } else if (path === "/html/product-detail.html") {
+        console.log("📌 상품상세 - productDetail.ts 로드");
+        import("./ts/page/productDetail.ts").then((module) => {
+            module.initProductDetail();
+        });
+    } else if (path === "/html/product-add.html") {
+        console.log("📌 상품등록 - productAdd.ts 로드");
+        import("./ts/page/productAdd.ts").then((module) => {
+            module.initProductAdd();
+        });
     } else if (path === "/html/register.html") {
         console.log("📌 회원가입 페이지 - register.ts 로드");
         import("./ts/page/register.ts").then((module) => {
@@ -102,9 +112,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }  else {
         console.log("📌 기본 페이지");
-
     }
-
 
 });
 

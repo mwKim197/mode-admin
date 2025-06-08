@@ -31,7 +31,9 @@ export default defineConfig({
                 empowerment: resolve(__dirname, 'html/empowerment.html'),               // 추가: 권한관리
                 register: resolve(__dirname, 'html/register.html'),                     // 추가: 회원가입 페이지
                 point: resolve(__dirname, 'html/point.html'),                           // 추가: 포인트(마일리지) 페이지
-                product: resolve(__dirname, 'html/product.html'),                       // 추가: 포인트(마일리지) 페이지
+                product: resolve(__dirname, 'html/product.html'),                       // 추가: 상품 목록 페이지
+                productDetail: resolve(__dirname, 'html/product-detail.html'),          // 추가: 상품 상세 페이지
+                productAdd: resolve(__dirname, 'html/product-add.html'),                // 추가: 상품 등록 페이지
                 franchise: resolve(__dirname, 'html/franchise_dashboard.html'),         // 추가: 프렌차이즈 메인 페이지
                 store: resolve(__dirname, 'html/store_dashboard.html'),                 // 추가: 회원 메인 페이지
                 // 다른 html들도 여기에 추가 가능

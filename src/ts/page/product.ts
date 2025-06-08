@@ -1,5 +1,6 @@
 import {getStoredUser} from "../utils/userStorage.ts";
 import {apiGet, apiPost} from "../api/apiHelpers.ts";
+import {MenuItem} from "../types/product.ts";
 
 const changeList: { menuId: number; empty?: string; delete?: boolean }[] = [];
 
@@ -10,16 +11,6 @@ export function initProduct() {
   if (!user) {
     alert("사용자 정보가 없습니다.");
     return;
-  }
-
-  interface MenuItem {
-    menuId: number;
-    userId: string;
-    no: number;
-    image: string;
-    name: string;
-    price: string;
-    empty: string;
   }
 
   async function fetchMenuList() {
@@ -42,7 +33,7 @@ export function initProduct() {
       <tr>
         <td>${item.no}</td>
         <td><img src="${imageUrl}" alt="상품 이미지" style="width:36px;height:46px; object-fit:cover;"></td>
-        <td class="product-name w-[100px] whitespace-normal break-all text-sm" onclick="window.open('./8.product_Set02.html?menuId=${item.menuId}', '_blank')">
+        <td class="product-name w-[100px] whitespace-normal break-all text-sm" onclick="window.open('./product-detail.html?menuId=${item.menuId}', '_blank')">
           ${item.name}
         </td>
         <td>${Number(item.price).toLocaleString()}</td>
