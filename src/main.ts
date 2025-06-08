@@ -75,6 +75,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         import("./ts/page/point.ts").then((module) => {
             module.initPoint();
         });
+    } else if (path === "/html/product.html") {
+        console.log("📌 상품 - product.ts 로드");
+        import("./ts/page/product.ts").then((module) => {
+            module.initProduct();
+        });
     } else if (path === "/html/register.html") {
         console.log("📌 회원가입 페이지 - register.ts 로드");
         import("./ts/page/register.ts").then((module) => {

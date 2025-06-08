@@ -522,7 +522,7 @@ input[type="checkbox"] {
     color:#999;
     border-bottom: 1px solid var(--stoke-gray);
 }
-.tableArea tr th ,.tableArea tr td  {padding: .5rem; white-space: nowrap;}
+.tableArea tr th ,.tableArea tr td  {padding: .5rem; white-space: normal;}
 .tableArea tr td  {font-size: 1.2rem;}
 .tableArea tbody tr {cursor: pointer; background: rgba(255, 255, 255, 0);  transition: backgrond 2s ease-in-out;}
 .tableArea tbody tr:hover {background: rgba(255, 255, 255, 0.2);}

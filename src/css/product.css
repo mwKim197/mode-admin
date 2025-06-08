@@ -1,0 +1,14 @@
+@charset "utf-8";
+
+.product-name {
+    white-space: normal;
+    word-break: break-all;
+    max-width: 100px;
+    font-size: 0.875rem; /* text-sm */
+}
+
+.tr-disabled {
+    opacity: 0.4;
+    pointer-events: none;
+    background-color: #f2f2f2;
+}

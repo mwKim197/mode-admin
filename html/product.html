@@ -6,7 +6,8 @@
   <link rel="stylesheet" href="/src/css/reset.css">
   <link rel="stylesheet" href="/src/css/common.css">
   <link rel="stylesheet" href="/src/css/style.css">
-  <script type="module" src="/src/main.ts"></script> <!-- ✅ 메인 진입 -->
+  <link rel="stylesheet" href="/src/css/product.css">
+  <script type="module" src="/src/main.ts"></script>
 </head>
 
 <body>
@@ -31,7 +32,7 @@
       <div class="inner">
         <h2 class="mb20">상품</h2>
         <div class="tableArea">
-          <table>
+          <table class="table-fixed w-full">
             <thead>
               <tr>
                 <th>순서</th>
@@ -42,42 +43,12 @@
                 <th></th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="menu-table-body">
               <tr onclick="window.open('./8.product_Set02.html', '_blank')">
                 <td>1</td>
-                <td><img src="/img/ice-coffee.svg" alt=""></td>
-                <td>아이스 <br>아메리카노</td>
-                <td>2,600</td>
                 <td>
-                  <label class="toggle-switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                  </label>
+                  <img src="https://model-narrow-road.s3.ap-northeast-2.amazonaws.com/model/model0000/108_%EA%BC%AC%EB%B6%81%EC%9D%B4.jpg" alt="상품 이미지" style="width:36px; height:46px; object-fit:cover;" />
                 </td>
-                <td>
-                  <span class="tag blue">제조</span>
-                  <span class="tag red">삭제</span>
-                </td>
-              </tr>
-              <tr  onclick="window.open('./8.product_Set02.html', '_blank')">
-                <td>2</td>
-                <td><img src="/img/ice-coffee.svg" alt=""></td>
-                <td>아이스 <br>아메리카노</td>
-                <td>2,600</td>
-                <td>
-                  <label class="toggle-switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                  </label>
-                </td>
-                <td>
-                  <span class="tag blue">제조</span>
-                  <span class="tag red">삭제</span>
-                </td>
-              </tr>
-              <tr  onclick="window.open('./8.product_Set02.html', '_blank')">
-                <td>3</td>
-                <td><img src="/img/ice-coffee.svg" alt=""></td>
                 <td>아이스 <br>아메리카노</td>
                 <td>2,600</td>
                 <td>
@@ -94,8 +65,9 @@
             </tbody>
           </table>            
         </div>
+        <div class="hidden whitespace-normal break-all max-w-[100px] text-sm"></div>
         <div class="btnFlex">
-          <button class="btn-outline">변경사항 저장</button>
+          <button id="saveBtn" class="btn-outline">변경사항 저장</button>
           <button class="btn blue"><a href="./8.projuct_Set01.html">상품 추가</a></button>
         </div>
       </div>
