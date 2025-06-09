@@ -1,6 +1,8 @@
+import "./css/common.css"; // 또는 상대 경로 맞게 수정
 import {checkUserAccess, getUserData} from "./ts/common/auth.ts";
 import "./ts/page/login.ts";
 import {loadPartials} from "./ts/utils/layoutLoader.ts";
+
 
 // 📌 main.ts (불필요한 코드 로딩 방지)
 document.addEventListener("DOMContentLoaded", async () => {
