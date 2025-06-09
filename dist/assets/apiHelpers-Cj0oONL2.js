@@ -1,0 +1,1 @@
+import{f as a}from"./main-oRYtEfGT.js";const i=async t=>await a(t,{method:"DELETE"}),n=async t=>await a(t,{method:"GET"}),o=async(t,s)=>await a(t,{method:"POST",body:JSON.stringify(s)}),r=async(t,s)=>await a(t,{method:"PUT",body:JSON.stringify(s)});export{n as a,i as b,r as c,o as d};

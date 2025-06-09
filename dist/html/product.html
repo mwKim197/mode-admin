@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <script type="module" crossorigin src="../assets/main-oRYtEfGT.js"></script>
+  <link rel="stylesheet" crossorigin href="../assets/style-B090HW4h.css">
+  <link rel="stylesheet" crossorigin href="../assets/product-C5mlyfJy.css">
+</head>
+
+<body>
+  <!-- 메인 -->
+  <div id="main-content">
+
+    <!--상품관리-->
+    <section class="mt8">
+      <div class="inner">
+        <div class="user-flex">
+          <div class="user">
+            <i class="fa-regular fa-circle-user"></i>
+            <p id="user-name">zero001 님</p>
+            <label class="label manager" id="user-grade"><span>총괄관리자</span></label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- table -->
+    <section class="pb20">
+      <div class="inner">
+        <h2 class="mb20">상품</h2>
+        <div class="tableArea">
+          <table class="table-fixed w-full">
+            <thead>
+              <tr>
+                <th>순서</th>
+                <th>이미지</th>
+                <th>상품명</th>
+                <th>가격</th>
+                <th>진열</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="menu-table-body">
+              <tr onclick="window.open('./product_set.html', '_blank')">
+                <td>1</td>
+                <td>
+                  <img src="https://model-narrow-road.s3.ap-northeast-2.amazonaws.com/model/model0000/108_%EA%BC%AC%EB%B6%81%EC%9D%B4.jpg" alt="상품 이미지" style="width:36px; height:46px; object-fit:cover;" />
+                </td>
+                <td>아이스 <br>아메리카노</td>
+                <td>2,600</td>
+                <td>
+                  <label class="toggle-switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                  </label>
+                </td>
+                <td>
+                  <span class="tag blue">제조</span>
+                  <span class="tag red">삭제</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>            
+        </div>
+        <div class="hidden whitespace-normal break-all max-w-[100px] text-sm"></div>
+        <div class="btnFlex">
+          <button id="saveBtn" class="btn-outline">변경사항 저장</button>
+          <button class="btn blue"><a href="./product-add.html">상품 추가</a></button>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+<script>
+  document.querySelectorAll(".clickable-row").forEach(row => {
+    row.addEventListener("click", function(e) {
+      // toggle-switch, input 클릭 시는 무시
+      if (e.target.closest('.toggle-switch') || e.target.tagName === 'INPUT') return;
+      window.open(this.dataset.href, '_blank');
+    });
+  });
+</script>
+</html>

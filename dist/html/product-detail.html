@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <script type="module" crossorigin src="../assets/main-oRYtEfGT.js"></script>
+  <link rel="stylesheet" crossorigin href="../assets/style-B090HW4h.css">
+  <link rel="stylesheet" crossorigin href="../assets/product-C5mlyfJy.css">
+</head>
+<body>
+<div id="main-content">
+  <section class="mt8">
+    <div class="inner">
+      <div class="user-flex">
+        <div class="user">
+          <i class="fa-regular fa-circle-user"></i>
+          <p id="user-name">zero001 님</p>
+          <label class="label manager" id="user-grade"><span>총괄관리자</span></label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pb20">
+    <div class="inner" id="section-container">
+      <div class="flex justify-end mb-4">
+        <button
+                id="back-button"
+                class="w-10 h-10 rounded-full bg-black/10 hover:bg-black/20 flex items-center justify-center text-xl"
+        >
+          ←
+        </button>
+      </div>
+      <!-- 이미지 업로드 -->
+      <div class="boxStyle gr mb20">
+        <div class="set-box">
+          <p class="ta-c">300X300</p>
+          <input type="file" id="logoUpload" accept="image/png" style="display: none;" />
+          <button class="btn-outline gr" onclick="document.getElementById('logoUpload').click()">파일선택</button>
+          <p id="fileName" class="mt10 fs14 gray"></p>
+          <div class="image-wrapper" style="position: relative; display: inline-block;">
+            <img id="logoPreview" src="" alt="로고 미리보기" class="mt10" style="max-width: 200px; display: none;">
+            <img id="overlay-new" class="state-overlay" src="" alt="New 상태" style="position: absolute; top: 0; left: 0; max-width: 200px; display: none; pointer-events: none;">
+            <img id="overlay-event" class="state-overlay" src="" alt="Event 상태" style="position: absolute; top: 0; left: 0; max-width: 200px; display: none; pointer-events: none;">
+            <img id="overlay-best" class="state-overlay" src="" alt="Best 상태" style="position: absolute; top: 0; left: 0; max-width: 200px; display: none; pointer-events: none;">
+          </div>
+        </div>
+      </div>
+
+      <!-- 기본 정보 입력 -->
+      <div class="boxStyle gr mb20">
+        <div class="input-group col">
+          <div>
+            <p class="fs14">순번</p>
+            <input type="text" id="menu-no">
+          </div>
+          <div>
+            <p class="fs14">메뉴명</p>
+            <input type="text" id="menu-name">
+          </div>
+        </div>
+      </div>
+
+      <div class="boxStyle gr mb20">
+        <div class="input-group col">
+          <div>
+            <p class="fs14">카테고리</p>
+            <select id="menu-category" class="popup-select mb0">
+              <option value="">선택</option>
+            </select>
+          </div>
+          <div>
+            <p class="fs14">금액</p>
+            <input type="text" id="menu-price">
+          </div>
+        </div>
+      </div>
+
+      <!-- 컵 / 얼음 선택 -->
+      <div class="boxStyle gr mb20">
+        <div class="radioBox">
+          <div class="details St02">
+            <p>컵</p>
+            <div class="radio-group">
+              <label><input type="radio" name="cup" value="plastic" checked> 플라스틱</label>
+              <label><input type="radio" name="cup" value="paper"> 종이컵</label>
+            </div>
+          </div>
+          <div class="details St02">
+            <p>얼음</p>
+            <div class="radio-group">
+              <label><input type="radio" name="iceYn" value="yes" checked> Yes</label>
+              <label><input type="radio" name="iceYn" value="no"> No</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 시간 입력 -->
+      <div class="boxStyle gr mb20">
+        <div class="input-group col">
+          <div>
+            <p class="fs14">얼음 시간</p>
+            <input type="text" id="ice-time">
+          </div>
+          <div>
+            <p class="fs14">물 시간</p>
+            <input type="text" id="water-time">
+          </div>
+        </div>
+      </div>
+
+      <!-- 상태 선택 -->
+      <div class="boxStyle gr mb20">
+        <h3 class="mb20">상태</h3>
+        <div class="input-group col">
+          <div>
+            <p class="fs14">New</p>
+            <select id="state-new" class="popup-select mb0">
+              <option value="" selected>선택</option>
+              <option value="new1">New1</option>
+              <option value="new2">New2</option>
+              <option value="new3">New3</option>
+            </select>
+          </div>
+          <div>
+            <p class="fs14">Event</p>
+            <select id="state-event" class="popup-select mb0">
+              <option value="" selected>선택</option>
+              <option value="event1">Event1</option>
+              <option value="event2">Event2</option>
+              <option value="event3">Event3</option>
+            </select>
+          </div>
+          <div>
+            <p class="fs14">Best</p>
+            <select id="state-best" class="popup-select mb0">
+              <option value="" selected>선택</option>
+              <option value="best1">Best1</option>
+              <option value="best2">Best2</option>
+              <option value="best3">Best3</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 품절 여부, 일반 상품 여부 (옵션에 따라 수정 필요 시 활용 가능) -->
+      <div class="boxStyle gr mb20">
+        <div class="radioBox">
+          <div class="details St02">
+            <p>품절여부</p>
+            <div class="radio-group">
+              <label><input type="radio" name="empty" value="yes"> Yes</label>
+              <label><input type="radio" name="empty" value="no" checked> No</label>
+            </div>
+          </div>
+          <div class="details St02">
+            <p>일반상품여부</p>
+            <div class="radio-group">
+              <label><input type="radio" name="general" value="yes" checked> Yes</label>
+              <label><input type="radio" name="general" value="no"> No</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 버튼 영역 -->
+      <div class="btnFlex">
+        <button class="btn-outline">저장</button>
+        <button class="btn blue" id="add-item-btn">+ 항목 추가</button>
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+</html>
