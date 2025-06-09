@@ -1,6 +1,32 @@
 import { getStoredUser } from "../utils/userStorage.ts";
 import { apiGet } from "../api/apiHelpers.ts";
 
+const stateNew = document.getElementById("state-new") as HTMLSelectElement;
+const stateEvent = document.getElementById("state-event") as HTMLSelectElement;
+const stateBest = document.getElementById("state-best") as HTMLSelectElement;
+
+const overlayNew = document.getElementById("overlay-new") as HTMLImageElement;
+const overlayEvent = document.getElementById("overlay-event") as HTMLImageElement;
+const overlayBest = document.getElementById("overlay-best") as HTMLImageElement;
+
+const BASE_URL = "/img/"; // 예: "/img/new1.png"
+
+// 상태별 업데이트 함수
+function updateOverlay(selectEl: HTMLSelectElement, overlayEl: HTMLImageElement) {
+  const val = selectEl.value;
+  if (val) {
+    overlayEl.src = `${BASE_URL}${val}.png`;
+    overlayEl.style.display = "block";
+  } else {
+    overlayEl.style.display = "none";
+  }
+}
+
+// 이벤트 바인딩
+stateNew.addEventListener("change", () => updateOverlay(stateNew, overlayNew));
+stateEvent.addEventListener("change", () => updateOverlay(stateEvent, overlayEvent));
+stateBest.addEventListener("change", () => updateOverlay(stateBest, overlayBest));
+
 // ✅ 초기화 함수
 export async function initProductDetail() {
   const user = getStoredUser();
@@ -96,4 +122,9 @@ function applyMenuData(menu: any) {
   (document.getElementById("state-new") as HTMLSelectElement).value = menu.state?.new || "";
   (document.getElementById("state-event") as HTMLSelectElement).value = menu.state?.event || "";
   (document.getElementById("state-best") as HTMLSelectElement).value = menu.state?.best || "";
+
+  // ✅ 상태 이미지 갱신
+  updateOverlay(stateNew, overlayNew);
+  updateOverlay(stateEvent, overlayEvent);
+  updateOverlay(stateBest, overlayBest);
 }
