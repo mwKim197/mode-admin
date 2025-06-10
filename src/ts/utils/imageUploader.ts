@@ -33,7 +33,7 @@ export function handleImageUpload(
       // base64 추출
       const reader = new FileReader();
       reader.onload = () => {
-        const base64 = (reader.result as string).replace(/^data:image\/png;base64,/, "");
+        const base64 = (reader.result as string).replace(/^data:image\/\w+;base64,/, "");
         resolve({ base64, fileName: file.name, dataUrl: reader.result as string });
       };
       reader.onerror = reject;
