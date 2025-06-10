@@ -1,6 +1,7 @@
 import {getStoredUser} from "../utils/userStorage.ts";
+import {renderProductForm} from "../form/renderProductForm.ts";
 
-export function initProductAdd() {
+export async function initProductAdd() {
   // localstorage에 저장된 user 정보를 불러옴
   const user = getStoredUser();
 
@@ -9,5 +10,5 @@ export function initProductAdd() {
     return;
   }
 
+  await renderProductForm();  // 기본화면 렌더링
 }
-

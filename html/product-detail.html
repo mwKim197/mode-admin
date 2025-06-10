@@ -25,10 +25,9 @@
 
   <section class="pb20">
     <div class="inner" id="section-container">
-      <div class="bg-red-500 text-white p-4 rounded">
-        Tailwind 작동 테스트
+      <div class="back-box">
+        <button class="back-button" onclick="history.back()" title="뒤로가기">←</button>
       </div>
-
       <!-- 이미지 업로드 -->
       <div class="boxStyle gr mb20">
         <div class="set-box">
@@ -77,6 +76,13 @@
       <!-- 컵 / 얼음 선택 -->
       <div class="boxStyle gr mb20">
         <div class="radioBox">
+          <div class="details St02">
+            <p>일반상품</p>
+            <div class="radio-group">
+              <label><input type="radio" name="cupYn" value="yes"> 일반상품</label>
+              <label><input type="radio" name="cupYn" value="no" checked> 음료상품</label>
+            </div>
+          </div>
           <div class="details St02">
             <p>컵</p>
             <div class="radio-group">
@@ -167,8 +173,8 @@
 
       <!-- 버튼 영역 -->
       <div class="btnFlex">
-        <button class="btn-outline">저장</button>
-        <button class="btn blue" id="add-item-btn">+ 항목 추가</button>
+        <button class="btn-outline" id="saveDtlBtn">저장</button>
+        <button class="btn blue" id="addItemBtn">+ 항목 추가</button>
       </div>
     </div>
   </section>

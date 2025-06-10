@@ -35,6 +35,7 @@ export interface MenuDetail {
     price: string;
     category: string;
     cup: string; // "plastic" | "paper" 등
+    cupYn: string;
     empty: string; // "yes" | "no"
     iceYn: string; // "yes" | "no"
     iceTime: string;

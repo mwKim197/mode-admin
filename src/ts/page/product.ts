@@ -33,7 +33,7 @@ export function initProduct() {
       <tr>
         <td>${item.no}</td>
         <td><img src="${imageUrl}" alt="상품 이미지" style="width:36px;height:46px; object-fit:cover;"></td>
-        <td class="product-name w-[100px] whitespace-normal break-all text-sm" onclick="window.open('./product-detail.html?menuId=${item.menuId}', '_blank')">
+        <td class="product-name w-[100px] whitespace-normal break-all text-sm" onclick="window.location.href='./product-detail.html?menuId=${item.menuId}'">
           ${item.name}
         </td>
         <td>${Number(item.price).toLocaleString()}</td>

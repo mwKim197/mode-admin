@@ -122,7 +122,7 @@ export function renderItems(items: any[]) {
 }
 
 // 새 항목 추가
-document.getElementById("add-item-btn")?.addEventListener("click", () => {
+document.getElementById("addItemBtn")?.addEventListener("click", () => {
   const container = document.getElementById("items-container")!;
   const index = container.children.length;
   const block = createItemBlock(index); // 빈 상태로 추가

@@ -290,7 +290,7 @@ function previewLogo(event) {
 
 //   항목 추가
 const container = document.getElementById("section-container");
-const addButton = document.getElementById("add-item-btn");
+const addButton = document.getElementById("addItemBtn");
 
 let itemCount = 1;
 
