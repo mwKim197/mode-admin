@@ -8,9 +8,6 @@ const __dirname = dirname(__filename);
 
 export default defineConfig({
     base: "./", // ✅ 경로를 상대 경로로 설정 (필수!)
-    css: {
-        postcss: "./postcss.config.js",
-    },
     optimizeDeps: {
         include: ["suneditor"],
     },

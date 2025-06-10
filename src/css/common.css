@@ -1,7 +1,4 @@
 @charset "utf-8";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 /* Medium */
 @font-face {
@@ -855,6 +852,5 @@ section>* {
     .hamburger {
         width:34px;
     }
-    
 
 }
