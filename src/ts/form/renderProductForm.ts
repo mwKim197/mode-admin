@@ -2,14 +2,7 @@ import { getStoredUser } from "../utils/userStorage.ts";
 import { apiGet } from "../api/apiHelpers.ts";
 import {createItemBlock} from "../components/ItemBlock.ts";
 
-const stateNew = document.getElementById("state-new") as HTMLSelectElement;
-const stateEvent = document.getElementById("state-event") as HTMLSelectElement;
-const stateBest = document.getElementById("state-best") as HTMLSelectElement;
-
-const overlayNew = document.getElementById("overlay-new") as HTMLImageElement;
-const overlayEvent = document.getElementById("overlay-event") as HTMLImageElement;
-const overlayBest = document.getElementById("overlay-best") as HTMLImageElement;
-
+const logoPreview = document.getElementById("logoPreview") as HTMLImageElement;
 const BASE_URL = "/img/"; // 예: "/img/new1.png"
 
 // 상태별 업데이트 함수
@@ -23,10 +16,35 @@ function updateOverlay(selectEl: HTMLSelectElement, overlayEl: HTMLImageElement)
   }
 }
 
-// 이벤트 바인딩
-stateNew.addEventListener("change", () => updateOverlay(stateNew, overlayNew));
-stateEvent.addEventListener("change", () => updateOverlay(stateEvent, overlayEvent));
-stateBest.addEventListener("change", () => updateOverlay(stateBest, overlayBest));
+function attachStateChangeHandler(stateEl: HTMLSelectElement, overlayEl: HTMLImageElement) {
+  stateEl.addEventListener("change", () => {
+    const src = logoPreview?.src || "";
+    const isImageSelected =
+        src.startsWith("blob:") ||
+        src.startsWith("data:") ||
+        src.includes("s3.ap-northeast-2.amazonaws.com");
+
+    if (!isImageSelected) {
+      alert("이미지를 선택해주세요.");
+      stateEl.value = ""; // 선택 초기화 (선택사항)
+      return;
+    }
+    updateOverlay(stateEl, overlayEl);
+  });
+}
+
+const stateNew = document.getElementById("state-new") as HTMLSelectElement;
+const stateEvent = document.getElementById("state-event") as HTMLSelectElement;
+const stateBest = document.getElementById("state-best") as HTMLSelectElement;
+
+const overlayNew = document.getElementById("overlay-new") as HTMLImageElement;
+const overlayEvent = document.getElementById("overlay-event") as HTMLImageElement;
+const overlayBest = document.getElementById("overlay-best") as HTMLImageElement;
+
+// 핸들러 연결
+attachStateChangeHandler(stateNew, overlayNew);
+attachStateChangeHandler(stateEvent, overlayEvent);
+attachStateChangeHandler(stateBest, overlayBest);
 
 // ✅ 초기화 함수
 export async function renderProductForm(menu?: any) {

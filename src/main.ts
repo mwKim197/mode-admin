@@ -2,17 +2,18 @@ import "./css/common.css"; // 또는 상대 경로 맞게 수정
 import {checkUserAccess, getUserData} from "./ts/common/auth.ts";
 import "./ts/page/login.ts";
 import {loadPartials} from "./ts/utils/layoutLoader.ts";
+import {ToastType} from "./ts/types/common.ts";
 
 // 글로벌 등록
 declare global {
     interface Window {
         showLoading: () => void;
         hideLoading: () => void;
+        showToast: (msg: string, duration?: number) => void;
     }
 }
 
-window.showLoading = showLoading;
-window.hideLoading = hideLoading;
+// ------- 로딩 딤 --------//
 
 function showLoading() {
     const loader = document.getElementById("global-loading");
@@ -23,8 +24,89 @@ function hideLoading() {
     const loader = document.getElementById("global-loading");
     if (loader) loader.style.display = "none";
 }
+window.showLoading = showLoading;
+window.hideLoading = hideLoading;
+// ------- 로딩 딤 --------//
+
+// ------- 토스트 메세지 --------//
+
+export function showToast(message: string, duration = 3000, type: ToastType = "success") {
+    const containerId = "toast-container";
+    let container = document.getElementById(containerId);
+
+    if (!container) {
+        container = document.createElement("div");
+        container.id = containerId;
+        container.style.cssText = `
+          position: fixed;
+          top: 1rem;
+          right: 2rem; /* ✅ 오른쪽 여백은 고정 */
+          z-index: 9999;
+          display: flex;
+          flex-direction: column;
+          align-items: center; /* ✅ 오른쪽 정렬 */
+        `;
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement("div");
+    toast.textContent = message;
+
+    // ✅ 스타일 분기
+    const styleMap = {
+        success: {
+            background: "#e6fbe6",
+            border: "2px solid #4CAF50",
+            color: "#2e7d32"
+        },
+        error: {
+            background: "#fde8e8",
+            border: "2px solid #f44336",
+            color: "#b71c1c"
+        },
+        warning: {
+            background: "#fff8e1",
+            border: "2px solid #ffb300",
+            color: "#795548"
+        }
+    };
+
+    const style = styleMap[type];
+
+    toast.style.cssText = `
+    background: ${style.background};
+    color: ${style.color};
+    border: ${style.border};
+    padding: 0.8rem 1.2rem;
+    margin-top: 0.5rem;
+    border-radius: 0.5rem;
+    font-size: 1.2rem;
+    max-width: 320px;                /* ✅ 최대 너비 제한 */
+    white-space: normal;             /* ✅ 줄바꿈 허용 */
+    word-break: break-word;          /* ✅ 단어 길어도 줄바꿈 */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(-10px);
+  `;
+
+    container.appendChild(toast);
+
+    requestAnimationFrame(() => {
+        toast.style.opacity = "1";
+        toast.style.transform = "translateY(0)";
+    });
+
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(-10px)";
+        setTimeout(() => container?.removeChild(toast), 300);
+    }, duration);
+}
 
 
+window.showToast = showToast;
+// ------- 토스트 메세지 --------//
 
 // 📌 main.ts (불필요한 코드 로딩 방지)
 document.addEventListener("DOMContentLoaded", async () => {
