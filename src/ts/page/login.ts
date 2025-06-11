@@ -27,6 +27,8 @@ export function initLogin() {
             return;
         }
 
+        // 글로벌
+        window.showLoading(); // ✅ 로딩 시작
         try {
             console.log("🚀 로그인 요청 시작:", { adminId, password }); // [TODO]⚠️ 테스트 후 비밀번호는 지워도 됨
 
@@ -89,6 +91,9 @@ export function initLogin() {
         } catch (error) {
             console.error("❌ 로그인 요청 중 오류 발생:", error);
             alert("서버 오류가 발생했습니다. 다시 시도하세요.");
+        } finally {
+            // 글로벌
+            window.hideLoading(); // ✅ 로딩 종료
         }
     });
 

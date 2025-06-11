@@ -42,6 +42,9 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
         }
     };
 
+    // 글로벌
+    window.showLoading(); // ✅ 로딩 시작
+
     try {
         const response = await fetch(`${API_URL}${endpoint}`, fetchOptions);
 
@@ -66,5 +69,8 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
             status: 500,
             json: async () => ({ message: "❌ API 요청 오류" }),
         };
+    } finally {
+        // 글로벌
+        window.hideLoading(); // ✅ 로딩 종료
     }
 }

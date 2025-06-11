@@ -3,6 +3,28 @@ import {checkUserAccess, getUserData} from "./ts/common/auth.ts";
 import "./ts/page/login.ts";
 import {loadPartials} from "./ts/utils/layoutLoader.ts";
 
+// 글로벌 등록
+declare global {
+    interface Window {
+        showLoading: () => void;
+        hideLoading: () => void;
+    }
+}
+
+window.showLoading = showLoading;
+window.hideLoading = hideLoading;
+
+function showLoading() {
+    const loader = document.getElementById("global-loading");
+    if (loader) loader.style.display = "flex";
+}
+
+function hideLoading() {
+    const loader = document.getElementById("global-loading");
+    if (loader) loader.style.display = "none";
+}
+
+
 
 // 📌 main.ts (불필요한 코드 로딩 방지)
 document.addEventListener("DOMContentLoaded", async () => {
@@ -121,4 +143,3 @@ document.addEventListener("DOMContentLoaded", async () => {
 window.addEventListener("load", () => {
     document.body.style.visibility = "visible";
 });
-
