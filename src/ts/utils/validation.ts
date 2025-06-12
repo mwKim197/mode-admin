@@ -40,12 +40,12 @@ export function validateMenuItemsByType(detail: MenuDetail): string | null {
 
     if (item.type === "coffee") {
       if (parseFloat(item.value1) > 0) {
-        if (parseFloat(item.value2) !== 0) return `☕ 그라인더1 사용 시, 그라인더2는 0이어야 합니다.`;
+        if (parseFloat(item.value2)) return `☕ 그라인더1 사용 시, 그라인더2는 0이어야 합니다.`;
         if (!isValidValue(item.value1)) return `☕ 그라인더1 값은 1~6 초 범위의 소수여야 합니다.`;
       }
 
       if (parseFloat(item.value2) > 0) {
-        if (parseFloat(item.value1) !== 0) return `☕ 그라인더2 사용 시, 그라인더1은 0이어야 합니다.`;
+        if (parseFloat(item.value1)) return `☕ 그라인더2 사용 시, 그라인더1은 0이어야 합니다.`;
         if (!isValidValue(item.value2)) return `☕ 그라인더2 값은 1~6 초 범위의 소수여야 합니다.`;
       }
     }
