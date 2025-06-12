@@ -1,3 +1,5 @@
+import {validateMenuItemsByType} from "../utils/validation.ts";
+
 export type ItemType = "coffee" | "garucha" | "syrup" | "";
 
 export interface ItemData {
@@ -37,6 +39,8 @@ export function createItemBlock(index: number, itemData?: ItemData): HTMLElement
     const newBlock = createItemBlock(index, { type: newType }); // ⚠️ 초기화된 폼
     container.replaceChild(newBlock, wrapper);
   });
+
+  attachValidationEvents(wrapper); // ✅ 여기서 호출
 
   return wrapper;
 }
@@ -83,4 +87,35 @@ function getDetailHTML(type: ItemType, data: any = {}): string {
   }
 
   return "";
+}
+
+// 각 item 벨리데이션체크
+function attachValidationEvents(wrapper: HTMLElement) {
+  const inputs = wrapper.querySelectorAll("input, select");
+
+  for (const el of inputs) {
+    el.addEventListener("blur", () => {
+      const itemBlock = wrapper;
+      const type = (itemBlock.querySelector(".item-type-select") as HTMLSelectElement).value as ItemType;
+      const inputEls = itemBlock.querySelectorAll("input");
+
+      const itemData = {
+        type,
+        value1: (inputEls[0] as HTMLInputElement)?.value,
+        value2: (inputEls[1] as HTMLInputElement)?.value,
+        value3: (inputEls[2] as HTMLInputElement)?.value,
+        value4: (inputEls[3] as HTMLInputElement)?.value
+      };
+
+      // 단일 항목만 검사하는 임시 menuData
+      const dummyMenu = {
+        items: [itemData]
+      };
+
+      const err = validateMenuItemsByType(dummyMenu as any);
+      if (err) {
+        window.showToast(err, 2000, "error");
+      }
+    });
+  }
 }

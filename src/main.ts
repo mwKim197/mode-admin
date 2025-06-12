@@ -9,7 +9,7 @@ declare global {
     interface Window {
         showLoading: () => void;
         hideLoading: () => void;
-        showToast: (msg: string, duration?: number) => void;
+        showToast: (msg: string, duration?: number, type?: ToastType ) => void;
     }
 }
 

@@ -23,7 +23,7 @@ export interface MenuItemIngredient {
     value1: string;  // 혹은 number로도 가능
     value2: string;  // 혹은 number
     value3: string;  // 혹은 number
-    value4: string | number; // 0으로 오는 경우가 있어 number도 허용
+    value4: string; // 0으로 오는 경우가 있어 number도 허용
 }
 
 // 상품 상세

@@ -4,6 +4,7 @@ import { getStoredUser } from "../utils/userStorage.ts";
 import { apiPost } from "../api/apiHelpers.ts";
 import { MenuDetail, MenuItemIngredient, MenuState } from "../types/product.ts";
 import { handleImageUpload } from "../utils/imageUploader.ts";
+import {validateMenuDetail} from "../utils/validation.ts";
 
 // 이미지 파일정보
 let uploadedImageBase64: string;
@@ -30,37 +31,39 @@ export async function initProductAdd() {
 
   if (saveBtn) {
     saveBtn.addEventListener("click", async () => {
-      const newMenuData = collectMenuDetail(user.userId);
+      const payload = collectMenuDetail(user.userId);
+      const validateChk = validateMenuDetail(payload);
+      console.log(payload);
+      if (validateChk) {
+        window.showToast(validateChk, 3000, "warning");
+      } else {
+        if (confirm("신규 메뉴를 등록하시겠습니까?")) {
+          const postData = {
+            userId: user.userId,
+            data: payload,
+            ...(uploadedImageBase64 && uploadedFileName && {
+              originalFileName: uploadedFileName,
+              imageBase64: uploadedImageBase64
+            })
+          };
+          console.log("postData: ", postData);
 
-      const payload = {
-        ...newMenuData,
-        ...(uploadedImageBase64 && uploadedFileName && {
-          originalFileName: uploadedFileName,
-          imageBase64: uploadedImageBase64
-        })
-      };
+          try {
+            const res = await apiPost(`/model_admin_menu?func=set-new-menu`, postData);
 
-      if (confirm("신규 메뉴를 등록하시겠습니까?")) {
-        const postData = {
-          userId: user.userId,
-          data: payload
-        };
-        console.log("postData: ", postData);
+            if (!res.ok) {
+              alert("신규 메뉴 등록에 실패하였습니다.");
+              return;
+            }
 
-        try {
-          const res = await apiPost(`/model_admin_menu?func=set-new-menu`, postData);
-
-          if (!res.ok) {
-            alert("신규 메뉴 등록에 실패하였습니다.");
-            return;
+            alert("신규 메뉴가 등록되었습니다.");
+          } catch (err) {
+            console.error("등록 중 오류 발생:", err);
+            alert("오류가 발생했습니다.");
           }
-
-          alert("신규 메뉴가 등록되었습니다.");
-        } catch (err) {
-          console.error("등록 중 오류 발생:", err);
-          alert("오류가 발생했습니다.");
         }
       }
+
     });
   }
 }
