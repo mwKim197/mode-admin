@@ -4,7 +4,7 @@ import { getStoredUser } from "../utils/userStorage.ts";
 import { apiPost } from "../api/apiHelpers.ts";
 import { MenuDetail, MenuItemIngredient, MenuState } from "../types/product.ts";
 import { handleImageUpload } from "../utils/imageUploader.ts";
-import {validateMenuDetail} from "../utils/validation.ts";
+import {validateMenuDetail, validateMenuItemsByType} from "../utils/validation.ts";
 
 // 이미지 파일정보
 let uploadedImageBase64: string;
@@ -32,35 +32,50 @@ export async function initProductAdd() {
   if (saveBtn) {
     saveBtn.addEventListener("click", async () => {
       const payload = collectMenuDetail(user.userId);
-      const validateChk = validateMenuDetail(payload);
       console.log(payload);
+
+      if (!uploadedImageBase64 || !uploadedFileName) {
+        window.showToast("이미지 등록은 필수입니다.", 3000, "warning");
+        return;
+      }
+
+      const validateChk = validateMenuDetail(payload);
+
       if (validateChk) {
         window.showToast(validateChk, 3000, "warning");
-      } else {
-        if (confirm("신규 메뉴를 등록하시겠습니까?")) {
-          const postData = {
-            userId: user.userId,
-            data: payload,
-            ...(uploadedImageBase64 && uploadedFileName && {
-              originalFileName: uploadedFileName,
-              imageBase64: uploadedImageBase64
-            })
-          };
-          console.log("postData: ", postData);
+        return;
+      }
 
-          try {
-            const res = await apiPost(`/model_admin_menu?func=set-new-menu`, postData);
+      const itemsValidate = validateMenuItemsByType(payload);
 
-            if (!res.ok) {
-              alert("신규 메뉴 등록에 실패하였습니다.");
-              return;
-            }
+      if (itemsValidate) {
+        window.showToast(itemsValidate, 3000, "warning");
+        return;
+      }
 
-            alert("신규 메뉴가 등록되었습니다.");
-          } catch (err) {
-            console.error("등록 중 오류 발생:", err);
-            alert("오류가 발생했습니다.");
+      if (confirm("신규 메뉴를 등록하시겠습니까?")) {
+        const postData = {
+          userId: user.userId,
+          data: payload,
+          ...(uploadedImageBase64 && uploadedFileName && {
+            originalFileName: uploadedFileName,
+            imageBase64: uploadedImageBase64
+          })
+        };
+        console.log("postData: ", postData);
+
+        try {
+          const res = await apiPost(`/model_admin_menu?func=set-new-menu`, postData);
+
+          if (!res.ok) {
+            window.showToast("신규 메뉴 등록에 실패하였습니다.", 3000, "error");
+            return;
           }
+          alert("신규 메뉴가 등록되었습니다.");
+
+        } catch (err) {
+          console.error("등록 중 오류 발생:", err);
+          window.showToast("오류가 발생했습니다.", 3000, "error");
         }
       }
 
@@ -74,7 +89,7 @@ async function setImage(e: any) {
   const fileNameEl = document.getElementById("fileName");
 
   if (!fileNameEl) {
-    alert("에러발생");
+    window.showToast("에러발생", 3000, "error");
     return;
   }
 
@@ -83,6 +98,7 @@ async function setImage(e: any) {
     uploadedImageBase64 = base64;
     uploadedFileName = fileName;
   } catch (err) {
+    window.showToast("이미지 업로드 실패", 3000, "error");
     console.warn("이미지 업로드 실패:", err);
   }
 }
@@ -113,13 +129,13 @@ function collectMenuDetail(userId: string): MenuDetail {
     const type = (itemEl.querySelector(".item-type-select") as HTMLSelectElement)?.value || "";
     const inputs = itemEl.querySelectorAll("input");
 
-    const value1 = (inputs[0] as HTMLInputElement)?.value || "";
-    const value2 = (inputs[1] as HTMLInputElement)?.value || "";
-    const value3 = (inputs[2] as HTMLInputElement)?.value || "";
+    const value1 = (inputs[0] as HTMLInputElement)?.value || "0";
+    const value2 = (inputs[1] as HTMLInputElement)?.value || "0";
+    const value3 = (inputs[2] as HTMLInputElement)?.value || "0";
 
     const value4 = type === "garucha"
         ? "0"
-        : (inputs[3] as HTMLInputElement)?.value || "";
+        : (inputs[3] as HTMLInputElement)?.value || "0";
 
     return {
       no: String(index + 1),
