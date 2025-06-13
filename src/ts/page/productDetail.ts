@@ -4,6 +4,7 @@ import {getStoredUser} from "../utils/userStorage.ts";
 import {apiGet, apiPut} from "../api/apiHelpers.ts";
 import {MenuDetail, MenuItemIngredient, MenuState} from "../types/product.ts";
 import {handleImageUpload} from "../utils/imageUploader.ts";
+import {validateMenuDetail, validateMenuItemsByType} from "../utils/validation.ts";
 
 // 이미지 파일정보
 let uploadedImageBase64: string;
@@ -39,6 +40,20 @@ export async function initProductDetail() {
 
     saveBtn.addEventListener("click", async () => {
       const updatedPayload = collectMenuDetail(user.userId);
+
+      const validateChk = validateMenuDetail(updatedPayload);
+
+      if (validateChk) {
+        window.showToast(validateChk, 3000, "warning");
+        return;
+      }
+
+      const itemsValidate = validateMenuItemsByType(updatedPayload);
+
+      if (itemsValidate) {
+        window.showToast(itemsValidate, 3000, "warning");
+        return;
+      }
 
       // 이미지 추가의 경우
       const payload = {

@@ -50,12 +50,12 @@ function getDetailHTML(type: ItemType, data: any = {}): string {
   if (type === "coffee") {
     return `
       <div class="input-group col mb20">
-        <div><p class="fs14">원두 1</p><input type="text" value="${data.value1 || ""}" /></div>
-        <div><p class="fs14">원두 2</p><input type="text" value="${data.value2 || ""}" /></div>
+        <div><p class="fs14">원두 1</p><input type="text" value="${data.value1 || "0"}" /></div>
+        <div><p class="fs14">원두 2</p><input type="text" value="${data.value2 || "0"}" /></div>
       </div>
       <div class="input-group col">
-        <div><p class="fs14">추출량</p><input type="text" value="${data.value3 || ""}" /></div>
-        <div><p class="fs14">온수</p><input type="text" value="${data.value4 || ""}" /></div>
+        <div><p class="fs14">추출량</p><input type="text" value="${data.value3 || "0"}" /></div>
+        <div><p class="fs14">온수</p><input type="text" value="${data.value4 || "0"}" /></div>
       </div>
     `;
   }
@@ -63,11 +63,11 @@ function getDetailHTML(type: ItemType, data: any = {}): string {
   if (type === "garucha") {
     return `
       <div class="input-group col mb20">
-        <div><p class="fs14">차 종류</p><input type="text" value="${data.value1 || ""}" /></div>
-        <div><p class="fs14">추출 시간</p><input type="text" value="${data.value2 || ""}" /></div>
+        <div><p class="fs14">차 종류</p><input type="text" value="${data.value1 || "0"}" /></div>
+        <div><p class="fs14">추출 시간</p><input type="text" value="${data.value2 || "0"}" /></div>
       </div>
       <div class="input-group col">
-        <div><p class="fs14">온수</p><input type="text" value="${data.value3 || ""}" /></div>
+        <div><p class="fs14">온수</p><input type="text" value="${data.value3 || "0"}" /></div>
         <div></div>
       </div>
     `;
@@ -76,12 +76,12 @@ function getDetailHTML(type: ItemType, data: any = {}): string {
   if (type === "syrup") {
     return `
       <div class="input-group col mb20">
-        <div><p class="fs14">시럽 종류</p><input type="text" value="${data.value1 || ""}" /></div>
-        <div><p class="fs14">펌프 시간</p><input type="text" value="${data.value2 || ""}" /></div>
+        <div><p class="fs14">시럽 종류</p><input type="text" value="${data.value1 || "0"}" /></div>
+        <div><p class="fs14">펌프 시간</p><input type="text" value="${data.value2 || "0"}" /></div>
       </div>
       <div class="input-group col">
-        <div><p class="fs14">온수</p><input type="text" value="${data.value3 || ""}" /></div>
-        <div><p class="fs14">탄산수</p><input type="text" value="${data.value4 || ""}" /></div>
+        <div><p class="fs14">온수</p><input type="text" value="${data.value3 || "0"}" /></div>
+        <div><p class="fs14">탄산수</p><input type="text" value="${data.value4 || "0"}" /></div>
       </div>
     `;
   }
