@@ -32,7 +32,7 @@ export async function initProductAdd() {
   if (saveBtn) {
     saveBtn.addEventListener("click", async () => {
       const payload = collectMenuDetail(user.userId);
-      console.log(payload);
+      console.log("???" , payload);
 
       if (!uploadedImageBase64 || !uploadedFileName) {
         window.showToast("이미지 등록은 필수입니다.", 3000, "warning");
@@ -108,14 +108,14 @@ function collectMenuDetail(userId: string): MenuDetail {
   const menuId = 0; // 신규 등록 시 0 또는 undefined
   const no = Number((document.getElementById("menu-no") as HTMLInputElement).value);
   const name = (document.getElementById("menu-name") as HTMLInputElement).value;
-  const price = (document.getElementById("menu-price") as HTMLInputElement).value;
+  const price = (document.getElementById("menu-price") as HTMLInputElement).value.trim();
   const category = (document.getElementById("menu-category") as HTMLSelectElement).value;
   const cupYn = (document.querySelector('input[name="cupYn"]:checked') as HTMLInputElement)?.value || "no";
   const cup = (document.querySelector('input[name="cup"]:checked') as HTMLInputElement)?.value || "";
   const iceYn = (document.querySelector('input[name="iceYn"]:checked') as HTMLInputElement)?.value || "";
   const empty = (document.querySelector('input[name="empty"]:checked') as HTMLInputElement)?.value || "";
-  const iceTime = (document.getElementById("ice-time") as HTMLInputElement).value;
-  const waterTime = (document.getElementById("water-time") as HTMLInputElement).value;
+  const iceTime = (document.getElementById("ice-time") as HTMLInputElement).value.trim();
+  const waterTime = (document.getElementById("water-time") as HTMLInputElement).value.trim();
 
   const image = ""; // 이미지 경로는 별도 처리
 
@@ -129,13 +129,13 @@ function collectMenuDetail(userId: string): MenuDetail {
     const type = (itemEl.querySelector(".item-type-select") as HTMLSelectElement)?.value || "";
     const inputs = itemEl.querySelectorAll("input");
 
-    const value1 = (inputs[0] as HTMLInputElement)?.value || "0";
-    const value2 = (inputs[1] as HTMLInputElement)?.value || "0";
-    const value3 = (inputs[2] as HTMLInputElement)?.value || "0";
+    const value1 = String(parseFloat((inputs[0] as HTMLInputElement)?.value || "0"));
+    const value2 = String(parseFloat((inputs[1] as HTMLInputElement)?.value || "0"));
+    const value3 = String(parseFloat((inputs[2] as HTMLInputElement)?.value || "0"));
 
     const value4 = type === "garucha"
         ? "0"
-        : (inputs[3] as HTMLInputElement)?.value || "0";
+        : String(parseFloat((inputs[3] as HTMLInputElement)?.value || "0"));
 
     return {
       no: String(index + 1),
@@ -165,3 +165,4 @@ function collectMenuDetail(userId: string): MenuDetail {
     items
   };
 }
+

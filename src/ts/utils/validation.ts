@@ -1,16 +1,17 @@
 // utils/validation.ts
 import { MenuDetail } from "../types/product.ts";
-import {isValidNumber} from "./common.ts";
+import {isValidDecimal1Strict, isValidIntegerStrict} from "./common.ts";
 
 // 기본 값 체크
 export function validateMenuDetail(detail: MenuDetail): string | null {
   if (!detail.no) return "📛 순번을 입력해주세요.";
   if (!detail.name?.trim()) return "📛 메뉴 이름을 입력해주세요.";
-  if (!detail.price?.trim() || !isValidNumber(detail.price)) return "📛 가격을 숫자로 입력해주세요.";
   if (!detail.category) return "📛 카테고리를 선택해주세요.";
+  const price = detail.price;
+  if (!price?.trim() || !isValidIntegerStrict(price)) return "📛 가격을 정수로 입력해주세요.";
 
   if (detail.cupYn === "no" && !detail.cup) return "📛 컵 종류를 선택해주세요.";
-  if (detail.cupYn === "no" && detail.iceYn === "yes" && !isValidNumber(detail.iceTime)) return "📛 얼음 시간을 입력해주세요.";
+  if (detail.cupYn === "no" && detail.iceYn === "yes" && !isValidDecimal1Strict(detail.iceTime)) return "📛 얼음 시간을 입력해주세요.";
   if (detail.cupYn === "no" && detail.items.length === 0) return "📛 음료상품은 항목을 추가해야합니다.";
 
   for (let i = 0; i < detail.items.length; i++) {
@@ -19,11 +20,11 @@ export function validateMenuDetail(detail: MenuDetail): string | null {
     if (item.type === "coffee" && !(parseFloat(item.value1) > 0 || parseFloat(item.value2) > 0)) {
       return `📛 원두1, 원두2 중 한개의 값은 입력해야합니다.`;
     } else if (item.type !== "coffee") {
-      if (!isValidNumber(item.value1)) return `📛 ${i + 1}번째 재료의 첫 번째 값을 입력해주세요.`;
-      if (!isValidNumber(item.value2)) return `📛 ${i + 1}번째 재료의 두 번째 값을 입력해주세요.`;
+      if (!isValidDecimal1Strict(item.value1)) return `📛 ${i + 1}번째 재료의 첫 번째 값을 입력해주세요.`;
+      if (!isValidDecimal1Strict(item.value2)) return `📛 ${i + 1}번째 재료의 두 번째 값을 입력해주세요.`;
     }
-    if (!isValidNumber(item.value3)) return `📛 ${i + 1}번째 재료의 세 번째 값을 입력해주세요.`;
-    if (item.type !== "garucha" && !isValidNumber(item.value4)) return `📛 ${i + 1}번째 재료의 네 번째 값을 입력해주세요.`;
+    if (!isValidDecimal1Strict(item.value3)) return `📛 ${i + 1}번째 재료의 세 번째 값을 입력해주세요.`;
+    if (item.type !== "garucha" && !isValidDecimal1Strict(item.value4)) return `📛 ${i + 1}번째 재료의 네 번째 값을 입력해주세요.`;
   }
 
     return null; // 유효
