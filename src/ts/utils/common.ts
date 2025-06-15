@@ -19,7 +19,7 @@ export function isValidIntegerStrict(value: any): boolean {
   if (value === null || value === undefined || value === '') return false;
 
   const str = String(value).trim();
-  return /^[1-9]\d*$/.test(str); // "03" 은 불허, "0" 또는 "3"은 OK
+  return /^([1-9]\d*|0)$/.test(str); // "03" 은 불허, "0" 또는 "3"은 OK
 }
 
 // 소수점 첫째자리인지 체크
@@ -27,5 +27,5 @@ export function isValidDecimal1Strict(value: any): boolean {
   if (value === null || value === undefined || value === '') return false;
 
   const str = String(value).trim();
-  return /^([1-9]\d*|0)(\.\d)?$/.test(str);  // "03.5" ❌, "3.5" ✅
+  return /^([1-9]\d*|0)(\.\d)?$/.test(str);  // "03.5" ❌, "3.5" ✅, "0.5" ✅
 }
