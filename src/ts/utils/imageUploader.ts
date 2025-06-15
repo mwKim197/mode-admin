@@ -1,15 +1,24 @@
 import {UploadResult} from "../types/imge.ts";
 
+// 이미지 업로드 - 2mb, 600x600 제한
 export function handleImageUpload(
   inputEl: HTMLInputElement,
   previewEl: HTMLImageElement,
   fileNameEl?: HTMLElement,
   maxWidth = 600,
-  maxHeight = 600
+  maxHeight = 600,
+  maxFileSize = 2 * 1024 * 1024 // ✅ 2MB
 ): Promise<UploadResult> {
   return new Promise((resolve, reject) => {
     const file = inputEl.files?.[0];
     if (!file) return reject("파일이 없습니다.");
+
+    // ✅ 파일 크기 제한 검사
+    if (file.size > maxFileSize) {
+      inputEl.value = "";
+      alert(`❌ 파일 크기는 최대 ${maxFileSize / 1024 / 1024}MB 이하여야 합니다.`);
+      return reject("파일 용량 초과");
+    }
 
     const img = new Image();
     const url = URL.createObjectURL(file);

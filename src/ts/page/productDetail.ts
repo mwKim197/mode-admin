@@ -69,7 +69,6 @@ export async function initProductDetail() {
           "userId": user.userId,
           "updatedData": payload
         }
-        console.log("data: ", putData);
         try {
           const res = await apiPut(`/model_admin_menu?func=put-update-menu`, putData);
 
