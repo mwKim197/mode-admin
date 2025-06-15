@@ -1,17 +1,17 @@
-// 정수만 남기고 제거
-export function isValidInteger(value: any): boolean {
-  if (value === null || value === undefined || value === "") return false;
+// 정수인 경우만 number, 아니면 null
+export function parseValidInteger(value: any): number | null {
+  if (value === null || value === undefined || value === "") return null;
 
   const str = String(value).trim();
-  return /^\d+$/.test(str); // 0 이상의 정수만 허용 (음수는 제외됨)
+  return /^\d+$/.test(str) ? parseInt(str, 10) : null;
 }
 
-// 소숫점 첫째자리까지 까지남기고 제거
-export function isValidDecimal1(value: any): boolean {
-  if (value === null || value === undefined || value === "") return false;
+// 정수 또는 소수 첫째 자리까지 허용
+export function parseValidDecimal1(value: any): number | null {
+  if (value === null || value === undefined || value === "") return null;
 
   const str = String(value).trim();
-  return /^\d+(\.\d)?$/.test(str); // 정수 또는 소수 첫째 자리까지만 허용
+  return /^\d+(\.\d)?$/.test(str) ? parseFloat(str) : null;
 }
 
 // 정수만인지 체크

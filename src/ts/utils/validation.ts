@@ -1,10 +1,14 @@
 // utils/validation.ts
 import { MenuDetail } from "../types/product.ts";
-import {isValidDecimal1Strict, isValidIntegerStrict} from "./common.ts";
+import {isValidDecimal1Strict, isValidIntegerStrict, parseValidDecimal1, parseValidInteger} from "./common.ts";
 
 // 기본 값 체크
 export function validateMenuDetail(detail: MenuDetail): string | null {
-  if (!detail.no) return "📛 순번을 입력해주세요.";
+  const menuNo = parseValidInteger(detail.no);
+
+  if (menuNo === null || menuNo < 1 || menuNo > 150) {
+    return "📛 순번은 1부터 150 사이의 정수로 입력해주세요.";
+  }
   if (!detail.name?.trim()) return "📛 메뉴 이름을 입력해주세요.";
   if (!detail.category) return "📛 카테고리를 선택해주세요.";
   const price = detail.price;
@@ -12,6 +16,18 @@ export function validateMenuDetail(detail: MenuDetail): string | null {
 
   if (detail.cupYn === "no" && !detail.cup) return "📛 컵 종류를 선택해주세요.";
   if (detail.cupYn === "no" && detail.iceYn === "yes" && !isValidDecimal1Strict(detail.iceTime)) return "📛 얼음 시간을 입력해주세요.";
+  const iceTime = parseValidDecimal1(detail.iceTime);
+
+  if (iceTime == null || iceTime < 0 || iceTime > 10) {
+    return "📛 얼음 시간은 0부터 10까지의 소수 첫째 자리까지 입력해주세요.";
+  }
+
+  const waterTime = parseValidDecimal1(detail.waterTime);
+
+  if (waterTime == null || waterTime < 0 || waterTime > 10) {
+    return "📛 물 시간은 0부터 10까지의 소수 첫째 자리까지 입력해주세요.";
+  }
+
   if (detail.cupYn === "no" && detail.items.length === 0) return "📛 음료상품은 항목을 추가해야합니다.";
 
   for (let i = 0; i < detail.items.length; i++) {
