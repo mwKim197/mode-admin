@@ -61,13 +61,4 @@
     </section>
   </div>
 </body>
-<script>
-  document.querySelectorAll(".clickable-row").forEach(row => {
-    row.addEventListener("click", function(e) {
-      // toggle-switch, input 클릭 시는 무시
-      if (e.target.closest('.toggle-switch') || e.target.tagName === 'INPUT') return;
-      window.open(this.dataset.href, '_blank');
-    });
-  });
-</script>
 </html>
