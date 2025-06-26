@@ -32,7 +32,6 @@ export async function initProductAdd() {
   if (saveBtn) {
     saveBtn.addEventListener("click", async () => {
       const payload = collectMenuDetail(user.userId);
-      console.log("???" , payload);
 
       if (!uploadedImageBase64 || !uploadedFileName) {
         window.showToast("이미지 등록은 필수입니다.", 3000, "warning");

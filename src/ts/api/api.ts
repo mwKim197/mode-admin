@@ -6,7 +6,7 @@ const API_URL = "https://api.narrowroad-model.com";
  * @param options fetch 옵션 (기본값: GET 요청)
  * @returns 응답 JSON 데이터 (자동으로 토큰 추가 & 만료 시 로그아웃)
  */
-export async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
+export async function fetchWithAuth(endpoint: string, options: RequestInit = {}, showLoading = true) {
     const isLoginPage =
         window.location.pathname.includes("/html/log.html") ||
         window.location.pathname === "/";
@@ -43,7 +43,7 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
     };
 
     // 글로벌
-    window.showLoading(); // ✅ 로딩 시작
+    if (showLoading) window.showLoading(); // ✅ 로딩 시작
 
     try {
         const response = await fetch(`${API_URL}${endpoint}`, fetchOptions);
@@ -71,6 +71,11 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
         };
     } finally {
         // 글로벌
-        window.hideLoading(); // ✅ 로딩 종료
+        if (showLoading) window.hideLoading(); // ✅ 로딩 종료
     }
+}
+
+// 로딩없는요청
+export function fetchWithoutLoading(endpoint: string, options: RequestInit = {}) {
+    return fetchWithAuth(endpoint, options, false);
 }

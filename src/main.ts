@@ -120,14 +120,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         await loadPartials();    // ✅ head, layout, header 로딩도 제외
     }
 
-    const userInfo = await getUserData();
+    const adminUserInfo = await getUserData();
 
-    if (userInfo) {
+    if (adminUserInfo) {
         const userNameEl = document.getElementById("user-name");
         const userGradeEl = document.getElementById("user-grade");
 
         if (userNameEl) {
-            userNameEl.textContent = `${userInfo.adminId} 님`;
+            userNameEl.textContent = `${adminUserInfo.adminId} 님`;
         }
 
         if (userGradeEl) {
@@ -136,17 +136,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                 2: "운영관리자",
                 3: "프랜차이즈",
                 4: "일반회원",
-            }[userInfo.grade] || "일반회원";
+            }[adminUserInfo.grade] || "일반회원";
 
             userGradeEl.innerHTML = `<span>${gradeText}</span>`;
             userGradeEl.classList.remove("manager", "franchise", "store"); // 필요 시
-            if (userInfo.grade === 1) userGradeEl.classList.add("manager");
-            if (userInfo.grade === 3) userGradeEl.classList.add("franchise");
-            if (userInfo.grade === 4) userGradeEl.classList.add("store");
+            if (adminUserInfo.grade === 1) userGradeEl.classList.add("manager");
+            if (adminUserInfo.grade === 3) userGradeEl.classList.add("franchise");
+            if (adminUserInfo.grade === 4) userGradeEl.classList.add("store");
         }
     }
 
-    if (userInfo && userInfo.grade <= 2) {
+    if (adminUserInfo && adminUserInfo.grade <= 2) {
         const menuList = document.querySelector(".sidemenu .menu");
         const adminMenus = [
             { href: "/html/notice.html?type=admin", label: "관리자 공지사항" },
@@ -216,7 +216,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         import("./ts/page/store.ts").then((module) => {
             module.storeEdit();
         });
-    }  else {
+    } else if (path === "/html/device_manage.html") {
+        console.log("📌 머신관리 - deviceManage.ts 로드");
+        import("./ts/page/deviceManage.ts").then((module) => {
+            module.initDeviceManage();
+        });
+    } else {
         console.log("📌 기본 페이지");
     }
 

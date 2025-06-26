@@ -61,6 +61,7 @@ export function initLogin() {
 
                 const userInfo = await meRes.json(); // ✅ 실제 userInfo 파싱
 
+                // 일반 계정일경우 (grade === 4) 즉시 userId를 조회해서 localStorage에 userInfo로 저장함
                 if (userInfo.grade === 4) {
                     const res = await fetch(`${API_URL}/model_user_setting?func=get-user&userId=${userInfo.userId}`, {
                         method: "GET",
