@@ -190,7 +190,7 @@ export async function initPoint() {
 }
 
 // 팝업 오픈
-function openPopup(detail?: PointItem) {
+function openPopup() {
     const popupOverlay = document.querySelector(".popup-overlay") as HTMLElement;
     popupOverlay.style.display = "flex";
 
@@ -198,16 +198,14 @@ function openPopup(detail?: PointItem) {
     const saveButton = document.getElementById("saveButton") as HTMLButtonElement;
     saveButton.textContent = isEditMode ? "수정" : "저장";
 
-    if (!detail) {
-        // 신규 등록 초기화
-        (document.getElementById('mileageNo') as HTMLInputElement).value = "";
-        (document.getElementById('popupTel') as HTMLInputElement).value = "";
-        (document.getElementById('popupPassword') as HTMLInputElement).value = "";
-        (document.getElementById('popupMileage') as HTMLInputElement).value = "";
-        (document.getElementById('popupCount') as HTMLInputElement).value = "";
-        (document.getElementById('popupAmount') as HTMLInputElement).value = "";
-        (document.getElementById('myTextarea') as HTMLTextAreaElement).value = "";
-    }
+    (document.getElementById('mileageNo') as HTMLInputElement).value = "";
+    (document.getElementById('popupTel') as HTMLInputElement).value = "";
+    (document.getElementById('popupPassword') as HTMLInputElement).value = "";
+    (document.getElementById('popupMileage') as HTMLInputElement).value = "";
+    (document.getElementById('popupCount') as HTMLInputElement).value = "";
+    (document.getElementById('popupAmount') as HTMLInputElement).value = "";
+    (document.getElementById('myTextarea') as HTMLTextAreaElement).value = "";
+
 }
 
 function closePopup() {
@@ -322,7 +320,7 @@ async function renderTable(data: PointItem[]) {
                     const detail = item;
                     selectedItem = detail;
                     isEditMode = true; // ✅ 수정 모드 지정
-                    openPopup(detail); // ← 상세 데이터 전달
+                    openPopup(); // ← 상세 데이터 전달
 
                     await loadMileageHistory(selectedItem, currentHistoryPage);
                     (document.getElementById('mileageNo') as HTMLInputElement).value = formatPhoneNumber(detail.mileageNo ?? "");
