@@ -87,5 +87,5 @@ export async function getUserData(): Promise<AdminUserInfo | null> {
  */
 export function logout() {
     localStorage.removeItem("authToken");
-    window.location.href = "/index.html";
+    window.location.href = "/log.html";
 }

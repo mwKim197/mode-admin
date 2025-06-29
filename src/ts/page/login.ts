@@ -83,9 +83,9 @@ export function initLogin() {
                         return;
                     }
                 }
-
-                // 대시보드로 이동
-                window.location.href = "../../../html/dashboard.html";
+                console.log("????");
+                // home 이동
+                window.location.href = "/html/home.html";
             } else {
                 alert(result.message || "로그인 실패. 다시 시도하세요.");
             }
@@ -142,7 +142,7 @@ function handleKakaoLogin() {
 
                             localStorage.setItem("authToken", body.token);
                             console.log("✅ 로그인 성공 → 토큰 저장 완료!");
-                            window.location.href = "../../../html/dashboard.html";
+                            window.location.href = "/html/home.html";
                         } else if (body.redirectUrl) {
                             console.log("✅ 신규 사용자 → 연동 페이지로 이동:", body.redirectUrl);
                             window.location.href = body.redirectUrl;

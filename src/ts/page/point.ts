@@ -426,7 +426,7 @@ async function savePoint(mode: PointMode) {
             userId,
             mileageNo,
             password,
-            amount: pointStr,
+            points: pointStr,
             tel,
         };
 
