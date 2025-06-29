@@ -277,7 +277,7 @@ body>* {
     max-width: 35px;
     width: 100%;
     padding: 5.5px;
-    background: var(--white);
+    background: var(--point-color);
     display: flex;
     justify-content: center;
     align-items: center;
