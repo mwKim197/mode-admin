@@ -250,6 +250,10 @@ body>* {
     width: fit-content;
     padding: 1.4rem 3rem;
 }
+.btn-s.blue {
+    color:var(--white);
+    background: var(--point-color);
+}
 
 .btn-outline {
     border: 1px solid var(--point-color);

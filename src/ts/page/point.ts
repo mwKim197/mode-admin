@@ -77,6 +77,7 @@ export async function initPoint() {
             checkbox.checked = allChecked;
         });
 
+        selectAllBtn.className = allChecked ? "btn-s mb10" : "btn-s blue mb10";
         selectAllBtn.textContent = allChecked ? '전체해제' : '전체선택';
 
         console.log(`현재 선택된 항목 수: ${document.querySelectorAll('input.row-checkbox:checked').length}`);
