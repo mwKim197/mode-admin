@@ -3,6 +3,7 @@ export function initSales() {
 
   // 테이블 부분만 동적으로 변경
   renderSalesTable();
+  initPopupHandlers();
 }
 
 async function renderSalesTable() {
@@ -45,5 +46,23 @@ async function renderSalesTable() {
     });
   } catch (error) {
     console.error("매출 데이터 로드 실패:", error);
+  }
+}
+
+function initPopupHandlers() {
+  const popupOverlay = document.querySelector(".popup-overlay") as HTMLElement;
+  const closeBtn = document.querySelector(".popup-footer .gr") as HTMLElement;
+
+  document.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    if (target.closest(".on-popup")) {
+      popupOverlay.style.display = "flex";
+    }
+  });
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      popupOverlay.style.display = "none";
+    });
   }
 }
