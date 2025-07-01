@@ -52,10 +52,11 @@ async function renderSalesTable() {
 
 function initPopupHandlers() {
   const popupOverlay = document.querySelector(".popup-overlay") as HTMLElement;
-  const closeBtn = document.querySelector(".popup-footer .gr") as HTMLElement;
 
   document.addEventListener("click", (e) => {
     const target = e.target as HTMLElement;
+
+    // 테이블 행 클릭
     if (target.closest(".on-popup")) {
       const row = target.closest(".on-popup") as HTMLElement;
       const rowIndex = parseInt(row.getAttribute("data-index") || "0");
@@ -64,13 +65,12 @@ function initPopupHandlers() {
       updatePopupContent(rowIndex);
       popupOverlay.style.display = "flex";
     }
-  });
 
-  if (closeBtn) {
-    closeBtn.addEventListener("click", () => {
+    // 팝업 닫기 버튼들 클릭
+    if (target.closest(".popup-footer .gr") || target.closest(".close-btn")) {
       popupOverlay.style.display = "none";
-    });
-  }
+    }
+  });
 }
 
 // 팝업 내용을 실제 데이터로 업데이트하는 함수
