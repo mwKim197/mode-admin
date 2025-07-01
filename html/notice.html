@@ -36,6 +36,15 @@
         <h2 class="mb10">공지사항 입력</h2>
           <div class="inputWrap noticeArea">
             <div class="text_input">
+              <div id="adminType" style="display: none">
+                <p>공지사항 타입</p>
+                <select class="popup-select" id="noticeType">
+                  <option value="emergency">긴급</option>
+                  <option value="patch">패치</option>
+                  <option value="event">이벤트</option>
+                  <option value="info">안내</option>
+                </select>
+              </div>
               <p>제목</p>
               <input type="text" name="" id="notice-title" placeholder="제목을 입력해주세요">
             </div>

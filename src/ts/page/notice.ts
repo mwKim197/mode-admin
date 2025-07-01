@@ -14,6 +14,8 @@ export function initNotice() {
   const listButton = document.getElementById("list-button");
   const startListDate = document.getElementById("start-list-date") as HTMLInputElement;
   const endListDate = document.getElementById("end-list-date") as HTMLInputElement;
+  const noticeTypeSelect = document.getElementById("noticeType") as HTMLSelectElement;
+  const adminType = document.getElementById("adminType") as HTMLDivElement;
   const startList = startListDate.value;
   const endList = endListDate.value;
 
@@ -29,6 +31,10 @@ export function initNotice() {
   }
 
   const boardType  = getParamId("type") || "notice";
+
+  if (boardType === "admin" && adminType) {
+    adminType.style.display = "block"; // ✅ admin일 때만 보이게
+  }
 
   const titleElement = document.getElementById("page-title");
 
@@ -104,7 +110,7 @@ export function initNotice() {
     const endDate = endDateInput.value;
     const startList = startListDate.value;
     const endList = endListDate.value;
-
+    const noticeType = noticeTypeSelect?.value || null;
 
     if (!title || !contentHtml) {
       alert("⚠️ 제목과 내용을 모두 입력해주세요.");
@@ -128,6 +134,7 @@ export function initNotice() {
     }
 
     const func = isEditMode ? `update-post&contentId=${editContentId}` : "create-post";
+
     const payload = {
       title,
       startDate,
@@ -135,6 +142,7 @@ export function initNotice() {
       content: contentHtml,
       images: base64Images,
       contentType: boardType,
+      ...(boardType === "admin" && {noticeType}),
       ...(isEditMode && { contentId: Number(editContentId) }),
     };
 
@@ -256,6 +264,11 @@ export function initNotice() {
       startDateInput.value = notice.startDate || "";
       endDateInput.value = notice.endDate || "";
       editor.setContents(notice.content || "");
+
+      // ✅ 타입 select 박스 값 세팅
+      if (noticeTypeSelect && notice.noticeType) {
+        noticeTypeSelect.value = notice.noticeType;
+      }
 
       // ✅ 수정 모드 활성화
       isEditMode = true;
