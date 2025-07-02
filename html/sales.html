@@ -26,7 +26,7 @@
               </div>
             </div>
             <!-- 날짜 인풋 2개 + 버튼 -->
-            <div class="input-group">
+            <div class="input-group" id="date-search-section">
               <input type="date" />
               <span>~</span>
               <input type="date" />
@@ -39,13 +39,12 @@
             </div>
 
             <!-- 상세 설정 -->
-            <div class="radioBox">
+            <div class="radioBox" id="detail-settings-section">
               <div class="details">
                 <p>상세 설정</p>
                 <div class="radio-group">
                   <label
-                    ><input type="radio" name="detail-period" checked />
-                    전체</label
+                    ><input type="radio" name="detail-period" /> 전체</label
                   >
                   <label
                     ><input type="radio" name="detail-period" /> 당일</label
@@ -54,14 +53,15 @@
                     ><input type="radio" name="detail-period" /> 전일</label
                   >
                   <label
-                    ><input type="radio" name="detail-period" /> 당월</label
+                    ><input type="radio" name="detail-period" checked />
+                    당월</label
                   >
                   <label
                     ><input type="radio" name="detail-period" /> 전월</label
                   >
                 </div>
               </div>
-              <div class="details">
+              <div class="details" id="payment-section">
                 <p>결제</p>
                 <div class="radio-group">
                   <label
@@ -83,7 +83,7 @@
               </div>
             </div>-->
 
-              <div class="flex gap-1">
+              <div class="flex gap-1" id="contact-section">
                 <p>연락처</p>
                 <input type="text" name="" placeholder="01012345678" />
               </div>

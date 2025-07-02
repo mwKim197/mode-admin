@@ -626,6 +626,7 @@ input[type="checkbox"]:checked {
   padding: 0.5rem;
   white-space: nowrap; /*한줄로 나오게 수정*/
 }
+
 .tableArea tr td {
   font-size: 1.2rem;
 }

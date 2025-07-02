@@ -27,9 +27,9 @@ function initSalesTypeRadioHandlers() {
       if (target.checked) {
         currentSalesType = index === 0 ? "transaction" : "product";
         currentPage = 1; // 페이지 초기화
-        updateTableHeader(); // 테이블 헤더 업데이트
+        updateTableHeader(); // 테이블 헤더 업데이트 (결제/연락처 섹션도 함께 처리)
         getSalesList(); // 새로운 데이터 로드
-        console.log("매출 구분 변경:", currentSalesType); // 디버깅용
+        console.log("매출 구분 변경:", currentSalesType);
       }
     });
   });
@@ -38,8 +38,14 @@ function initSalesTypeRadioHandlers() {
 // 테이블 헤더 업데이트 함수
 function updateTableHeader() {
   const tableHeader = document.getElementById("table-header");
-  if (!tableHeader) {
-    console.error("테이블 헤더를 찾을 수 없습니다.");
+  const tableArea = document.querySelector(".tableArea");
+  const dateSearchSection = document.getElementById("date-search-section");
+  const detailSettingsSection = document.getElementById(
+    "detail-settings-section"
+  );
+
+  if (!tableHeader || !tableArea) {
+    console.error("테이블 요소를 찾을 수 없습니다.");
     return;
   }
 
@@ -52,6 +58,16 @@ function updateTableHeader() {
       <th>가격</th>
       <th>상태</th>
     `;
+    // 건별 클래스 제거
+    tableArea.classList.remove("product-view");
+
+    // 모든 섹션 표시
+    if (dateSearchSection) {
+      dateSearchSection.style.display = "flex";
+    }
+    if (detailSettingsSection) {
+      detailSettingsSection.style.display = "block";
+    }
   } else {
     // 상품별 헤더
     tableHeader.innerHTML = `
@@ -60,8 +76,18 @@ function updateTableHeader() {
       <th>총주문액</th>
       <th>총건수</th>
     `;
+    // 상품별 클래스 추가
+    tableArea.classList.add("product-view");
+
+    // 달력 조회, 상세설정 섹션 모두 숨기기
+    if (dateSearchSection) {
+      dateSearchSection.style.display = "none";
+    }
+    if (detailSettingsSection) {
+      detailSettingsSection.style.display = "none";
+    }
   }
-  console.log("테이블 헤더 업데이트 완료:", currentSalesType); // 디버깅용
+  console.log("테이블 헤더 업데이트 완료:", currentSalesType);
 }
 
 async function getSalesList() {
