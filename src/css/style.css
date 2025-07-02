@@ -400,6 +400,10 @@ sales start
   margin-bottom: 0;
 }
 
+.details {
+  margin-bottom: 2rem;
+}
+
 .details p {
   margin-bottom: 10px;
 }
