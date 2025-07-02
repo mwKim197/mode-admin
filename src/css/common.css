@@ -457,9 +457,10 @@ label.plus {
   width: 16px;
   height: 16px;
   line-height: 16px;
-  position: absolute;
-  top: 5%;
-  right: 5%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 .label.full {
   background: var(--point-color);
@@ -645,6 +646,14 @@ input[type="checkbox"]:checked {
 }
 .tableArea.St02 tr th {
   font-size: 1.1rem;
+}
+
+/* 상품명 셀을 flex로 만들어서 요소들을 자연스럽게 배치 */
+.tableArea tr td .rel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 /* ------------------------------------------
