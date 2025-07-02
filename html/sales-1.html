@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="/src/css/reset.css">
+  <link rel="stylesheet" href="/src/css/common.css">
+  <link rel="stylesheet" href="/src/css/style.css">
+  <script type="module" src="/src/main.ts"></script> <!-- ✅ 메인 진입 -->
+</head>
+<!--매출-->
+<body>
+  <!-- 메인 -->
+  <div id="main-content">
+
+    <section class="mt80">
+      <div class="inner">
+        <div class="boxStyle gr">
+          <h2 class="ta-c mb20">매출</h2>
+
+          <!-- 상세 설정 -->
+          <div class="radioBox">
+            <div class="details">
+              <div class="details">
+                <p>매출 구분</p>
+                <div class="radio-group">
+                  <label><input type="radio" name="detail-option"> 건별</label>
+                  <label><input type="radio" name="detail-option" checked> 상품별</label>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 매출 -->
+    <section>
+      <div class="inner">
+        <div class="boxStyle bl ta-c">
+          <div class="countArea mb20">
+            <div class="countbox mb10">
+              <p>총 매출</p>
+              <h4 data-target="">2,174,600<small>원</small></h4>
+            </div>
+            <div class="countbox mb10">
+              <p>총 판매량</p>
+              <h4 data-target="">1470<small>건</small></h4>
+            </div>
+          </div>
+          <button class="btn wt">엑셀다운로드</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- table -->
+    <section class="pb20">
+      <div class="inner">
+        <div class="tableArea">
+          <table>
+            <colgroup>
+              <col width="10%">
+              <col width="50%">
+              <col width="20%">
+              <col width="20%">
+            </colgroup>
+           
+            <thead>
+              <tr>
+                <th>순서</th>
+                <th>상품</th>
+                <th>총주문액</th>
+                <th>총건수</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="on-popup">
+                <td>1</td>
+                <td class="rel"><span>복숭아망고아이스티(무탄산)</span></td>
+                <td>2,172,000 원</td>
+                <td>1235 건</td>
+              </tr>
+              <tr class="on-popup">
+                <td>2</td>
+                <td>진한 아메리카노</td>
+                <td>2,600 원</td>
+                <td>235 건</td>
+              </tr>
+            </tbody>
+          </table>
+            <!-- 페이지네이션 -->
+            <div class="pagination" data-type="table">
+              <button class="page-first"><img src="/img/page_first.svg" alt="처음으로"></button>
+              <button class="page-prev"><img src="/img/page_prev.svg" alt="이전"></button>
+              <span class="page-numbers"></span>
+              <button class="page-next"><img src="/img/page_next.svg" alt="다음"></button>
+              <button class="page-last"><img src="/img/page_last.svg" alt="끝으로"></button>
+            </div>
+
+            <!-- popup -->
+            <div class="popup-overlay" style="display:none;">
+              <div class="popup">
+                <!-- 헤더 -->
+                <div class="popup-header ta-c">
+                  <h2>결제 정보</h2>
+                  <button class="close-btn" onclick="closePopup()">&times;</button>
+                </div>
+    
+                <!-- 이미지 저장 버튼 -->
+                <div class="popup-body">
+                  <button class="btn save-img"><img src="/img/image_icon.svg" alt="">이미지 저장</button>
+    
+                  <!-- 내역 내용 -->
+                  <ul class="history">
+                    <li>
+                      <div>
+                        <h5>주문상품</h5>
+                        <p>프리미엄 아이스 아메리카노 2개
+                        </p>
+                      </div>
+                    </li>
+                    <li>
+                      <div>
+                        <h5>매장명</h5>
+                        <p>행금길 14</p>
+                      </div>
+                      <div>
+                        <h5>매장 연락처</h5>
+                        <p>010-1234-5678</p>
+                      </div>
+                      <div>
+                        <h5>사업자 등록번호</h5>
+                        <p>123-45-67890</p>
+                      </div>
+                    </li>
+                    <li>
+                      <div>
+                        <h5>결제 금액</h5>
+                        <p>3,000원</p>
+                      </div>
+                      <div>
+                        <h5>결제 일자</h5>
+                        <p>24-12-30 21:35:35</p>
+                      </div>
+                      <div>
+                        <h5>승인번호</h5>
+                        <p>12345678</p>
+                      </div>
+                      
+                      <div>
+                        <h5>결제 수단</h5>
+                        <p>카드</p>
+                      </div>
+                      <div>
+                        <h5>결제 카드</h5>
+                        <p>KB 국민마스타체크</p>
+                      </div>
+                      <div>
+                        <h5>카드 번호</h5>
+                        <p>12345678********</p>
+                      </div>
+                      
+                      <div>
+                        <h5>포인트 연락처</h5>
+                        <p>카드</p>
+                      </div>
+                      <div>
+                        <h5>사용 포인트</h5>
+                        <p>0P</p>
+                      </div>
+                      <div>
+                        <h5>적립 포인트</h5>
+                        <p>0P</p>
+                      </div>
+                    </li>
+                    <!-- 필요한 만큼 추가 -->
+                  </ul>
+    
+                  <!-- 하단 버튼 -->
+                  <div class="popup-footer">
+                    <button class="btn blue">환불</button>
+                    <button class="btn red">삭제</button>
+                    <button class="btn gr">취소</button>
+                  </div>
+                </div>
+              </div>
+            </div>        
+        </div>
+      </div>
+    </section>
+  </div>
+
+</body>
+<script>
+  const excelBtns = document.querySelectorAll(".on-popup");
+  const popupOverlay = document.querySelector(".popup-overlay");
+  const cancelBtn = document.querySelector(".popup-footer .gr");
+
+  // 각각의 버튼에 이벤트 등록
+  excelBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      popupOverlay.style.display = "flex";
+    });
+  });
+
+  function closePopup() {
+    popupOverlay.style.display = "none";
+  }
+
+  // 취소 버튼에도 팝업 닫기 기능 추가
+  cancelBtn.addEventListener("click", closePopup);
+</script>
+</html>
