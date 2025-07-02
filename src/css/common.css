@@ -458,8 +458,8 @@ label.plus {
   height: 16px;
   line-height: 16px;
   position: absolute;
-  top: 25%;
-  right: 15%;
+  top: 5%;
+  right: 5%;
 }
 .label.full {
   background: var(--point-color);
