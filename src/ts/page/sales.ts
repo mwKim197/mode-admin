@@ -134,9 +134,10 @@ async function renderSalesTable(data: any[]) {
 
     if (currentSalesType === "transaction") {
       // 건별 데이터 렌더링
-      const date = new Date(item.timestamp);
-      const dateStr = date.toISOString().split("T")[0];
-      const timeStr = date.toTimeString().split(" ")[0].substring(0, 5);
+      const date = String(item.timestamp).split("T");
+      const dateStr = date[0];
+      const timeStr = date[1].substring(0, 5);
+
       const menuName = item.menuSummary[0]?.name || "알 수 없음";
       const quantityDisplay =
         item.menuSummary.length > 1
