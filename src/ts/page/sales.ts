@@ -1,13 +1,67 @@
 let items: any[] = []; // API 데이터 저장용
 let currentPage = 1;
 const pageLimit = 10;
+let currentSalesType = "transaction"; // 'transaction' (건별) 또는 'product' (상품별)
 
 export function initSales() {
   console.log("✅ sales.ts 로드됨");
 
+  // 매출 구분 라디오 버튼 이벤트 리스너 추가
+  initSalesTypeRadioHandlers();
+
+  // 페이지 로드 시 기본값 설정 (건별이 체크되어 있음)
+  currentSalesType = "transaction";
+
   // 테이블 부분만 동적으로 변경
   getSalesList();
   initPopupHandlers();
+}
+
+// 매출 구분 라디오 버튼 이벤트 핸들러
+function initSalesTypeRadioHandlers() {
+  const radioButtons = document.querySelectorAll('input[name="sales-type"]');
+
+  radioButtons.forEach((radio, index) => {
+    radio.addEventListener("change", (e) => {
+      const target = e.target as HTMLInputElement;
+      if (target.checked) {
+        currentSalesType = index === 0 ? "transaction" : "product";
+        currentPage = 1; // 페이지 초기화
+        updateTableHeader(); // 테이블 헤더 업데이트
+        getSalesList(); // 새로운 데이터 로드
+        console.log("매출 구분 변경:", currentSalesType); // 디버깅용
+      }
+    });
+  });
+}
+
+// 테이블 헤더 업데이트 함수
+function updateTableHeader() {
+  const tableHeader = document.getElementById("table-header");
+  if (!tableHeader) {
+    console.error("테이블 헤더를 찾을 수 없습니다.");
+    return;
+  }
+
+  if (currentSalesType === "transaction") {
+    // 건별 헤더
+    tableHeader.innerHTML = `
+      <th>순서</th>
+      <th>일자</th>
+      <th>상품</th>
+      <th>가격</th>
+      <th>상태</th>
+    `;
+  } else {
+    // 상품별 헤더
+    tableHeader.innerHTML = `
+      <th>순서</th>
+      <th>상품</th>
+      <th>총주문액</th>
+      <th>총건수</th>
+    `;
+  }
+  console.log("테이블 헤더 업데이트 완료:", currentSalesType); // 디버깅용
 }
 
 async function getSalesList() {
@@ -15,10 +69,17 @@ async function getSalesList() {
     const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
     const userId = userInfo.userId;
 
-    const response = await fetch(
-      `https://api.narrowroad-model.com/model_payment?func=get-payment&userId=${userId}&limit=1000`
-    );
+    let apiUrl = "";
 
+    if (currentSalesType === "transaction") {
+      // 건별 매출 데이터
+      apiUrl = `https://api.narrowroad-model.com/model_payment?func=get-payment&userId=${userId}&limit=1000`;
+    } else {
+      // 상품별 매출 데이터
+      apiUrl = `https://api.narrowroad-model.com/model_payment?userId=${userId}&func=get-menu-statistics`;
+    }
+
+    const response = await fetch(apiUrl);
     const data = await response.json();
     items = data.items || [];
 
@@ -41,25 +102,44 @@ async function renderSalesTable(data: any[]) {
   tbody.innerHTML = "";
 
   pageData.forEach((item: any, index: number) => {
-    const date = new Date(item.timestamp);
-    const dateStr = date.toISOString().split("T")[0];
-    const timeStr = date.toTimeString().split(" ")[0].substring(0, 5);
-    const menuName = item.menuSummary[0]?.name || "알 수 없음";
-    const quantityDisplay =
-      item.menuSummary.length > 1
-        ? `<label class="plus">+${item.menuSummary.length - 1}</label>`
-        : "";
+    let rowContent = "";
+
+    if (currentSalesType === "transaction") {
+      // 건별 데이터 렌더링
+      const date = new Date(item.timestamp);
+      const dateStr = date.toISOString().split("T")[0];
+      const timeStr = date.toTimeString().split(" ")[0].substring(0, 5);
+      const menuName = item.menuSummary[0]?.name || "알 수 없음";
+      const quantityDisplay =
+        item.menuSummary.length > 1
+          ? `<label class="plus">+${item.menuSummary.length - 1}</label>`
+          : "";
+
+      rowContent = `
+        <td>${startIndex + index + 1}</td>
+        <td>${dateStr} <br class="br-s">${timeStr}</td>
+        <td class="rel"><span>${menuName}</span> ${quantityDisplay}</td>
+        <td>${item.totalPrice.toLocaleString()}원</td>
+        <td class="blue">정보없음</td>
+      `;
+    } else {
+      // 상품별 데이터 렌더링
+      const productName = item.name || "알 수 없음";
+      const totalSales = item.totalSales || 0;
+      const totalCount = item.totalCount || 0;
+
+      rowContent = `
+        <td>${startIndex + index + 1}</td>
+        <td class="rel"><span>${productName}</span></td>
+        <td>${totalSales.toLocaleString()}원</td>
+        <td class="blue">${totalCount}건</td>
+      `;
+    }
 
     const row = document.createElement("tr");
     row.className = "on-popup";
     row.setAttribute("data-index", (startIndex + index).toString());
-    row.innerHTML = `
-      <td>${startIndex + index + 1}</td>
-      <td>${dateStr} <br class="br-s">${timeStr}</td>
-      <td class="rel"><span>${menuName}</span> ${quantityDisplay}</td>
-      <td>${item.totalPrice.toLocaleString()}원</td>
-      <td class="blue">정보없음</td>
-    `;
+    row.innerHTML = rowContent;
 
     tbody.appendChild(row);
   });
@@ -201,27 +281,25 @@ async function updatePopupContent(rowIndex: number) {
       return;
     }
 
-    // 주문상품 정보 구성
-    const menuItems = item.menuSummary
-      .map((menu: any) => `${menu.name} ${menu.quantity || 1}개`)
-      .join("<br>");
+    let popupContent = "";
 
-    // 결제일자 포맷팅
-    const date = new Date(item.timestamp);
-    const formattedDate = `${date.getFullYear()}-${String(
-      date.getMonth() + 1
-    ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")} ${String(
-      date.getHours()
-    ).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}:${String(
-      date.getSeconds()
-    ).padStart(2, "0")}`;
+    if (currentSalesType === "transaction") {
+      // 건별 데이터 팝업 (기존 코드)
+      const menuItems = item.menuSummary
+        .map((menu: any) => `${menu.name} ${menu.quantity || 1}개`)
+        .join("<br>");
 
-    // 팝업 내용 업데이트
-    const popupBody = document.querySelector(
-      ".popup-body .history"
-    ) as HTMLElement;
-    if (popupBody) {
-      popupBody.innerHTML = `
+      const date = new Date(item.timestamp);
+      const formattedDate = `${date.getFullYear()}-${String(
+        date.getMonth() + 1
+      ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")} ${String(
+        date.getHours()
+      ).padStart(2, "0")}:${String(date.getMinutes()).padStart(
+        2,
+        "0"
+      )}:${String(date.getSeconds()).padStart(2, "0")}`;
+
+      popupContent = `
         <li>
           <div>
             <h5>주문상품</h5>
@@ -281,6 +359,47 @@ async function updatePopupContent(rowIndex: number) {
           </div>
         </li>
       `;
+    } else {
+      // 상품별 데이터 팝업
+      const lastOrderDate = new Date(item.lastOrderTimestamp);
+      const formattedDate = `${lastOrderDate.getFullYear()}-${String(
+        lastOrderDate.getMonth() + 1
+      ).padStart(2, "0")}-${String(lastOrderDate.getDate()).padStart(2, "0")}`;
+
+      popupContent = `
+        <li>
+          <div>
+            <h5>상품명</h5>
+            <p>${item.name || "정보 없음"}</p>
+          </div>
+          <div>
+            <h5>상품 ID</h5>
+            <p>${item.menuId || "정보 없음"}</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h5>총 주문액</h5>
+            <p>${(item.totalSales || 0).toLocaleString()}원</p>
+          </div>
+          <div>
+            <h5>총 주문 건수</h5>
+            <p>${item.totalCount || 0}건</p>
+          </div>
+          <div>
+            <h5>마지막 주문일</h5>
+            <p>${formattedDate}</p>
+          </div>
+        </li>
+      `;
+    }
+
+    // 팝업 내용 업데이트
+    const popupBody = document.querySelector(
+      ".popup-body .history"
+    ) as HTMLElement;
+    if (popupBody) {
+      popupBody.innerHTML = popupContent;
     }
   } catch (error) {
     console.error("팝업 데이터 업데이트 실패:", error);

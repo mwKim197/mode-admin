@@ -20,12 +20,9 @@
               <p>매출 구분</p>
               <div class="radio-group">
                 <label
-                  ><input type="radio" name="detail-option" checked />
-                  건별</label
+                  ><input type="radio" name="sales-type" checked /> 건별</label
                 >
-                <label
-                  ><input type="radio" name="detail-option" /> 상품별</label
-                >
+                <label><input type="radio" name="sales-type" /> 상품별</label>
               </div>
             </div>
             <!-- 날짜 인풋 2개 + 버튼 -->
@@ -47,20 +44,20 @@
                 <p>상세 설정</p>
                 <div class="radio-group">
                   <label
-                    ><input type="radio" name="detail-option" /> 전체</label
+                    ><input type="radio" name="detail-period" checked />
+                    전체</label
                   >
                   <label
-                    ><input type="radio" name="detail-option" /> 당일</label
+                    ><input type="radio" name="detail-period" /> 당일</label
                   >
                   <label
-                    ><input type="radio" name="detail-option" /> 전일</label
+                    ><input type="radio" name="detail-period" /> 전일</label
                   >
                   <label
-                    ><input type="radio" name="detail-option" checked />
-                    당월</label
+                    ><input type="radio" name="detail-period" /> 당월</label
                   >
                   <label
-                    ><input type="radio" name="detail-option" /> 전월</label
+                    ><input type="radio" name="detail-period" /> 전월</label
                   >
                 </div>
               </div>
@@ -68,14 +65,12 @@
                 <p>결제</p>
                 <div class="radio-group">
                   <label
-                    ><input type="radio" name="detail-option" checked />
+                    ><input type="radio" name="payment-type" checked />
                     전체</label
                   >
+                  <label><input type="radio" name="payment-type" /> 카드</label>
                   <label
-                    ><input type="radio" name="detail-option" /> 카드</label
-                  >
-                  <label
-                    ><input type="radio" name="detail-option" /> 포인트</label
+                    ><input type="radio" name="payment-type" /> 포인트</label
                   >
                 </div>
               </div>
@@ -138,7 +133,7 @@
               </colgroup>
 
               <thead>
-                <tr>
+                <tr id="table-header">
                   <th>순서</th>
                   <th>일자</th>
                   <th>상품</th>
