@@ -1,3 +1,5 @@
+import html2canvas from "html2canvas";
+
 let items: any[] = []; // API 데이터 저장용
 let currentPage = 1;
 const pageLimit = 10;
@@ -279,6 +281,12 @@ function initPopupHandlers() {
   document.addEventListener("click", (e) => {
     const target = e.target as HTMLElement;
 
+    // 이미지 저장 버튼 클릭 처리
+    if (target.closest(".save-img")) {
+      savePopupAsImage();
+      return;
+    }
+
     // 테이블 행 클릭
     if (target.closest(".on-popup")) {
       const row = target.closest(".on-popup") as HTMLElement;
@@ -430,4 +438,22 @@ async function updatePopupContent(rowIndex: number) {
   } catch (error) {
     console.error("팝업 데이터 업데이트 실패:", error);
   }
+
+}
+
+function savePopupAsImage() {
+  const popup = document.querySelector(".popup") as HTMLElement;
+  if (!popup) {
+    alert("팝업을 찾을 수 없습니다.");
+    return;
+  }
+
+  html2canvas(popup).then((canvas) => {
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = "sales-info.png";
+    link.click();
+  }).catch((err) => {
+    console.error("❌ 이미지 저장 실패:", err);
+  });
 }
