@@ -1,55 +1,172 @@
+let items: any[] = []; // API 데이터 저장용
+let currentPage = 1;
+const pageLimit = 10;
+
 export function initSales() {
   console.log("✅ sales.ts 로드됨");
 
   // 테이블 부분만 동적으로 변경
-  renderSalesTable();
+  getSalesList();
   initPopupHandlers();
 }
 
-async function renderSalesTable() {
-  const tbody = document.querySelector(".tableArea table tbody");
-  if (!tbody) return;
-
+async function getSalesList() {
   try {
     const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
     const userId = userInfo.userId;
 
     const response = await fetch(
-      `https://api.narrowroad-model.com/model_payment?func=get-payment&userId=${userId}`
+      `https://api.narrowroad-model.com/model_payment?func=get-payment&userId=${userId}&limit=1000`
     );
 
     const data = await response.json();
+    items = data.items || [];
 
-    tbody.innerHTML = "";
-
-    data.items.forEach((item: any, index: number) => {
-      const date = new Date(item.timestamp);
-      const dateStr = date.toISOString().split("T")[0];
-      const timeStr = date.toTimeString().split(" ")[0].substring(0, 5);
-      const menuName = item.menuSummary[0]?.name || "알 수 없음";
-      const quantityDisplay =
-        item.menuSummary.length > 1
-          ? `<label class="plus">+${item.menuSummary.length - 1}</label>`
-          : "";
-
-      const row = document.createElement("tr");
-      row.className = "on-popup";
-      row.setAttribute("data-index", index.toString());
-      row.innerHTML = `
-        <td>${index + 1}</td>
-        <td>${dateStr} <br class="br-s">${timeStr}</td>
-        <td class="rel"><span>${menuName}</span> ${quantityDisplay}</td>
-        <td>${item.totalPrice.toLocaleString()}원</td>
-        <td class="blue">정보없음</td>
-      `;
-
-      tbody.appendChild(row);
-    });
+    // 페이지네이션으로 테이블 렌더링
+    await renderSalesTable(items);
   } catch (error) {
     console.error("매출 데이터 로드 실패:", error);
   }
 }
 
+async function renderSalesTable(data: any[]) {
+  const tbody = document.querySelector(".tableArea table tbody");
+  if (!tbody) return;
+
+  // 페이지네이션 계산
+  const startIndex = (currentPage - 1) * pageLimit;
+  const endIndex = startIndex + pageLimit;
+  const pageData = data.slice(startIndex, endIndex);
+
+  tbody.innerHTML = "";
+
+  pageData.forEach((item: any, index: number) => {
+    const date = new Date(item.timestamp);
+    const dateStr = date.toISOString().split("T")[0];
+    const timeStr = date.toTimeString().split(" ")[0].substring(0, 5);
+    const menuName = item.menuSummary[0]?.name || "알 수 없음";
+    const quantityDisplay =
+      item.menuSummary.length > 1
+        ? `<label class="plus">+${item.menuSummary.length - 1}</label>`
+        : "";
+
+    const row = document.createElement("tr");
+    row.className = "on-popup";
+    row.setAttribute("data-index", (startIndex + index).toString());
+    row.innerHTML = `
+      <td>${startIndex + index + 1}</td>
+      <td>${dateStr} <br class="br-s">${timeStr}</td>
+      <td class="rel"><span>${menuName}</span> ${quantityDisplay}</td>
+      <td>${item.totalPrice.toLocaleString()}원</td>
+      <td class="blue">정보없음</td>
+    `;
+
+    tbody.appendChild(row);
+  });
+
+  // 페이지네이션 버튼 렌더링
+  renderSimplePagination(data.length);
+}
+
+// 페이지네이션 렌더링
+function renderSimplePagination(totalItems: number) {
+  const paginationContainer = document.querySelector(
+    ".pagination"
+  ) as HTMLElement;
+  if (!paginationContainer) return;
+
+  // null 체크 후에 사용
+  paginationContainer.style.display = "block";
+
+  const totalPages = Math.ceil(totalItems / pageLimit);
+
+  // 페이지 번호 업데이트
+  const pageNumbers = paginationContainer.querySelector(".page-numbers");
+  if (pageNumbers) {
+    pageNumbers.textContent = `${currentPage} / ${totalPages}`;
+  }
+
+  // 모든 버튼에 이벤트 리스너 추가
+  const firstBtn = paginationContainer.querySelector(
+    ".page-first"
+  ) as HTMLButtonElement;
+  const prevBtn = paginationContainer.querySelector(
+    ".page-prev"
+  ) as HTMLButtonElement;
+  const nextBtn = paginationContainer.querySelector(
+    ".page-next"
+  ) as HTMLButtonElement;
+  const lastBtn = paginationContainer.querySelector(
+    ".page-last"
+  ) as HTMLButtonElement;
+
+  // 기존 이벤트 리스너 제거 (중복 방지)
+  [firstBtn, prevBtn, nextBtn, lastBtn].forEach((btn) => {
+    if (btn) {
+      btn.replaceWith(btn.cloneNode(true));
+    }
+  });
+
+  // 새로운 버튼들 가져오기
+  const newFirstBtn = paginationContainer.querySelector(
+    ".page-first"
+  ) as HTMLButtonElement;
+  const newPrevBtn = paginationContainer.querySelector(
+    ".page-prev"
+  ) as HTMLButtonElement;
+  const newNextBtn = paginationContainer.querySelector(
+    ".page-next"
+  ) as HTMLButtonElement;
+  const newLastBtn = paginationContainer.querySelector(
+    ".page-last"
+  ) as HTMLButtonElement;
+
+  // 맨 앞으로 버튼
+  if (newFirstBtn) {
+    newFirstBtn.addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage = 1;
+        renderSalesTable(items);
+      }
+    });
+    newFirstBtn.disabled = currentPage === 1;
+  }
+
+  // 이전 버튼
+  if (newPrevBtn) {
+    newPrevBtn.addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderSalesTable(items);
+      }
+    });
+    newPrevBtn.disabled = currentPage === 1;
+  }
+
+  // 다음 버튼
+  if (newNextBtn) {
+    newNextBtn.addEventListener("click", () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderSalesTable(items);
+      }
+    });
+    newNextBtn.disabled = currentPage === totalPages;
+  }
+
+  // 맨 뒤로 버튼
+  if (newLastBtn) {
+    newLastBtn.addEventListener("click", () => {
+      if (currentPage < totalPages) {
+        currentPage = totalPages;
+        renderSalesTable(items);
+      }
+    });
+    newLastBtn.disabled = currentPage === totalPages;
+  }
+}
+
+// 팝업 이벤트 핸들러 초기화
 function initPopupHandlers() {
   const popupOverlay = document.querySelector(".popup-overlay") as HTMLElement;
 
@@ -76,22 +193,18 @@ function initPopupHandlers() {
 // 팝업 내용을 실제 데이터로 업데이트하는 함수
 async function updatePopupContent(rowIndex: number) {
   try {
-    const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
-    const userId = userInfo.userId;
+    // 전역 items 배열에서 해당 인덱스의 데이터 가져오기
+    const item = items[rowIndex];
 
-    const response = await fetch(
-      `https://api.narrowroad-model.com/model_payment?func=get-payment&userId=${userId}`
-    );
-
-    const data = await response.json();
-    const item = data.items[rowIndex];
-
-    if (!item) return;
+    if (!item) {
+      console.error("해당 인덱스의 데이터를 찾을 수 없습니다:", rowIndex);
+      return;
+    }
 
     // 주문상품 정보 구성
     const menuItems = item.menuSummary
       .map((menu: any) => `${menu.name} ${menu.quantity || 1}개`)
-      .join(", ");
+      .join("<br>");
 
     // 결제일자 포맷팅
     const date = new Date(item.timestamp);
