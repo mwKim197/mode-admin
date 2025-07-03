@@ -562,7 +562,7 @@ async function updatePopupContent(rowIndex: number) {
           </div>
           <div>
             <h5>매장 연락처</h5>
-            <p>${item.storePhone || "정보 없음"}</p>
+            <p>${item.tel || "정보 없음"}</p>
           </div>
           <div>
             <h5>사업자 등록번호</h5>
