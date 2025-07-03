@@ -1,15 +1,25 @@
-import html2canvas from "html2canvas";
-
-let items: any[] = []; // API 데이터 저장용
+let items: any[] = []; // 현재 페이지 데이터만 저장
+let pageKeys: any[] = []; // 페이지 키 배열
+let totalItems = 0; // 전체 아이템 수
 let currentPage = 1;
 const pageLimit = 10;
 let currentSalesType = "transaction"; // 'transaction' (건별) 또는 'product' (상품별)
+
+// 날짜 검색 관련 변수
+let startDate = "";
+let endDate = "";
 
 export function initSales() {
   console.log("✅ sales.ts 로드됨");
 
   // 매출 구분 라디오 버튼 이벤트 리스너 추가
   initSalesTypeRadioHandlers();
+
+  // 날짜 검색 이벤트 리스너 추가
+  initDateSearchHandlers();
+
+  // 상세설정 라디오 버튼 이벤트 리스너 추가
+  initDetailPeriodHandlers();
 
   // 페이지 로드 시 기본값 설정 (건별이 체크되어 있음)
   currentSalesType = "transaction";
@@ -31,10 +41,142 @@ function initSalesTypeRadioHandlers() {
         currentPage = 1; // 페이지 초기화
         updateTableHeader(); // 테이블 헤더 업데이트 (결제/연락처 섹션도 함께 처리)
         getSalesList(); // 새로운 데이터 로드
-        console.log("매출 구분 변경:", currentSalesType);
       }
     });
   });
+}
+
+// 날짜 검색 이벤트 핸들러
+function initDateSearchHandlers() {
+  const startDateInput = document.querySelector(
+    'input[type="date"]:first-of-type'
+  ) as HTMLInputElement;
+  const endDateInput = document.querySelector(
+    'input[type="date"]:last-of-type'
+  ) as HTMLInputElement;
+  const searchBtn = document.querySelector(
+    ".btn-i.search"
+  ) as HTMLButtonElement;
+  const resetBtn = document.querySelector(".btn-i.reset") as HTMLButtonElement;
+
+  // 시작일 변경 이벤트
+  if (startDateInput) {
+    startDateInput.addEventListener("change", (e) => {
+      startDate = (e.target as HTMLInputElement).value;
+    });
+  }
+
+  // 종료일 변경 이벤트
+  if (endDateInput) {
+    endDateInput.addEventListener("change", (e) => {
+      endDate = (e.target as HTMLInputElement).value;
+    });
+  }
+
+  // 검색 버튼 클릭 이벤트
+  if (searchBtn) {
+    searchBtn.addEventListener("click", () => {
+      if (!validateDateRange()) {
+        return;
+      }
+      currentPage = 1;
+      getSalesList();
+    });
+  }
+
+  // 초기화 버튼 클릭 이벤트
+  if (resetBtn) {
+    resetDateInputs();
+    currentPage = 1;
+    getSalesList();
+  }
+}
+
+// 상세설정 라디오 버튼 이벤트 핸들러
+function initDetailPeriodHandlers() {
+  const periodRadioButtons = document.querySelectorAll(
+    'input[name="detail-period"]'
+  );
+
+  periodRadioButtons.forEach((radio, index) => {
+    radio.addEventListener("change", (e) => {
+      const target = e.target as HTMLInputElement;
+      if (target.checked) {
+        setDateRangeByPeriod(index);
+        currentPage = 1;
+        getSalesList();
+      }
+    });
+  });
+}
+
+// 기간별 날짜 설정 함수
+function setDateRangeByPeriod(periodIndex: number) {
+  const startDateInput = document.querySelector(
+    'input[type="date"]:first-of-type'
+  ) as HTMLInputElement;
+  const endDateInput = document.querySelector(
+    'input[type="date"]:last-of-type'
+  ) as HTMLInputElement;
+
+  if (!startDateInput || !endDateInput) return;
+
+  const today = new Date();
+  let startDateValue = "";
+  let endDateValue = "";
+
+  switch (periodIndex) {
+    case 0: // 전체
+      startDateValue = "";
+      endDateValue = "";
+      break;
+    case 1: // 당일
+      startDateValue = formatDate(today);
+      endDateValue = formatDate(today);
+      break;
+    case 2: // 전일
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+      startDateValue = formatDate(yesterday);
+      endDateValue = formatDate(yesterday);
+      break;
+    case 3: // 당월
+      const firstDayOfMonth = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        1
+      );
+      const lastDayOfMonth = new Date(
+        today.getFullYear(),
+        today.getMonth() + 1,
+        0
+      );
+      startDateValue = formatDate(firstDayOfMonth);
+      endDateValue = formatDate(lastDayOfMonth);
+      break;
+    case 4: // 전월
+      const firstDayOfLastMonth = new Date(
+        today.getFullYear(),
+        today.getMonth() - 1,
+        1
+      );
+      const lastDayOfLastMonth = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        0
+      );
+      startDateValue = formatDate(firstDayOfLastMonth);
+      endDateValue = formatDate(lastDayOfLastMonth);
+      break;
+  }
+
+  // 날짜 인풋에 값 설정
+  startDateInput.value = startDateValue;
+  endDateInput.value = endDateValue;
+
+  // 전역 변수 업데이트
+  startDate = startDateValue;
+  endDate = endDateValue;
 }
 
 // 테이블 헤더 업데이트 함수
@@ -89,7 +231,6 @@ function updateTableHeader() {
       detailSettingsSection.style.display = "none";
     }
   }
-  console.log("테이블 헤더 업데이트 완료:", currentSalesType);
 }
 
 async function getSalesList() {
@@ -100,18 +241,44 @@ async function getSalesList() {
     let apiUrl = "";
 
     if (currentSalesType === "transaction") {
-      // 건별 매출 데이터
-      apiUrl = `https://api.narrowroad-model.com/model_payment?func=get-payment&userId=${userId}&limit=1000`;
+      apiUrl = `https://api.narrowroad-model.com/model_payment?func=get-payment&userId=${userId}`;
+
+      if (startDate && endDate) {
+        apiUrl += `&startDate=${startDate}&endDate=${endDate}`;
+      }
     } else {
-      // 상품별 매출 데이터
       apiUrl = `https://api.narrowroad-model.com/model_payment?userId=${userId}&func=get-menu-statistics`;
+    }
+
+    // 1페이지가 아닌 경우에만 lastEvaluatedKey 추가
+    if (currentPage > 1 && pageKeys.length > 0) {
+      const keyIndex = currentPage - 2; // 2페이지는 pageKeys[0], 3페이지는 pageKeys[1]
+
+      if (pageKeys[keyIndex]) {
+        apiUrl += `&lastEvaluatedKey=${encodeURIComponent(
+          JSON.stringify(pageKeys[keyIndex])
+        )}`;
+      }
     }
 
     const response = await fetch(apiUrl);
     const data = await response.json();
-    items = data.items || [];
 
-    // 페이지네이션으로 테이블 렌더링
+    // 1페이지에서만 초기화
+    if (currentPage === 1) {
+      pageKeys = [];
+      totalItems = data.total || 0;
+
+      if (data.pageKeys) {
+        try {
+          pageKeys = JSON.parse(data.pageKeys);
+        } catch (e) {
+          console.error("pageKeys 파싱 실패:", e);
+        }
+      }
+    }
+
+    items = data.items || [];
     await renderSalesTable(items);
   } catch (error) {
     console.error("매출 데이터 로드 실패:", error);
@@ -122,14 +289,9 @@ async function renderSalesTable(data: any[]) {
   const tbody = document.querySelector(".tableArea table tbody");
   if (!tbody) return;
 
-  // 페이지네이션 계산
-  const startIndex = (currentPage - 1) * pageLimit;
-  const endIndex = startIndex + pageLimit;
-  const pageData = data.slice(startIndex, endIndex);
-
   tbody.innerHTML = "";
 
-  pageData.forEach((item: any, index: number) => {
+  data.forEach((item: any, index: number) => {
     let rowContent = "";
 
     if (currentSalesType === "transaction") {
@@ -145,7 +307,7 @@ async function renderSalesTable(data: any[]) {
           : "";
 
       rowContent = `
-        <td>${startIndex + index + 1}</td>
+        <td>${(currentPage - 1) * pageLimit + index + 1}</td>
         <td>${dateStr} <br class="br-s">${timeStr}</td>
         <td class="rel"><span>${menuName}</span> ${quantityDisplay}</td>
         <td>${item.totalPrice.toLocaleString()}원</td>
@@ -158,8 +320,8 @@ async function renderSalesTable(data: any[]) {
       const totalCount = item.totalCount || 0;
 
       rowContent = `
-        <td>${startIndex + index + 1}</td>
-        <td class="rel"><span>${productName}</span></td>
+        <td>${(currentPage - 1) * pageLimit + index + 1}</td>
+        <td class="rel" style="padding-left: 10rem; text-align: left;"><span>${productName}</span></td>
         <td>${totalSales.toLocaleString()}원</td>
         <td class="blue">${totalCount}건</td>
       `;
@@ -167,35 +329,86 @@ async function renderSalesTable(data: any[]) {
 
     const row = document.createElement("tr");
     row.className = "on-popup";
-    row.setAttribute("data-index", (startIndex + index).toString());
+    row.setAttribute(
+      "data-index",
+      ((currentPage - 1) * pageLimit + index).toString()
+    );
     row.innerHTML = rowContent;
 
     tbody.appendChild(row);
   });
 
   // 페이지네이션 버튼 렌더링
-  renderSimplePagination(data.length);
+  renderServerSidePagination();
 }
 
-// 페이지네이션 렌더링
-function renderSimplePagination(totalItems: number) {
+// 서버 사이드 페이지네이션 렌더링
+function renderServerSidePagination() {
   const paginationContainer = document.querySelector(
     ".pagination"
   ) as HTMLElement;
   if (!paginationContainer) return;
 
-  // null 체크 후에 사용
   paginationContainer.style.display = "block";
 
+  // 전체 페이지 수 계산 (매번 계산)
   const totalPages = Math.ceil(totalItems / pageLimit);
 
-  // 페이지 번호 업데이트
+  // 기존 내용 초기화
   const pageNumbers = paginationContainer.querySelector(".page-numbers");
   if (pageNumbers) {
-    pageNumbers.textContent = `${currentPage} / ${totalPages}`;
+    pageNumbers.innerHTML = "";
   }
 
-  // 모든 버튼에 이벤트 리스너 추가
+  // 기존 페이지 번호 버튼들 제거
+  const existingPageButtons =
+    paginationContainer.querySelectorAll("button[data-page]");
+  existingPageButtons.forEach((btn) => btn.remove());
+
+  // 페이지 번호 버튼 생성
+  const visiblePages = 5;
+  let startPage = Math.max(1, currentPage - Math.floor(visiblePages / 2));
+  let endPage = startPage + visiblePages - 1;
+
+  if (endPage > totalPages) {
+    endPage = totalPages;
+    startPage = Math.max(1, endPage - visiblePages + 1);
+  }
+
+  // 페이지 번호 버튼들 생성
+  for (let i = startPage; i <= endPage; i++) {
+    const btn = document.createElement("button");
+    btn.setAttribute("data-page", String(i));
+    btn.innerText = String(i);
+    btn.style.display = "inline-block";
+    btn.style.margin = "0 2px";
+    btn.style.padding = "5px 10px";
+    btn.style.border = "1px solid #ddd";
+    btn.style.backgroundColor = i === currentPage ? "#007bff" : "#fff";
+    btn.style.color = i === currentPage ? "#fff" : "#333";
+    btn.style.cursor = "pointer";
+
+    if (i === currentPage) {
+      btn.classList.add("active");
+    }
+
+    btn.addEventListener("click", () => {
+      if (i !== currentPage) {
+        currentPage = i;
+        getSalesList();
+      }
+    });
+
+    // 페이지 번호 버튼을 > 버튼 앞에 삽입
+    const nextBtn = paginationContainer.querySelector(".page-next");
+    if (nextBtn) {
+      paginationContainer.insertBefore(btn, nextBtn);
+    } else {
+      paginationContainer.appendChild(btn);
+    }
+  }
+
+  // 기존 <<, <, >, >> 버튼 이벤트 리스너 설정
   const firstBtn = paginationContainer.querySelector(
     ".page-first"
   ) as HTMLButtonElement;
@@ -209,7 +422,7 @@ function renderSimplePagination(totalItems: number) {
     ".page-last"
   ) as HTMLButtonElement;
 
-  // 기존 이벤트 리스너 제거 (중복 방지)
+  // 기존 이벤트 리스너 제거
   [firstBtn, prevBtn, nextBtn, lastBtn].forEach((btn) => {
     if (btn) {
       btn.replaceWith(btn.cloneNode(true));
@@ -235,7 +448,7 @@ function renderSimplePagination(totalItems: number) {
     newFirstBtn.addEventListener("click", () => {
       if (currentPage > 1) {
         currentPage = 1;
-        renderSalesTable(items);
+        getSalesList();
       }
     });
     newFirstBtn.disabled = currentPage === 1;
@@ -246,7 +459,7 @@ function renderSimplePagination(totalItems: number) {
     newPrevBtn.addEventListener("click", () => {
       if (currentPage > 1) {
         currentPage--;
-        renderSalesTable(items);
+        getSalesList();
       }
     });
     newPrevBtn.disabled = currentPage === 1;
@@ -257,7 +470,7 @@ function renderSimplePagination(totalItems: number) {
     newNextBtn.addEventListener("click", () => {
       if (currentPage < totalPages) {
         currentPage++;
-        renderSalesTable(items);
+        getSalesList();
       }
     });
     newNextBtn.disabled = currentPage === totalPages;
@@ -268,7 +481,7 @@ function renderSimplePagination(totalItems: number) {
     newLastBtn.addEventListener("click", () => {
       if (currentPage < totalPages) {
         currentPage = totalPages;
-        renderSalesTable(items);
+        getSalesList();
       }
     });
     newLastBtn.disabled = currentPage === totalPages;
@@ -281,12 +494,6 @@ function initPopupHandlers() {
 
   document.addEventListener("click", (e) => {
     const target = e.target as HTMLElement;
-
-    // 이미지 저장 버튼 클릭 처리
-    if (target.closest(".save-img")) {
-      savePopupAsImage();
-      return;
-    }
 
     // 테이블 행 클릭
     if (target.closest(".on-popup")) {
@@ -308,18 +515,23 @@ function initPopupHandlers() {
 // 팝업 내용을 실제 데이터로 업데이트하는 함수
 async function updatePopupContent(rowIndex: number) {
   try {
-    // 전역 items 배열에서 해당 인덱스의 데이터 가져오기
-    const item = items[rowIndex];
+    // 현재 페이지의 실제 데이터 인덱스 계산
+    const actualIndex = rowIndex % pageLimit; // 0~9 범위로 변환
+    const item = items[actualIndex];
 
     if (!item) {
-      console.error("해당 인덱스의 데이터를 찾을 수 없습니다:", rowIndex);
+      console.error("해당 인덱스의 데이터를 찾을 수 없습니다:", actualIndex);
       return;
     }
+
+    console.log(
+      `팝업 데이터 - 페이지: ${currentPage}, rowIndex: ${rowIndex}, actualIndex: ${actualIndex}`
+    );
 
     let popupContent = "";
 
     if (currentSalesType === "transaction") {
-      // 건별 데이터 팝업 (기존 코드)
+      // 건별 데이터 팝업
       const menuItems = item.menuSummary
         .map((menu: any) => `${menu.name} ${menu.quantity || 1}개`)
         .join("<br>");
@@ -439,22 +651,76 @@ async function updatePopupContent(rowIndex: number) {
   } catch (error) {
     console.error("팝업 데이터 업데이트 실패:", error);
   }
-
 }
 
-function savePopupAsImage() {
-  const popup = document.querySelector(".popup") as HTMLElement;
-  if (!popup) {
-    alert("팝업을 찾을 수 없습니다.");
-    return;
+// 날짜 포맷팅 함수 (YYYY-MM-DD)
+function formatDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+// 날짜 범위 유효성 검사
+function validateDateRange(): boolean {
+  if (!startDate && !endDate) {
+    return true;
   }
 
-  html2canvas(popup).then((canvas) => {
-    const link = document.createElement("a");
-    link.href = canvas.toDataURL("image/png");
-    link.download = "sales-info.png";
-    link.click();
-  }).catch((err) => {
-    console.error("❌ 이미지 저장 실패:", err);
-  });
+  if (!startDate || !endDate) {
+    showToastMessage("시작일과 종료일을 모두 선택해주세요.");
+    return false;
+  }
+
+  if (startDate > endDate) {
+    showToastMessage("시작일은 종료일보다 클 수 없습니다.");
+    return false;
+  }
+
+  return true;
+}
+
+// 날짜 인풋 초기화
+function resetDateInputs() {
+  const startDateInput = document.querySelector(
+    'input[type="date"]:first-of-type'
+  ) as HTMLInputElement;
+  const endDateInput = document.querySelector(
+    'input[type="date"]:last-of-type'
+  ) as HTMLInputElement;
+
+  if (startDateInput) {
+    startDateInput.value = "";
+    startDate = "";
+  }
+  if (endDateInput) {
+    endDateInput.value = "";
+    endDate = "";
+  }
+}
+
+// 토스트 메시지 표시
+function showToastMessage(message: string) {
+  const toast = document.createElement("div");
+  toast.style.cssText = `
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ff4444;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    z-index: 10000;
+    font-size: 14px;
+  `;
+  toast.textContent = message;
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    if (toast.parentNode) {
+      toast.parentNode.removeChild(toast);
+    }
+  }, 3000);
 }
