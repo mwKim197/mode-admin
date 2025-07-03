@@ -84,11 +84,13 @@ function initDateSearchHandlers() {
     });
   }
 
-  // 초기화 버튼 클릭 이벤트
+  // 리셋 버튼 클릭 이벤트
   if (resetBtn) {
-    resetDateInputs();
-    currentPage = 1;
-    getSalesList();
+    resetBtn.addEventListener("click", () => {
+      resetDateInputs();
+      currentPage = 1;
+      getSalesList();
+    });
   }
 }
 
@@ -697,6 +699,18 @@ function resetDateInputs() {
     endDateInput.value = "";
     endDate = "";
   }
+
+  // 상세설정 라디오 버튼도 초기화 (전체 선택)
+  const periodRadioButtons = document.querySelectorAll(
+    'input[name="detail-period"]'
+  ) as NodeListOf<HTMLInputElement>;
+
+  if (periodRadioButtons.length > 0) {
+    // 첫 번째 버튼(전체)을 선택
+    periodRadioButtons[0].checked = true;
+  }
+
+  console.log("날짜 검색 초기화 완료");
 }
 
 // 토스트 메시지 표시
