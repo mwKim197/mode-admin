@@ -537,6 +537,28 @@ async function updatePopupContent(rowIndex: number) {
       `팝업 데이터 - 페이지: ${currentPage}, rowIndex: ${rowIndex}, actualIndex: ${actualIndex}`
     );
 
+    // 매장 정보 가져오기
+    const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+    const userId = userInfo.userId;
+    let storeInfo = { storeName: "정보 없음", tel: "정보 없음" };
+
+    try {
+      const storeResponse = await fetch(
+        `https://api.narrowroad-model.com/model_user_setting?func=get-user&userId=${userId}`
+      );
+      const storeData = await storeResponse.json();
+
+      if (storeData) {
+        storeInfo = {
+          storeName: storeData.storeName || "정보 없음",
+          tel: storeData.tel || "정보 없음",
+          //사업자 번호는 추후 등록 필요
+        };
+      }
+    } catch (error) {
+      console.error("매장 정보 로드 실패:", error);
+    }
+
     let popupContent = "";
 
     if (currentSalesType === "transaction") {
@@ -565,15 +587,15 @@ async function updatePopupContent(rowIndex: number) {
         <li>
           <div>
             <h5>매장명</h5>
-            <p>${item.storeName || "정보 없음"}</p>
+            <p>${storeInfo.storeName}</p>
           </div>
           <div>
             <h5>매장 연락처</h5>
-            <p>${item.tel || "정보 없음"}</p>
+            <p>${storeInfo.tel}</p>
           </div>
           <div>
             <h5>사업자 등록번호</h5>
-            <p>${item.businessNumber || "정보 없음"}</p>
+            <p>정보 없음</p>
           </div>
         </li>
         <li>
