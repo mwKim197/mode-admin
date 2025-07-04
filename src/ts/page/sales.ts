@@ -724,70 +724,105 @@ function resetDateInputs() {
 async function savePopupAsImage() {
   try {
     const popup = document.querySelector(".popup") as HTMLElement;
-
     if (!popup) {
       showToastMessage("팝업을 찾을 수 없습니다.");
       return;
     }
 
-    // 이미지 저장 버튼을 임시로 숨김 (캡처에서 제외)
-    const saveButton = popup.querySelector(".save-img") as HTMLElement;
-    const originalDisplay = saveButton.style.display;
-    saveButton.style.display = "none";
+    // 캡처에서 제외할 요소들
+    const elementsToHide = [
+      popup.querySelector(".save-img"),
+      popup.querySelector(".close-btn"),
+      ...popup.querySelectorAll(".popup-footer .btn"),
+    ].filter(Boolean) as HTMLElement[];
 
-    // 팝업의 원래 스타일 저장
-    const originalAnimation = popup.style.animation;
-    const originalBoxShadow = popup.style.boxShadow;
-    const originalOpacity = popup.style.opacity;
-    const originalTransform = popup.style.transform;
+    // 원래 display 값 저장 및 숨김
+    const originalDisplays = elementsToHide.map((el) => el.style.display);
+    elementsToHide.forEach((el) => (el.style.display = "none"));
 
-    // 캡처를 위해 스타일 임시 변경
-    popup.style.animation = "none";
-    popup.style.boxShadow = "none";
-    popup.style.opacity = "1";
-    popup.style.transform = "none";
+    // 스타일 저장
+    const originalStyles = {
+      animation: popup.style.animation,
+      boxShadow: popup.style.boxShadow,
+      opacity: popup.style.opacity,
+      transform: popup.style.transform,
+      width: popup.style.width,
+      height: popup.style.height,
+    };
 
-    // 팝업만 캡처
-    html2canvas(popup, {
-      scale: window.devicePixelRatio,
-      useCORS: true,
-    })
-      .then((canvas) => {
-        // 캔버스를 이미지로 변환
-        const myImage = canvas.toDataURL("image/png");
+    const historyElement = popup.querySelector(".history") as HTMLElement;
+    const originalHistoryStyles = {
+      maxHeight: historyElement.style.maxHeight,
+      minHeight: historyElement.style.minHeight,
+      height: historyElement.style.height,
+      overflow: historyElement.style.overflow,
+    };
 
-        // 파일명 생성
-        const fileName = `매출정보_${new Date()
-          .toISOString()
-          .slice(0, 10)}.png`;
+    // 캡처용 스타일 적용
+    Object.assign(popup.style, {
+      animation: "none",
+      boxShadow: "none",
+      opacity: "1",
+      transform: "none",
+      width: "400px",
+      height: "auto",
+    });
 
-        // 이미지 다운로드
-        downloadURI(myImage, fileName);
+    Object.assign(historyElement.style, {
+      maxHeight: "none",
+      minHeight: "auto",
+      height: "auto",
+      overflow: "visible",
+    });
 
-        // 팝업 스타일 원래대로 복구
-        popup.style.animation = originalAnimation;
-        popup.style.boxShadow = originalBoxShadow;
-        popup.style.opacity = originalOpacity;
-        popup.style.transform = originalTransform;
-
-        // 버튼 다시 표시
-        saveButton.style.display = originalDisplay;
-
-        showToastMessage("이미지가 성공적으로 저장되었습니다.");
+    // 캡처 실행
+    setTimeout(() => {
+      html2canvas(popup, {
+        scale: 1,
+        useCORS: true,
+        width: 400,
+        height: popup.scrollHeight,
       })
-      .catch(function (error) {
-        // 에러 발생 시에도 스타일 복구
-        popup.style.animation = originalAnimation;
-        popup.style.boxShadow = originalBoxShadow;
-        popup.style.opacity = originalOpacity;
-        popup.style.transform = originalTransform;
+        .then((canvas) => {
+          // 둥근 모서리 적용
+          const roundedCanvas = document.createElement("canvas");
+          const ctx = roundedCanvas.getContext("2d");
 
-        console.error("이미지 저장 실패:", error);
-        showToastMessage("이미지 저장에 실패했습니다.");
+          roundedCanvas.width = canvas.width;
+          roundedCanvas.height = canvas.height;
 
-        // 에러 발생 시에도 버튼 다시 표시
-        saveButton.style.display = originalDisplay;
+          if (ctx) {
+            ctx.beginPath();
+            ctx.roundRect(0, 0, canvas.width, canvas.height, 10);
+            ctx.clip();
+            ctx.drawImage(canvas, 0, 0);
+          }
+
+          // 다운로드
+          const fileName = `매출정보_${new Date()
+            .toISOString()
+            .slice(0, 10)}.png`;
+          downloadURI(roundedCanvas.toDataURL("image/png"), fileName);
+
+          // 스타일 복구
+          restoreStyles();
+          showToastMessage("이미지가 성공적으로 저장되었습니다.");
+        })
+        .catch((error) => {
+          console.error("이미지 저장 실패:", error);
+          showToastMessage("이미지 저장에 실패했습니다.");
+          restoreStyles();
+        });
+    }, 100);
+
+    // 스타일 복구 함수
+    function restoreStyles() {
+      Object.assign(popup.style, originalStyles);
+      Object.assign(historyElement.style, originalHistoryStyles);
+      elementsToHide.forEach((el, index) => {
+        el.style.display = originalDisplays[index];
       });
+    }
   } catch (error) {
     console.error("이미지 저장 실패:", error);
     showToastMessage("이미지 저장에 실패했습니다.");
