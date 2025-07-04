@@ -1,3 +1,5 @@
+import html2canvas from "html2canvas";
+
 let items: any[] = []; // 현재 페이지 데이터만 저장
 let pageKeys: any[] = []; // 페이지 키 배열
 let totalItems = 0; // 전체 아이템 수
@@ -507,6 +509,11 @@ function initPopupHandlers() {
       popupOverlay.style.display = "flex";
     }
 
+    // 이미지 저장 버튼 클릭
+    if (target.closest(".save-img")) {
+      savePopupAsImage();
+    }
+
     // 팝업 닫기 버튼들 클릭
     if (target.closest(".popup-footer .gr") || target.closest(".close-btn")) {
       popupOverlay.style.display = "none";
@@ -711,6 +718,90 @@ function resetDateInputs() {
   }
 
   console.log("날짜 검색 초기화 완료");
+}
+
+// 팝업을 이미지로 저장하는 함수
+async function savePopupAsImage() {
+  try {
+    const popup = document.querySelector(".popup") as HTMLElement;
+
+    if (!popup) {
+      showToastMessage("팝업을 찾을 수 없습니다.");
+      return;
+    }
+
+    // 이미지 저장 버튼을 임시로 숨김 (캡처에서 제외)
+    const saveButton = popup.querySelector(".save-img") as HTMLElement;
+    const originalDisplay = saveButton.style.display;
+    saveButton.style.display = "none";
+
+    // 팝업의 원래 스타일 저장
+    const originalAnimation = popup.style.animation;
+    const originalBoxShadow = popup.style.boxShadow;
+    const originalOpacity = popup.style.opacity;
+    const originalTransform = popup.style.transform;
+
+    // 캡처를 위해 스타일 임시 변경
+    popup.style.animation = "none";
+    popup.style.boxShadow = "none";
+    popup.style.opacity = "1";
+    popup.style.transform = "none";
+
+    // 팝업만 캡처
+    html2canvas(popup, {
+      scale: window.devicePixelRatio,
+      useCORS: true,
+    })
+      .then((canvas) => {
+        // 캔버스를 이미지로 변환
+        const myImage = canvas.toDataURL("image/png");
+
+        // 파일명 생성
+        const fileName = `매출정보_${new Date()
+          .toISOString()
+          .slice(0, 10)}.png`;
+
+        // 이미지 다운로드
+        downloadURI(myImage, fileName);
+
+        // 팝업 스타일 원래대로 복구
+        popup.style.animation = originalAnimation;
+        popup.style.boxShadow = originalBoxShadow;
+        popup.style.opacity = originalOpacity;
+        popup.style.transform = originalTransform;
+
+        // 버튼 다시 표시
+        saveButton.style.display = originalDisplay;
+
+        showToastMessage("이미지가 성공적으로 저장되었습니다.");
+      })
+      .catch(function (error) {
+        // 에러 발생 시에도 스타일 복구
+        popup.style.animation = originalAnimation;
+        popup.style.boxShadow = originalBoxShadow;
+        popup.style.opacity = originalOpacity;
+        popup.style.transform = originalTransform;
+
+        console.error("이미지 저장 실패:", error);
+        showToastMessage("이미지 저장에 실패했습니다.");
+
+        // 에러 발생 시에도 버튼 다시 표시
+        saveButton.style.display = originalDisplay;
+      });
+  } catch (error) {
+    console.error("이미지 저장 실패:", error);
+    showToastMessage("이미지 저장에 실패했습니다.");
+  }
+}
+
+// 이미지 다운로드 함수
+function downloadURI(uri: string, name: string) {
+  const link = document.createElement("a");
+  link.download = name; // 다운로드할 파일 이름
+  link.href = uri; // Data URI
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link); // DOM 정리
 }
 
 // 토스트 메시지 표시
