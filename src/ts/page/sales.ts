@@ -11,6 +11,9 @@ let currentSalesType = "transaction"; // 'transaction' (건별) 또는 'product'
 let startDate = "";
 let endDate = "";
 
+// 결제방식 관련 변수 추가
+let currentPaymentType = "all"; // 'all', 'card', 'point'
+
 export function initSales() {
   console.log("✅ sales.ts 로드됨");
 
@@ -22,6 +25,12 @@ export function initSales() {
 
   // 상세설정 라디오 버튼 이벤트 리스너 추가
   initDetailPeriodHandlers();
+
+  // 결제방식 라디오 버튼 이벤트 리스너 추가
+  initPaymentTypeHandlers();
+
+  // 엑셀 다운로드 이벤트 리스너 추가
+  initExcelDownloadHandler();
 
   // 페이지 로드 시 기본값 설정 (건별이 체크되어 있음)
   currentSalesType = "transaction";
@@ -318,6 +327,34 @@ async function updateSectionWithPaymentData(userId: string) {
   }
 }
 
+// 결제방식 라디오 버튼 이벤트 핸들러 추가
+function initPaymentTypeHandlers() {
+  const paymentRadioButtons = document.querySelectorAll(
+    'input[name="payment-type"]'
+  );
+
+  paymentRadioButtons.forEach((radio, index) => {
+    radio.addEventListener("change", (e) => {
+      const target = e.target as HTMLInputElement;
+      if (target.checked) {
+        switch (index) {
+          case 0: // 전체
+            currentPaymentType = "all";
+            break;
+          case 1: // 카드
+            currentPaymentType = "card";
+            break;
+          case 2: // 포인트
+            currentPaymentType = "point";
+            break;
+        }
+        currentPage = 1;
+        getSalesList();
+      }
+    });
+  });
+}
+
 // 테이블 부분을 위한 페이지별 데이터 API 호출
 async function getTableData(userId: string) {
   try {
@@ -325,6 +362,11 @@ async function getTableData(userId: string) {
 
     if (startDate && endDate) {
       apiUrl += `&startDate=${startDate}&endDate=${endDate}`;
+    }
+
+    // 결제방식 파라미터 추가 (전체가 아닌 경우에만)
+    if (currentPaymentType !== "all") {
+      apiUrl += `&paymentType=${currentPaymentType}`;
     }
 
     // 페이지네이션 키 추가
@@ -531,83 +573,110 @@ function renderServerSidePagination() {
     }
   }
 
-  // 기존 <<, <, >, >> 버튼 이벤트 리스너 설정
-  const firstBtn = paginationContainer.querySelector(
-    ".page-first"
-  ) as HTMLButtonElement;
-  const prevBtn = paginationContainer.querySelector(
-    ".page-prev"
-  ) as HTMLButtonElement;
-  const nextBtn = paginationContainer.querySelector(
-    ".page-next"
-  ) as HTMLButtonElement;
-  const lastBtn = paginationContainer.querySelector(
-    ".page-last"
-  ) as HTMLButtonElement;
+  // 상품별 탭일 때는 <<, <, >, >> 버튼 숨기기
+  if (currentSalesType === "product") {
+    const firstBtn = paginationContainer.querySelector(
+      ".page-first"
+    ) as HTMLButtonElement;
+    const prevBtn = paginationContainer.querySelector(
+      ".page-prev"
+    ) as HTMLButtonElement;
+    const nextBtn = paginationContainer.querySelector(
+      ".page-next"
+    ) as HTMLButtonElement;
+    const lastBtn = paginationContainer.querySelector(
+      ".page-last"
+    ) as HTMLButtonElement;
 
-  // 기존 이벤트 리스너 제거
-  [firstBtn, prevBtn, nextBtn, lastBtn].forEach((btn) => {
-    if (btn) {
-      btn.replaceWith(btn.cloneNode(true));
+    if (firstBtn) firstBtn.style.display = "none";
+    if (prevBtn) prevBtn.style.display = "none";
+    if (nextBtn) nextBtn.style.display = "none";
+    if (lastBtn) lastBtn.style.display = "none";
+  } else {
+    // 건별 탭일 때는 버튼들 표시하고 이벤트 리스너 설정
+    const firstBtn = paginationContainer.querySelector(
+      ".page-first"
+    ) as HTMLButtonElement;
+    const prevBtn = paginationContainer.querySelector(
+      ".page-prev"
+    ) as HTMLButtonElement;
+    const nextBtn = paginationContainer.querySelector(
+      ".page-next"
+    ) as HTMLButtonElement;
+    const lastBtn = paginationContainer.querySelector(
+      ".page-last"
+    ) as HTMLButtonElement;
+
+    // 버튼들 표시
+    if (firstBtn) firstBtn.style.display = "inline-block";
+    if (prevBtn) prevBtn.style.display = "inline-block";
+    if (nextBtn) nextBtn.style.display = "inline-block";
+    if (lastBtn) lastBtn.style.display = "inline-block";
+
+    // 기존 이벤트 리스너 제거
+    [firstBtn, prevBtn, nextBtn, lastBtn].forEach((btn) => {
+      if (btn) {
+        btn.replaceWith(btn.cloneNode(true));
+      }
+    });
+
+    // 새로운 버튼들 가져오기
+    const newFirstBtn = paginationContainer.querySelector(
+      ".page-first"
+    ) as HTMLButtonElement;
+    const newPrevBtn = paginationContainer.querySelector(
+      ".page-prev"
+    ) as HTMLButtonElement;
+    const newNextBtn = paginationContainer.querySelector(
+      ".page-next"
+    ) as HTMLButtonElement;
+    const newLastBtn = paginationContainer.querySelector(
+      ".page-last"
+    ) as HTMLButtonElement;
+
+    // 맨 앞으로 버튼
+    if (newFirstBtn) {
+      newFirstBtn.addEventListener("click", () => {
+        if (currentPage > 1) {
+          currentPage = 1;
+          getSalesList();
+        }
+      });
+      newFirstBtn.disabled = currentPage === 1;
     }
-  });
 
-  // 새로운 버튼들 가져오기
-  const newFirstBtn = paginationContainer.querySelector(
-    ".page-first"
-  ) as HTMLButtonElement;
-  const newPrevBtn = paginationContainer.querySelector(
-    ".page-prev"
-  ) as HTMLButtonElement;
-  const newNextBtn = paginationContainer.querySelector(
-    ".page-next"
-  ) as HTMLButtonElement;
-  const newLastBtn = paginationContainer.querySelector(
-    ".page-last"
-  ) as HTMLButtonElement;
+    // 이전 버튼
+    if (newPrevBtn) {
+      newPrevBtn.addEventListener("click", () => {
+        if (currentPage > 1) {
+          currentPage--;
+          getSalesList();
+        }
+      });
+      newPrevBtn.disabled = currentPage === 1;
+    }
 
-  // 맨 앞으로 버튼
-  if (newFirstBtn) {
-    newFirstBtn.addEventListener("click", () => {
-      if (currentPage > 1) {
-        currentPage = 1;
-        getSalesList();
-      }
-    });
-    newFirstBtn.disabled = currentPage === 1;
-  }
+    // 다음 버튼
+    if (newNextBtn) {
+      newNextBtn.addEventListener("click", () => {
+        if (currentPage < totalPages) {
+          currentPage++;
+          getSalesList();
+        }
+      });
+      newNextBtn.disabled = currentPage === totalPages;
+    }
 
-  // 이전 버튼
-  if (newPrevBtn) {
-    newPrevBtn.addEventListener("click", () => {
-      if (currentPage > 1) {
-        currentPage--;
-        getSalesList();
-      }
-    });
-    newPrevBtn.disabled = currentPage === 1;
-  }
-
-  // 다음 버튼
-  if (newNextBtn) {
-    newNextBtn.addEventListener("click", () => {
-      if (currentPage < totalPages) {
-        currentPage++;
-        getSalesList();
-      }
-    });
-    newNextBtn.disabled = currentPage === totalPages;
-  }
-
-  // 맨 뒤로 버튼
-  if (newLastBtn) {
-    newLastBtn.addEventListener("click", () => {
-      if (currentPage < totalPages) {
-        currentPage = totalPages;
-        getSalesList();
-      }
-    });
-    newLastBtn.disabled = currentPage === totalPages;
+    // 맨 뒤로 버튼
+    if (newLastBtn) {
+      newLastBtn.addEventListener("click", () => {
+        if (currentPage < totalPages) {
+          currentPage = totalPages;
+          getSalesList();
+        }
+      });
+      newLastBtn.disabled = currentPage === totalPages;
+    }
   }
 }
 
@@ -696,6 +765,8 @@ async function updatePopupContent(rowIndex: number) {
         "0"
       )}:${String(date.getSeconds()).padStart(2, "0")}`;
 
+      const usedPoints = item.point === 0 ? "0P" : `${item.point}P`;
+
       popupContent = `
         <li>
           <div>
@@ -714,7 +785,7 @@ async function updatePopupContent(rowIndex: number) {
           </div>
           <div>
             <h5>사업자 등록번호</h5>
-            <p>정보 없음</p>
+            <p>추후등록예정</p>
           </div>
         </li>
         <li>
@@ -748,11 +819,11 @@ async function updatePopupContent(rowIndex: number) {
           </div>
           <div>
             <h5>사용 포인트</h5>
-            <p>정보 없음</p>
+            <p>${usedPoints}</p>
           </div>
           <div>
             <h5>적립 포인트</h5>
-            <p>${item.point || "정보없음"}P</p>
+            <p>정보없음</p>
           </div>
         </li>
       `;
@@ -863,110 +934,24 @@ function resetDateInputs() {
 
 // 팝업을 이미지로 저장하는 함수
 async function savePopupAsImage() {
+  const popup = document.querySelector(".popup") as HTMLElement;
+  if (!popup) return;
+
   try {
-    const popup = document.querySelector(".popup") as HTMLElement;
-    if (!popup) {
-      showToastMessage("팝업을 찾을 수 없습니다.");
-      return;
-    }
-
-    // 캡처에서 제외할 요소들
-    const elementsToHide = [
-      popup.querySelector(".save-img"),
-      popup.querySelector(".close-btn"),
-      ...popup.querySelectorAll(".popup-footer .btn"),
-    ].filter(Boolean) as HTMLElement[];
-
-    // 원래 display 값 저장 및 숨김
-    const originalDisplays = elementsToHide.map((el) => el.style.display);
-    elementsToHide.forEach((el) => (el.style.display = "none"));
-
-    // 스타일 저장
-    const originalStyles = {
-      animation: popup.style.animation,
-      boxShadow: popup.style.boxShadow,
-      opacity: popup.style.opacity,
-      transform: popup.style.transform,
-      width: popup.style.width,
-      height: popup.style.height,
-    };
-
-    const historyElement = popup.querySelector(".history") as HTMLElement;
-    const originalHistoryStyles = {
-      maxHeight: historyElement.style.maxHeight,
-      minHeight: historyElement.style.minHeight,
-      height: historyElement.style.height,
-      overflow: historyElement.style.overflow,
-    };
-
-    // 캡처용 스타일 적용
-    Object.assign(popup.style, {
-      animation: "none",
-      boxShadow: "none",
-      opacity: "1",
-      transform: "none",
-      width: "400px",
-      height: "auto",
-    });
-
-    Object.assign(historyElement.style, {
-      maxHeight: "none",
-      minHeight: "auto",
-      height: "auto",
-      overflow: "visible",
-    });
-
     // 캡처 실행
-    setTimeout(() => {
-      html2canvas(popup, {
-        scale: 1,
-        useCORS: true,
-        width: 400,
-        height: popup.scrollHeight,
-      })
-        .then((canvas) => {
-          // 둥근 모서리 적용
-          const roundedCanvas = document.createElement("canvas");
-          const ctx = roundedCanvas.getContext("2d");
+    const canvas = await html2canvas(popup, {
+      scale: 1,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: "#ffffff",
+    });
 
-          roundedCanvas.width = canvas.width;
-          roundedCanvas.height = canvas.height;
-
-          if (ctx) {
-            ctx.beginPath();
-            ctx.roundRect(0, 0, canvas.width, canvas.height, 10);
-            ctx.clip();
-            ctx.drawImage(canvas, 0, 0);
-          }
-
-          // 다운로드
-          const fileName = `매출정보_${new Date()
-            .toISOString()
-            .slice(0, 10)}.png`;
-          downloadURI(roundedCanvas.toDataURL("image/png"), fileName);
-
-          // 스타일 복구
-          restoreStyles();
-          showToastMessage("이미지가 성공적으로 저장되었습니다.");
-        })
-        .catch((error) => {
-          console.error("이미지 저장 실패:", error);
-          showToastMessage("이미지 저장에 실패했습니다.");
-          restoreStyles();
-        });
-    }, 100);
-
-    // 스타일 복구 함수
-    function restoreStyles() {
-      Object.assign(popup.style, originalStyles);
-      Object.assign(historyElement.style, originalHistoryStyles);
-      elementsToHide.forEach((el, index) => {
-        el.style.display = originalDisplays[index];
-      });
-    }
+    // 이미지 다운로드
+    const imageUrl = canvas.toDataURL("image/png");
+    const fileName = `매출_${new Date().toISOString().slice(0, 10)}.png`;
+    downloadURI(imageUrl, fileName);
   } catch (error) {
     console.error("이미지 저장 실패:", error);
-    showToastMessage("이미지 저장에 실패했습니다.");
   }
 }
 
@@ -1043,5 +1028,59 @@ function resetSalesStatistics() {
         pointCountElement.innerHTML = `0<small>건</small>`;
       }
     }
+  }
+}
+
+// 엑셀 다운로드 이벤트 핸들러 추가
+function initExcelDownloadHandler() {
+  const excelBtn = document.querySelector(".btn.wt") as HTMLButtonElement;
+
+  if (excelBtn) {
+    excelBtn.addEventListener("click", downloadExcel);
+  }
+}
+
+// 엑셀 다운로드 함수
+async function downloadExcel() {
+  try {
+    const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+    const userId = userInfo.userId;
+
+    if (!userId) {
+      showToastMessage("사용자 정보를 찾을 수 없습니다.");
+      return;
+    }
+
+    // API URL 생성
+    let apiUrl = `https://api.narrowroad-model.com/model_payment?func=get-payment-excel&paymentType=all&userId=${userId}`;
+
+    // 날짜 파라미터 추가 (전체가 아닌 경우에만)
+    if (startDate && endDate) {
+      apiUrl += `&startDate=${startDate}&endDate=${endDate}`;
+    }
+
+    // API 호출
+    const response = await fetch(apiUrl);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.excelUrl) {
+      throw new Error("엑셀 URL을 받지 못했습니다.");
+    }
+
+    // S3 URL로 파일 다운로드
+    const a = document.createElement("a");
+    a.href = data.excelUrl;
+    a.download = `매출_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch (error) {
+    console.error("엑셀 다운로드 실패:", error);
+    showToastMessage("엑셀 다운로드에 실패했습니다.");
   }
 }
