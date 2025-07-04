@@ -26,6 +26,9 @@ export function initSales() {
   // 페이지 로드 시 기본값 설정 (건별이 체크되어 있음)
   currentSalesType = "transaction";
 
+  // 통계 정보 초기화
+  resetSalesStatistics();
+
   // 테이블 부분만 동적으로 변경
   getSalesList();
   initPopupHandlers();
@@ -42,6 +45,12 @@ function initSalesTypeRadioHandlers() {
         currentSalesType = index === 0 ? "transaction" : "product";
         currentPage = 1; // 페이지 초기화
         updateTableHeader(); // 테이블 헤더 업데이트 (결제/연락처 섹션도 함께 처리)
+
+        // 상품별 데이터일 때 통계 정보 초기화
+        if (currentSalesType === "product") {
+          resetSalesStatistics();
+        }
+
         getSalesList(); // 새로운 데이터 로드
       }
     });
@@ -242,22 +251,85 @@ async function getSalesList() {
     const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
     const userId = userInfo.userId;
 
-    let apiUrl = "";
-
+    // 건별 데이터일 때는 섹션과 테이블을 따로 호출
     if (currentSalesType === "transaction") {
-      apiUrl = `https://api.narrowroad-model.com/model_payment?func=get-payment&userId=${userId}`;
+      // 섹션 부분을 위한 전체 통계 API 호출 (페이지네이션 없이)
+      await updateSectionWithPaymentData(userId);
 
-      if (startDate && endDate) {
-        apiUrl += `&startDate=${startDate}&endDate=${endDate}`;
-      }
+      // 테이블 부분을 위한 페이지별 데이터 API 호출
+      await getTableData(userId);
     } else {
-      apiUrl = `https://api.narrowroad-model.com/model_payment?userId=${userId}&func=get-menu-statistics`;
+      // 상품별 데이터는 테이블만 따로 호출하고, 섹션은 건별 탭과 동일하게
+      await updateSectionWithPaymentData(userId);
+
+      // 테이블 부분을 위한 상품별 데이터 API 호출
+      let apiUrl = `https://api.narrowroad-model.com/model_payment?userId=${userId}&func=get-menu-statistics`;
+
+      // 1페이지가 아닌 경우에만 lastEvaluatedKey 추가
+      if (currentPage > 1 && pageKeys.length > 0) {
+        const keyIndex = currentPage - 2;
+        if (pageKeys[keyIndex]) {
+          apiUrl += `&lastEvaluatedKey=${encodeURIComponent(
+            JSON.stringify(pageKeys[keyIndex])
+          )}`;
+        }
+      }
+
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+
+      // 1페이지에서만 초기화
+      if (currentPage === 1) {
+        pageKeys = [];
+        totalItems = data.total || 0;
+
+        if (data.pageKeys) {
+          try {
+            pageKeys = JSON.parse(data.pageKeys);
+          } catch (e) {
+            console.error("pageKeys 파싱 실패:", e);
+          }
+        }
+      }
+
+      items = data.items || [];
+      await renderSalesTable(items);
+    }
+  } catch (error) {
+    console.error("매출 데이터 로드 실패:", error);
+  }
+}
+
+// 섹션 부분을 위한 전체 통계 API 호출
+async function updateSectionWithPaymentData(userId: string) {
+  try {
+    let paymentApiUrl = `https://api.narrowroad-model.com/model_payment?func=get-payment&userId=${userId}`;
+
+    if (startDate && endDate) {
+      paymentApiUrl += `&startDate=${startDate}&endDate=${endDate}`;
     }
 
-    // 1페이지가 아닌 경우에만 lastEvaluatedKey 추가
-    if (currentPage > 1 && pageKeys.length > 0) {
-      const keyIndex = currentPage - 2; // 2페이지는 pageKeys[0], 3페이지는 pageKeys[1]
+    const paymentResponse = await fetch(paymentApiUrl);
+    const paymentData = await paymentResponse.json();
 
+    updateSalesStatistics(paymentData);
+  } catch (error) {
+    console.error("섹션 데이터 로드 실패:", error);
+  }
+}
+
+// 테이블 부분을 위한 페이지별 데이터 API 호출
+async function getTableData(userId: string) {
+  try {
+    let apiUrl = `https://api.narrowroad-model.com/model_payment?func=get-payment&userId=${userId}`;
+
+    if (startDate && endDate) {
+      apiUrl += `&startDate=${startDate}&endDate=${endDate}`;
+    }
+
+    // 페이지네이션 키 추가
+    if (currentPage > 1 && pageKeys.length > 0) {
+      const keyIndex = currentPage - 2;
       if (pageKeys[keyIndex]) {
         apiUrl += `&lastEvaluatedKey=${encodeURIComponent(
           JSON.stringify(pageKeys[keyIndex])
@@ -268,7 +340,7 @@ async function getSalesList() {
     const response = await fetch(apiUrl);
     const data = await response.json();
 
-    // 1페이지에서만 초기화
+    // 페이지네이션 데이터 업데이트
     if (currentPage === 1) {
       pageKeys = [];
       totalItems = data.total || 0;
@@ -285,7 +357,54 @@ async function getSalesList() {
     items = data.items || [];
     await renderSalesTable(items);
   } catch (error) {
-    console.error("매출 데이터 로드 실패:", error);
+    console.error("테이블 데이터 로드 실패:", error);
+  }
+}
+
+// 매출 통계 정보 업데이트 함수
+function updateSalesStatistics(data: any) {
+  console.log("API 응답 데이터:", data); // 디버깅용 로그 추가
+
+  // HTML 요소 업데이트
+  const countArea = document.querySelector(".countArea");
+  if (countArea) {
+    const countboxes = countArea.querySelectorAll(".countbox");
+
+    // 총 매출
+    if (countboxes[0]) {
+      const totalPriceElement = countboxes[0].querySelector("h4");
+      if (totalPriceElement) {
+        const totalPriceSum = data.totalPriceSum || 0;
+        totalPriceElement.innerHTML = `${totalPriceSum.toLocaleString()}<small>원</small>`;
+      }
+    }
+
+    // 총 판매량
+    if (countboxes[1]) {
+      const totalCountElement = countboxes[1].querySelector("h4");
+      if (totalCountElement) {
+        const totalCount = data.totalCount || 0;
+        totalCountElement.innerHTML = `${totalCount}<small>건</small>`;
+      }
+    }
+
+    // 포인트 매출
+    if (countboxes[2]) {
+      const pointSumElement = countboxes[2].querySelector("h4");
+      if (pointSumElement) {
+        const pointSum = data.pointSum || 0;
+        pointSumElement.innerHTML = `${pointSum}<small>P</small>`;
+      }
+    }
+
+    // 포인트 결제건
+    if (countboxes[3]) {
+      const pointCountElement = countboxes[3].querySelector("h4");
+      if (pointCountElement) {
+        const pointCount = data.pointCount || 0;
+        pointCountElement.innerHTML = `${pointCount}<small>건</small>`;
+      }
+    }
   }
 }
 
@@ -552,7 +671,7 @@ async function updatePopupContent(rowIndex: number) {
         storeInfo = {
           storeName: storeData.storeName || "정보 없음",
           tel: storeData.tel || "정보 없음",
-          //사업자 번호는 추후 등록 필요
+          //사업자번호는 추후 등록 필요
         };
       }
     } catch (error) {
@@ -885,4 +1004,44 @@ function showToastMessage(message: string) {
       toast.parentNode.removeChild(toast);
     }
   }, 3000);
+}
+
+// 통계 정보 초기화 함수
+function resetSalesStatistics() {
+  const countArea = document.querySelector(".countArea");
+  if (countArea) {
+    const countboxes = countArea.querySelectorAll(".countbox");
+
+    // 총 매출
+    if (countboxes[0]) {
+      const totalPriceElement = countboxes[0].querySelector("h4");
+      if (totalPriceElement) {
+        totalPriceElement.innerHTML = `0<small>원</small>`;
+      }
+    }
+
+    // 총 판매량
+    if (countboxes[1]) {
+      const totalCountElement = countboxes[1].querySelector("h4");
+      if (totalCountElement) {
+        totalCountElement.innerHTML = `0<small>건</small>`;
+      }
+    }
+
+    // 포인트 매출
+    if (countboxes[2]) {
+      const pointSumElement = countboxes[2].querySelector("h4");
+      if (pointSumElement) {
+        pointSumElement.innerHTML = `0<small>P</small>`;
+      }
+    }
+
+    // 포인트 결제건
+    if (countboxes[3]) {
+      const pointCountElement = countboxes[3].querySelector("h4");
+      if (pointCountElement) {
+        pointCountElement.innerHTML = `0<small>건</small>`;
+      }
+    }
+  }
 }
