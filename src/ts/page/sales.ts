@@ -59,14 +59,9 @@ function initSalesTypeRadioHandlers() {
         if (currentSalesType === "product") {
           resetSalesStatistics();
 
-          // 날짜 파라미터 초기화하고 전체 통계 다시 로드
+          // 날짜 파라미터 초기화
           startDate = "";
           endDate = "";
-
-          // 전체 통계로 다시 로드
-          const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
-          const userId = userInfo.userId;
-          updateSectionWithPaymentData(userId);
         }
 
         getSalesList(); // 새로운 데이터 로드
@@ -1153,17 +1148,35 @@ async function downloadExcel() {
       return;
     }
 
-    // API URL 생성 - 결제방식 파라미터 동적 추가
-    let apiUrl = `https://api.narrowroad-model.com/model_payment?func=get-payment-excel&userId=${userId}`;
+    // 현재 탭에 따라 다른 API 호출
+    let apiUrl = "";
 
-    // 결제방식 파라미터 추가 (전체가 아닌 경우에만)
-    if (currentPaymentType !== "all") {
-      apiUrl += `&paymentType=${currentPaymentType}`;
-    }
+    if (currentSalesType === "transaction") {
+      // 건별 탭: 기존 API
+      apiUrl = `https://api.narrowroad-model.com/model_payment?func=get-payment-excel&userId=${userId}`;
 
-    // 날짜 파라미터 추가 (전체가 아닌 경우에만)
-    if (startDate && endDate) {
-      apiUrl += `&startDate=${startDate}&endDate=${endDate}`;
+      // 결제방식 파라미터 추가 (전체가 아닌 경우에만)
+      if (currentPaymentType !== "all") {
+        apiUrl += `&paymentType=${currentPaymentType}`;
+      }
+
+      // 날짜 파라미터 추가 (전체가 아닌 경우에만)
+      if (startDate && endDate) {
+        apiUrl += `&startDate=${startDate}&endDate=${endDate}`;
+      }
+    } else {
+      // 상품별 탭: 새로운 API
+      apiUrl = `https://api.narrowroad-model.com/model_payment?func=get-menu-statistics-excel&userId=${userId}`;
+
+      // 페이지네이션 키 추가 (1페이지가 아닌 경우에만)
+      if (currentPage > 1 && pageKeys.length > 0) {
+        const keyIndex = currentPage - 2;
+        if (pageKeys[keyIndex]) {
+          apiUrl += `&lastEvaluatedKey=${encodeURIComponent(
+            JSON.stringify(pageKeys[keyIndex])
+          )}`;
+        }
+      }
     }
 
     console.log("엑셀 다운로드 API URL:", apiUrl);
