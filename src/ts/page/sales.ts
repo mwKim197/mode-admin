@@ -409,8 +409,6 @@ async function getTableData(userId: string) {
 
 // 매출 통계 정보 업데이트 함수
 function updateSalesStatistics(data: any) {
-  console.log("API 응답 데이터:", data); // 디버깅용 로그 추가
-
   // HTML 요소 업데이트
   const countArea = document.querySelector(".countArea");
   if (countArea) {
@@ -470,9 +468,15 @@ async function renderSalesTable(data: any[]) {
       const timeStr = date[1].substring(0, 5);
 
       const menuName = item.menuSummary[0]?.name || "알 수 없음";
+
+      // 각 메뉴의 count를 모두 더한 값 계산
+      const totalQuantity = item.menuSummary.reduce(
+        (sum: number, menu: any) => sum + (menu.count || 1),
+        0
+      );
       const quantityDisplay =
-        item.menuSummary.length > 1
-          ? `<label class="plus">+${item.menuSummary.length - 1}</label>`
+        totalQuantity > 1
+          ? `<label class="plus">+${totalQuantity - 1}</label>`
           : "";
 
       rowContent = `
@@ -760,7 +764,7 @@ async function updatePopupContent(rowIndex: number) {
       const menuItems = item.menuSummary
         .map((menu: any, index: number) => {
           console.log(`메뉴 ${index + 1}:`, menu); // 디버깅용
-          return `${menu.name} ${menu.quantity || 1}개`;
+          return `${menu.name} ${menu.count || 1}개`;
         })
         .join("<br>");
 
@@ -943,7 +947,7 @@ function resetDateInputs() {
   console.log("날짜 검색 초기화 완료");
 }
 
-// 팝업을 이미지로 저장하는 함수 (코드 1번의 완전한 버전)
+// 팝업을 이미지로 저장하는 함수
 async function savePopupAsImage() {
   try {
     const popup = document.querySelector(".popup") as HTMLElement;
