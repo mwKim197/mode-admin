@@ -58,6 +58,15 @@ function initSalesTypeRadioHandlers() {
         // 상품별 데이터일 때 통계 정보 초기화
         if (currentSalesType === "product") {
           resetSalesStatistics();
+
+          // 날짜 파라미터 초기화하고 전체 통계 다시 로드
+          startDate = "";
+          endDate = "";
+
+          // 전체 통계로 다시 로드
+          const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+          const userId = userInfo.userId;
+          updateSectionWithPaymentData(userId);
         }
 
         getSalesList(); // 새로운 데이터 로드
@@ -750,9 +759,17 @@ async function updatePopupContent(rowIndex: number) {
 
     if (currentSalesType === "transaction") {
       // 건별 데이터 팝업
+      console.log("menuSummary 전체 데이터:", item.menuSummary); // 디버깅용
+      console.log("menuSummary 길이:", item.menuSummary.length); // 디버깅용
+
       const menuItems = item.menuSummary
-        .map((menu: any) => `${menu.name} ${menu.quantity || 1}개`)
+        .map((menu: any, index: number) => {
+          console.log(`메뉴 ${index + 1}:`, menu); // 디버깅용
+          return `${menu.name} ${menu.quantity || 1}개`;
+        })
         .join("<br>");
+
+      console.log("최종 menuItems:", menuItems); // 디버깅용
 
       const date = new Date(item.timestamp);
       const formattedDate = `${date.getFullYear()}-${String(
@@ -1149,9 +1166,7 @@ async function downloadExcel() {
       apiUrl += `&startDate=${startDate}&endDate=${endDate}`;
     }
 
-    console.log("엑셀 다운로드 API URL:", apiUrl); // 디버깅용
-    console.log("startDate:", startDate); // 디버깅용
-    console.log("endDate:", endDate); // 디버깅용
+    console.log("엑셀 다운로드 API URL:", apiUrl);
 
     // API 호출
     const response = await fetch(apiUrl);
@@ -1166,10 +1181,9 @@ async function downloadExcel() {
       throw new Error("엑셀 URL을 받지 못했습니다.");
     }
 
-    // S3 URL로 파일 다운로드
+    // S3 URL로 파일 다운로드 (백엔드 파일명 그대로 사용)
     const a = document.createElement("a");
     a.href = data.excelUrl;
-    a.download = `매출_${new Date().toISOString().slice(0, 10)}.xlsx`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
