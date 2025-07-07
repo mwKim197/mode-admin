@@ -238,7 +238,7 @@ function updateTableHeader() {
     // 상품별 헤더
     tableHeader.innerHTML = `
       <th>순서</th>
-      <th>상품</th>
+      <th style="padding-left: 3rem; text-align: center;">상품</th>
       <th>총주문액</th>
       <th>총건수</th>
     `;
@@ -486,7 +486,7 @@ async function renderSalesTable(data: any[]) {
 
       rowContent = `
         <td>${(currentPage - 1) * pageLimit + index + 1}</td>
-        <td class="rel" style="padding-left: 10rem; text-align: left;"><span>${productName}</span></td>
+        <td class="rel" style="padding-left: 3rem; text-align: left;"><span>${productName}</span></td>
         <td>${totalSales.toLocaleString()}원</td>
         <td class="blue">${totalCount}건</td>
       `;
