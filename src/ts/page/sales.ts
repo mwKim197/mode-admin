@@ -736,11 +736,10 @@ async function updatePopupContent(rowIndex: number) {
       );
       const storeData = await storeResponse.json();
 
-      if (storeData) {
+      if (storeData && storeData.user) {
         storeInfo = {
-          storeName: storeData.storeName || "정보 없음",
-          tel: storeData.tel || "정보 없음",
-          //사업자번호는 추후 등록 필요
+          storeName: storeData.user.storeName || "정보 없음",
+          tel: storeData.user.tel || "정보 없음",
         };
       }
     } catch (error) {
@@ -1137,13 +1136,22 @@ async function downloadExcel() {
       return;
     }
 
-    // API URL 생성
-    let apiUrl = `https://api.narrowroad-model.com/model_payment?func=get-payment-excel&paymentType=all&userId=${userId}`;
+    // API URL 생성 - 결제방식 파라미터 동적 추가
+    let apiUrl = `https://api.narrowroad-model.com/model_payment?func=get-payment-excel&userId=${userId}`;
+
+    // 결제방식 파라미터 추가 (전체가 아닌 경우에만)
+    if (currentPaymentType !== "all") {
+      apiUrl += `&paymentType=${currentPaymentType}`;
+    }
 
     // 날짜 파라미터 추가 (전체가 아닌 경우에만)
     if (startDate && endDate) {
       apiUrl += `&startDate=${startDate}&endDate=${endDate}`;
     }
+
+    console.log("엑셀 다운로드 API URL:", apiUrl); // 디버깅용
+    console.log("startDate:", startDate); // 디버깅용
+    console.log("endDate:", endDate); // 디버깅용
 
     // API 호출
     const response = await fetch(apiUrl);
