@@ -932,26 +932,112 @@ function resetDateInputs() {
   console.log("날짜 검색 초기화 완료");
 }
 
-// 팝업을 이미지로 저장하는 함수
+// 팝업을 이미지로 저장하는 함수 (코드 1번의 완전한 버전)
 async function savePopupAsImage() {
-  const popup = document.querySelector(".popup") as HTMLElement;
-  if (!popup) return;
-
   try {
-    // 캡처 실행
-    const canvas = await html2canvas(popup, {
-      scale: 1,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: "#ffffff",
+    const popup = document.querySelector(".popup") as HTMLElement;
+    if (!popup) {
+      showToastMessage("팝업을 찾을 수 없습니다.");
+      return;
+    }
+
+    // 캡처에서 제외할 요소들
+    const elementsToHide = [
+      popup.querySelector(".save-img"),
+      popup.querySelector(".close-btn"),
+      ...popup.querySelectorAll(".popup-footer .btn"),
+    ].filter(Boolean) as HTMLElement[];
+
+    // 원래 display 값 저장 및 숨김
+    const originalDisplays = elementsToHide.map((el) => el.style.display);
+    elementsToHide.forEach((el) => (el.style.display = "none"));
+
+    // 스타일 저장
+    const originalStyles = {
+      animation: popup.style.animation,
+      boxShadow: popup.style.boxShadow,
+      opacity: popup.style.opacity,
+      transform: popup.style.transform,
+      width: popup.style.width,
+      height: popup.style.height,
+    };
+
+    const historyElement = popup.querySelector(".history") as HTMLElement;
+    const originalHistoryStyles = {
+      maxHeight: historyElement.style.maxHeight,
+      minHeight: historyElement.style.minHeight,
+      height: historyElement.style.height,
+      overflow: historyElement.style.overflow,
+    };
+
+    // 캡처용 스타일 적용
+    Object.assign(popup.style, {
+      animation: "none",
+      boxShadow: "none",
+      opacity: "1",
+      transform: "none",
+      width: "400px",
+      height: "auto",
     });
 
-    // 이미지 다운로드
-    const imageUrl = canvas.toDataURL("image/png");
-    const fileName = `매출_${new Date().toISOString().slice(0, 10)}.png`;
-    downloadURI(imageUrl, fileName);
+    Object.assign(historyElement.style, {
+      maxHeight: "none",
+      minHeight: "auto",
+      height: "auto",
+      overflow: "visible",
+    });
+
+    // 캡처 실행
+    setTimeout(() => {
+      html2canvas(popup, {
+        scale: 1,
+        useCORS: true,
+        width: 400,
+        height: popup.scrollHeight,
+      })
+        .then((canvas) => {
+          // 둥근 모서리 적용
+          const roundedCanvas = document.createElement("canvas");
+          const ctx = roundedCanvas.getContext("2d");
+
+          roundedCanvas.width = canvas.width;
+          roundedCanvas.height = canvas.height;
+
+          if (ctx) {
+            ctx.beginPath();
+            ctx.roundRect(0, 0, canvas.width, canvas.height, 10);
+            ctx.clip();
+            ctx.drawImage(canvas, 0, 0);
+          }
+
+          // 다운로드
+          const fileName = `매출정보_${new Date()
+            .toISOString()
+            .slice(0, 10)}.png`;
+          downloadURI(roundedCanvas.toDataURL("image/png"), fileName);
+
+          // 스타일 복구
+          restoreStyles();
+          showToastMessage("이미지가 성공적으로 저장되었습니다.");
+        })
+        .catch((error) => {
+          console.error("이미지 저장 실패:", error);
+          showToastMessage("이미지 저장에 실패했습니다.");
+          restoreStyles();
+        });
+    }, 100);
+
+    // 스타일 복구 함수
+    function restoreStyles() {
+      Object.assign(popup.style, originalStyles);
+      Object.assign(historyElement.style, originalHistoryStyles);
+      elementsToHide.forEach((el, index) => {
+        el.style.display = originalDisplays[index];
+      });
+    }
   } catch (error) {
     console.error("이미지 저장 실패:", error);
+    showToastMessage("이미지 저장에 실패했습니다.");
   }
 }
 
