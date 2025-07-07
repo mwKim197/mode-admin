@@ -275,37 +275,15 @@ async function getSalesList() {
       // 상품별 데이터는 테이블만 따로 호출하고, 섹션은 건별 탭과 동일하게
       await updateSectionWithPaymentData(userId);
 
-      // 테이블 부분을 위한 상품별 데이터 API 호출
+      // 상품별 데이터는 전체 데이터를 한 번에 가져오기
       let apiUrl = `https://api.narrowroad-model.com/model_payment?userId=${userId}&func=get-menu-statistics`;
-
-      // 1페이지가 아닌 경우에만 lastEvaluatedKey 추가
-      if (currentPage > 1 && pageKeys.length > 0) {
-        const keyIndex = currentPage - 2;
-        if (pageKeys[keyIndex]) {
-          apiUrl += `&lastEvaluatedKey=${encodeURIComponent(
-            JSON.stringify(pageKeys[keyIndex])
-          )}`;
-        }
-      }
 
       const response = await fetch(apiUrl);
       const data = await response.json();
 
-      // 1페이지에서만 초기화
-      if (currentPage === 1) {
-        pageKeys = [];
-        totalItems = data.total || 0;
-
-        if (data.pageKeys) {
-          try {
-            pageKeys = JSON.parse(data.pageKeys);
-          } catch (e) {
-            console.error("pageKeys 파싱 실패:", e);
-          }
-        }
-      }
-
+      // 정렬 없이 그대로 사용
       items = data.items || [];
+
       await renderSalesTable(items);
     }
   } catch (error) {
@@ -493,7 +471,7 @@ async function renderSalesTable(data: any[]) {
       const totalCount = item.totalCount || 0;
 
       rowContent = `
-        <td>${(currentPage - 1) * pageLimit + index + 1}</td>
+        <td>${index + 1}</td>
         <td class="rel" style="padding-left: 3rem; text-align: left;"><span>${productName}</span></td>
         <td>${totalSales.toLocaleString()}원</td>
         <td class="blue">${totalCount}건</td>
@@ -502,10 +480,14 @@ async function renderSalesTable(data: any[]) {
 
     const row = document.createElement("tr");
     row.className = "on-popup";
-    row.setAttribute(
-      "data-index",
-      ((currentPage - 1) * pageLimit + index).toString()
-    );
+
+    // 상품별 탭에서는 단순 인덱스, 건별 탭에서는 페이지네이션 고려
+    const dataIndex =
+      currentSalesType === "product"
+        ? index.toString()
+        : ((currentPage - 1) * pageLimit + index).toString();
+
+    row.setAttribute("data-index", dataIndex);
     row.innerHTML = rowContent;
 
     tbody.appendChild(row);
@@ -721,8 +703,18 @@ function initPopupHandlers() {
 async function updatePopupContent(rowIndex: number) {
   try {
     // 현재 페이지의 실제 데이터 인덱스 계산
-    const actualIndex = rowIndex % pageLimit; // 0~9 범위로 변환
-    const item = items[actualIndex];
+    let actualIndex: number;
+    let item: any;
+
+    if (currentSalesType === "product") {
+      // 상품별 탭에서는 rowIndex를 그대로 사용
+      actualIndex = rowIndex;
+      item = items[actualIndex];
+    } else {
+      // 건별 탭에서는 페이지네이션 고려
+      actualIndex = rowIndex % pageLimit;
+      item = items[actualIndex];
+    }
 
     if (!item) {
       console.error("해당 인덱스의 데이터를 찾을 수 없습니다:", actualIndex);
@@ -863,11 +855,11 @@ async function updatePopupContent(rowIndex: number) {
         <li>
           <div>
             <h5>총 주문액</h5>
-            <p>${(item.totalSales || 0).toLocaleString()}원</p>
+            <p>${item.totalSales.toLocaleString()}원</p>
           </div>
           <div>
             <h5>총 주문 건수</h5>
-            <p>${item.totalCount || 0}건</p>
+            <p>${item.totalCount}건</p>
           </div>
           <div>
             <h5>마지막 주문일</h5>
