@@ -504,6 +504,13 @@ function renderServerSidePagination() {
   ) as HTMLElement;
   if (!paginationContainer) return;
 
+  // 상품별 탭일 때는 페이지네이션 완전히 숨기기
+  if (currentSalesType === "product") {
+    paginationContainer.style.display = "none";
+    return;
+  }
+
+  // 건별 탭일 때만 페이지네이션 표시
   paginationContainer.style.display = "block";
 
   // 전체 페이지 수 계산 (매번 계산)
@@ -563,110 +570,89 @@ function renderServerSidePagination() {
     }
   }
 
-  // 상품별 탭일 때는 <<, <, >, >> 버튼 숨기기
-  if (currentSalesType === "product") {
-    const firstBtn = paginationContainer.querySelector(
-      ".page-first"
-    ) as HTMLButtonElement;
-    const prevBtn = paginationContainer.querySelector(
-      ".page-prev"
-    ) as HTMLButtonElement;
-    const nextBtn = paginationContainer.querySelector(
-      ".page-next"
-    ) as HTMLButtonElement;
-    const lastBtn = paginationContainer.querySelector(
-      ".page-last"
-    ) as HTMLButtonElement;
+  // 건별 탭일 때는 버튼들 표시하고 이벤트 리스너 설정
+  const firstBtn = paginationContainer.querySelector(
+    ".page-first"
+  ) as HTMLButtonElement;
+  const prevBtn = paginationContainer.querySelector(
+    ".page-prev"
+  ) as HTMLButtonElement;
+  const nextBtn = paginationContainer.querySelector(
+    ".page-next"
+  ) as HTMLButtonElement;
+  const lastBtn = paginationContainer.querySelector(
+    ".page-last"
+  ) as HTMLButtonElement;
 
-    if (firstBtn) firstBtn.style.display = "none";
-    if (prevBtn) prevBtn.style.display = "none";
-    if (nextBtn) nextBtn.style.display = "none";
-    if (lastBtn) lastBtn.style.display = "none";
-  } else {
-    // 건별 탭일 때는 버튼들 표시하고 이벤트 리스너 설정
-    const firstBtn = paginationContainer.querySelector(
-      ".page-first"
-    ) as HTMLButtonElement;
-    const prevBtn = paginationContainer.querySelector(
-      ".page-prev"
-    ) as HTMLButtonElement;
-    const nextBtn = paginationContainer.querySelector(
-      ".page-next"
-    ) as HTMLButtonElement;
-    const lastBtn = paginationContainer.querySelector(
-      ".page-last"
-    ) as HTMLButtonElement;
+  // 버튼들 표시
+  if (firstBtn) firstBtn.style.display = "inline-block";
+  if (prevBtn) prevBtn.style.display = "inline-block";
+  if (nextBtn) nextBtn.style.display = "inline-block";
+  if (lastBtn) lastBtn.style.display = "inline-block";
 
-    // 버튼들 표시
-    if (firstBtn) firstBtn.style.display = "inline-block";
-    if (prevBtn) prevBtn.style.display = "inline-block";
-    if (nextBtn) nextBtn.style.display = "inline-block";
-    if (lastBtn) lastBtn.style.display = "inline-block";
+  // 기존 이벤트 리스너 제거
+  [firstBtn, prevBtn, nextBtn, lastBtn].forEach((btn) => {
+    if (btn) {
+      btn.replaceWith(btn.cloneNode(true));
+    }
+  });
 
-    // 기존 이벤트 리스너 제거
-    [firstBtn, prevBtn, nextBtn, lastBtn].forEach((btn) => {
-      if (btn) {
-        btn.replaceWith(btn.cloneNode(true));
+  // 새로운 버튼들 가져오기
+  const newFirstBtn = paginationContainer.querySelector(
+    ".page-first"
+  ) as HTMLButtonElement;
+  const newPrevBtn = paginationContainer.querySelector(
+    ".page-prev"
+  ) as HTMLButtonElement;
+  const newNextBtn = paginationContainer.querySelector(
+    ".page-next"
+  ) as HTMLButtonElement;
+  const newLastBtn = paginationContainer.querySelector(
+    ".page-last"
+  ) as HTMLButtonElement;
+
+  // 맨 앞으로 버튼
+  if (newFirstBtn) {
+    newFirstBtn.addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage = 1;
+        getSalesList();
       }
     });
+    newFirstBtn.disabled = currentPage === 1;
+  }
 
-    // 새로운 버튼들 가져오기
-    const newFirstBtn = paginationContainer.querySelector(
-      ".page-first"
-    ) as HTMLButtonElement;
-    const newPrevBtn = paginationContainer.querySelector(
-      ".page-prev"
-    ) as HTMLButtonElement;
-    const newNextBtn = paginationContainer.querySelector(
-      ".page-next"
-    ) as HTMLButtonElement;
-    const newLastBtn = paginationContainer.querySelector(
-      ".page-last"
-    ) as HTMLButtonElement;
+  // 이전 버튼
+  if (newPrevBtn) {
+    newPrevBtn.addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage--;
+        getSalesList();
+      }
+    });
+    newPrevBtn.disabled = currentPage === 1;
+  }
 
-    // 맨 앞으로 버튼
-    if (newFirstBtn) {
-      newFirstBtn.addEventListener("click", () => {
-        if (currentPage > 1) {
-          currentPage = 1;
-          getSalesList();
-        }
-      });
-      newFirstBtn.disabled = currentPage === 1;
-    }
+  // 다음 버튼
+  if (newNextBtn) {
+    newNextBtn.addEventListener("click", () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        getSalesList();
+      }
+    });
+    newNextBtn.disabled = currentPage === totalPages;
+  }
 
-    // 이전 버튼
-    if (newPrevBtn) {
-      newPrevBtn.addEventListener("click", () => {
-        if (currentPage > 1) {
-          currentPage--;
-          getSalesList();
-        }
-      });
-      newPrevBtn.disabled = currentPage === 1;
-    }
-
-    // 다음 버튼
-    if (newNextBtn) {
-      newNextBtn.addEventListener("click", () => {
-        if (currentPage < totalPages) {
-          currentPage++;
-          getSalesList();
-        }
-      });
-      newNextBtn.disabled = currentPage === totalPages;
-    }
-
-    // 맨 뒤로 버튼
-    if (newLastBtn) {
-      newLastBtn.addEventListener("click", () => {
-        if (currentPage < totalPages) {
-          currentPage = totalPages;
-          getSalesList();
-        }
-      });
-      newLastBtn.disabled = currentPage === totalPages;
-    }
+  // 맨 뒤로 버튼
+  if (newLastBtn) {
+    newLastBtn.addEventListener("click", () => {
+      if (currentPage < totalPages) {
+        currentPage = totalPages;
+        getSalesList();
+      }
+    });
+    newLastBtn.disabled = currentPage === totalPages;
   }
 }
 
