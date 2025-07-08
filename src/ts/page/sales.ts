@@ -985,6 +985,22 @@ async function updatePopupContent(rowIndex: number) {
     if (popupBody) {
       popupBody.innerHTML = popupContent;
     }
+
+    // 환불/삭제 버튼을 투명하게 만들고 취소 버튼만 보이게
+    const popupFooter = document.querySelector(".popup-footer") as HTMLElement;
+    if (popupFooter) {
+      const refundBtn = popupFooter.querySelector(".btn.blue") as HTMLElement;
+      const deleteBtn = popupFooter.querySelector(".btn.red") as HTMLElement;
+
+      if (refundBtn) {
+        refundBtn.style.visibility = "hidden"; // 공간은 유지하되 보이지 않게
+        refundBtn.style.opacity = "0";
+      }
+      if (deleteBtn) {
+        deleteBtn.style.visibility = "hidden"; // 공간은 유지하되 보이지 않게
+        deleteBtn.style.opacity = "0";
+      }
+    }
   } catch (error) {
     console.error("팝업 데이터 업데이트 실패:", error);
   }
