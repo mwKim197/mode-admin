@@ -707,10 +707,6 @@ async function updatePopupContent(rowIndex: number) {
       return;
     }
 
-    console.log(
-      `팝업 데이터 - 페이지: ${currentPage}, rowIndex: ${rowIndex}, actualIndex: ${actualIndex}`
-    );
-
     // 매장 정보 가져오기
     const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
     const userId = userInfo.userId;
@@ -736,17 +732,11 @@ async function updatePopupContent(rowIndex: number) {
 
     if (currentSalesType === "transaction") {
       // 건별 데이터 팝업
-      console.log("menuSummary 전체 데이터:", item.menuSummary);
-      console.log("menuSummary 길이:", item.menuSummary.length);
-
       const menuItems = item.menuSummary
         .map((menu: any, index: number) => {
-          console.log(`메뉴 ${index + 1}:`, menu);
           return `${menu.name} ${menu.count || 1}개`;
         })
         .join("<br>");
-
-      console.log("최종 menuItems:", menuItems);
 
       const date = new Date(item.timestamp);
       const formattedDate = `${date.getFullYear()}-${String(
@@ -760,12 +750,33 @@ async function updatePopupContent(rowIndex: number) {
 
       const usedPoints = item.point === 0 ? "0P" : `${item.point}P`;
 
-      // 결제방식에 따른 표시 정보 결정
+      // 해당 주문의 실제 결제방식 확인
+      let actualPaymentType = "card"; // 기본값
+      let paymentMethodText = "카드"; // 기본값
+      let pointContact = "정보 없음";
+      let earnedPoints = "정보없음";
+
+      // 실제 결제방식 확인을 먼저 실행
+      if (item.point > 0) {
+        actualPaymentType = "point";
+        paymentMethodText = "포인트";
+      } else {
+      }
+
+      // API 호출 제거하고 현재 데이터에서 포인트 정보 가져오기
+      if (item.pointData) {
+        pointContact = item.pointData.tel || "정보 없음";
+        const earnedPointsValue = item.pointData.points || 0;
+        earnedPoints = `${earnedPointsValue}P`;
+      } else {
+      }
+
+      // 실제 결제방식에 따라 표시 정보 결정
       let paymentMethodInfo = "";
       let pointInfo = "";
 
-      if (currentPaymentType === "card") {
-        // 카드 결제일 때: 카드 정보만 표시, 포인트 정보는 숨김
+      if (actualPaymentType === "card") {
+        // 카드 결제일 때: 카드 정보만 표시
         paymentMethodInfo = `
           <div>
             <h5>결제 카드</h5>
@@ -776,101 +787,10 @@ async function updatePopupContent(rowIndex: number) {
             <p>정보 없음</p>
           </div>
         `;
-        // 포인트 정보는 빈 문자열로 설정 (표시하지 않음)
         pointInfo = "";
-      } else if (currentPaymentType === "point") {
-        // 포인트 결제일 때: 포인트 정보만 표시, 카드 정보는 숨김
-        // 포인트 정보 가져오기
-        let pointContact = "정보 없음";
-        let earnedPoints = "정보없음";
-
-        try {
-          if (item.orderId) {
-            const pointResponse = await fetch(
-              `https://api.narrowroad-model.com/model_payment?func=get-payment&userId=${userId}&orderId=${item.orderId}`
-            );
-            const pointData = await pointResponse.json();
-
-            if (pointData.items && pointData.items.length > 0) {
-              const orderData = pointData.items.find(
-                (order: any) => order.orderId === item.orderId
-              );
-              if (orderData && orderData.pointData) {
-                pointContact = orderData.pointData.tel || "정보 없음";
-
-                // 적립 포인트 계산
-                const currentPoints = orderData.pointData.points || 0;
-                const usedPointsValue = item.point || 0;
-                const earnedPointsValue = currentPoints + usedPointsValue;
-
-                earnedPoints = `${earnedPointsValue}P`;
-              }
-            }
-          }
-        } catch (error) {
-          console.error("포인트 정보 로드 실패:", error);
-        }
-
-        pointInfo = `
-          <div>
-            <h5>포인트 연락처</h5>
-            <p>${pointContact}</p>
-          </div>
-          <div>
-            <h5>사용 포인트</h5>
-            <p>${usedPoints}</p>
-          </div>
-          <div>
-            <h5>적립 포인트</h5>
-            <p>${earnedPoints}</p>
-          </div>
-        `;
-        // 카드 정보는 빈 문자열로 설정 (표시하지 않음)
+      } else if (actualPaymentType === "point") {
+        // 포인트 결제일 때: 포인트 정보만 표시
         paymentMethodInfo = "";
-      } else {
-        // 전체일 때: 모든 정보 표시
-        paymentMethodInfo = `
-          <div>
-            <h5>결제 카드</h5>
-            <p>정보 없음</p>
-          </div>
-          <div>
-            <h5>카드 번호</h5>
-            <p>정보 없음</p>
-          </div>
-        `;
-
-        // 포인트 정보 가져오기
-        let pointContact = "정보 없음";
-        let earnedPoints = "정보없음";
-
-        try {
-          if (item.orderId) {
-            const pointResponse = await fetch(
-              `https://api.narrowroad-model.com/model_payment?func=get-payment&userId=${userId}&orderId=${item.orderId}`
-            );
-            const pointData = await pointResponse.json();
-
-            if (pointData.items && pointData.items.length > 0) {
-              const orderData = pointData.items.find(
-                (order: any) => order.orderId === item.orderId
-              );
-              if (orderData && orderData.pointData) {
-                pointContact = orderData.pointData.tel || "정보 없음";
-
-                // 적립 포인트 계산
-                const currentPoints = orderData.pointData.points || 0;
-                const usedPointsValue = item.point || 0;
-                const earnedPointsValue = currentPoints + usedPointsValue;
-
-                earnedPoints = `${earnedPointsValue}P`;
-              }
-            }
-          }
-        } catch (error) {
-          console.error("포인트 정보 로드 실패:", error);
-        }
-
         pointInfo = `
           <div>
             <h5>포인트 연락처</h5>
@@ -923,7 +843,7 @@ async function updatePopupContent(rowIndex: number) {
           </div>
           <div>
             <h5>결제 수단</h5>
-            <p>정보없음</p>
+            <p>${paymentMethodText}</p>
           </div>
           ${paymentMethodInfo}
           ${pointInfo}
