@@ -779,7 +779,7 @@ async function updatePopupContent(rowIndex: number) {
       let pointInfo = "";
 
       if (currentPaymentType === "card") {
-        // 카드 결제일 때: 카드 정보만 표시
+        // 카드 결제일 때: 카드 정보만 표시, 포인트 정보는 숨김
         paymentMethodInfo = `
           <div>
             <h5>결제 카드</h5>
@@ -790,8 +790,10 @@ async function updatePopupContent(rowIndex: number) {
             <p>정보 없음</p>
           </div>
         `;
+        // 포인트 정보는 빈 문자열로 설정 (표시하지 않음)
+        pointInfo = "";
       } else if (currentPaymentType === "point") {
-        // 포인트 결제일 때: 포인트 정보만 표시
+        // 포인트 결제일 때: 포인트 정보만 표시, 카드 정보는 숨김
         // 포인트 정보 가져오기
         let pointContact = "정보 없음";
         let earnedPoints = "정보없음";
@@ -810,7 +812,7 @@ async function updatePopupContent(rowIndex: number) {
               if (orderData && orderData.pointData) {
                 pointContact = orderData.pointData.tel || "정보 없음";
 
-                // 적립 포인트 계산 (현재 포인트 - 사용 포인트)
+                // 적립 포인트 계산
                 const currentPoints = orderData.pointData.points || 0;
                 const usedPointsValue = item.point || 0;
                 const earnedPointsValue = currentPoints + usedPointsValue;
@@ -837,6 +839,8 @@ async function updatePopupContent(rowIndex: number) {
             <p>${earnedPoints}</p>
           </div>
         `;
+        // 카드 정보는 빈 문자열로 설정 (표시하지 않음)
+        paymentMethodInfo = "";
       } else {
         // 전체일 때: 모든 정보 표시
         paymentMethodInfo = `
