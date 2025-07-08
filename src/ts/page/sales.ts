@@ -750,17 +750,17 @@ async function updatePopupContent(rowIndex: number) {
 
     if (currentSalesType === "transaction") {
       // 건별 데이터 팝업
-      console.log("menuSummary 전체 데이터:", item.menuSummary); // 디버깅용
-      console.log("menuSummary 길이:", item.menuSummary.length); // 디버깅용
+      console.log("menuSummary 전체 데이터:", item.menuSummary);
+      console.log("menuSummary 길이:", item.menuSummary.length);
 
       const menuItems = item.menuSummary
         .map((menu: any, index: number) => {
-          console.log(`메뉴 ${index + 1}:`, menu); // 디버깅용
+          console.log(`메뉴 ${index + 1}:`, menu);
           return `${menu.name} ${menu.count || 1}개`;
         })
         .join("<br>");
 
-      console.log("최종 menuItems:", menuItems); // 디버깅용
+      console.log("최종 menuItems:", menuItems);
 
       const date = new Date(item.timestamp);
       const formattedDate = `${date.getFullYear()}-${String(
@@ -773,6 +773,129 @@ async function updatePopupContent(rowIndex: number) {
       )}:${String(date.getSeconds()).padStart(2, "0")}`;
 
       const usedPoints = item.point === 0 ? "0P" : `${item.point}P`;
+
+      // 결제방식에 따른 표시 정보 결정
+      let paymentMethodInfo = "";
+      let pointInfo = "";
+
+      if (currentPaymentType === "card") {
+        // 카드 결제일 때: 카드 정보만 표시
+        paymentMethodInfo = `
+          <div>
+            <h5>결제 카드</h5>
+            <p>정보 없음</p>
+          </div>
+          <div>
+            <h5>카드 번호</h5>
+            <p>정보 없음</p>
+          </div>
+        `;
+      } else if (currentPaymentType === "point") {
+        // 포인트 결제일 때: 포인트 정보만 표시
+        // 포인트 정보 가져오기
+        let pointContact = "정보 없음";
+        let earnedPoints = "정보없음";
+
+        try {
+          if (item.orderId) {
+            const pointResponse = await fetch(
+              `https://api.narrowroad-model.com/model_payment?func=get-payment&userId=${userId}&orderId=${item.orderId}`
+            );
+            const pointData = await pointResponse.json();
+
+            if (pointData.items && pointData.items.length > 0) {
+              const orderData = pointData.items.find(
+                (order: any) => order.orderId === item.orderId
+              );
+              if (orderData && orderData.pointData) {
+                pointContact = orderData.pointData.tel || "정보 없음";
+
+                // 적립 포인트 계산 (현재 포인트 - 사용 포인트)
+                const currentPoints = orderData.pointData.points || 0;
+                const usedPointsValue = item.point || 0;
+                const earnedPointsValue = currentPoints + usedPointsValue;
+
+                earnedPoints = `${earnedPointsValue}P`;
+              }
+            }
+          }
+        } catch (error) {
+          console.error("포인트 정보 로드 실패:", error);
+        }
+
+        pointInfo = `
+          <div>
+            <h5>포인트 연락처</h5>
+            <p>${pointContact}</p>
+          </div>
+          <div>
+            <h5>사용 포인트</h5>
+            <p>${usedPoints}</p>
+          </div>
+          <div>
+            <h5>적립 포인트</h5>
+            <p>${earnedPoints}</p>
+          </div>
+        `;
+      } else {
+        // 전체일 때: 모든 정보 표시
+        paymentMethodInfo = `
+          <div>
+            <h5>결제 카드</h5>
+            <p>정보 없음</p>
+          </div>
+          <div>
+            <h5>카드 번호</h5>
+            <p>정보 없음</p>
+          </div>
+        `;
+
+        // 포인트 정보 가져오기
+        let pointContact = "정보 없음";
+        let earnedPoints = "정보없음";
+
+        try {
+          if (item.orderId) {
+            const pointResponse = await fetch(
+              `https://api.narrowroad-model.com/model_payment?func=get-payment&userId=${userId}&orderId=${item.orderId}`
+            );
+            const pointData = await pointResponse.json();
+
+            if (pointData.items && pointData.items.length > 0) {
+              const orderData = pointData.items.find(
+                (order: any) => order.orderId === item.orderId
+              );
+              if (orderData && orderData.pointData) {
+                pointContact = orderData.pointData.tel || "정보 없음";
+
+                // 적립 포인트 계산
+                const currentPoints = orderData.pointData.points || 0;
+                const usedPointsValue = item.point || 0;
+                const earnedPointsValue = currentPoints + usedPointsValue;
+
+                earnedPoints = `${earnedPointsValue}P`;
+              }
+            }
+          }
+        } catch (error) {
+          console.error("포인트 정보 로드 실패:", error);
+        }
+
+        pointInfo = `
+          <div>
+            <h5>포인트 연락처</h5>
+            <p>${pointContact}</p>
+          </div>
+          <div>
+            <h5>사용 포인트</h5>
+            <p>${usedPoints}</p>
+          </div>
+          <div>
+            <h5>적립 포인트</h5>
+            <p>${earnedPoints}</p>
+          </div>
+        `;
+      }
 
       popupContent = `
         <li>
@@ -812,30 +935,12 @@ async function updatePopupContent(rowIndex: number) {
             <h5>결제 수단</h5>
             <p>정보없음</p>
           </div>
-          <div>
-            <h5>결제 카드</h5>
-            <p>정보 없음</p>
-          </div>
-          <div>
-            <h5>카드 번호</h5>
-            <p>정보 없음</p>
-          </div>
-          <div>
-            <h5>포인트 연락처</h5>
-            <p>정보 없음</p>
-          </div>
-          <div>
-            <h5>사용 포인트</h5>
-            <p>${usedPoints}</p>
-          </div>
-          <div>
-            <h5>적립 포인트</h5>
-            <p>정보없음</p>
-          </div>
+          ${paymentMethodInfo}
+          ${pointInfo}
         </li>
       `;
     } else {
-      // 상품별 데이터 팝업
+      // 상품별 데이터 팝업 (기존과 동일)
       const lastOrderDate = new Date(item.lastOrderTimestamp);
       const formattedDate = `${lastOrderDate.getFullYear()}-${String(
         lastOrderDate.getMonth() + 1
@@ -855,11 +960,11 @@ async function updatePopupContent(rowIndex: number) {
         <li>
           <div>
             <h5>총 주문액</h5>
-            <p>${item.totalSales.toLocaleString()}원</p>
+            <p>${(item.totalSales || 0).toLocaleString()}원</p>
           </div>
           <div>
             <h5>총 주문 건수</h5>
-            <p>${item.totalCount}건</p>
+            <p>${item.totalCount || 0}건</p>
           </div>
           <div>
             <h5>마지막 주문일</h5>
