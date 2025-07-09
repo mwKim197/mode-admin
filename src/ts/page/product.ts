@@ -27,7 +27,8 @@ export function initProduct() {
 
     tbody.innerHTML = items.map(item => {
       const imageFile = item.image?.split("\\").pop() ?? "";
-      const imageUrl = `https://model-narrow-road.s3.ap-northeast-2.amazonaws.com/model/${item.userId}/${imageFile}`; // 필요 시 경로 조정
+      const encodedFile = encodeURIComponent(imageFile); // ✅ 한글/공백 처리
+      const imageUrl = `https://model-narrow-road.s3.ap-northeast-2.amazonaws.com/model/${item.userId}/${encodedFile}`; // 필요 시 경로 조정
 
       return `
       <tr>
@@ -53,7 +54,6 @@ export function initProduct() {
       </tr>
     `;
     }).join("");
-
   }
 
   (async function init() {
@@ -119,7 +119,6 @@ function transformToOrderData(item: any): any {
           orderId: `${item.menuId}-${item.userId}`,
           userId: item.userId,
           menuId: item.menuId,
-          item: item.items,
           name: item.name,
           count: 1 // ✅ 주문 개수로 사용
         }
