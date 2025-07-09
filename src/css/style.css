@@ -860,3 +860,15 @@ noticeArea start
     max-width: calc(100% - 2rem);
   }
 }
+
+/* 상품별 탭일 때 팝업 크기 조정 */
+.product-view .popup .history {
+  min-height: 200px; /* 상품별 탭에서는 최소 높이 줄이기 */
+  max-height: 300px; /* 상품별 탭에서는 최대 높이도 줄이기 */
+}
+
+/* 상품별 탭일 때 팝업 자체 크기도 조정 */
+.product-view .popup {
+  height: auto;
+  min-height: auto;
+}
