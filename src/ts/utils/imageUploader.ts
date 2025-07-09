@@ -42,8 +42,15 @@ export function handleImageUpload(
       // base64 추출
       const reader = new FileReader();
       reader.onload = () => {
-        const base64 = (reader.result as string).replace(/^data:image\/\w+;base64,/, "");
-        resolve({ base64, fileName: file.name, dataUrl: reader.result as string });
+        const dataUrl = reader.result as string;
+        previewEl.src = dataUrl; // ✅ 한글 깨짐 방지
+        previewEl.style.display = "block";
+
+        if (fileNameEl) {
+          fileNameEl.textContent = file.name;
+        }
+
+        resolve({ base64: dataUrl, fileName: file.name, dataUrl });
       };
       reader.onerror = reject;
       reader.readAsDataURL(file);

@@ -83,7 +83,8 @@ function setCategoryOptions(categories: { name: string; item: string }[]) {
 function applyMenuData(menu: any) {
   // 이미지
   const imageFile = menu.image?.split("\\").pop();
-  const imageUrl = `https://model-narrow-road.s3.ap-northeast-2.amazonaws.com/model/${menu.userId}/${imageFile}`;
+  const encodedFileName = encodeURIComponent(imageFile ?? "");
+  const imageUrl = `https://model-narrow-road.s3.ap-northeast-2.amazonaws.com/model/${menu.userId}/${encodedFileName}`;
   const preview = document.getElementById("logoPreview") as HTMLImageElement;
   if (preview) {
     preview.src = imageUrl;
