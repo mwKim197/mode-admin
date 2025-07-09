@@ -9,7 +9,7 @@ export function initProduct() {
   const user = getStoredUser();
 
   if (!user) {
-    alert("사용자 정보가 없습니다.");
+    window.showToast(`❌ 사용자 정보가 없습니다.`, 3000, "error");
     return;
   }
 
@@ -47,7 +47,7 @@ export function initProduct() {
           </label>
         </td>
         <td>
-          <span class="tag blue">제조</span>
+          <span class="tag blue" data-menu='${encodeURIComponent(JSON.stringify(item))}' onclick="onAdminOder(this)">제조</span>
           <span class="tag red" onclick="onDeleteClick(${item.menuId}, event)">삭제</span>
         </td>
       </tr>
@@ -63,6 +63,7 @@ export function initProduct() {
       changeList.length = 0; // 기존 변경사항 모두 제거
     } catch (err) {
       console.error("❌ 메뉴 목록 불러오기 실패", err);
+      window.showToast(`❌ 메뉴 목록 불러오기 실패: ${err}`, 3000, "error");
     }
   })();
 
@@ -75,13 +76,13 @@ if (saveBtn) {
   saveBtn.addEventListener("click", () => {
 
     if (changeList.length === 0) {
-      alert("변경된 내용이 없습니다.");
+      window.showToast(`변경된 내용이 없습니다.`, 3000, "warning");
       return;
     }
 
     if(confirm("수정사항을 저장하시겠습니까?")) {
       saveChanges().catch(() => {
-        alert("수정에 실패했습니다.");
+        window.showToast(`❌ 수정에 실패했습니다.`, 3000, "error");
       });
     }
   })
@@ -99,6 +100,32 @@ function onDeleteClick(menuId: number, event: any) {
   updateChangeList(menuId, { delete: true });
   const row = event.target.closest("tr");
   if (row) row.classList.add("tr-disabled");
+}
+
+// 어드민 주문
+function onAdminOder(el: HTMLElement) {
+  const itemStr = decodeURIComponent(el.dataset.menu || '{}');
+  const item = JSON.parse(itemStr);
+  const data = transformToOrderData(item);
+  sendMachineCommand("order", data);
+}
+
+// 주문내역 변환
+function transformToOrderData(item: any): any {
+  return {
+    orderData: {
+      orderList: [
+        {
+          orderId: `${item.menuId}-${item.userId}`,
+          userId: item.userId,
+          menuId: item.menuId,
+          item: item.items,
+          name: item.name,
+          count: 1 // ✅ 주문 개수로 사용
+        }
+      ]
+    }
+  };
 }
 
 // 수정 목록 업데이트
@@ -126,18 +153,44 @@ async function saveChanges() {
     const res = await apiPost(`/model_admin_menu?func=bulk-update-or-delete`, body);
 
     if (res.ok) {
-      alert("✅ 변경 사항 저장 완료");
+      window.showToast(`변경 사항 저장 완료`);
       location.reload(); // 또는 init() 호출
     } else {
       const err = await res.json();
-      alert(`❌ 저장 실패: ${err.message}`);
+      console.error("❌ 저장 실패:", err.message);
+      window.showToast(`❌ 저장 실패: ${err.message} `, 3000, "error");
     }
   } catch (err) {
     console.error("❌ 저장 오류:", err);
-    alert("서버 오류로 저장에 실패했습니다.");
+    window.showToast(`❌ 저장 오류: ${err} `, 3000, "error");
   }
+}
+
+async function sendMachineCommand(func: string, data: any = {}) {
+  const user = getStoredUser();
+  if (!user) {
+    window.showToast(`❌ 사용자 정보가 없습니다.`, 3000, "error");
+    return;
+  }
+  const payload = {
+    func,
+    userId: user.userId,
+    ...(func === "order" ? { orderData: data.orderData } : {})
+  };
+
+  // ✅ 요청만 보내고 응답 기다리지 않음
+  apiPost("/model_machine_controll", payload)
+      .then(() => {
+        window.showToast(`제조 명령 전송 완료`);
+      })
+      .catch(err => {
+        window.showToast(`❌ 명령 전송 실패: ${err} `, 3000, "error");
+      });
+
+  window.showToast(`제조 명령 전송`);
 }
 
 // 맨 아래에 추가하세요
 (window as any).onToggleChange = onToggleChange;
 (window as any).onDeleteClick = onDeleteClick;
+(window as any).onAdminOder = onAdminOder;
