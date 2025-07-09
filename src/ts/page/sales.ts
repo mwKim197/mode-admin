@@ -760,7 +760,6 @@ async function updatePopupContent(rowIndex: number) {
       if (item.point > 0) {
         actualPaymentType = "point";
         paymentMethodText = "포인트";
-      } else {
       }
 
       // API 호출 제거하고 현재 데이터에서 포인트 정보 가져오기
@@ -768,7 +767,6 @@ async function updatePopupContent(rowIndex: number) {
         pointContact = item.pointData.tel || "정보 없음";
         const earnedPointsValue = item.pointData.points || 0;
         earnedPoints = `${earnedPointsValue}P`;
-      } else {
       }
 
       // 실제 결제방식에 따라 표시 정보 결정
@@ -776,15 +774,19 @@ async function updatePopupContent(rowIndex: number) {
       let pointInfo = "";
 
       if (actualPaymentType === "card") {
-        // 카드 결제일 때: 카드 정보만 표시
+        // 카드 결제일 때: 카드 정보 표시
+        const cardInfo = item.payInfo || {};
+        const issuerName = cardInfo.issuerName || "정보 없음";
+        const cardBin = cardInfo.cardBin || "정보 없음";
+
         paymentMethodInfo = `
           <div>
             <h5>결제 카드</h5>
-            <p>정보 없음</p>
+            <p>${issuerName}</p>
           </div>
           <div>
             <h5>카드 번호</h5>
-            <p>정보 없음</p>
+            <p>${cardBin}</p>
           </div>
         `;
         pointInfo = "";
