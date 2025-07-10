@@ -94,18 +94,12 @@ async function saveStoreInfo() {
       'input[value="20"]'
     ) as HTMLInputElement;
 
-    // API 요청 body (필수 필드)
-    const updateData: any = {
-      userId: currentUserId,
-      adminId: currentUserId,
-    };
-
     // 수정된 필드만 추가
     let hasChanges = false;
+    let hasPasswordChange = false;
 
     // 원격 주소가 수정되었는지 확인
     if (remoteAddressInput && remoteAddressInput.value !== "") {
-      updateData.ipAddress = remoteAddressInput.value;
       hasChanges = true;
     }
 
@@ -120,8 +114,7 @@ async function saveStoreInfo() {
         showToastMessage("비밀번호는 6자리 이상이어야 합니다.");
         return;
       }
-      updateData.password = passwordInput.value;
-      hasChanges = true;
+      hasPasswordChange = true;
     }
 
     // 한번에 결제 가능한 최대 잔 수가 수정되었는지 확인
@@ -134,44 +127,88 @@ async function saveStoreInfo() {
       currentLimitCount !== "" &&
       currentLimitCount !== originalLimitCount
     ) {
-      updateData.limitCount = parseInt(currentLimitCount);
       hasChanges = true;
     }
 
     // 수정할 내용이 없으면 저장하지 않음
-    if (!hasChanges) {
+    if (!hasChanges && !hasPasswordChange) {
       showToastMessage("변경사항이 없습니다.");
       return;
     }
 
-    // body에 어떤 데이터가 가는지 콘솔로 확인
-    console.log("📤 API 요청 body:", updateData);
+    // 일반 정보 업데이트 (비밀번호 제외)
+    if (hasChanges) {
+      const updateData: any = {
+        userId: currentUserId,
+        adminId: currentUserId,
+      };
 
-    // API 호출하여 저장
-    const response = await fetch(
-      `https://api.narrowroad-model.com/model_user_setting?func=update-user`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify(updateData),
+      // 원격 주소 추가
+      if (remoteAddressInput && remoteAddressInput.value !== "") {
+        updateData.ipAddress = remoteAddressInput.value;
       }
-    );
 
-    const result = await response.json();
-
-    if (result.message && result.message.includes("✅")) {
-      showToastMessage("변경사항이 저장되었습니다.");
-      // 저장 성공 시 비밀번호 필드를 ******로 초기화
-      if (passwordInput) {
-        passwordInput.value = "******";
+      // 한번에 결제 가능한 최대 잔 수 추가
+      if (
+        limitCountInput &&
+        currentLimitCount !== "" &&
+        currentLimitCount !== originalLimitCount
+      ) {
+        updateData.limitCount = parseInt(currentLimitCount);
       }
-    } else {
-      showToastMessage(result.message || "저장에 실패했습니다.");
+
+      console.log("📤 일반 정보 API 요청:", updateData);
+
+      const response = await fetch(
+        `https://api.narrowroad-model.com/model_user_setting?func=update-user`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify(updateData),
+        }
+      );
+
+      const result = await response.json();
+      console.log("📥 일반 정보 API 응답:", result);
+    }
+
+    // 비밀번호 업데이트 (별도 API)
+    if (hasPasswordChange) {
+      const passwordData = {
+        userId: currentUserId,
+        newPassword: passwordInput.value,
+        adminId: currentUserId,
+      };
+
+      console.log("📤 비밀번호 API 요청:", passwordData);
+
+      const passwordResponse = await fetch(
+        `https://api.narrowroad-model.com/model_user_setting?func=update-password`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify(passwordData),
+        }
+      );
+
+      const passwordResult = await passwordResponse.json();
+      console.log("📥 비밀번호 API 응답:", passwordResult);
+    }
+
+    showToastMessage("변경사항이 저장되었습니다.");
+
+    // 저장 성공 시 비밀번호 필드를 ******로 초기화
+    if (passwordInput) {
+      passwordInput.value = "******";
     }
   } catch (error) {
+    console.error("❌ 저장 중 오류:", error);
     showToastMessage("저장 중 오류가 발생했습니다.");
   }
 }
