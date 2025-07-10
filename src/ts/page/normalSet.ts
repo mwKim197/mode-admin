@@ -60,7 +60,15 @@ async function loadStoreInfo() {
         '.in-box input[type="text"]'
       ) as HTMLInputElement;
       if (limitCountInput) {
-        limitCountInput.value = data.user.limitCount || "10";
+        limitCountInput.value = data.user.limitCount || "";
+      }
+
+      // 전체 세척 예약 시간 설정
+      const washTimeInput = document.querySelector(
+        "#wash-time-input"
+      ) as HTMLInputElement;
+      if (washTimeInput) {
+        washTimeInput.value = data.user.washTime || "";
       }
 
       // 원격 주소 설정
@@ -69,6 +77,14 @@ async function loadStoreInfo() {
       ) as HTMLInputElement;
       if (remoteAddressInput) {
         remoteAddressInput.value = data.user.ipAddress || "";
+      }
+
+      // 포인트 사용 체크박스 설정
+      // payType이 false면 체크박스 켜짐 (true), payType이 true면 체크박스 꺼짐 (false)
+      const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+      const pointCheckbox = allCheckboxes[1] as HTMLInputElement;
+      if (pointCheckbox) {
+        pointCheckbox.checked = !data.user.payType; // payType의 반대값
       }
     }
   } catch (error) {
