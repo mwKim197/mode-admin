@@ -43,23 +43,21 @@ async function loadStoreInfo() {
 
       // 매장명 설정
       const storeNameInput = document.querySelector(
-        'input[value="mypas"]'
+        'input[name="player-id"]'
       ) as HTMLInputElement;
       if (storeNameInput) {
         storeNameInput.value = data.user.storeName || "";
       }
 
       // 매장 연락처 설정
-      const telInput = document.querySelector(
-        'input[placeholder="010-1234-5678"]'
-      ) as HTMLInputElement;
+      const telInput = document.querySelector("#tel-input") as HTMLInputElement;
       if (telInput) {
         telInput.value = data.user.tel || "";
       }
 
       // 한번에 결제 가능한 최대 잔 수 설정
       const limitCountInput = document.querySelector(
-        'input[value="20"]'
+        '.in-box input[type="text"]'
       ) as HTMLInputElement;
       if (limitCountInput) {
         limitCountInput.value = data.user.limitCount || "10";
