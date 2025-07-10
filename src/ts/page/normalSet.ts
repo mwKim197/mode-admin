@@ -106,6 +106,10 @@ async function saveStoreInfo() {
     const currentUserId = userInfo.userId || "zero001";
 
     // 폼 데이터 수집
+    const storeNameInput = document.querySelector(
+      'input[name="player-id"]'
+    ) as HTMLInputElement;
+    const telInput = document.querySelector("#tel-input") as HTMLInputElement;
     const remoteAddressInput = document.querySelector(
       'input[placeholder="원격 주소"]'
     ) as HTMLInputElement;
@@ -113,15 +117,33 @@ async function saveStoreInfo() {
       'input[type="password"]'
     ) as HTMLInputElement;
     const limitCountInput = document.querySelector(
-      'input[value="20"]'
+      '.in-box input[type="text"]'
     ) as HTMLInputElement;
+    const washTimeInput = document.querySelector(
+      "#wash-time-input"
+    ) as HTMLInputElement;
+    // 포인트 사용 체크박스 선택자 수정
+    const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+    const pointCheckbox = allCheckboxes[1] as HTMLInputElement;
 
     // 수정된 필드만 추가
     let hasChanges = false;
     let hasPasswordChange = false;
 
-    // 원격 주소가 수정되었는지 확인
-    if (remoteAddressInput && remoteAddressInput.value !== "") {
+    // 원격 주소가 수정되었는지 확인 (실제로 변경된 경우만)
+    if (
+      remoteAddressInput &&
+      remoteAddressInput.value !== originalUserData?.ipAddress
+    ) {
+      hasChanges = true;
+    }
+
+    // 전체 세척 예약 시간이 수정되었는지 확인
+    if (washTimeInput && washTimeInput.value !== originalUserData?.washTime) {
+      hasChanges = true;
+    }
+
+    if (pointCheckbox && pointCheckbox.checked !== !originalUserData?.payType) {
       hasChanges = true;
     }
 
@@ -140,7 +162,6 @@ async function saveStoreInfo() {
     }
 
     // 한번에 결제 가능한 최대 잔 수가 수정되었는지 확인
-    // 저장된 원래 데이터와 비교
     const currentLimitCount = limitCountInput?.value || "";
     const originalLimitCount = originalUserData?.limitCount?.toString() || "";
 
@@ -165,12 +186,41 @@ async function saveStoreInfo() {
         adminId: currentUserId,
       };
 
-      // 원격 주소 추가
-      if (remoteAddressInput && remoteAddressInput.value !== "") {
+      // 매장명 추가 (변경된 경우만)
+      if (
+        storeNameInput &&
+        storeNameInput.value !== originalUserData?.storeName
+      ) {
+        updateData.storeName = storeNameInput.value;
+      }
+
+      // 매장 연락처 추가 (변경된 경우만)
+      if (telInput && telInput.value !== originalUserData?.tel) {
+        updateData.tel = telInput.value;
+      }
+
+      // 원격 주소 추가 (변경된 경우만)
+      if (
+        remoteAddressInput &&
+        remoteAddressInput.value !== originalUserData?.ipAddress
+      ) {
         updateData.ipAddress = remoteAddressInput.value;
       }
 
-      // 한번에 결제 가능한 최대 잔 수 추가
+      // 전체 세척 예약 시간 추가 (변경된 경우만)
+      if (washTimeInput && washTimeInput.value !== originalUserData?.washTime) {
+        updateData.washTime = washTimeInput.value;
+      }
+
+      // 포인트 사용 추가 (변경된 경우만)
+      if (
+        pointCheckbox &&
+        pointCheckbox.checked !== !originalUserData?.payType
+      ) {
+        updateData.payType = !pointCheckbox.checked;
+      }
+
+      // 한번에 결제 가능한 최대 잔 수 추가 (변경된 경우만)
       if (
         limitCountInput &&
         currentLimitCount !== "" &&
@@ -178,8 +228,6 @@ async function saveStoreInfo() {
       ) {
         updateData.limitCount = parseInt(currentLimitCount);
       }
-
-      console.log("📤 일반 정보 API 요청:", updateData);
 
       const response = await fetch(
         `https://api.narrowroad-model.com/model_user_setting?func=update-user`,
@@ -195,6 +243,23 @@ async function saveStoreInfo() {
 
       const result = await response.json();
       console.log("📥 일반 정보 API 응답:", result);
+
+      // update-user 성공 후 머신 컨트롤 API 호출
+      if (result.success || result.status === "success" || response.ok) {
+        const machineControlData = {
+          userId: currentUserId,
+          func: "update-user",
+        };
+
+        await fetch(`https://api.narrowroad-model.com/model_machine_controll`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify(machineControlData),
+        });
+      }
     }
 
     // 비밀번호 업데이트 (별도 API)
@@ -204,8 +269,6 @@ async function saveStoreInfo() {
         newPassword: passwordInput.value,
         adminId: currentUserId,
       };
-
-      console.log("📤 비밀번호 API 요청:", passwordData);
 
       const passwordResponse = await fetch(
         `https://api.narrowroad-model.com/model_user_setting?func=update-password`,
