@@ -64,6 +64,14 @@ async function loadStoreInfo() {
       if (limitCountInput) {
         limitCountInput.value = data.user.limitCount || "10";
       }
+
+      // 원격 주소 설정
+      const remoteAddressInput = document.querySelector(
+        'input[placeholder="원격 주소"]'
+      ) as HTMLInputElement;
+      if (remoteAddressInput) {
+        remoteAddressInput.value = data.user.ipAddress || "";
+      }
     }
   } catch (error) {
     showToastMessage("매장 정보 로드에 실패했습니다.");
