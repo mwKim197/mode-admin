@@ -16,8 +16,8 @@ function initCommonScripts() {
       if (window.innerWidth <= 768) {
         // 모바일 환경: 햄버거 메뉴 클릭 시 메뉴 토글
         $("#menuToggle")
-            .off("click touchstart")
-            .on("click touchstart", function (e) {
+            .off("click")
+            .on("click", function (e) {
               e.stopPropagation(); // 클릭 이벤트 전파 방지
               $(this).toggleClass("open"); // 햄버거 버튼 애니메이션 적용
               $(".sidemenu").stop().slideToggle();
@@ -25,15 +25,15 @@ function initCommonScripts() {
 
         // 사이드 메뉴 내부 클릭 시 닫히지 않도록 방지
         $(".sidemenu")
-            .off("click touchstart")
-            .on("click touchstart", function (e) {
+            .off("click")
+            .on("click", function (e) {
               e.stopPropagation();
             });
 
         // 바깥 영역 클릭 시 메뉴 닫기
         $(document)
-            .off("click touchstart")
-            .on("click touchstart", function () {
+            .off("click")
+            .on("click", function () {
               $(".sidemenu").slideUp();
               $("#menuToggle").removeClass("open"); // 햄버거 버튼 초기 상태로 복귀
             });

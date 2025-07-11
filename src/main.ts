@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     import("./ts/page/store.ts").then((module) => {
       module.storeEdit();
     });
-  } else if (path === "/html/device_manage.html") {
+  } else if (path === "/html/deviceManage.html") {
     console.log("📌 머신관리 - deviceManage.ts 로드");
     import("./ts/page/deviceManage.ts").then((module) => {
       module.initDeviceManage();
