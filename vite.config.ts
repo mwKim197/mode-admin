@@ -34,8 +34,9 @@ export default defineConfig({
                 productAdd: resolve(__dirname, 'html/product-add.html'),                // 추가: 상품 등록 페이지
                 franchise: resolve(__dirname, 'html/franchise_dashboard.html'),         // 추가: 프렌차이즈 메인 페이지
                 store: resolve(__dirname, 'html/store_dashboard.html'),                 // 추가: 회원 메인 페이지
-                sales: resolve(__dirname, 'html/sales.html'),                       // 추가: 매출 페이지
+                sales: resolve(__dirname, 'html/sales.html'),                           // 추가: 매출 페이지
                 normalSet: resolve(__dirname, 'html/normalSet.html'),                   // 추가: 회원 기본정보
+                deviceManage: resolve(__dirname, 'html/deviceManage.html'),                   // 추가: 회원 기본정보
                 // 다른 html들도 여기에 추가 가능
             },
         },
