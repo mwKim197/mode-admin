@@ -230,6 +230,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     import("./ts/page/sales.ts").then((module) => {
       module.initSales();
     });
+  } else if (path === "/html/normalSet.html") {
+    console.log("📌 일반설정 - normalSet.ts 로드");
+    import("./ts/page/normalSet.ts").then((module) => {
+      module.initNormalSet();
+    });
   } else {
     console.log("📌 기본 페이지");
   }
