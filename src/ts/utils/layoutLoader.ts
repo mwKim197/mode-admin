@@ -26,7 +26,7 @@ export async function loadPartials() {
     jqueryScript.src = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js";
     jqueryScript.onload = () => {
       const commonScript = document.createElement("script");
-      commonScript.src = "/src/js/common.js";
+      commonScript.src = "/js/common.js";
       document.body.appendChild(commonScript);
     };
     document.head.appendChild(jqueryScript);
