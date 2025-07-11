@@ -1,4 +1,5 @@
 import html2canvas from "html2canvas";
+import { apiGet } from "../api/apiHelpers";
 
 let items: any[] = []; // 현재 페이지 데이터만 저장
 let pageKeys: any[] = []; // 페이지 키 배열
@@ -276,9 +277,9 @@ async function getSalesList() {
       await updateSectionWithPaymentData(userId);
 
       // 상품별 데이터는 전체 데이터를 한 번에 가져오기
-      let apiUrl = `https://api.narrowroad-model.com/model_payment?userId=${userId}&func=get-menu-statistics`;
+      let apiUrl = `/model_payment?userId=${userId}&func=get-menu-statistics`;
 
-      const response = await fetch(apiUrl);
+      const response = await apiGet(apiUrl);
       const data = await response.json();
 
       // 정렬 없이 그대로 사용
@@ -294,13 +295,13 @@ async function getSalesList() {
 // 섹션 부분을 위한 전체 통계 API 호출
 async function updateSectionWithPaymentData(userId: string) {
   try {
-    let paymentApiUrl = `https://api.narrowroad-model.com/model_payment?func=get-payment&userId=${userId}`;
+    let paymentApiUrl = `/model_payment?func=get-payment&userId=${userId}`;
 
     if (startDate && endDate) {
       paymentApiUrl += `&startDate=${startDate}&endDate=${endDate}`;
     }
 
-    const paymentResponse = await fetch(paymentApiUrl);
+    const paymentResponse = await apiGet(paymentApiUrl);
     const paymentData = await paymentResponse.json();
 
     updateSalesStatistics(paymentData);
@@ -340,7 +341,7 @@ function initPaymentTypeHandlers() {
 // 테이블 부분을 위한 페이지별 데이터 API 호출
 async function getTableData(userId: string) {
   try {
-    let apiUrl = `https://api.narrowroad-model.com/model_payment?func=get-payment&userId=${userId}`;
+    let apiUrl = `/model_payment?func=get-payment&userId=${userId}`;
 
     if (startDate && endDate) {
       apiUrl += `&startDate=${startDate}&endDate=${endDate}`;
@@ -361,7 +362,7 @@ async function getTableData(userId: string) {
       }
     }
 
-    const response = await fetch(apiUrl);
+    const response = await apiGet(apiUrl);
     const data = await response.json();
 
     // 페이지네이션 데이터 업데이트
@@ -713,8 +714,8 @@ async function updatePopupContent(rowIndex: number) {
     let storeInfo = { storeName: "정보 없음", tel: "정보 없음" };
 
     try {
-      const storeResponse = await fetch(
-        `https://api.narrowroad-model.com/model_user_setting?func=get-user&userId=${userId}`
+      const storeResponse = await apiGet(
+        `/model_user_setting?func=get-user&userId=${userId}`
       );
       const storeData = await storeResponse.json();
 
@@ -929,12 +930,12 @@ function validateDateRange(): boolean {
   }
 
   if (!startDate || !endDate) {
-    showToastMessage("시작일과 종료일을 모두 선택해주세요.");
+    window.showToast("시작일과 종료일을 모두 선택해주세요.", 3000, "warning");
     return false;
   }
 
   if (startDate > endDate) {
-    showToastMessage("시작일은 종료일보다 클 수 없습니다.");
+    window.showToast("시작일은 종료일보다 클 수 없습니다.", 3000, "error");
     return false;
   }
 
@@ -977,7 +978,7 @@ async function savePopupAsImage() {
   try {
     const popup = document.querySelector(".popup") as HTMLElement;
     if (!popup) {
-      showToastMessage("팝업을 찾을 수 없습니다.");
+      window.showToast("팝업을 찾을 수 없습니다.", 3000, "error");
       return;
     }
 
@@ -1058,11 +1059,15 @@ async function savePopupAsImage() {
 
           // 스타일 복구
           restoreStyles();
-          showToastMessage("이미지가 성공적으로 저장되었습니다.");
+          window.showToast(
+            "이미지가 성공적으로 저장되었습니다.",
+            3000,
+            "success"
+          );
         })
         .catch((error) => {
           console.error("이미지 저장 실패:", error);
-          showToastMessage("이미지 저장에 실패했습니다.");
+          window.showToast("이미지 저장에 실패했습니다.", 3000, "error");
           restoreStyles();
         });
     }, 100);
@@ -1077,7 +1082,7 @@ async function savePopupAsImage() {
     }
   } catch (error) {
     console.error("이미지 저장 실패:", error);
-    showToastMessage("이미지 저장에 실패했습니다.");
+    window.showToast("이미지 저장에 실패했습니다.", 3000, "error");
   }
 }
 
@@ -1089,32 +1094,6 @@ function downloadURI(uri: string, name: string) {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link); // DOM 정리
-}
-
-// 토스트 메시지 표시
-function showToastMessage(message: string) {
-  const toast = document.createElement("div");
-  toast.style.cssText = `
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #ff4444;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
-    z-index: 10000;
-    font-size: 14px;
-  `;
-  toast.textContent = message;
-
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    if (toast.parentNode) {
-      toast.parentNode.removeChild(toast);
-    }
-  }, 3000);
 }
 
 // 통계 정보 초기화 함수
@@ -1173,7 +1152,7 @@ async function downloadExcel() {
     const userId = userInfo.userId;
 
     if (!userId) {
-      showToastMessage("사용자 정보를 찾을 수 없습니다.");
+      window.showToast("사용자 정보를 찾을 수 없습니다.", 3000, "error");
       return;
     }
 
@@ -1182,7 +1161,7 @@ async function downloadExcel() {
 
     if (currentSalesType === "transaction") {
       // 건별 탭: 기존 API
-      apiUrl = `https://api.narrowroad-model.com/model_payment?func=get-payment-excel&userId=${userId}`;
+      apiUrl = `/model_payment?func=get-payment-excel&userId=${userId}`;
 
       // 결제방식 파라미터 추가 (전체가 아닌 경우에만)
       if (currentPaymentType !== "all") {
@@ -1195,7 +1174,7 @@ async function downloadExcel() {
       }
     } else {
       // 상품별 탭: 새로운 API
-      apiUrl = `https://api.narrowroad-model.com/model_payment?func=get-menu-statistics-excel&userId=${userId}`;
+      apiUrl = `/model_payment?func=get-menu-statistics-excel&userId=${userId}`;
 
       // 페이지네이션 키 추가 (1페이지가 아닌 경우에만)
       if (currentPage > 1 && pageKeys.length > 0) {
@@ -1211,12 +1190,7 @@ async function downloadExcel() {
     console.log("엑셀 다운로드 API URL:", apiUrl);
 
     // API 호출
-    const response = await fetch(apiUrl);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
+    const response = await apiGet(apiUrl);
     const data = await response.json();
 
     if (!data.excelUrl) {
@@ -1231,6 +1205,6 @@ async function downloadExcel() {
     document.body.removeChild(a);
   } catch (error) {
     console.error("엑셀 다운로드 실패:", error);
-    showToastMessage("엑셀 다운로드에 실패했습니다.");
+    window.showToast("엑셀 다운로드에 실패했습니다.", 3000, "error");
   }
 }
