@@ -4,12 +4,12 @@ export interface ModelUser {
   tel?: string;
   earnMileage?: number;
   mileageNumber?: number;
-  ipAddress?: string;
   remoteAddress?: string;
   isPhone?: boolean;
   limitCount?: number;
   washTime?: string;
-  logoUrl?: string;
+  logoBase64?: string; // S3 URL 대신 Base64
+  iconBase64?: string; // S3 URL 대신 Base64
   url?: string;
   payType?: boolean;
   category?: Array<{
