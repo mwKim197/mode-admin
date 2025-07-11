@@ -1,3 +1,6 @@
+import { ModelUser } from "../types/user";
+import { apiGet, apiPut, apiPost } from "../api/apiHelpers";
+
 export function initNormalSet() {
   // 페이지 로드 시 매장 정보 가져오기
   loadStoreInfo();
@@ -20,7 +23,7 @@ function initSaveButtonHandler() {
 }
 
 // 전역 변수로 원래 데이터 저장
-let originalUserData: any = null;
+let originalUserData: ModelUser | null = null;
 
 // 매장 정보 로드 함수
 async function loadStoreInfo() {
@@ -32,14 +35,14 @@ async function loadStoreInfo() {
       return;
     }
 
-    const response = await fetch(
-      `https://api.narrowroad-model.com/model_user_setting?func=get-user&userId=${userId}`
+    const response = await apiGet(
+      `/model_user_setting?func=get-user&userId=${userId}`
     );
     const data = await response.json();
 
     if (data && data.user) {
       // 원래 데이터 저장 (나중에 비교용)
-      originalUserData = data.user;
+      originalUserData = data.user as ModelUser;
 
       // 매장명 설정
       const storeNameInput = document.querySelector(
@@ -88,7 +91,7 @@ async function loadStoreInfo() {
       }
     }
   } catch (error) {
-    showToastMessage("매장 정보 로드에 실패했습니다.");
+    window.showToast("매장 정보 로드에 실패했습니다.", 3000, "error");
   }
 }
 
@@ -168,7 +171,11 @@ async function saveStoreInfo() {
     ) {
       // 비밀번호 유효성 검사
       if (passwordInput.value.length < 6) {
-        showToastMessage("비밀번호는 6자리 이상이어야 합니다.");
+        window.showToast(
+          "비밀번호는 6자리 이상이어야 합니다.",
+          3000,
+          "warning"
+        );
         return;
       }
       hasPasswordChange = true;
@@ -188,7 +195,7 @@ async function saveStoreInfo() {
 
     // 수정할 내용이 없으면 저장하지 않음
     if (!hasChanges && !hasPasswordChange) {
-      showToastMessage("변경사항이 없습니다.");
+      window.showToast("변경사항이 없습니다.", 3000, "warning");
       return;
     }
 
@@ -242,18 +249,10 @@ async function saveStoreInfo() {
         updateData.limitCount = parseInt(currentLimitCount);
       }
 
-      const response = await fetch(
-        `https://api.narrowroad-model.com/model_user_setting?func=update-user`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
-          },
-          body: JSON.stringify(updateData),
-        }
+      const response = await apiPut(
+        `/model_user_setting?func=update-user`,
+        updateData
       );
-
       const result = await response.json();
       console.log("📥 일반 정보 API 응답:", result);
 
@@ -264,14 +263,7 @@ async function saveStoreInfo() {
           func: "update-user",
         };
 
-        await fetch(`https://api.narrowroad-model.com/model_machine_controll`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
-          },
-          body: JSON.stringify(machineControlData),
-        });
+        await apiPost(`/model_machine_controll`, machineControlData);
       }
     }
 
@@ -283,23 +275,15 @@ async function saveStoreInfo() {
         adminId: currentUserId,
       };
 
-      const passwordResponse = await fetch(
-        `https://api.narrowroad-model.com/model_user_setting?func=update-password`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
-          },
-          body: JSON.stringify(passwordData),
-        }
+      const passwordResponse = await apiPut(
+        `/model_user_setting?func=update-password`,
+        passwordData
       );
-
       const passwordResult = await passwordResponse.json();
       console.log("📥 비밀번호 API 응답:", passwordResult);
     }
 
-    showToastMessage("변경사항이 저장되었습니다.");
+    window.showToast("변경사항이 저장되었습니다.", 3000, "success");
 
     // 저장 성공 시 비밀번호 필드를 ******로 초기화
     if (passwordInput) {
@@ -307,32 +291,6 @@ async function saveStoreInfo() {
     }
   } catch (error) {
     console.error("❌ 저장 중 오류:", error);
-    showToastMessage("저장 중 오류가 발생했습니다.");
+    window.showToast("저장 중 오류가 발생했습니다.", 3000, "error");
   }
-}
-
-// 토스트 메시지 표시 함수
-function showToastMessage(message: string) {
-  const toast = document.createElement("div");
-  toast.style.cssText = `
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #4CAF50;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
-    z-index: 10000;
-    font-size: 14px;
-  `;
-  toast.textContent = message;
-
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    if (toast.parentNode) {
-      toast.parentNode.removeChild(toast);
-    }
-  }, 3000);
 }
