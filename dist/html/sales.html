@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- ✅ 메인 진입 -->
+    <script type="module" crossorigin src="../assets/main-Cd0e_wCj.js"></script>
+    <link rel="stylesheet" crossorigin href="../assets/main-iqNbfc76.css">
+    <link rel="stylesheet" crossorigin href="../assets/style-CUFLUENf.css">
+  </head>
+  <!--매출-->
+  <body>
+    <!-- 메인 -->
+    <div id="main-content">
+      <section class="mt80">
+        <div class="inner">
+          <div class="boxStyle gr">
+            <h2 class="ta-c mb20">매출</h2>
+            <div class="details">
+              <p>매출 구분</p>
+              <div class="radio-group">
+                <label
+                  ><input type="radio" name="sales-type" checked /> 건별</label
+                >
+                <label><input type="radio" name="sales-type" /> 상품별</label>
+              </div>
+            </div>
+            <!-- 날짜 인풋 2개 + 버튼 -->
+            <div class="input-group" id="date-search-section">
+              <input type="date" />
+              <span>~</span>
+              <input type="date" />
+              <button class="btn-i search">
+                <img src="../img/search.svg" alt="" />
+              </button>
+              <button class="btn-i reset">
+                <img src="../img/refresh_icon.svg" alt="" />
+              </button>
+            </div>
+
+            <!-- 상세 설정 -->
+            <div class="radioBox" id="detail-settings-section">
+              <div class="details">
+                <p>상세 설정</p>
+                <div class="radio-group">
+                  <label
+                    ><input type="radio" name="detail-period" checked />
+                    전체</label
+                  >
+                  <label
+                    ><input type="radio" name="detail-period" /> 당일</label
+                  >
+                  <label
+                    ><input type="radio" name="detail-period" /> 전일</label
+                  >
+                  <label
+                    ><input type="radio" name="detail-period" /> 당월</label
+                  >
+                  <label
+                    ><input type="radio" name="detail-period" /> 전월</label
+                  >
+                </div>
+              </div>
+              <div class="details" id="payment-section">
+                <p>결제</p>
+                <div class="radio-group">
+                  <label
+                    ><input type="radio" name="payment-type" checked />
+                    전체</label
+                  >
+                  <label><input type="radio" name="payment-type" /> 카드</label>
+                  <label
+                    ><input type="radio" name="payment-type" /> 포인트</label
+                  >
+                </div>
+              </div>
+              <!--<div class="details"> [TODO] 추후 환불 구현 후 적용
+              <p>상태</p>
+              <div class="radio-group">
+                <label><input type="radio" name="detail-option" checked> 전체</label>
+                <label><input type="radio" name="detail-option"> 완료</label>
+                <label><input type="radio" name="detail-option"> 환불</label>
+              </div>
+            </div>-->
+
+              <!--<div class="flex gap-1" id="contact-section">
+                <p>연락처</p>
+                <input type="text" name="" placeholder="01012345678" />
+              </div>-->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 매출 -->
+      <section>
+        <div class="inner">
+          <div class="boxStyle bl ta-c">
+            <div class="countArea mb20">
+              <div class="countbox mb10">
+                <p>총 매출</p>
+                <h4 data-target="87,000">0<small>원</small></h4>
+              </div>
+              <div class="countbox mb10">
+                <p>총 판매량</p>
+                <h4 data-target="87,000">00<small>원</small></h4>
+              </div>
+              <div class="countbox mb10">
+                <p>포인트 매출</p>
+                <h4 data-target="87,000">0<small>원</small></h4>
+              </div>
+              <div class="countbox">
+                <p>포인트 결제건</p>
+                <h4 data-target="240,000">00<small>원</small></h4>
+              </div>
+            </div>
+            <button class="btn wt">엑셀다운로드</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- table -->
+      <section class="pb20">
+        <div class="inner">
+          <div class="tableArea">
+            <table>
+              <colgroup>
+                <col width="10%" />
+                <col width="20%" />
+                <col width="40%" />
+                <col width="15%" />
+                <col width="15%" />
+              </colgroup>
+
+              <thead>
+                <tr id="table-header">
+                  <th>순서</th>
+                  <th>일자</th>
+                  <th>상품</th>
+                  <th>가격</th>
+                  <th>상태</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="on-popup">
+                  <!--ts에서 렌더링-->
+                </tr>
+              </tbody>
+            </table>
+            <!-- 페이지네이션 -->
+            <div
+              id="pagination"
+              class="pagination"
+              data-type="table"
+              style="display: none"
+            >
+              <button class="page-first">
+                <img src="../img/page_first.svg" alt="처음으로" />
+              </button>
+              <button class="page-prev">
+                <img src="../img/page_prev.svg" alt="이전" />
+              </button>
+              <span class="page-numbers"></span>
+              <button class="page-next">
+                <img src="../img/page_next.svg" alt="다음" />
+              </button>
+              <button class="page-last">
+                <img src="../img/page_last.svg" alt="끝으로" />
+              </button>
+            </div>
+
+            <!-- popup -->
+            <div class="popup-overlay" style="display: none">
+              <div class="popup">
+                <!-- 헤더 -->
+                <div class="popup-header ta-c">
+                  <h2>결제 정보</h2>
+                  <button class="close-btn" onclick="closePopup()">
+                    &times;
+                  </button>
+                </div>
+
+                <!-- 이미지 저장 버튼 -->
+                <div class="popup-body">
+                  <button class="btn save-img">
+                    <img src="../img/image_icon.svg" alt="" />이미지 저장
+                  </button>
+
+                  <!-- 내역 내용 -->
+                  <ul class="history">
+                    <!--ts에서 렌더링-->
+                  </ul>
+
+                  <!-- 하단 버튼 -->
+                  <div class="popup-footer">
+                    <button class="btn blue">환불</button>
+                    <button class="btn red">삭제</button>
+                    <button class="btn gr">닫기</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

@@ -18,6 +18,7 @@ export default defineConfig({
         rollupOptions: {
             input: {
                 main: resolve(__dirname, 'index.html'),                                 // 기본 페이지
+                home: resolve(__dirname, 'html/home.html'),                             // 사용자 기본페이지
                 login: resolve(__dirname, 'html/log.html'),                             // 기본 페이지
                 dashboard: resolve(__dirname, 'html/dashboard.html'),                   // 추가: 데시보드
                 kakao: resolve(__dirname, 'html/kakao-callback.html'),                  // 추가: 카카오 콜백
@@ -33,6 +34,8 @@ export default defineConfig({
                 productAdd: resolve(__dirname, 'html/product-add.html'),                // 추가: 상품 등록 페이지
                 franchise: resolve(__dirname, 'html/franchise_dashboard.html'),         // 추가: 프렌차이즈 메인 페이지
                 store: resolve(__dirname, 'html/store_dashboard.html'),                 // 추가: 회원 메인 페이지
+                sales: resolve(__dirname, 'html/sales.html'),                       // 추가: 매출 페이지
+                normalSet: resolve(__dirname, 'html/normalSet.html'),                   // 추가: 회원 기본정보
                 // 다른 html들도 여기에 추가 가능
             },
         },
