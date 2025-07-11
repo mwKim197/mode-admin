@@ -3,8 +3,9 @@
 
 <head>
   <meta charset="UTF-8" /> <!-- ✅ 메인 진입 -->
-  <script type="module" crossorigin src="../assets/main-oRYtEfGT.js"></script>
-  <link rel="stylesheet" crossorigin href="../assets/style-B090HW4h.css">
+  <script type="module" crossorigin src="../assets/main-BJQcAWmy.js"></script>
+  <link rel="stylesheet" crossorigin href="../assets/main-iqNbfc76.css">
+  <link rel="stylesheet" crossorigin href="../assets/style-CUFLUENf.css">
 </head>
 <!--관리자 공지사항-->
 <body>
@@ -34,6 +35,15 @@
         <h2 class="mb10">공지사항 입력</h2>
           <div class="inputWrap noticeArea">
             <div class="text_input">
+              <div id="adminType" style="display: none">
+                <p>공지사항 타입</p>
+                <select class="popup-select" id="noticeType">
+                  <option value="emergency">긴급</option>
+                  <option value="patch">패치</option>
+                  <option value="event">이벤트</option>
+                  <option value="info">안내</option>
+                </select>
+              </div>
               <p>제목</p>
               <input type="text" name="" id="notice-title" placeholder="제목을 입력해주세요">
             </div>

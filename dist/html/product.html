@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
   <meta charset="UTF-8" />
-  <script type="module" crossorigin src="../assets/main-oRYtEfGT.js"></script>
-  <link rel="stylesheet" crossorigin href="../assets/style-B090HW4h.css">
-  <link rel="stylesheet" crossorigin href="../assets/product-C5mlyfJy.css">
+  <script type="module" crossorigin src="../assets/main-BJQcAWmy.js"></script>
+  <link rel="stylesheet" crossorigin href="../assets/main-iqNbfc76.css">
+  <link rel="stylesheet" crossorigin href="../assets/style-CUFLUENf.css">
+  <link rel="stylesheet" crossorigin href="../assets/product-DOsWwYGR.css">
 </head>
 
 <body>
@@ -42,23 +42,11 @@
               </tr>
             </thead>
             <tbody id="menu-table-body">
-              <tr onclick="window.open('./product_set.html', '_blank')">
-                <td>1</td>
-                <td>
-                  <img src="https://model-narrow-road.s3.ap-northeast-2.amazonaws.com/model/model0000/108_%EA%BC%AC%EB%B6%81%EC%9D%B4.jpg" alt="상품 이미지" style="width:36px; height:46px; object-fit:cover;" />
-                </td>
-                <td>아이스 <br>아메리카노</td>
-                <td>2,600</td>
-                <td>
-                  <label class="toggle-switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                  </label>
-                </td>
-                <td>
-                  <span class="tag blue">제조</span>
-                  <span class="tag red">삭제</span>
-                </td>
+              <tr onclick="window.location.href='./product_set.html'">
+                <td colspan="6" style="
+                 height: 56px;
+                 line-height: 56px;
+                 text-align: center;">등록된 메뉴가 없습니다.</td>
               </tr>
             </tbody>
           </table>            
@@ -66,19 +54,10 @@
         <div class="hidden whitespace-normal break-all max-w-[100px] text-sm"></div>
         <div class="btnFlex">
           <button id="saveBtn" class="btn-outline">변경사항 저장</button>
-          <button class="btn blue"><a href="./product-add.html">상품 추가</a></button>
+          <button class="btn blue" onclick="location.href='./product-add.html'">상품 추가</button>
         </div>
       </div>
     </section>
   </div>
 </body>
-<script>
-  document.querySelectorAll(".clickable-row").forEach(row => {
-    row.addEventListener("click", function(e) {
-      // toggle-switch, input 클릭 시는 무시
-      if (e.target.closest('.toggle-switch') || e.target.tagName === 'INPUT') return;
-      window.open(this.dataset.href, '_blank');
-    });
-  });
-</script>
 </html>

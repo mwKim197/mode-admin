@@ -1,144 +1,217 @@
 <!DOCTYPE html>
 <html lang="ko">
-
-<head>
-  <meta charset="UTF-8" /> <!-- ✅ 메인 진입 -->
-  <script type="module" crossorigin src="../assets/main-oRYtEfGT.js"></script>
-  <link rel="stylesheet" crossorigin href="../assets/style-B090HW4h.css">
-</head>
-<!--마일리지관리-->
-<body>
-  <!-- 메인 -->
-  <div id="main-content">
-
-    <section class="mt80">
-      <div class="inner">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- ✅ 메인 진입 -->
+    <script type="module" crossorigin src="../assets/main-BJQcAWmy.js"></script>
+    <link rel="stylesheet" crossorigin href="../assets/main-iqNbfc76.css">
+    <link rel="stylesheet" crossorigin href="../assets/style-CUFLUENf.css">
+  </head>
+  <!--마일리지관리-->
+  <body>
+    <!-- 메인 -->
+    <div id="main-content">
+      <section class="mt80">
+        <div class="inner">
           <div class="pointWrap">
             <h2 class="ta-c mb20">포인트</h2>
-          <div class="input-group in-1">
-            <div class="in-box">
-              <input id="earnMileage" type="text" name="" placeholder="적립율%">
-              <span>연락처</span>
+            <div class="input-group in-1">
+              <div class="in-box">
+                <input
+                  id="earnMileage"
+                  type="text"
+                  name=""
+                  placeholder="적립율%"
+                />
+                <span>연락처</span>
+              </div>
+              <div class="in-box">
+                <span>고객번호</span>
+                <input
+                  id="mileageNumber"
+                  type="text"
+                  name=""
+                  placeholder="4-12"
+                />
+              </div>
+              <div class="in-box">
+                <span>or 휴대번호</span>
+                <input type="checkbox" id="isPhone" name="isPhone" />
+              </div>
+              <button id="pointInfoSave" class="btn-outline">저장</button>
             </div>
-            <div class="in-box">              
-              <span>고객번호</span>
-              <input id="mileageNumber" type="text" name="" placeholder="4-12">
+            <div class="input-group">
+              <input
+                id="searchNumber"
+                type="text"
+                placeholder="고객번호 or 연락처를 입력해주세요."
+              />
+              <button id="searchButton" class="btn-i search">
+                <img src="../img/search.svg" alt="" />
+              </button>
+              <button id="searchReset" class="btn-i reset">
+                <img src="../img/refresh_icon.svg" alt="" />
+              </button>
             </div>
-            <div class="in-box">
-              <span>or 휴대번호</span>
-              <input type="checkbox" id="isPhone" name="isPhone">
-            </div>
-            <button id="pointInfoSave" class="btn-outline">저장</button>
-          </div>
-          <div class="input-group">
-            <input id="searchNumber" type="text" placeholder="고객번호 or 연락처를 입력해주세요.">
-            <button id="searchButton" class="btn-i search"><img src="../img/search.svg" alt=""></button>
-            <button id="searchReset" class="btn-i reset"><img src="../img/refresh_icon.svg" alt=""></button>
           </div>
         </div>
-          </div>
-    </section>
+      </section>
 
-    <!-- table -->
-    <section>
-      <div class="inner">
-        <div class="tableArea">
-          <table>
-            <button id="selectAllBtn" class="btn-s mb10">전체선택</button>
-            <tbody>
-              <tr class="on-popup">
-                <td colspan="5" style="padding:2rem 0 0;">표시할 마일리지가 없습니다.</td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- table -->
+      <section>
+        <div class="inner">
+          <div class="tableArea">
+            <table>
+              <button id="selectAllBtn" class="btn-s blue mb10">
+                전체선택
+              </button>
+              <tbody>
+                <tr class="on-popup">
+                  <td colspan="5" style="padding: 2rem 0 0">
+                    표시할 마일리지가 없습니다.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
             <!-- 페이지네이션 -->
             <div id="pagination" class="pagination" data-type="table">
-              <button class="page-first" disabled=""><img src="../img/page_first.svg" alt="처음으로"></button>
-              <button class="page-prev" disabled=""><img src="../img/page_prev.svg" alt="이전"></button>
-              <span class="page-numbers"><button class="page-number active" data-page="1">1</button></span>
-              <button class="page-next" disabled=""><img src="../img/page_next.svg" alt="다음"></button>
-              <button class="page-last" disabled=""><img src="../img/page_last.svg" alt="끝으로"></button>
+              <button class="page-first" disabled="">
+                <img src="../img/page_first.svg" alt="처음으로" />
+              </button>
+              <button class="page-prev" disabled="">
+                <img src="../img/page_prev.svg" alt="이전" />
+              </button>
+              <span class="page-numbers"
+                ><button class="page-number active" data-page="1">
+                  1
+                </button></span
+              >
+              <button class="page-next" disabled="">
+                <img src="../img/page_next.svg" alt="다음" />
+              </button>
+              <button class="page-last" disabled="">
+                <img src="../img/page_last.svg" alt="끝으로" />
+              </button>
             </div>
-        </div>
+          </div>
 
-        <div class="btnFlex">
-          <button id="createPointBtn" class="btn blue">신규등록</button>
-          <button id="deleteButton" class="btn red">삭제</button>
-        </div>
+          <div class="btnFlex">
+            <button id="createPointBtn" class="btn blue">신규등록</button>
+            <button id="deleteButton" class="btn red">삭제</button>
+          </div>
 
-        <!-- popup -->
-        <div class="popup-overlay" style="display:none;">
-          <div class="popup">
-            <div class="popup-header ta-c">
-              <h2>고객정보</h2>
-              <button class="close-btn popupCloseBtn">&times;</button>
-            </div>
-
-            <!-- popup-body -->
-            <div class="popup-body">
-              <div class="history">
-                <div class="inputWrap">
-                  <div class="data_input">
-                    <p>고객번호</p>
-                    <input type="text" id="mileageNo" name="mileageNo" placeholder="010-1234-5678">
-                  </div>
-                  <div class="data_input">
-                    <p>비밀번호</p>
-                    <input type="password" id="popupPassword" name="popupPassword">
-                  </div>
-                  <div class="data_input">
-                    <p>누적 이용 횟수</p>
-                    <input type="text" id="popupCount" name="popupCount" placeholder="0">
-                  </div>
-                  <div class="data_input">
-                    <p>보유 포인트</p>
-                    <input type="text" id="popupMileage" name="popupMileage" placeholder="0" disabled="">
-                  </div>
-                  <div class="data_input">
-                    <p>수정 포인트</p>
-                    <input type="text" id="popupAmount" name="popupAmount" placeholder="0">
-                  </div>
-                  <div class="data_input">
-                    <p>연락처</p>
-                    <input type="text" id="popupTel" name="popupTel" placeholder="010-1234-5678">
-                  </div>
-                  <div class="text_input">
-                    <p>메모</p>
-                    <textarea id="myTextarea" maxlength="200" rows="4" cols="50" placeholder="내용을 입력해주세요"></textarea>
-                  </div>
-                </div>
-                <hr class="borderSt-dot">
-                <h2 class="mb20">이용 내역</h2>
-                <div class="tableArea">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>순서</th>
-                        <th>일자</th>
-                        <th>시간</th>
-                        <th>결제<br>금액</th>
-                        <th>사용<br>포인트</th>                      
-                        <th>잔여<br>포인트</th>
-                      </tr>
-                    </thead>
-                    <tbody id="historyTableBody">
-                    <!-- JS에서 렌더링 -->
-                    </tbody>
-                  </table>
-                </div>
-                <div id="historyPagination" class="pagination" data-type="table"></div>
+          <!-- popup -->
+          <div class="popup-overlay" style="display: none">
+            <div class="popup">
+              <div class="popup-header ta-c">
+                <h2>고객정보</h2>
+                <button class="close-btn popupCloseBtn">&times;</button>
               </div>
-              <!-- 하단 버튼 -->
-              <div class="popup-footer">
-                <button id="saveButton" class="btn blue">저장</button>
-                <button class="btn gr popupCloseBtn">취소</button>
+
+              <!-- popup-body -->
+              <div class="popup-body">
+                <div class="history">
+                  <div class="inputWrap">
+                    <div class="data_input">
+                      <p>고객번호</p>
+                      <input
+                        type="text"
+                        id="mileageNo"
+                        name="mileageNo"
+                        placeholder="010-1234-5678"
+                      />
+                    </div>
+                    <div class="data_input">
+                      <p>비밀번호</p>
+                      <input
+                        type="password"
+                        id="popupPassword"
+                        name="popupPassword"
+                      />
+                    </div>
+                    <div class="data_input">
+                      <p>누적 이용 횟수</p>
+                      <input
+                        type="text"
+                        id="popupCount"
+                        name="popupCount"
+                        placeholder="0"
+                      />
+                    </div>
+                    <div class="data_input">
+                      <p>보유 포인트</p>
+                      <input
+                        type="text"
+                        id="popupMileage"
+                        name="popupMileage"
+                        placeholder="0"
+                        disabled=""
+                      />
+                    </div>
+                    <div class="data_input">
+                      <p>수정 포인트</p>
+                      <input
+                        type="text"
+                        id="popupAmount"
+                        name="popupAmount"
+                        placeholder="0"
+                      />
+                    </div>
+                    <div class="data_input">
+                      <p>연락처</p>
+                      <input
+                        type="text"
+                        id="popupTel"
+                        name="popupTel"
+                        placeholder="010-1234-5678"
+                      />
+                    </div>
+                    <div class="text_input">
+                      <p>메모</p>
+                      <textarea
+                        id="myTextarea"
+                        maxlength="200"
+                        rows="4"
+                        cols="50"
+                        placeholder="내용을 입력해주세요"
+                      ></textarea>
+                    </div>
+                  </div>
+                  <hr class="borderSt-dot" />
+                  <h2 class="mb20">이용 내역</h2>
+                  <div class="tableArea">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>순서</th>
+                          <th>일자</th>
+                          <th>시간</th>
+                          <th>결제<br />금액</th>
+                          <th>사용<br />포인트</th>
+                          <th>잔여<br />포인트</th>
+                        </tr>
+                      </thead>
+                      <tbody id="historyTableBody">
+                        <!-- JS에서 렌더링 -->
+                      </tbody>
+                    </table>
+                  </div>
+                  <div
+                    id="historyPagination"
+                    class="pagination"
+                    data-type="table"
+                  ></div>
+                </div>
+                <!-- 하단 버튼 -->
+                <div class="popup-footer">
+                  <button id="saveButton" class="btn blue">저장</button>
+                  <button class="btn gr popupCloseBtn">취소</button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
-  </div>
-
-</body>
+      </section>
+    </div>
+  </body>
 </html>

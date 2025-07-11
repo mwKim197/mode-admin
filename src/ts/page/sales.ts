@@ -733,7 +733,7 @@ async function updatePopupContent(rowIndex: number) {
     if (currentSalesType === "transaction") {
       // 건별 데이터 팝업
       const menuItems = item.menuSummary
-        .map((menu: any, index: number) => {
+        .map((menu: any) => {
           return `${menu.name} ${menu.count || 1}개`;
         })
         .join("<br>");
