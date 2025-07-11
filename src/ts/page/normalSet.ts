@@ -73,16 +73,16 @@ async function loadStoreInfo() {
 
       // 원격 주소 설정
       const remoteAddressInput = document.querySelector(
-        'input[placeholder="원격 주소"]'
+        "#remote-address"
       ) as HTMLInputElement;
       if (remoteAddressInput) {
-        remoteAddressInput.value = data.user.ipAddress || "";
+        remoteAddressInput.value = data.user.remoteAddress || "";
       }
 
       // 포인트 사용 체크박스 설정
       // payType이 false면 체크박스 켜짐 (true), payType이 true면 체크박스 꺼짐 (false)
       const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-      const pointCheckbox = allCheckboxes[1] as HTMLInputElement;
+      const pointCheckbox = allCheckboxes[0] as HTMLInputElement; // [1]에서 [0]으로 변경
       if (pointCheckbox) {
         pointCheckbox.checked = !data.user.payType; // payType의 반대값
       }
@@ -111,7 +111,7 @@ async function saveStoreInfo() {
     ) as HTMLInputElement;
     const telInput = document.querySelector("#tel-input") as HTMLInputElement;
     const remoteAddressInput = document.querySelector(
-      'input[placeholder="원격 주소"]'
+      "#remote-address"
     ) as HTMLInputElement;
     const passwordInput = document.querySelector(
       'input[type="password"]'
@@ -124,16 +124,29 @@ async function saveStoreInfo() {
     ) as HTMLInputElement;
     // 포인트 사용 체크박스 선택자 수정
     const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-    const pointCheckbox = allCheckboxes[1] as HTMLInputElement;
+    const pointCheckbox = allCheckboxes[0] as HTMLInputElement; // [1]에서 [0]으로 변경
 
     // 수정된 필드만 추가
     let hasChanges = false;
     let hasPasswordChange = false;
 
+    // 매장명이 수정되었는지 확인
+    if (
+      storeNameInput &&
+      storeNameInput.value !== originalUserData?.storeName
+    ) {
+      hasChanges = true;
+    }
+
+    // 매장 연락처가 수정되었는지 확인
+    if (telInput && telInput.value !== originalUserData?.tel) {
+      hasChanges = true;
+    }
+
     // 원격 주소가 수정되었는지 확인 (실제로 변경된 경우만)
     if (
       remoteAddressInput &&
-      remoteAddressInput.value !== originalUserData?.ipAddress
+      remoteAddressInput.value !== originalUserData?.remoteAddress
     ) {
       hasChanges = true;
     }
@@ -202,9 +215,9 @@ async function saveStoreInfo() {
       // 원격 주소 추가 (변경된 경우만)
       if (
         remoteAddressInput &&
-        remoteAddressInput.value !== originalUserData?.ipAddress
+        remoteAddressInput.value !== originalUserData?.remoteAddress
       ) {
-        updateData.ipAddress = remoteAddressInput.value;
+        updateData.remoteAddress = remoteAddressInput.value;
       }
 
       // 전체 세척 예약 시간 추가 (변경된 경우만)
