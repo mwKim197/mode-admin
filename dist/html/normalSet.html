@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <!-- ✅ 메인 진입 -->
-    <script type="module" crossorigin src="../assets/main-DmHAN9Wt.js"></script>
+    <script type="module" crossorigin src="../assets/main-Bf-UK50S.js"></script>
     <link rel="stylesheet" crossorigin href="../assets/main-iqNbfc76.css">
     <link rel="stylesheet" crossorigin href="../assets/style-CUFLUENf.css">
   </head>
@@ -50,12 +50,7 @@
             </div>
             <div class="data_input">
               <p>원격 주소</p>
-              <input
-                type="text"
-                id="player-id"
-                name="player-id"
-                placeholder="원격 주소"
-              />
+              <input type="text" id="remote-address" name="remote-address" />
             </div>
             <div class="text_input">
               <p>매장 주소</p>
@@ -121,6 +116,7 @@
           <hr class="borderSt-dot" />
           <div class="screenSet">
             <h3 class="mb10">화면설정</h3>
+            <!-- 로고 업로드 부분 수정 -->
             <div class="set-box">
               <p>매장 로고 설정</p>
 
@@ -130,7 +126,6 @@
                 id="logoUpload"
                 accept="image/png"
                 style="display: none"
-                onchange="previewLogo(event)"
               />
 
               <!-- 사용자에게 보여지는 버튼 -->
@@ -156,48 +151,48 @@
               />
 
               <p class="caption">
-                * 초기화면 우측 상단(사이즈 가로 X px/ 세로 X px 이내 확장자
+                * 초기화면 우측 상단(사이즈 가로 600px/ 세로 140px 이내 확장자
                 png)
               </p>
             </div>
 
+            <!-- 아이콘 업로드 부분 수정 -->
             <div class="set-box">
               <p>매장 아이콘 설정</p>
 
               <!-- 숨겨진 파일 입력 -->
               <input
                 type="file"
-                id="logoUpload"
+                id="iconUpload"
                 accept="image/png"
                 style="display: none"
-                onchange="previewLogo(event)"
               />
 
               <!-- 사용자에게 보여지는 버튼 -->
               <button
                 class="btn-outline gr"
-                onclick="document.getElementById('logoUpload').click()"
+                onclick="document.getElementById('iconUpload').click()"
               >
                 파일선택
               </button>
 
               <!-- 파일 이름 표시 -->
               <p
-                id="fileName"
+                id="iconFileName"
                 style="margin-top: 10px; font-size: 14px; color: #555"
               ></p>
 
               <!-- 이미지 미리보기 -->
               <img
-                id="logoPreview"
+                id="iconPreview"
                 src=""
-                alt="로고 미리보기"
+                alt="아이콘 미리보기"
                 style="margin-top: 10px; max-width: 200px; display: none"
               />
 
               <p class="caption">
-                * 화면 우측 음료제조 순서위치<br />(사이즈 가로 X px/ 세로 X px
-                이내 확장자 png)
+                * 화면 우측 음료제조 순서위치<br />(사이즈 가로 1300px/ 세로
+                2000px 이내 확장자 png)
               </p>
             </div>
           </div>

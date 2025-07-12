@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <!-- ✅ 메인 진입 -->
-  <script type="module" crossorigin src="../assets/main-DmHAN9Wt.js"></script>
+  <script type="module" crossorigin src="../assets/main-Bf-UK50S.js"></script>
   <link rel="stylesheet" crossorigin href="../assets/main-iqNbfc76.css">
   <link rel="stylesheet" crossorigin href="../assets/style-CUFLUENf.css">
 </head>
@@ -17,9 +17,9 @@
       <div class="user-flex">
         <div class="user">
           <i class="fa-regular fa-circle-user"></i>
-          <p id="user-name">zero001님</p>
+          <p id="user-name">-</p>
           <label class="label manager" id="user-grade"
-          ><span>총괄관리자</span></label
+          ><span>-</span></label
           >
         </div>
       </div>
@@ -31,35 +31,20 @@
     <div class="inner">
       <div class="notice-slider-wrapper overflow-hidden">
         <div class="notice-slider" id="noticeSlider">
-          <div class="notice-item box flex gap-1 mb20">
-            <img src="../img/notice_icon.svg" alt="" />
-            <label class="tag red none-bg">긴급</label>
-            <p>02-23 / <br class="br-s" />2.01버전 패치사항 안내</p>
-          </div>
-          <div class="notice-item box flex gap-1 mb20">
-            <img src="../img/notice_icon.svg" alt="" />
-            <label class="tag blue none-bg">패치</label>
-            <p>03-01 / <br class="br-s" />신규 기능 추가 안내</p>
-          </div>
-          <div class="notice-item box flex gap-1 mb20">
-            <img src="../img/notice_icon.svg" alt="" />
-            <label class="tag org none-bg">이벤트</label>
-            <p>04-10 / <br class="br-s" />봄맞이 이벤트 시작</p>
-          </div>
         </div>
       </div>
 
-      <div class="boxStyle bl">
+      <div class="boxStyle bl" id="noticeBox">
         <div class="countArea">
           <div class="countbox mb10">
             <p>당일 매출</p>
-            <h4 data-target="87000">
+            <h4 data-target="0" id="today">
               <span class="number">0000000</span><small>원</small>
             </h4>
           </div>
           <div class="countbox">
             <p>전일 매출</p>
-            <h4 data-target="240000">
+            <h4 data-target="0" id="yesterday">
               <span class="number">0000000</span><small>원</small>
             </h4>
           </div>
@@ -67,13 +52,13 @@
           <div class="flex">
             <div class="countbox St2">
               <p>당월 매출</p>
-              <h4 data-target="2600000">
-                <span class="number">0000000</span><small>원</small>
+              <h4 data-target="0" id="month">
+                <span class="number" >0000000</span><small>원</small>
               </h4>
             </div>
             <div class="countbox St2">
               <p>최고 매출</p>
-              <h4 data-target="250000">
+              <h4 data-target="0" id="highest">
                 <span class="number">0000000</span><small>원</small>
               </h4>
             </div>
@@ -141,115 +126,15 @@
       <div class="boxStyle wt mb20">
         <h2 class="ta-c mb20">공지사항</h2>
         <div class="notice-flex">
-          <div class="box">
-            <div class="num">1</div>
-            <label class="tag red">긴급</label>
-            <div class="textBox">
-              <h4>[소프트웨어] 2월 18일 (화) 업데이트 공지</h4>
-              <span>2024.12.10 11:11:11</span>
-            </div>
-          </div>
-          <div class="box">
-            <div class="num">2</div>
-            <label class="tag blue">패치</label>
-            <div class="textBox">
-              <h4>2025년 메일빈 제품별 변동 사항관련 공지</h4>
-              <span>2024.12.10 11:11:11</span>
-            </div>
-          </div>
-          <div class="box">
-            <div class="num">3</div>
-            <label class="tag org">이벤트</label>
-            <div class="textBox">
-              <h4>당사 건물 화재로 인한 전화 응대관련 공지</h4>
-              <span>2024.12.10 11:11:11</span>
-            </div>
-          </div>
-          <div class="box">
-            <div class="num">4</div>
-            <label class="tag">안내</label>
-            <div class="textBox">
-              <h4>크리스마스 및 연말 배송 안내 관련 공지</h4>
-              <span>2024.12.10 11:11:11</span>
-            </div>
-          </div>
-          <div class="box">
-            <div class="num">5</div>
-            <label class="tag red">긴급</label>
-            <div class="textBox">
-              <h4>[소프트웨어] 2월 18일 (화) 업데이트 공지</h4>
-              <span>2024.12.10 11:11:11</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
   </section>
+  <div id="popupArea" class="hidden fixed inset-0 z-50"></div>
 </div>
 </body>
 
 <script>
-  // 매출 카운팅
-  document.addEventListener("DOMContentLoaded", () => {
-    const counters = document.querySelectorAll(".countbox h4");
 
-    counters.forEach((counter) => {
-      const target = +counter.getAttribute("data-target").replace(/,/g, "");
-      const numberSpan = counter.querySelector(".number");
-
-      const totalDigits = target.toLocaleString().replace(/,/g, "").length;
-
-      const updateCount = () => {
-        let current = +numberSpan.innerText.replace(/[^0-9]/g, "") || 0;
-        const increment = Math.ceil(target / 100);
-
-        if (current < target) {
-          current += increment;
-          if (current > target) current = target;
-
-          numberSpan.innerText = formatWithPadding(current, totalDigits);
-          setTimeout(updateCount, 20);
-        } else {
-          numberSpan.innerText = formatWithPadding(target, totalDigits);
-        }
-      };
-
-      const formatWithPadding = (num, width) => {
-        const numStr = num.toLocaleString(); // adds commas
-        const plainNum = num.toString().padStart(width, "0");
-        return plainNum.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      };
-
-      updateCount();
-    });
-  });
-
-  // notice 스와이퍼
-  const slider = document.getElementById("noticeSlider");
-  const items = slider.children;
-  const totalItems = items.length;
-
-  let index = 0;
-
-  // 복제 첫 슬라이드 (무한 루프용)
-  const firstClone = items[0].cloneNode(true);
-  slider.appendChild(firstClone);
-
-  function slideNext() {
-    index++;
-    slider.style.transition = "transform 0.5s ease-in-out";
-    slider.style.transform = `translateX(-${index * 100}%)`;
-
-    // 마지막 복제 슬라이드까지 갔을 때 처음으로 리셋
-    if (index === totalItems) {
-      setTimeout(() => {
-        slider.style.transition = "none";
-        slider.style.transform = "translateX(0)";
-        index = 0;
-      }, 600); // transition 시간보다 살짝 길게
-    }
-  }
-
-  setInterval(slideNext, 5000); // 3초마다 전환
 </script>
 </html>
