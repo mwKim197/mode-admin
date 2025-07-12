@@ -3,6 +3,7 @@ import { checkUserAccess, getUserData } from "./ts/common/auth.ts";
 import "./ts/page/login.ts";
 import { loadPartials } from "./ts/utils/layoutLoader.ts";
 import { ToastType } from "./ts/types/common.ts";
+import {getStoredUser} from "./ts/utils/userStorage.ts";
 
 // 글로벌 등록
 declare global {
@@ -150,8 +151,35 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // 일반 유저 정보
+  const user = getStoredUser();
+
+  // 일반 유저정보 있을경우에만 빠른조작화면 노출
+  if (user) {
+    const menuWrap = document.querySelector(".user-menuWrap") as HTMLElement;
+    if (menuWrap) {
+      menuWrap.style.display = "block"; // ✅ 보이게
+    }
+  } else {
+    const menuWrap = document.querySelector(".user-menuWrap") as HTMLElement;
+    if (menuWrap) {
+      menuWrap.style.display = "none"; // ✅ 숨기기
+    }
+  }
+
+  if (!user?.payType) {
+    const menuList = document.querySelector(".sidemenu .menu");
+    const pointMene = [{ href: "/html/point.html", label: "포인트" }]
+    pointMene.forEach((item) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<a href="${item.href}"><p>${item.label}</p></a>`;
+      menuList?.appendChild(li);
+    });
+  }
+
   if (adminUserInfo && adminUserInfo.grade <= 2) {
     const menuList = document.querySelector(".sidemenu .menu");
+
     const adminMenus = [
       { href: "/html/notice.html?type=admin", label: "관리자 공지사항" },
       { href: "/html/notice.html?type=notice", label: "홈페이지 공지사항" },
