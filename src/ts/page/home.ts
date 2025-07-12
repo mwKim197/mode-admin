@@ -114,7 +114,7 @@ async function loadNotices() {
             const tagInfo = getTagInfo(notice.noticeType);
 
             const html = `
-                <div class="box">
+                <div class="box notice-item" data-content-id="${notice.contentId}">
                   <div class="num">${index + 1}</div>
                   <label class="tag ${tagInfo.color}">${tagInfo.label}</label>
                   <div class="textBox">
@@ -124,6 +124,18 @@ async function loadNotices() {
                 </div>
               `;
             noticeFlex.insertAdjacentHTML("beforeend", html);
+        });
+
+        // ✅ 클릭 이벤트 추가 (공지사항 박스 클릭 시 팝업)
+        document.querySelectorAll(".notice-item").forEach(item => {
+            item.addEventListener("click", () => {
+                const contentId = item.getAttribute("data-content-id");
+                const clickedNotice = notices.find((n: any) => n.contentId == contentId);
+                if (clickedNotice) {
+                    const popup = showPopup(clickedNotice);
+                    document.getElementById("popupArea")?.appendChild(popup);
+                }
+            });
         });
 
         const slider = document.getElementById("noticeSlider");
@@ -136,13 +148,25 @@ async function loadNotices() {
             const tagInfo = getTagInfo(notice.noticeType);
 
             const html = `
-                    <div class="notice-item box flex gap-1 mb20">
+                    <div class="notice-item box flex gap-1 mb20" data-content-id="${notice.contentId}">
                       <img src="/img/notice_icon.svg" alt="" />
                       <label class="tag ${tagInfo.color} none-bg">${tagInfo.label}</label>
                       <p>${formatDateKST(notice.timestamp)} / <br class="br-s" />${notice.title}</p>
                     </div>
                     `;
             slider.insertAdjacentHTML("beforeend", html);
+        });
+
+        // ✅ 슬라이더에서도 클릭 이벤트 추가
+        slider.querySelectorAll(".notice-item").forEach(item => {
+            item.addEventListener("click", () => {
+                const contentId = item.getAttribute("data-content-id");
+                const clickedNotice = notices.find((n: any) => n.contentId == contentId);
+                if (clickedNotice) {
+                    const popup = showPopup(clickedNotice);
+                    document.getElementById("popupArea")?.appendChild(popup);
+                }
+            });
         });
     } catch (err) {
         console.error("❌ 공지사항 불러오기 실패:", err);
@@ -256,6 +280,13 @@ async function openPopup() {
 }
 
 function showPopup(notice: any): HTMLDivElement {
+    const popupArea = document.getElementById("popupArea");
+
+    if (popupArea) {
+        popupArea.classList.remove("hidden"); // ✅ hidden 제거
+        popupArea.style.display = "flex";     // ✅ 혹시 hidden 안먹으면 강제 표시
+    }
+
     const popup = document.createElement("div");
     popup.id = `popup_${notice.contentId}`;
     popup.className = "popup_module";
@@ -326,6 +357,13 @@ function showPopup(notice: any): HTMLDivElement {
         if (!document.querySelector(".popup_module")) {
             document.getElementById("popupArea")!.classList.add("hidden");
         }
+
+        if (!document.querySelector(".popup_module")) {
+            if (popupArea) {
+                popupArea.classList.add("hidden");
+                popupArea.style.display = "none";
+            }
+        }
     });
 
     // 오늘 하루 안 보기 이벤트
@@ -336,6 +374,13 @@ function showPopup(notice: any): HTMLDivElement {
             popup.remove();
             if (!document.querySelector(".popup_module")) {
                 document.getElementById("popupArea")!.classList.add("hidden");
+            }
+        }
+
+        if (!document.querySelector(".popup_module")) {
+            if (popupArea) {
+                popupArea.classList.add("hidden");
+                popupArea.style.display = "none";
             }
         }
     });
