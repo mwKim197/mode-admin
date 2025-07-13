@@ -41,7 +41,7 @@ export function initLogin() {
             console.log("📥 로그인 응답:", response.status, result); // ✅ 응답 전체 출력
 
             if (response.ok) {
-                await handlePostLogin(result.token);
+                await handlePostLogin(result.accessToken);
             } else {
                 alert(result.message || "로그인 실패. 다시 시도하세요.");
             }
@@ -96,7 +96,7 @@ function handleKakaoLogin() {
                             localStorage.removeItem("authToken");
                             console.log("🗑️ 기존 로그인 토큰 삭제됨");
 
-                            await handlePostLogin(body.token);
+                            await handlePostLogin(body.accessToken);
                         } else if (body.redirectUrl) {
                             console.log("✅ 신규 사용자 → 연동 페이지로 이동:", body.redirectUrl);
                             window.location.href = body.redirectUrl;

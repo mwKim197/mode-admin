@@ -98,8 +98,6 @@ async function loadNotices() {
 
         if (!res.ok) throw new Error(notices.message);
 
-        console.log("📦 공지사항 데이터:", notices);
-
         // 최신순 정렬 (timestamp 기준)
         notices.sort((a:any, b:any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
