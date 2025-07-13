@@ -30,8 +30,6 @@ export function initLogin() {
         // 글로벌
         window.showLoading(); // ✅ 로딩 시작
         try {
-            console.log("🚀 로그인 요청 시작:", { adminId, password }); // [TODO]⚠️ 테스트 후 비밀번호는 지워도 됨
-
             const response = await fetch(`${API_URL}/model_admin_login?func=login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -41,50 +39,9 @@ export function initLogin() {
 
             const result = await response.json();
             console.log("📥 로그인 응답:", response.status, result); // ✅ 응답 전체 출력
+
             if (response.ok) {
-                localStorage.setItem("authToken", result.token);
-                console.log("✅ 로그인 성공 → 토큰 저장 완료!");
-
-                const meRes = await fetch(`${API_URL}/model_admin_login?func=me`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("authToken")}` // 🔐 꼭 필요
-                    },
-                    mode: "cors",
-                });
-
-                if (!meRes.ok) {
-                    alert("유저 정보를 불러오지 못했습니다.");
-                    return;
-                }
-
-                const userInfo = await meRes.json(); // ✅ 실제 userInfo 파싱
-
-                // 일반 계정일경우 (grade === 4) 즉시 userId를 조회해서 localStorage에 userInfo로 저장함
-                if (userInfo.grade === 4) {
-                    const res = await fetch(`${API_URL}/model_user_setting?func=get-user&userId=${userInfo.userId}`, {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${localStorage.getItem("authToken")}`
-                        },
-                        mode: "cors",
-                    });
-
-                    if (res.ok) {
-                        const { user } = await res.json();
-                        localStorage.setItem("userInfo", JSON.stringify(user));
-                        console.log("✅ 사용자 정보 저장 완료");
-                    } else {
-                        const errorBody = await res.text();
-                        console.error("❌ 사용자 정보 조회 실패:", res.status, errorBody);
-                        alert("사용자 정보를 불러오지 못했습니다.");
-                        return;
-                    }
-                }
-                // home 이동
-                window.location.href = "/html/home.html";
+                await handlePostLogin(result.token);
             } else {
                 alert(result.message || "로그인 실패. 다시 시도하세요.");
             }
@@ -133,15 +90,13 @@ function handleKakaoLogin() {
                     body: JSON.stringify({ code }),
                 })
                     .then(response => response.json())
-                    .then((body) => {
+                    .then(async (body) => {
                         if (body.token) {
                             // ✅ 기존 토큰 삭제
                             localStorage.removeItem("authToken");
                             console.log("🗑️ 기존 로그인 토큰 삭제됨");
 
-                            localStorage.setItem("authToken", body.token);
-                            console.log("✅ 로그인 성공 → 토큰 저장 완료!");
-                            window.location.href = "/html/home.html";
+                            await handlePostLogin(body.token);
                         } else if (body.redirectUrl) {
                             console.log("✅ 신규 사용자 → 연동 페이지로 이동:", body.redirectUrl);
                             window.location.href = body.redirectUrl;
@@ -154,5 +109,62 @@ function handleKakaoLogin() {
                     });
             }
         });
+    }
+}
+
+// 로그인정보 검증
+async function handlePostLogin(token: string) {
+    try {
+        // 🔐 토큰 저장
+        localStorage.setItem("authToken", token);
+        console.log("✅ 로그인 성공 → 토큰 저장 완료!");
+
+        // 🧑‍💻 사용자 정보 조회
+        const meRes = await fetch(`${API_URL}/model_admin_login?func=me`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            mode: "cors",
+        });
+
+        if (!meRes.ok) {
+            console.error("❌ 사용자 정보 불러오기 실패:", meRes.status);
+            alert("유저 정보를 불러오지 못했습니다.");
+            return;
+        }
+
+        const userInfo = await meRes.json();
+        console.log("👤 사용자 정보:", userInfo);
+
+        // 📦 일반 계정이면 userInfo 저장
+        if (userInfo.grade === 4 && userInfo.userId) {
+            const res = await fetch(`${API_URL}/model_user_setting?func=get-user&userId=${userInfo.userId}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                mode: "cors",
+            });
+
+            if (res.ok) {
+                const { user } = await res.json();
+                localStorage.setItem("userInfo", JSON.stringify(user));
+                console.log("✅ 일반 사용자 정보 저장 완료");
+            } else {
+                const errorBody = await res.text();
+                console.error("❌ 사용자 정보 조회 실패:", res.status, errorBody);
+                alert("사용자 정보를 불러오지 못했습니다.");
+                return;
+            }
+        }
+
+        // ✅ 홈으로 이동
+        window.location.href = "/html/home.html";
+    } catch (error) {
+        console.error("❌ postLogin 처리 오류:", error);
+        alert("로그인 후 처리 중 오류가 발생했습니다.");
     }
 }
