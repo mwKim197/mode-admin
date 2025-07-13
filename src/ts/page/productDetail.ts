@@ -72,8 +72,6 @@ export async function initProductDetail() {
         try {
           const res = await apiPut(`/model_admin_menu?func=put-update-menu`, putData);
 
-          console.log("res: ", res);
-
           if (!res.ok) {
             window.showToast(`수정사항 저장에 실패하였습니다.`, 3000, "error");
             return;
@@ -134,7 +132,6 @@ async function sendMachineCommand(func: string, data: any = {}) {
   // ✅ 요청만 보내고 응답 기다리지 않음
   apiPost("/model_machine_controll", payload)
       .then(() => {
-        console.log(`✅ ${func} 명령 전송 완료`);
         window.showToast(`${func} 명령 전송 완료`);
       })
       .catch(err => {

@@ -16,8 +16,6 @@
         return;
       }
 
-      console.log("✅ 카카오 로그인 코드 확인:", code);
-
       if (window.opener && !window.opener.closed) {
         console.log("✅ 팝업 창에서 로그인 완료 → 부모 창으로 code 전달");
 

@@ -61,7 +61,6 @@ export async function initProductAdd() {
             imageBase64: uploadedImageBase64
           })
         };
-        console.log("postData: ", postData);
 
         try {
           const res = await apiPost(`/model_admin_menu?func=set-new-menu`, postData);

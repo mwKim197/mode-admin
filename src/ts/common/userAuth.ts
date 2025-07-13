@@ -13,7 +13,6 @@ export async function fetchUserInfo(userId: string): Promise<ModelUser | null> {
     }
 
     const { user } = await res.json();
-    console.log("✅ 사용자 정보:", user);
 
     return user;
 }

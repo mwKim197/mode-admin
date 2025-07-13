@@ -42,7 +42,6 @@ export function initLogin() {
             });
 
             const result = await response.json();
-            console.log("📥 로그인 응답:", response.status, result); // ✅ 응답 전체 출력
 
             if (response.ok) {
                 await handlePostLogin(result, autoLoginChecked);
@@ -86,7 +85,6 @@ function handleKakaoLogin() {
             if (event.origin !== "https://zeroadmin.kr") return;
             const { code } = event.data;
             if (code) {
-                console.log("✅ 카카오 로그인 코드 받음:", code);
                 loginPopup?.close();
 
                 fetch(`${API_URL}/model_admin_login?func=kakao-login`, {
@@ -100,7 +98,6 @@ function handleKakaoLogin() {
                             // 토큰 후 처리
                             await handlePostLogin(body, autoLoginChecked);
                         } else if (body.redirectUrl) {
-                            console.log("✅ 신규 사용자 → 연동 페이지로 이동:", body.redirectUrl);
                             window.location.href = body.redirectUrl;
                         } else {
                             alert("카카오 로그인 실패. 다시 시도하세요.");
@@ -145,7 +142,6 @@ async function handlePostLogin(data: any, autoLoginChecked: boolean = false) {
         }
 
         const userInfo = await meRes.json();
-        console.log("사용자 정보:", userInfo);
 
         // 📦 일반 계정이면 userInfo 저장
         if (userInfo.grade === 4 && userInfo.userId) {

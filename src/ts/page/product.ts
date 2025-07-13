@@ -92,7 +92,6 @@ if (saveBtn) {
 function onToggleChange(menuId: number, isChecked: boolean) {
   const emptyValue = isChecked ? "no" : "yes";
   updateChangeList(menuId, { empty: emptyValue });
-  console.log("changeList: ", changeList);
 }
 
 // 삭제 버튼

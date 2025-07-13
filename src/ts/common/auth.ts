@@ -31,7 +31,6 @@ export async function checkUserAccess() {
     }
 
     const data = await res.json();
-    console.log("✅ 사용자 정보:", data);
 
     const grade = data?.grade;
 

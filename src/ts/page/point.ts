@@ -80,7 +80,6 @@ export async function initPoint() {
         selectAllBtn.className = allChecked ? "btn-s mb10" : "btn-s blue mb10";
         selectAllBtn.textContent = allChecked ? '전체해제' : '전체선택';
 
-        console.log(`현재 선택된 항목 수: ${document.querySelectorAll('input.row-checkbox:checked').length}`);
     });
     //--- 마일리지 전체선택 버튼 세팅 ---//
     //--- 마일리지 정보 저장 버튼 세팅 ---//

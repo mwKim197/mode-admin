@@ -1187,8 +1187,6 @@ async function downloadExcel() {
       }
     }
 
-    console.log("엑셀 다운로드 API URL:", apiUrl);
-
     // API 호출
     const response = await apiGet(apiUrl);
     const data = await response.json();

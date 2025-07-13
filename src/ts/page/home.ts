@@ -31,8 +31,6 @@ async function loadSalesSummary(user: any) {
 
         if (!res.ok) throw new Error(data.message);
 
-        console.log("📦 매출 요약 데이터:", data);
-
         // DOM 요소 매핑
         const todayEl = document.getElementById("today");
         const yesterdayEl = document.getElementById("yesterday");
