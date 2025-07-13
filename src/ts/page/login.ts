@@ -87,7 +87,6 @@ function handleKakaoLogin() {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ code }),
-                    credentials: "include",
                 })
                     .then(response => response.json())
                     .then(async (body) => {
