@@ -37,13 +37,13 @@
         })
                 .then(response => response.json())
                 .then(result => {
-                  if (result.token) {
-                    localStorage.setItem("authToken", result.token);
+                  if (result.accessToken) {
+                    localStorage.setItem("accessToken", result.accessToken);
                     console.log("✅ 모바일 로그인 성공 → 토큰 저장 완료!");
 
                     // ✅ 부모 창이 있으면 메시지 전달
                     if (window.opener && !window.opener.closed) {
-                      window.opener.postMessage({ token: result.token }, "https://zeroadmin.kr/html/home.html");
+                      window.opener.postMessage({ accessToken: result.accessToken }, "https://zeroadmin.kr/html/home.html");
                     } else {
                       window.location.href = "/html/home.html"; // 직접 이동
                     }

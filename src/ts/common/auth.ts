@@ -6,11 +6,11 @@ import {jwtDecode} from "jwt-decode";
  * ✅ 토큰 사용자 권한 확인
  */
 export function getUserFromToken(): DecodedToken | null {
-    const token = localStorage.getItem("authToken");
-    if (!token) return null;
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) return null;
 
     try {
-        return jwtDecode<DecodedToken>(token);
+        return jwtDecode<DecodedToken>(accessToken);
     } catch (err) {
         console.error("❌ 토큰 디코딩 실패:", err);
         return null;
@@ -25,7 +25,7 @@ export async function checkUserAccess() {
 
     if (res.status === 401 || res.status === 403) {
         console.warn("🚫 인증 실패 - 로그인 페이지로 이동");
-        localStorage.removeItem("authToken");
+        localStorage.removeItem("accessToken");
         window.location.href = "/index.html";
         return;
     }
@@ -86,6 +86,6 @@ export async function getUserData(): Promise<AdminUserInfo | null> {
  * ✅ 로그아웃
  */
 export function logout() {
-    localStorage.removeItem("authToken");
+    localStorage.removeItem("accessToken");
     window.location.href = "/log.html";
 }

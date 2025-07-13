@@ -156,9 +156,9 @@ async function loadStoreInfo() {
 async function saveStoreInfo() {
   try {
     const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
-    const authToken = localStorage.getItem("authToken");
+    const accessToken = localStorage.getItem("accessToken");
 
-    if (!authToken) {
+    if (!accessToken) {
       return;
     }
 

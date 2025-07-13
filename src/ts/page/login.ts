@@ -14,7 +14,7 @@ export function initLogin() {
         event.preventDefault(); // 기본 제출 방지
 
         // ✅ 기존 토큰 삭제
-        localStorage.removeItem("authToken");
+        localStorage.removeItem("accessToken");
         // ✅ 기존 유저정보 삭제
         localStorage.removeItem("userInfo");
         console.log("🗑️ 기존 로그인 토큰 삭제됨");
@@ -34,15 +34,13 @@ export function initLogin() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ adminId, password }),
-                mode: "cors",
-                credentials: "include",
             });
 
             const result = await response.json();
             console.log("📥 로그인 응답:", response.status, result); // ✅ 응답 전체 출력
 
             if (response.ok) {
-                await handlePostLogin(result.accessToken);
+                await handlePostLogin(result);
             } else {
                 alert(result.message || "로그인 실패. 다시 시도하세요.");
             }
@@ -93,9 +91,9 @@ function handleKakaoLogin() {
                 })
                     .then(response => response.json())
                     .then(async (body) => {
-                        if (body.token) {
+                        if (body.accessToken) {
                             // ✅ 기존 토큰 삭제
-                            localStorage.removeItem("authToken");
+                            localStorage.removeItem("accessToken");
                             console.log("🗑️ 기존 로그인 토큰 삭제됨");
 
                             await handlePostLogin(body.accessToken);
@@ -115,10 +113,11 @@ function handleKakaoLogin() {
 }
 
 // 로그인정보 검증
-async function handlePostLogin(token: string) {
+async function handlePostLogin(data: any) {
     try {
         // 🔐 토큰 저장
-        localStorage.setItem("authToken", token);
+        localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("refreshToken", data.refreshToken);
         console.log("✅ 로그인 성공 → 토큰 저장 완료!");
 
         // 🧑‍💻 사용자 정보 조회
@@ -126,7 +125,7 @@ async function handlePostLogin(token: string) {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
+                "Authorization": `Bearer ${data.accessToken}`
             },
             mode: "cors",
         });
@@ -146,7 +145,7 @@ async function handlePostLogin(token: string) {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+                    "Authorization": `Bearer ${data.accessToken}`
                 },
                 mode: "cors",
             });

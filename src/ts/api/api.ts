@@ -20,9 +20,9 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {},
         };
     }
 
-    const token = localStorage.getItem("authToken");
+    const accessToken = localStorage.getItem("accessToken");
 
-    if (!token) {
+    if (!accessToken) {
         console.log("❌ 토큰이 없습니다. 로그인 페이지로 이동합니다.");
         window.location.href = "/index.html";
         return {
@@ -37,7 +37,7 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {},
         ...options,
         headers: {
             ...options.headers,
-            "Authorization": `Bearer ${token}`,
+            "Authorization": `Bearer ${accessToken}`,
             "Content-Type": "application/json",
         }
     };
@@ -53,7 +53,7 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {},
             console.error("❌ 인증 실패:", resJson.message);
 
             alert(resJson.message || "세션이 만료되었습니다. 다시 로그인해주세요.");
-            localStorage.removeItem("authToken");
+            localStorage.removeItem("accessToken");
             window.location.href = "/index.html";
             return {
                 ok: false,
