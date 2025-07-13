@@ -83,7 +83,6 @@ export function initLogin() {
                         return;
                     }
                 }
-                console.log("????");
                 // home 이동
                 window.location.href = "/html/home.html";
             } else {
@@ -108,7 +107,7 @@ export function initLogin() {
 // ✅ 카카오 로그인 처리 함수
 function handleKakaoLogin() {
     const KAKAO_CLIENT_ID = "240886095629b93f9655026145a39487";
-    const KAKAO_REDIRECT_URI = "http://model-web-admin.s3-website.ap-northeast-2.amazonaws.com/html/kakao-callback.html";
+    const KAKAO_REDIRECT_URI = "https://zeroadmin.kr/html/kakao-callback.html";
     const kakaoAuthURL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KAKAO_CLIENT_ID}&redirect_uri=${KAKAO_REDIRECT_URI}`;
 
     // 📱 모바일 환경 체크
@@ -122,7 +121,7 @@ function handleKakaoLogin() {
         const loginPopup = window.open(kakaoAuthURL, "kakaoLogin", "width=500,height=700");
 
         window.addEventListener("message", (event) => {
-            if (event.origin !== "http://model-web-admin.s3-website.ap-northeast-2.amazonaws.com") return;
+            if (event.origin !== "https://zeroadmin.kr") return;
             const { code } = event.data;
             if (code) {
                 console.log("✅ 카카오 로그인 코드 받음:", code);

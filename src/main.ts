@@ -4,6 +4,7 @@ import "./ts/page/login.ts";
 import { loadPartials } from "./ts/utils/layoutLoader.ts";
 import { ToastType } from "./ts/types/common.ts";
 import {getStoredUser} from "./ts/utils/userStorage.ts";
+import { sendMachineCommand } from "./ts/page/deviceManage.ts";
 
 // 글로벌 등록
 declare global {
@@ -11,8 +12,13 @@ declare global {
     showLoading: () => void;
     hideLoading: () => void;
     showToast: (msg: string, duration?: number, type?: ToastType) => void;
+    sendMachineCommand: typeof import("./ts/page/deviceManage").sendMachineCommand;
   }
 }
+
+// ------- 머신조작전역등록 --------//
+window.sendMachineCommand = sendMachineCommand;
+// ------- 머신조작전역등록 --------//
 
 // ------- 로딩 딤 --------//
 
@@ -122,6 +128,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (path != "/html/log.html" && path != "/html/dashboard.html") {
     await checkUserAccess();
     await loadPartials(); // ✅ head, layout, header 로딩도 제외
+    bindGlobalDeviceEvents();
   }
 
   const adminUserInfo = await getUserData();
@@ -271,3 +278,59 @@ document.addEventListener("DOMContentLoaded", async () => {
 window.addEventListener("load", () => {
   document.body.style.visibility = "visible";
 });
+
+// 머신 조작 전역등록 api - deviceManage.ts 호출
+function bindGlobalDeviceEvents() {
+  const userInfo = getStoredUser();
+  if (!userInfo) {
+    console.warn("❌ 사용자 정보 없음");
+    return;
+  }
+  const userId = userInfo.userId;
+
+  // [data-func] 있는 모든 버튼 및 a 태그 처리
+  document.querySelectorAll<HTMLAnchorElement | HTMLButtonElement>('a[data-func], button[data-func]').forEach((el) => {
+    el.addEventListener("click", (e) => {
+      e.preventDefault();
+      const func = el.dataset.func!;
+      const msg = el.dataset.msg || "명령이 전송되었습니다";
+
+      // 커피 세척 및 전체 세척 구분
+      const washData = el.id === "coffeeWash" ? { data: [{ type: "coffee" }] }
+          : el.id === "wash" ? {
+                data: [
+                  { type: "coffee" },
+                  { type: "garucha", value1: "1" },
+                  { type: "garucha", value1: "2" },
+                  { type: "garucha", value1: "3" },
+                  { type: "garucha", value1: "4" },
+                  { type: "garucha", value1: "5" },
+                  { type: "garucha", value1: "6" },
+                  { type: "syrup", value1: "1" },
+                  { type: "syrup", value1: "2" },
+                  { type: "syrup", value1: "3" },
+                  { type: "syrup", value1: "5" },
+                  { type: "syrup", value1: "6" },
+                ],
+              }
+              : undefined;
+
+      window.sendMachineCommand(userId, washData ? { func, washData } : { func }, msg);
+    });
+  });
+
+  // [data-type][data-value] 있는 모든 버튼 및 a 태그 처리 (부분세척)
+  document.querySelectorAll<HTMLAnchorElement | HTMLButtonElement>('a[data-type][data-value], button[data-type][data-value]').forEach((el) => {
+    el.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      const type = el.dataset.type as "garucha" | "syrup";
+      const value1 = el.dataset.value!;
+      const msg = `${type === "garucha" ? "가루차" : "시럽"} ${value1}번 세척`;
+
+      const washData = { data: [{ type, value1 }] };
+
+      window.sendMachineCommand(userId, { func: "wash", washData }, msg);
+    });
+  });
+}

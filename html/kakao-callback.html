@@ -12,7 +12,7 @@
       if (!code) {
         console.error("❌ 카카오 로그인 코드 없음");
         alert("카카오 로그인에 실패했습니다.");
-        window.location.href = "/index.html"; // 로그인 실패 시 메인 페이지로 이동
+        window.location.href = "/html/log.html"; // 로그인 실패 시 메인 페이지로 이동
         return;
       }
 
@@ -43,32 +43,32 @@
 
                     // ✅ 부모 창이 있으면 메시지 전달
                     if (window.opener && !window.opener.closed) {
-                      window.opener.postMessage({ token: result.token }, "http://model-web-admin.s3-website.ap-northeast-2.amazonaws.com");
+                      window.opener.postMessage({ token: result.token }, "https://zeroadmin.kr/html/home.html");
                     } else {
                       window.location.href = "/html/home.html"; // 직접 이동
                     }
                   } else if (result.redirectUrl) {
                     console.log("✅ 신규 사용자 → 부모 창에서 연동 페이지 이동");
                     if (window.opener && !window.opener.closed) {
-                      window.opener.postMessage({ redirectUrl: result.redirectUrl }, "http://model-web-admin.s3-website.ap-northeast-2.amazonaws.com");
+                      window.opener.postMessage({ redirectUrl: result.redirectUrl }, "https://zeroadmin.kr/html/link-account.html");
                     } else {
                       window.location.href = result.redirectUrl;
                     }
                   } else {
                     alert("카카오 로그인 실패. 다시 시도하세요.");
-                    window.location.href = "/index.html";
+                    window.location.href = "/html/log.html";
                   }
                 })
                 .catch(error => {
                   console.error("❌ 로그인 오류:", error);
                   alert("서버 오류가 발생했습니다. 다시 시도하세요.");
-                  window.location.href = "/index.html";
+                  window.location.href = "/html/log.html";
                 });
       }
     })();
   </script>
 </head>
-<body>
+<body style="background-color: black; color: white;" >
 <h1>카카오 로그인 중...</h1>
 </body>
 </html>
