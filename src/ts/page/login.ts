@@ -3,6 +3,10 @@ const API_URL = "https://api.narrowroad-model.com"; // ✅ 전역 충돌 방지
 export function initLogin() {
     console.log("✅ login.ts 로드됨");
 
+    // 로그인정보 삭제
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("userInfo"); // 유저정보 삭제
+
     const loginForm = document.getElementById("login-form") as HTMLFormElement;
     if (!loginForm) {
         console.error("❌ 로그인 폼을 찾을 수 없음");
@@ -21,7 +25,8 @@ export function initLogin() {
 
         const adminId = (document.getElementById("adminId") as HTMLInputElement).value.trim();
         const password = (document.getElementById("password") as HTMLInputElement).value.trim();
-
+        const autoLoginChecked = (document.getElementById("agree") as HTMLInputElement).checked;
+        
         if (!adminId || !password) {
             alert("아이디와 비밀번호를 입력해주세요.");
             return;
@@ -40,7 +45,7 @@ export function initLogin() {
             console.log("📥 로그인 응답:", response.status, result); // ✅ 응답 전체 출력
 
             if (response.ok) {
-                await handlePostLogin(result);
+                await handlePostLogin(result, autoLoginChecked);
             } else {
                 alert(result.message || "로그인 실패. 다시 시도하세요.");
             }
@@ -68,6 +73,7 @@ function handleKakaoLogin() {
 
     // 📱 모바일 환경 체크
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    const autoLoginChecked = (document.getElementById("agree") as HTMLInputElement).checked;
 
     if (isMobile) {
         console.log("📱 모바일 환경 → 리디렉트 방식");
@@ -92,7 +98,7 @@ function handleKakaoLogin() {
                     .then(async (body) => {
                         if (body) {
                             // 토큰 후 처리
-                            await handlePostLogin(body);
+                            await handlePostLogin(body, autoLoginChecked);
                         } else if (body.redirectUrl) {
                             console.log("✅ 신규 사용자 → 연동 페이지로 이동:", body.redirectUrl);
                             window.location.href = body.redirectUrl;
@@ -109,11 +115,17 @@ function handleKakaoLogin() {
 }
 
 // 로그인정보 검증
-async function handlePostLogin(data: any) {
+async function handlePostLogin(data: any, autoLoginChecked: boolean = false) {
     try {
         // 🔐 토큰 저장
         localStorage.setItem("accessToken", data.accessToken);
-        localStorage.setItem("refreshToken", data.refreshToken);
+        if (autoLoginChecked) {
+            console.log("✅ 로그인 성공 → 자동로그인 활성화");
+            localStorage.setItem("refreshToken", data.refreshToken);    
+        } else {
+            console.log("✅ 로그인 성공 → 자동로그인 삭제");
+            localStorage.removeItem("refreshToken");
+        }
         console.log("✅ 로그인 성공 → 토큰 저장 완료!");
 
         // 🧑‍💻 사용자 정보 조회

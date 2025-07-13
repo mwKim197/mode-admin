@@ -24,7 +24,7 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {},
 
     if (!accessToken) {
         console.log("❌ 토큰이 없습니다. 로그인 페이지로 이동합니다.");
-        window.location.href = "/index.html";
+        window.location.href = "/html/log.html";
         return {
             ok: false,
             status: 401,
@@ -54,7 +54,7 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {},
 
             alert(resJson.message || "세션이 만료되었습니다. 다시 로그인해주세요.");
             localStorage.removeItem("accessToken");
-            window.location.href = "/index.html";
+            window.location.href = "/html/log.html";
             return {
                 ok: false,
                 status: response.status,

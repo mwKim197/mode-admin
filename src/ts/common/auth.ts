@@ -26,7 +26,7 @@ export async function checkUserAccess() {
     if (res.status === 401 || res.status === 403) {
         console.warn("🚫 인증 실패 - 로그인 페이지로 이동");
         localStorage.removeItem("accessToken");
-        window.location.href = "/index.html";
+        window.location.href = "/html/log.html";
         return;
     }
 
@@ -59,7 +59,7 @@ export async function checkUserAccess() {
 
     if (allowedGrades && !allowedGrades.includes(grade)) {
         alert("이 페이지에 접근할 수 있는 권한이 없습니다.");
-        window.location.href = gradeHome[grade] || "/index.html";
+        window.location.href = gradeHome[grade] || "/html/log.html";
     }
 }
 

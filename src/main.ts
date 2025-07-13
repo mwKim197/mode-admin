@@ -126,6 +126,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   const path = window.location.pathname;
 
   if (path != "/html/log.html" && path != "/html/dashboard.html") {
+    // ✅ 자동로그인 시도 (세션 토큰 없을 때만)
+    if (!localStorage.getItem("authToken")) {
+      console.log("🔄 자동로그인 시도");
+      await tryAutoLogin(); // ✅ 토큰 저장까지 기다림
+    } else {
+      console.log("✅ 기존 세션 토큰 사용");
+    }
+
     await checkUserAccess();
     await loadPartials(); // ✅ head, layout, header 로딩도 제외
     bindGlobalDeviceEvents();
@@ -333,4 +341,44 @@ function bindGlobalDeviceEvents() {
       window.sendMachineCommand(userId, { func: "wash", washData }, msg);
     });
   });
+}
+
+// 자동로그인
+async function tryAutoLogin() {
+  const API_URL = "https://api.narrowroad-model.com"; // ✅ 전역 충돌 방지
+  const refreshToken = localStorage.getItem("refreshToken");
+  if (!refreshToken) {
+    console.log("🔒 자동로그인 스킵: refreshToken 없음");
+    return;
+  }
+
+  console.log("🔄 자동로그인 시도 중...");
+
+  try {
+    const res = await fetch(`${API_URL}/model_admin_login?func=refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken })
+    });
+
+    const data = await res.json();
+    console.log(data);
+    if (res.ok) {
+      localStorage.setItem("accessToken", data.accessToken);
+      console.log("✅ 자동로그인 성공");
+    } else {
+      console.warn("❌ 자동로그인 실패:", data.message || "Unknown error");
+      localStorage.removeItem("refreshToken");
+      redirectToLogin();
+    }
+  } catch (err) {
+    console.error("❌ 자동로그인 요청 오류:", err);
+    redirectToLogin();
+  }
+}
+
+// 로그인페이지 이동
+function redirectToLogin() {
+  console.log("➡️ 로그인 페이지로 이동");
+  window.location.href = "/html/log.html";
 }
