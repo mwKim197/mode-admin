@@ -52,9 +52,7 @@ async function loadStoreInfo() {
       originalUserData = data.user as ModelUser;
 
       // 매장명 설정
-      const storeNameInput = document.querySelector(
-        'input[name="player-id"]'
-      ) as HTMLInputElement;
+      const storeNameInput = document.getElementById("storeNm") as HTMLInputElement;
       if (storeNameInput) {
         storeNameInput.value = data.user.storeName || "";
       }
@@ -63,6 +61,12 @@ async function loadStoreInfo() {
       const telInput = document.querySelector("#tel-input") as HTMLInputElement;
       if (telInput) {
         telInput.value = data.user.tel || "";
+      }
+
+      // 매장 연락처 설정
+      const businessNo = document.getElementById("businessNo") as HTMLInputElement;
+      if (businessNo) {
+        businessNo.value = data.user.businessNo || "";
       }
 
       // 한번에 결제 가능한 최대 잔 수 설정
