@@ -22,7 +22,7 @@ export async function initPoint() {
     const user = getStoredUser();
 
     if (!user) {
-        alert("사용자 정보가 없습니다.");
+        window.showToast("사용자 정보가 없습니다.", 2000, "error");
         return;
     }
 
@@ -97,7 +97,7 @@ export async function initPoint() {
     searchBtn.addEventListener("click", () => {
         const keyword = searchInput.value.trim();
         if (!keyword) {
-            alert("검색어를 입력해주세요.");
+            window.showToast("검색어를 입력해주세요.", 2000, "warning");
             return;
         }
 
@@ -146,7 +146,7 @@ export async function initPoint() {
             const checkboxes = document.querySelectorAll<HTMLInputElement>('input.row-checkbox:checked');
 
             if (checkboxes.length === 0) {
-                alert("삭제할 항목을 선택해주세요.");
+                window.showToast("삭제할 항목을 선택해주세요.", 2000, "warning");
                 return;
             }
 
@@ -155,7 +155,7 @@ export async function initPoint() {
 
             const user = getStoredUser();
             if (!user) {
-                alert("사용자 정보가 없습니다.");
+                window.showToast("사용자 정보가 없습니다.", 2000, "error");
                 return;
             }
 
@@ -176,9 +176,9 @@ export async function initPoint() {
             }
 
             if (failed > 0) {
-                alert(`❌ ${failed}건 삭제 실패`);
+                window.showToast(`❌ ${failed}건 삭제 실패`, 2000, "error");
             } else {
-                alert("✅ 선택된 마일리지를 모두 삭제했습니다.");
+                window.showToast("✅ 선택된 마일리지를 모두 삭제했습니다.");
             }
 
             await getPointList(); // 목록 갱신
@@ -218,7 +218,7 @@ async function setPointInfo() {
     const user = getStoredUser();
 
     if (!user) {
-        alert("사용자 정보가 없습니다.");
+        window.showToast("사용자 정보가 없습니다.", 2000, "error");
         return;
     }
 
@@ -229,12 +229,12 @@ async function setPointInfo() {
     const isPhone = document.getElementById("isPhone") as HTMLInputElement;
 
     if (!earnMileage) {
-        alert("마일리지 적립률을 입력해주세요.");
+        window.showToast("마일리지 적립률을 입력해주세요.", 2000, "warning");
         return;
     }
 
     if (!mileageNumber) {
-        alert("마일리지 적립 번호 자리수를 입력해주세요.");
+        window.showToast("마일리지 적립 번호 자리수를 입력해주세요.", 2000, "warning");
         return;
     }
 
@@ -256,7 +256,7 @@ async function setPointInfo() {
     const userRes = await fetchUserInfo(user.userId); // fetchUserInfo 내부에서 이미 await 처리됨
     if (userRes) {
         localStorage.setItem("userInfo", JSON.stringify(userRes));
-        alert("✅ 사용자 정보 저장 완료");
+        window.showToast("✅ 사용자 정보 저장 완료");
     }
 }
 
@@ -265,7 +265,7 @@ async function getPointList() {
     // localstorage에 저장된 user 정보를 불러옴
     const user = getStoredUser();
     if (!user) {
-        alert("사용자 정보가 없습니다.");
+        window.showToast("사용자 정보가 없습니다.", 2000, "error");
         return;
     }
     const userId = user.userId;
@@ -339,18 +339,18 @@ async function renderTable(data: PointItem[]) {
                     const user = getStoredUser();
 
                     if (!user) {
-                        alert("사용자 정보가 없습니다.");
+                        window.showToast("사용자 정보가 없습니다.", 2000, "error");
                         return;
                     }
                     const userId = user.userId;
 
                     const res = await apiDelete(`/model_admin_mileage?userId=${userId}&func=mileage-delete&uniqueMileageNo=${item.uniqueMileageNo}`);
                     if (!res.ok) {
-                        alert("❌ 삭제 실패");
+                        window.showToast("❌ 삭제 실패", 2000, "error");
                         return;
                     }
 
-                    alert("✅ 삭제 완료");
+                    window.showToast("✅ 삭제 완료");
                     await getPointList(); // 삭제 후 목록 다시 로딩
                 };
 
@@ -371,21 +371,21 @@ async function savePoint(mode: PointMode) {
 
         const user = getStoredUser();
         if (!user) {
-            alert("사용자 정보가 없습니다.");
+            window.showToast("사용자 정보가 없습니다.", 2000, "error");
             return;
         }
 
         const { userId, isPhone, mileageNumber } = user;
 
         if (!userId || isPhone === undefined || mileageNumber === undefined) {
-            alert("📌 고객번호 설정이 누락되었습니다.\n[휴대폰 여부 / 자릿수] 정보를 먼저 등록해주세요.");
+            window.showToast("📌 고객번호 설정이 누락되었습니다.\n[휴대폰 여부 / 자릿수] 정보를 먼저 등록해주세요.", 2000, "warning");
             return;
         }
 
         // mileage 번호 유효성 검사
         const msg = validateMileageNo(mileageNoRaw, isPhone, mileageNumber);
         if (msg) {
-            alert(msg);
+            window.showToast(msg, 2000, "warning");
             return;
         }
 
@@ -395,26 +395,26 @@ async function savePoint(mode: PointMode) {
         if (mode === "create") {
             // 필수 필드 검사
             if (!tel || !password || !pointStr) {
-                alert("필수 항목을 모두 입력해주세요.");
+                window.showToast("필수 항목을 모두 입력해주세요.", 2000, "warning");
                 return;
             }
         } else {
             // 필수 필드 검사
             if (!tel || !password) {
-                alert("필수 항목을 모두 입력해주세요.");
+                window.showToast("필수 항목을 모두 입력해주세요.", 2000, "warning");
                 return;
             }
         }
 
         if (!/^\d+$/.test(password)) {
-            alert("비밀번호는 숫자만 입력해주세요.");
+            window.showToast("비밀번호는 숫자만 입력해주세요.", 2000, "warning");
             return;
         }
 
         if (pointStr) {
 
             if (!/^\d+$/.test(pointStr)) {
-                alert("포인트는 숫자만 입력해주세요.");
+                window.showToast("포인트는 숫자만 입력해주세요.", 2000, "warning");
                 return;
             }
         }
@@ -433,7 +433,7 @@ async function savePoint(mode: PointMode) {
         // 수정일 경우 uniqueMileageNo 포함, password는 newPassword로 변경
         if (mode === "update") {
             if (!selectedItem?.uniqueMileageNo) {
-                alert("선택된 항목이 없습니다.");
+                window.showToast("선택된 항목이 없습니다.", 2000, "warning");
                 return;
             }
 
@@ -454,20 +454,20 @@ async function savePoint(mode: PointMode) {
             try {
                 const errorBody = await res.json();
                 const errorMessage = errorBody?.message ?? `${mode === "create" ? "등록" : "수정"} 중 오류가 발생했습니다.`;
-                alert(`❌ ${errorMessage}`);
+                window.showToast(`❌ ${errorMessage}`, 2000, "error");
             } catch (e) {
-                alert(`❌ ${mode === "create" ? "등록" : "수정"} 실패`);
+                window.showToast(`❌ ${mode === "create" ? "등록" : "수정"} 실패`, 2000, "error");
             }
             return;
         }
 
-        alert(`✅ ${mode === "create" ? "등록" : "수정"} 완료`);
+        window.showToast(`✅ ${mode === "create" ? "등록" : "수정"} 완료`);
         closePopup();
         await getPointList();
 
     } catch (e) {
         console.error(`❌ ${mode} 오류:`, e);
-        alert(`서버 오류로 ${mode === "create" ? "등록" : "수정"}에 실패했습니다.`);
+        window.showToast(`서버 오류로 ${mode === "create" ? "등록" : "수정"}에 실패했습니다.`, 2000, "error");
     }
 }
 
