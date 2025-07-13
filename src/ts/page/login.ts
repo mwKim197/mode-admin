@@ -90,12 +90,9 @@ function handleKakaoLogin() {
                 })
                     .then(response => response.json())
                     .then(async (body) => {
-                        if (body.accessToken) {
-                            // ✅ 기존 토큰 삭제
-                            localStorage.removeItem("accessToken");
-                            console.log("🗑️ 기존 로그인 토큰 삭제됨");
-
-                            await handlePostLogin(body.accessToken);
+                        if (body) {
+                            // 토큰 후 처리
+                            await handlePostLogin(body);
                         } else if (body.redirectUrl) {
                             console.log("✅ 신규 사용자 → 연동 페이지로 이동:", body.redirectUrl);
                             window.location.href = body.redirectUrl;
@@ -136,7 +133,7 @@ async function handlePostLogin(data: any) {
         }
 
         const userInfo = await meRes.json();
-        console.log("👤 사용자 정보:", userInfo);
+        console.log("사용자 정보:", userInfo);
 
         // 📦 일반 계정이면 userInfo 저장
         if (userInfo.grade === 4 && userInfo.userId) {

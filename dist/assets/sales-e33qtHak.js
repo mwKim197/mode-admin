@@ -1,4 +1,4 @@
-import{a as pe}from"./main-BjDgKYhc.js";/*!
+import{a as pe}from"./main-ByjjG37K.js";/*!
  * html2canvas 1.4.1 <https://html2canvas.hertzen.com>
  * Copyright (c) 2022 Niklas von Hertzen <https://hertzen.com>
  * Released under MIT License
