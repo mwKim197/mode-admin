@@ -282,8 +282,10 @@ async function getSalesList() {
       const response = await apiGet(apiUrl);
       const data = await response.json();
 
-      // 정렬 없이 그대로 사용
-      items = data.items || [];
+      // 총 건수 기준 내림차순 정렬 (많은 것이 위로)
+      items = (data.items || []).sort((a: any, b: any) => {
+        return (b.totalCount || 0) - (a.totalCount || 0);
+      });
 
       await renderSalesTable(items);
     }
