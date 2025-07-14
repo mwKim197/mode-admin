@@ -16,31 +16,34 @@
         <div class="inner">
           <div class="pointWrap">
             <h2 class="ta-c mb20">포인트</h2>
+
+            <div class="input-group in-1 earn-rate-only">
+              <div class="in-box">
+                <span>포인트 적립율</span>
+                <input id="earnMileage" type="text" name="" />
+                <span>%</span>
+              </div>
+              <button id="pointInfoSave" class="btn-outline">저장</button>
+            </div>
+
             <div class="input-group in-1">
               <div class="in-box">
-                <input
-                  id="earnMileage"
-                  type="text"
-                  name=""
-                  placeholder="적립율%"
-                />
-                <span>연락처</span>
-              </div>
-              <div class="in-box">
-                <span>고객번호</span>
+                <span>고객번호 자리수</span>
                 <input
                   id="mileageNumber"
                   type="text"
                   name=""
                   placeholder="4-12"
                 />
+                <span>자리</span>
               </div>
               <div class="in-box">
-                <span>or 휴대번호</span>
+                <span>휴대번호 사용</span>
                 <input type="checkbox" id="isPhone" name="isPhone" />
               </div>
-              <button id="pointInfoSave" class="btn-outline">저장</button>
             </div>
+
+            <!-- 검색 영역은 그대로 -->
             <div class="input-group">
               <input
                 id="searchNumber"

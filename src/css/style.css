@@ -500,7 +500,7 @@ input[type="radio"]:checked::before {
 /* 내역 리스트 */
 .history {
   list-style: none;
-  padding: 0;
+  padding: 10px 5px;
   margin: 0;
   max-height: 500px;
   min-height: 380px;
@@ -873,11 +873,32 @@ noticeArea start
   min-height: auto;
 }
 
+.pointWrap .input-group.earn-rate-only .in-box input#earnMileage {
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
+  padding: 1rem 0.3rem;
+  text-align: center;
+}
+
+.pointWrap .input-group .in-box input#mileageNumber {
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
+  padding: 1rem 0.3rem;
+  text-align: center;
+}
+
+.pointWrap .in-box span {
+  width: 90px;
+  min-width: 90px;
+  display: inline-block;
+}
+
 /* 미리보기 이미지 배경색 */
 #logoPreview,
 #iconPreview {
-  margin-left: auto;
-  margin-right: auto;
-  display: block;
   background-color: white;
+  display: block;
+  margin: 10px auto;
 }
