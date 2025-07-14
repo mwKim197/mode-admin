@@ -247,14 +247,8 @@ async function setPointInfo() {
 
   const admin = await getUserData();
   const adminId = admin?.adminId;
-  const earnMileage = parseInt(
-    (document.getElementById("earnMileage") as HTMLInputElement).value,
-    10
-  );
-  const mileageNumber = parseInt(
-    (document.getElementById("mileageNumber") as HTMLInputElement).value,
-    10
-  );
+  const earnMileage = parseInt((document.getElementById("earnMileage") as HTMLInputElement).value, 10);
+  const mileageNumber = parseInt((document.getElementById("mileageNumber") as HTMLInputElement).value, 10);
   const isPhone = document.getElementById("isPhone") as HTMLInputElement;
 
     if (!earnMileage) {
@@ -262,8 +256,18 @@ async function setPointInfo() {
         return;
     }
 
+    if(100 < earnMileage) {
+        window.showToast("마일리지 적립률은 0~100 사이로 입력해주세요.", 2000, "warning");
+        return;
+    }
+
     if (!mileageNumber) {
         window.showToast("마일리지 적립 번호 자리수를 입력해주세요.", 2000, "warning");
+        return;
+    }
+
+    if(4 > mileageNumber || 12 < mileageNumber) {
+        window.showToast("마일리지 적립번호 자리수는 4-12자리 이내로 입력해주세요.", 2000, "warning");
         return;
     }
 
