@@ -282,8 +282,10 @@ async function getSalesList() {
       const response = await apiGet(apiUrl);
       const data = await response.json();
 
-      // 정렬 없이 그대로 사용
-      items = data.items || [];
+      // 총 건수 기준 내림차순 정렬 (많은 것이 위로)
+      items = (data.items || []).sort((a: any, b: any) => {
+        return (b.totalCount || 0) - (a.totalCount || 0);
+      });
 
       await renderSalesTable(items);
     }
@@ -711,7 +713,11 @@ async function updatePopupContent(rowIndex: number) {
     // 매장 정보 가져오기
     const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
     const userId = userInfo.userId;
-    let storeInfo = { storeName: "정보 없음", tel: "정보 없음" };
+    let storeInfo = {
+      storeName: "정보 없음",
+      tel: "정보 없음",
+      businessNo: "정보 없음",
+    };
 
     try {
       const storeResponse = await apiGet(
@@ -723,6 +729,7 @@ async function updatePopupContent(rowIndex: number) {
         storeInfo = {
           storeName: storeData.user.storeName || "정보 없음",
           tel: storeData.user.tel || "정보 없음",
+          businessNo: storeData.user.businessNo || "정보 없음",
         };
       }
     } catch (error) {
@@ -828,7 +835,7 @@ async function updatePopupContent(rowIndex: number) {
           </div>
           <div>
             <h5>사업자 등록번호</h5>
-            <p>추후등록예정</p>
+            <p>${storeInfo.businessNo}</p>
           </div>
         </li>
         <li>

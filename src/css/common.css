@@ -482,7 +482,7 @@ input[type="password"] {
   position: relative;
 }
 input[type="date"] {
-  width: 30%;
+  width: 35%;
   padding: 10px;
   color: rgb(84, 84, 84);
   border: 1px solid #ccc;
