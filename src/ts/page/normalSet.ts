@@ -178,6 +178,9 @@ async function saveStoreInfo() {
       "#storeNm"
     ) as HTMLInputElement;
     const telInput = document.querySelector("#tel-input") as HTMLInputElement;
+    const businessNoInput = document.getElementById(
+      "businessNo"
+    ) as HTMLInputElement; // 추가
     const remoteAddressInput = document.querySelector(
       "#remote-address"
     ) as HTMLInputElement;
@@ -209,6 +212,14 @@ async function saveStoreInfo() {
 
     // 매장 연락처가 수정되었는지 확인
     if (telInput && telInput.value !== originalUserData?.tel) {
+      hasChanges = true;
+    }
+
+    // 사업자등록번호가 수정되었는지 확인 (추가)
+    if (
+      businessNoInput &&
+      businessNoInput.value !== originalUserData?.businessNo
+    ) {
       hasChanges = true;
     }
 
@@ -288,6 +299,14 @@ async function saveStoreInfo() {
       // 매장 연락처 추가 (변경된 경우만)
       if (telInput && telInput.value !== originalUserData?.tel) {
         updateData.tel = telInput.value;
+      }
+
+      // 사업자등록번호 추가 (변경된 경우만) - 추가
+      if (
+        businessNoInput &&
+        businessNoInput.value !== originalUserData?.businessNo
+      ) {
+        updateData.businessNo = businessNoInput.value;
       }
 
       // 원격 주소 추가 (변경된 경우만)
