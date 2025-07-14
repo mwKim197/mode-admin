@@ -52,7 +52,9 @@ async function loadStoreInfo() {
       originalUserData = data.user as ModelUser;
 
       // 매장명 설정
-      const storeNameInput = document.getElementById("storeNm") as HTMLInputElement;
+      const storeNameInput = document.getElementById(
+        "storeNm"
+      ) as HTMLInputElement;
       if (storeNameInput) {
         storeNameInput.value = data.user.storeName || "";
       }
@@ -64,7 +66,9 @@ async function loadStoreInfo() {
       }
 
       // 매장 연락처 설정
-      const businessNo = document.getElementById("businessNo") as HTMLInputElement;
+      const businessNo = document.getElementById(
+        "businessNo"
+      ) as HTMLInputElement;
       if (businessNo) {
         businessNo.value = data.user.businessNo || "";
       }
@@ -171,7 +175,7 @@ async function saveStoreInfo() {
 
     // 폼 데이터 수집
     const storeNameInput = document.querySelector(
-      'input[name="player-id"]'
+      "#storeNm"
     ) as HTMLInputElement;
     const telInput = document.querySelector("#tel-input") as HTMLInputElement;
     const remoteAddressInput = document.querySelector(
