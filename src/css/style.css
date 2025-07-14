@@ -872,3 +872,12 @@ noticeArea start
   height: auto;
   min-height: auto;
 }
+
+/* 미리보기 이미지 배경색 */
+#logoPreview,
+#iconPreview {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  background-color: white;
+}
