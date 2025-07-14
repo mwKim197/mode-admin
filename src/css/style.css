@@ -894,3 +894,11 @@ noticeArea start
   min-width: 90px;
   display: inline-block;
 }
+
+/* 미리보기 이미지 배경색 */
+#logoPreview,
+#iconPreview {
+  background-color: white;
+  display: block;
+  margin: 10px auto;
+}
