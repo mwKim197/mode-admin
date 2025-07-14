@@ -2,6 +2,7 @@ export interface ModelUser {
   userId: string;
   storeName?: string;
   tel?: string;
+  businessNo?: string; // 추가
   earnMileage?: number;
   mileageNumber?: number;
   remoteAddress?: string;
