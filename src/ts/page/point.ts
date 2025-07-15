@@ -696,8 +696,14 @@ export function applyPhoneInputFormat(input: HTMLInputElement) {
 // 휴대폰 포멧
 function formatPhoneNumber(number: string): string {
     const cleaned = number.replace(/\D/g, "");
-    if (cleaned.length === 11) {
-        return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7)}`;
+
+    if (cleaned.startsWith("02")) {
+        if (cleaned.length === 9) return `${cleaned.slice(0, 2)}-${cleaned.slice(2, 5)}-${cleaned.slice(5)}`;
+        if (cleaned.length === 10) return `${cleaned.slice(0, 2)}-${cleaned.slice(2, 6)}-${cleaned.slice(6)}`;
     }
-    return cleaned; // 형식이 안 맞으면 그대로 반환
+
+    if (cleaned.length === 10) return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+    if (cleaned.length === 11) return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7)}`;
+
+    return cleaned;
 }
