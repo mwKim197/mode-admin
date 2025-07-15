@@ -43,14 +43,20 @@ export function handleImageUpload(
       const reader = new FileReader();
       reader.onload = () => {
         const dataUrl = reader.result as string;
-        previewEl.src = dataUrl; // ✅ 한글 깨짐 방지
+        const pureBase64 = dataUrl.replace(/^data:image\/[a-zA-Z]+;base64,/, ""); // ✅ prefix 제거
+
+        previewEl.src = dataUrl; // 미리보기는 prefix 포함
         previewEl.style.display = "block";
 
         if (fileNameEl) {
           fileNameEl.textContent = file.name;
         }
 
-        resolve({ base64: dataUrl, fileName: file.name, dataUrl });
+        resolve({
+          base64: pureBase64,          // ✅ prefix 제거한값
+          fileName: file.name,
+          dataUrl,                  // ✅ 동일 (alias)
+        });
       };
       reader.onerror = reject;
       reader.readAsDataURL(file);
