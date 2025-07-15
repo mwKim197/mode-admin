@@ -210,7 +210,7 @@ export async function initPoint() {
     }
 
     //--- 마일리지 삭제 세팅 ---//
-    getPointList();
+    await getPointList();
 }
 
 // 팝업 오픈
