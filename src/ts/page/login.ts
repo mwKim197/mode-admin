@@ -74,40 +74,45 @@ function handleKakaoLogin() {
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
     const autoLoginChecked = (document.getElementById("agree") as HTMLInputElement).checked;
 
+    let loginPopup: Window | null = null; // ✅ 전역 스코프에서 선언
+
+    const onMessage = (event: MessageEvent) => {
+        if (event.origin !== "https://zeroadmin.kr") return;
+
+        const { code } = event.data;
+        if (code) {
+            console.log("✅ 카카오 code 수신:", code);
+            window.removeEventListener("message", onMessage); // ✅ 중복 방지
+            loginPopup?.close(); // ✅ 팝업 닫기
+
+            fetch(`${API_URL}/model_admin_login?func=kakao-login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code }),
+            })
+                .then(response => response.json())
+                .then(async (body) => {
+                    if (body) {
+                        await handlePostLogin(body, autoLoginChecked);
+                    } else if (body.redirectUrl) {
+                        window.location.href = body.redirectUrl;
+                    } else {
+                        alert("카카오 로그인 실패. 다시 시도하세요.");
+                    }
+                })
+                .catch(error => {
+                    console.error("❌ 로그인 오류:", error);
+                });
+        }
+    };
+
     if (isMobile) {
         console.log("📱 모바일 환경 → 리디렉트 방식");
         window.location.href = kakaoAuthURL;
     } else {
         console.log("💻 PC 환경 → 팝업 로그인 사용");
-        const loginPopup = window.open(kakaoAuthURL, "kakaoLogin", "width=500,height=700");
-
-        window.addEventListener("message", (event) => {
-            if (event.origin !== "https://zeroadmin.kr") return;
-            const { code } = event.data;
-            if (code) {
-                loginPopup?.close();
-
-                fetch(`${API_URL}/model_admin_login?func=kakao-login`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ code }),
-                })
-                    .then(response => response.json())
-                    .then(async (body) => {
-                        if (body) {
-                            // 토큰 후 처리
-                            await handlePostLogin(body, autoLoginChecked);
-                        } else if (body.redirectUrl) {
-                            window.location.href = body.redirectUrl;
-                        } else {
-                            alert("카카오 로그인 실패. 다시 시도하세요.");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("❌ 로그인 오류:", error);
-                    });
-            }
-        });
+        loginPopup = window.open(kakaoAuthURL, "kakaoLogin", "width=500,height=700");
+        window.addEventListener("message", onMessage, { once: true }); // ✅ 한번만 실행
     }
 }
 
