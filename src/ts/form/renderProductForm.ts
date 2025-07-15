@@ -113,6 +113,10 @@ function applyMenuData(menu: any) {
   document.querySelectorAll<HTMLInputElement>('input[name="iceYn"]')
     .forEach(radio => radio.checked = radio.value === menu.iceYn);
 
+  // 일반상품 여부
+  document.querySelectorAll<HTMLInputElement>('input[name="cupYn"]')
+      .forEach(radio => radio.checked = radio.value === menu.cupYn);
+
   // 품절 여부
   document.querySelectorAll<HTMLInputElement>('input[name="empty"]')
     .forEach(radio => radio.checked = radio.value === menu.empty);
