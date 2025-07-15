@@ -75,22 +75,6 @@
 
   </body>
   <script>
-      document.addEventListener("DOMContentLoaded", function () {
-          $('.eyes').on('click', function () {
-              $(this).toggleClass('active');
-
-              const passwordField = $(this).closest('.password-container').find('#password');
-
-              if ($(this).hasClass('active')) {
-                  $(this).find('i').attr('class', "fa-regular fa-eye-slash");
-                  passwordField.attr('type', "text");
-              } else {
-                  $(this).find('i').attr('class', "fa-regular fa-eye");
-                  passwordField.attr('type', 'password');
-              }
-          });
-      });
-
       //-------- mouseCursor 이벤트 --------
       const cursor = document.querySelector(".custom-cursor");
 

@@ -342,7 +342,7 @@ async function renderTable(data: PointItem[]) {
                   }"></td>
                   <td>${index + 1 + (page - 1) * 10}</td>
                   <td>${formatPhoneNumber(item.mileageNo)}</td>
-                  <td>${Number(amount).toLocaleString()}원</td>
+                  <td>${Number(amount).toLocaleString()}p</td>
                   <td><button class="btn-delete" data-id="${
                     item.uniqueMileageNo
                   }">삭제</button></td>
@@ -372,14 +372,31 @@ async function renderTable(data: PointItem[]) {
           (document.getElementById("popupPassword") as HTMLInputElement).value =
             detail.password ?? "";
           (document.getElementById("popupMileage") as HTMLInputElement).value =
-            String(Number(amount).toLocaleString() ?? "0") + " 원";
+            String(Number(amount).toLocaleString() ?? "0") + "p";
           (document.getElementById("popupCount") as HTMLInputElement).value =
             "";
           (document.getElementById("popupAmount") as HTMLInputElement).value =
-            String(Number(amount).toLocaleString() ?? "0") + " 원";
+            String(Number(amount).toLocaleString() ?? "0") + "p";
           (document.getElementById("myTextarea") as HTMLInputElement).value =
             detail.note ?? "";
         });
+
+          const popupAmountInput = document.getElementById("popupAmount") as HTMLInputElement;
+
+          popupAmountInput.addEventListener("click", () => {
+              popupAmountInput.value = popupAmountInput.value.replace(/[^0-9]/g, '');
+          });
+
+          // 포커스 아웃 시 쉼표 + p 붙임
+          popupAmountInput.addEventListener("blur", () => {
+              const rawValue = popupAmountInput.value.replace(/[^0-9]/g, '');
+              if (rawValue) {
+                  popupAmountInput.value =
+                      Number(rawValue).toLocaleString() + 'p';
+              } else {
+                  popupAmountInput.value = '0p'; // 빈값이면 0p 표시
+              }
+          });
 
         const deleteBtn = tr.querySelector(".btn-delete") as HTMLButtonElement;
         deleteBtn.onclick = async () => {
@@ -481,9 +498,9 @@ async function savePoint(mode: PointMode) {
             return;
         }
 
-        if (pointStr) {
+        if (cleanPointStr) {
 
-            if (!/^\d+$/.test(pointStr)) {
+            if (!/^\d+$/.test(cleanPointStr)) {
                 window.showToast("포인트는 숫자만 입력해주세요.", 2000, "warning");
                 return;
             }
@@ -591,7 +608,7 @@ async function loadMileageHistory(point: PointItem, page = 1) {
               minute: "2-digit",
               second: "2-digit",
             })}</td>
-            <td>${Number(item.totalAmt ?? 0).toLocaleString()}원</td>
+            <td>${Number(item.totalAmt ?? 0).toLocaleString()}</td>
             <td>${item.points}p</td>
             <td>${Number(item.amount).toLocaleString()}p</td>
         `;
