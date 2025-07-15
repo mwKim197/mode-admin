@@ -456,19 +456,25 @@ async function savePoint(mode: PointMode) {
         const mileageNo = isPhone ? mileageNoRaw.replace(/-/g, "") : mileageNoRaw;
 
 
-        if (mode === "create") {
-            // 필수 필드 검사
-            if (!tel || !password || !pointStr) {
-                window.showToast("필수 항목을 모두 입력해주세요.", 2000, "warning");
-                return;
-            }
-        } else {
-            // 필수 필드 검사
-            if (!tel || !password) {
-                window.showToast("필수 항목을 모두 입력해주세요.", 2000, "warning");
-                return;
-            }
-        }
+      if (mode === "create") {
+
+          const item = tel ? (password ? (pointStr ? null: "포인트") : "패스워드") : "전화번호";
+
+          // 필수 필드 검사
+          if (item) {
+
+              window.showToast(`필수 항목 ${item} 를 입력해주세요.`, 2000, "warning");
+              return;
+          }
+      } else {
+          const item = tel ? (password ? null : "패스워드") : "전화번호";
+
+          // 필수 필드 검사
+          if (item) {
+              window.showToast(`필수 항목 ${item} 를 입력해주세요.`, 2000, "warning");
+              return;
+          }
+      }
 
         if (!/^\d+$/.test(password)) {
             window.showToast("비밀번호는 숫자만 입력해주세요.", 2000, "warning");
