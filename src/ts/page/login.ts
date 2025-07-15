@@ -81,33 +81,46 @@ function handleKakaoLogin() {
         console.log("💻 PC 환경 → 팝업 로그인 사용");
         const loginPopup = window.open(kakaoAuthURL, "kakaoLogin", "width=500,height=700");
 
-        window.addEventListener("message", (event) => {
+        const onMessage = async (event: MessageEvent) => {
             if (event.origin !== "https://zeroadmin.kr") return;
             const { code } = event.data;
-            if (code) {
-                loginPopup?.close();
+            if (!code) {
+                console.error("❌ 카카오 로그인 코드 없음");
+                alert("카카오 로그인 실패. 다시 시도하세요.");
+                return;
+            }
 
-                fetch(`${API_URL}/model_admin_login?func=kakao-login`, {
+            window.removeEventListener("message", onMessage); // ✅ 중복 방지
+            loginPopup?.close();
+
+            console.log("✅ 카카오 code 수신:", code);
+
+            try {
+                const response = await fetch(`${API_URL}/model_admin_login?func=kakao-login`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ code }),
-                })
-                    .then(response => response.json())
-                    .then(async (body) => {
-                        if (body) {
-                            // 토큰 후 처리
-                            await handlePostLogin(body, autoLoginChecked);
-                        } else if (body.redirectUrl) {
-                            window.location.href = body.redirectUrl;
-                        } else {
-                            alert("카카오 로그인 실패. 다시 시도하세요.");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("❌ 로그인 오류:", error);
-                    });
+                });
+
+                const body = await response.json();
+
+                if (response.ok && body.accessToken) {
+                    console.log("✅ 기존 사용자 로그인 성공");
+                    await handlePostLogin(body, autoLoginChecked);
+                } else if (response.ok && body.redirectUrl) {
+                    console.log("🆕 신규 사용자 → 연동 페이지 이동");
+                    window.location.href = body.redirectUrl;
+                } else {
+                    console.error("❌ 카카오 로그인 실패 응답:", body);
+                    alert("카카오 로그인 실패. 다시 시도하세요.");
+                }
+            } catch (error) {
+                console.error("❌ 카카오 로그인 요청 오류:", error);
+                alert("서버 오류가 발생했습니다. 다시 시도하세요.");
             }
-        });
+        };
+
+        window.addEventListener("message", onMessage, { once: true });
     }
 }
 

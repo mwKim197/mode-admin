@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>카카오 로그인 처리</title>
   <script>
     (function () {
@@ -12,22 +12,16 @@
       if (!code) {
         console.error("❌ 카카오 로그인 코드 없음");
         alert("카카오 로그인에 실패했습니다.");
-        window.location.href = "/html/log.html"; // 로그인 실패 시 메인 페이지로 이동
+        window.location.href = "/html/log.html";
         return;
       }
 
       if (window.opener && !window.opener.closed) {
-        console.log("✅ 팝업 창에서 로그인 완료 → 부모 창으로 code 전달");
-
-        // ✅ 부모 창으로 인증 코드 전달
+        console.log("✅ 팝업 → 부모창으로 code 전달");
         window.opener.postMessage({ code }, "https://zeroadmin.kr");
-
-        // ✅ 팝업 창 닫기
         window.close();
       } else {
-        // 📱 모바일 환경 → 로그인 요청 후 부모 창에서 처리하도록 메시지 전달
-        console.log("📱 모바일 환경 → 로그인 요청 후 부모 창에서 처리");
-
+        console.log("📱 모바일 → redirect 처리");
         fetch("https://api.narrowroad-model.com/model_admin_login?func=kakao-login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -37,21 +31,9 @@
                 .then(result => {
                   if (result.accessToken) {
                     localStorage.setItem("accessToken", result.accessToken);
-                    console.log("✅ 모바일 로그인 성공 → 토큰 저장 완료!");
-
-                    // ✅ 부모 창이 있으면 메시지 전달
-                    if (window.opener && !window.opener.closed) {
-                      window.opener.postMessage({ accessToken: result.accessToken }, "https://zeroadmin.kr/html/home.html");
-                    } else {
-                      window.location.href = "/html/home.html"; // 직접 이동
-                    }
+                    window.location.href = "/html/home.html";
                   } else if (result.redirectUrl) {
-                    console.log("✅ 신규 사용자 → 부모 창에서 연동 페이지 이동");
-                    if (window.opener && !window.opener.closed) {
-                      window.opener.postMessage({ redirectUrl: result.redirectUrl }, "https://zeroadmin.kr/html/link-account.html");
-                    } else {
-                      window.location.href = result.redirectUrl;
-                    }
+                    window.location.href = result.redirectUrl;
                   } else {
                     alert("카카오 로그인 실패. 다시 시도하세요.");
                     window.location.href = "/html/log.html";
@@ -66,7 +48,7 @@
     })();
   </script>
 </head>
-<body style="background-color: black; color: white;" >
+<body style="background-color: black; color: white;">
 <h1>카카오 로그인 중...</h1>
 </body>
 </html>
