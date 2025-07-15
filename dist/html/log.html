@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
     <script src="../public/js/jquery-3.6.0.js"></script> <!-- ✅ type="module" 추가-->
-  <script type="module" crossorigin src="../assets/main-6gfpM4k3.js"></script>
+  <script type="module" crossorigin src="../assets/main-DTM-IhdG.js"></script>
   <link rel="stylesheet" crossorigin href="../assets/main-B7wHyZZU.css">
   <link rel="stylesheet" crossorigin href="../assets/style-CchalFEw.css">
 </head>
@@ -74,22 +74,6 @@
 
   </body>
   <script>
-      document.addEventListener("DOMContentLoaded", function () {
-          $('.eyes').on('click', function () {
-              $(this).toggleClass('active');
-
-              const passwordField = $(this).closest('.password-container').find('#password');
-
-              if ($(this).hasClass('active')) {
-                  $(this).find('i').attr('class', "fa-regular fa-eye-slash");
-                  passwordField.attr('type', "text");
-              } else {
-                  $(this).find('i').attr('class', "fa-regular fa-eye");
-                  passwordField.attr('type', 'password');
-              }
-          });
-      });
-
       //-------- mouseCursor 이벤트 --------
       const cursor = document.querySelector(".custom-cursor");
 
