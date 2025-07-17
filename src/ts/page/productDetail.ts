@@ -119,6 +119,7 @@ export async function initProductDetail() {
   if (btnDrink) {
     btnDrink.addEventListener("click", () => {
       if (confirm("현재 설정으로 음료를 투출하시겠습니까?")) {
+        console.log("상품상세페이지 음료투출 - menu:", menu);
         sendMachineCommand("drink", menu);
       }
     });
