@@ -504,19 +504,10 @@ input[type="date"] {
   white-space: nowrap;
 }
 
-.inputWrap.St02 .data_input {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
 .inputWrap.St02 .data_input > p {
   width: 100%;
 }
-.inputWrap.St02 .data_input .in-box {
-  width: auto; /* span 공간을 줄이기 */
-  display: flex;
-  align-items: center;
-}
+
 .inputWrap.St02 .data_input .in-box p {
   width: auto;
 }
