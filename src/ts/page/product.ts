@@ -178,6 +178,18 @@ async function sendMachineCommand(func: string, data: any = {}) {
     func,
     userId: user.userId,
     ...(func === "order" ? { orderData: data.orderData } : {}),
+    ...(func === "drink" ? { orderData: { recipe: data } } : {}),
+    ...(func === "ice"
+      ? {
+          orderData: {
+            recipe: {
+              iceTime: data.iceTime,
+              waterTime: data.waterTime,
+              name: data.name,
+            },
+          },
+        }
+      : {}),
   };
 
   // ✅ 요청만 보내고 응답 기다리지 않음
@@ -215,50 +227,68 @@ function onAdminOder(el: HTMLElement) {
   }
 }
 
-// 팝업 관련 이벤트 리스너들
+// 팝업 닫기 공통 함수
+function closeAdminPopup() {
+  const popup = document.getElementById("adminActionPopup");
+  if (popup) {
+    popup.style.display = "none";
+  }
+}
+
+// 전체주문
 const btnPopupTotalOrder = document.getElementById("btnPopupTotalOrder");
 if (btnPopupTotalOrder) {
   btnPopupTotalOrder.addEventListener("click", () => {
     if (menu) {
       const data = transformToOrderData(menu);
       sendMachineCommand("order", data);
+      closeAdminPopup(); // 공통 함수 호출
+    }
+  });
+}
 
-      const popup = document.getElementById("adminActionPopup");
-      if (popup) {
-        popup.style.display = "none";
+// 컵 배출
+const btnCupDispense = document.getElementById("btnCupDispense");
+if (btnCupDispense) {
+  btnCupDispense.addEventListener("click", () => {
+    if (menu) {
+      const cupType = menu.cup;
+      if (cupType === "plastic") {
+        if (confirm("플라스틱 컵을 배출하시겠습니까?")) {
+          sendMachineCommand("pl");
+          closeAdminPopup(); // 공통 함수 호출
+        }
+      } else if (cupType === "paper") {
+        if (confirm("종이컵을 배출하시겠습니까?")) {
+          sendMachineCommand("pa");
+          closeAdminPopup(); // 공통 함수 호출
+        }
       }
     }
   });
 }
 
-// 플라스틱 컵 배출 - 올바른 id로 수정
-const btnPopupPlasticCup = document.getElementById("btnPlasticCup");
-if (btnPopupPlasticCup) {
-  btnPopupPlasticCup.addEventListener("click", () => {
-    if (confirm("플라스틱 컵을 배출하시겠습니까?")) {
-      sendMachineCommand("pl");
+// 얼음/물 배출
+const btnIceWaterDispense = document.getElementById("btnIceWaterDispense");
+if (btnIceWaterDispense) {
+  btnIceWaterDispense.addEventListener("click", () => {
+    if (menu) {
+      if (confirm("얼음/물을 배출하시겠습니까?")) {
+        sendMachineCommand("ice", menu);
+        closeAdminPopup(); // 공통 함수 호출
+      }
     }
   });
 }
 
-// 종이컵 배출
-const btnPopupPaperCup = document.getElementById("btnPopupPaperCup");
-if (btnPopupPaperCup) {
-  btnPopupPaperCup.addEventListener("click", () => {
-    if (confirm("종이컵을 배출하시겠습니까?")) {
-      sendMachineCommand("pa");
-    }
-  });
-}
-
-// 음료 투출 - 전체주문과 동일한 방식으로 수정
+// 음료 투출
 const btnPopupDrinkOrder = document.getElementById("btnPopupDrinkOrder");
 if (btnPopupDrinkOrder) {
   btnPopupDrinkOrder.addEventListener("click", () => {
     if (confirm("현재 설정으로 음료를 투출하시겠습니까?")) {
       if (menu) {
-        console.log("상품페이지 음료투출 - menu:", menu);
         sendMachineCommand("drink", menu);
+        closeAdminPopup(); // 공통 함수 호출
       }
     }
   });

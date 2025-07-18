@@ -94,7 +94,8 @@ input,
 
 /* text */
 .fs14 {
-  font-size: 1.4rem;
+  font-size: 1.6rem;
+  margin-bottom: 2rem;
 }
 .ta-c {
   text-align: center;
@@ -1024,7 +1025,7 @@ section.mt80.pb20 .in-box input[type="text"] {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-
+  padding: 2rem;
   border-radius: 10px;
   min-width: 300px;
 }

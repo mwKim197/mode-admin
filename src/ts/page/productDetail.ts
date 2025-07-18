@@ -93,63 +93,6 @@ export async function initProductDetail() {
       }
     });
   }
-
-  // 플라스틱 컵 배출
-  const btnPlastic = document.getElementById("btnPlasticCup");
-  if (btnPlastic) {
-    btnPlastic.addEventListener("click", () => {
-      if (confirm("플라스틱 컵을 배출하시겠습니까?")) {
-        sendMachineCommand("pl");
-      }
-    });
-  }
-
-  // 종이컵 배출
-  const btnPaper = document.getElementById("btnPaperCup");
-  if (btnPaper) {
-    btnPaper.addEventListener("click", () => {
-      if (confirm("종이컵을 배출하시겠습니까?")) {
-        sendMachineCommand("pa");
-      }
-    });
-  }
-
-  // 음료 투출
-  const btnDrink = document.getElementById("btnDrinkOrder");
-  if (btnDrink) {
-    btnDrink.addEventListener("click", () => {
-      if (confirm("현재 설정으로 음료를 투출하시겠습니까?")) {
-        console.log("상품상세페이지 음료투출 - menu:", menu);
-        sendMachineCommand("drink", menu);
-      }
-    });
-  }
-}
-
-async function sendMachineCommand(func: string, data: any = {}) {
-  const user = getStoredUser();
-  if (!user) {
-    window.showToast(`❌ 사용자 정보가 없습니다.`, 3000, "error");
-    return;
-  }
-  const payload = {
-    func,
-    userId: user.userId,
-    ...(func === "order" ? { orderData: { recipe: data } } : {}),
-  };
-
-  // ✅ 요청만 보내고 응답 기다리지 않음
-  apiPost("/model_machine_controll", payload)
-    .then(() => {
-      window.showToast(`${func} 명령 전송 완료`);
-    })
-    .catch((err) => {
-      console.error(`❌ ${func} 명령 전송 실패:`, err);
-      window.showToast(`❌ ${func} 명령 전송 실패: ${err} `, 3000, "error");
-    });
-
-  // ✅ 바로 UI 알림
-  window.showToast(`${func} 명령 전송`);
 }
 
 // ✅ URL 파라미터 추출
