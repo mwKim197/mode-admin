@@ -53,9 +53,13 @@ export function initProduct() {
           </label>
         </td>
         <td>
-          <span class="tag blue" data-menu='${encodeURIComponent(
-            JSON.stringify(item)
-          )}' onclick="onAdminOder(this)">제조</span>
+          ${
+            item.cupYn === "yes"
+              ? '<span class="tag gray disabled">제조</span>'
+              : `<span class="tag blue" data-menu='${encodeURIComponent(
+                  JSON.stringify(item)
+                )}' onclick="onAdminOder(this)">제조</span>`
+          }
           <span class="tag red" onclick="onDeleteClick(${
             item.menuId
           }, event)">삭제</span>
@@ -303,3 +307,5 @@ if (popup) {
     }
   });
 }
+
+(window as any).closeAdminPopup = closeAdminPopup;
