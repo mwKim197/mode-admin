@@ -86,6 +86,72 @@ export async function initProductAdd() {
         }
       }
     });
+
+    // 얼음 Yes/No 선택에 따른 시간 입력 박스 표시/숨김
+    const iceRadios = document.querySelectorAll('input[name="iceYn"]');
+    const timeInputBox = document.getElementById(
+      "ice-water-time-box"
+    ) as HTMLElement;
+
+    function toggleTimeInputs() {
+      const selectedValue = (
+        document.querySelector(
+          'input[name="iceYn"]:checked'
+        ) as HTMLInputElement
+      )?.value;
+
+      if (timeInputBox) {
+        timeInputBox.style.display = selectedValue === "no" ? "none" : "block";
+      }
+    }
+
+    // 라디오 버튼 변경 시 이벤트 리스너
+    iceRadios.forEach((radio) => {
+      radio.addEventListener("change", toggleTimeInputs);
+    });
+
+    // 페이지 로드 시 초기 상태 설정
+    toggleTimeInputs();
+
+    // 일반상품/음료상품 선택에 따른 관련 요소들 표시/숨김
+    const cupRadios = document.querySelectorAll('input[name="cupYn"]');
+    const itemsContainer = document.getElementById(
+      "items-container"
+    ) as HTMLElement;
+    const cupIceSelectionBox = document.getElementById(
+      "cup-ice-selection-box"
+    ) as HTMLElement;
+    const iceWaterTimeBox = document.getElementById(
+      "ice-water-time-box"
+    ) as HTMLElement;
+
+    function toggleDrinkRelatedElements() {
+      const selectedValue = (
+        document.querySelector(
+          'input[name="cupYn"]:checked'
+        ) as HTMLInputElement
+      )?.value;
+
+      const shouldHide = selectedValue === "yes"; // 일반상품일 때 숨김
+
+      if (itemsContainer) {
+        itemsContainer.style.display = shouldHide ? "none" : "block";
+      }
+      if (cupIceSelectionBox) {
+        cupIceSelectionBox.style.display = shouldHide ? "none" : "block";
+      }
+      if (iceWaterTimeBox) {
+        iceWaterTimeBox.style.display = shouldHide ? "none" : "block";
+      }
+    }
+
+    // 라디오 버튼 변경 시 이벤트 리스너
+    cupRadios.forEach((radio) => {
+      radio.addEventListener("change", toggleDrinkRelatedElements);
+    });
+
+    // 페이지 로드 시 초기 상태 설정
+    toggleDrinkRelatedElements();
   }
 }
 
