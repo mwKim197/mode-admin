@@ -39,7 +39,7 @@
           <!-- 이미지 업로드 -->
           <div class="boxStyle gr mb20">
             <div class="set-box">
-              <p class="ta-c">300X300</p>
+              <p class="ta-c">600X600</p>
               <input
                 type="file"
                 id="logoUpload"
@@ -138,9 +138,38 @@
               </div>
             </div>
           </div>
-
-          <!-- 컵 / 얼음 선택 -->
+          <!-- 품절여부, 일반상품여부 -->
           <div class="boxStyle gr mb20">
+            <div class="radioBox">
+              <div class="details St02">
+                <p>품절여부</p>
+                <div class="radio-group">
+                  <label
+                    ><input type="radio" name="empty" value="yes" /> Yes</label
+                  >
+                  <label
+                    ><input type="radio" name="empty" value="no" checked />
+                    No</label
+                  >
+                </div>
+              </div>
+              <div class="details St02">
+                <p>일반상품여부</p>
+                <div class="radio-group">
+                  <label
+                    ><input type="radio" name="cupYn" value="yes" />
+                    일반상품</label
+                  >
+                  <label
+                    ><input type="radio" name="cupYn" value="no" checked />
+                    음료상품</label
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 컵 / 얼음 선택 -->
+          <div class="boxStyle gr mb20" id="cup-ice-selection-box">
             <div class="radioBox">
               <div class="details St02">
                 <p>컵</p>
@@ -171,7 +200,7 @@
           </div>
 
           <!-- 시간 입력 -->
-          <div class="boxStyle gr mb20">
+          <div class="boxStyle gr mb20" id="ice-water-time-box">
             <div class="input-group col">
               <div>
                 <p class="fs14">얼음 시간</p>
@@ -219,35 +248,6 @@
           </div>
 
           <!-- 품절 여부, 일반 상품 여부 (옵션에 따라 수정 필요 시 활용 가능) -->
-          <div class="boxStyle gr mb20">
-            <div class="radioBox">
-              <div class="details St02">
-                <p>품절여부</p>
-                <div class="radio-group">
-                  <label
-                    ><input type="radio" name="empty" value="yes" /> Yes</label
-                  >
-                  <label
-                    ><input type="radio" name="empty" value="no" checked />
-                    No</label
-                  >
-                </div>
-              </div>
-              <div class="details St02">
-                <p>일반상품여부</p>
-                <div class="radio-group">
-                  <label
-                    ><input type="radio" name="cupYn" value="yes" />
-                    일반상품</label
-                  >
-                  <label
-                    ><input type="radio" name="cupYn" value="no" checked />
-                    음료상품</label
-                  >
-                </div>
-              </div>
-            </div>
-          </div>
 
           <!-- 아이템 영역 -->
           <div id="items-container"></div>
