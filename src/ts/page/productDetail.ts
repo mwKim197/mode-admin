@@ -1,57 +1,59 @@
-// productDetail.ts
-import { renderProductForm } from "../form/renderProductForm.ts";
-import { getStoredUser } from "../utils/userStorage.ts";
-import { apiGet, apiPost, apiPut } from "../api/apiHelpers.ts";
-import { MenuDetail, MenuItemIngredient, MenuState } from "../types/product.ts";
-import { handleImageUpload } from "../utils/imageUploader.ts";
-import {
-  validateMenuDetail,
-  validateMenuItemsByType,
-} from "../utils/validation.ts";
+import {renderProductForm} from "../form/renderProductForm.ts";
+import {getStoredUser} from "../utils/userStorage.ts";
+import {apiGet, apiPost, apiPut} from "../api/apiHelpers.ts";
+import {MenuDetail, MenuItemIngredient, MenuState} from "../types/product.ts";
+import {handleImageUpload} from "../utils/imageUploader.ts";
+import {validateMenuDetail, validateMenuItemsByType} from "../utils/validation.ts";
 
 // 이미지 파일정보
 let uploadedImageBase64: string;
 let uploadedFileName: string;
 
 export async function initProductDetail() {
-  const menuId = getParamId("menuId");
-  if (!menuId) return;
+    const menuId = getParamId("menuId");
+    if (!menuId) return;
 
-  const user = getStoredUser();
+    const user = getStoredUser();
 
-  if (!user) {
-    window.showToast("사용자 정보가 없습니다.", 3000, "warning");
-    return;
-  }
-
-  const menuRes = await apiGet(
-    `/model_admin_menu?userId=${user.userId}&menuId=${menuId}&func=get-menu-by-id`
-  );
-  const menu = await menuRes.json();
-
-  await renderProductForm(menu); // 수정용 렌더링
-
-  const logoUpload = document.getElementById("logoUpload") as HTMLInputElement;
-
-  logoUpload.addEventListener("change", async (e) => {
-    await setImage(e);
-  });
-
-  // 저장버튼
-  const saveBtn = document.getElementById("saveDtlBtn") as HTMLInputElement;
-
-  if (saveBtn) {
-    saveBtn.addEventListener("click", async () => {
-      const updatedPayload = collectMenuDetail(user.userId);
-
-      const validateChk = validateMenuDetail(updatedPayload);
-
-      if (validateChk) {
-        window.showToast(validateChk, 3000, "warning");
+    if (!user) {
+        window.showToast("사용자 정보가 없습니다.", 3000, "warning");
         return;
-      }
+    }
 
-      const itemsValidate = validateMenuItemsByType(updatedPayload);
+
+    const menuRes = await apiGet(`/model_admin_menu?userId=${user.userId}&menuId=${menuId}&func=get-menu-by-id`);
+    const menu = await menuRes.json();
+
+
+    await renderProductForm(menu); // 수정용 렌더링
+
+    const logoUpload = document.getElementById("logoUpload") as HTMLInputElement;
+
+
+    logoUpload.addEventListener("change", async (e) => {
+        await setImage(e);
+
+    });
+
+
+    // 저장버튼
+    const saveBtn = document.getElementById("saveDtlBtn") as HTMLInputElement;
+
+    if (saveBtn) {
+
+        saveBtn.addEventListener("click", async () => {
+            const updatedPayload = collectMenuDetail(user.userId);
+
+
+            const validateChk = validateMenuDetail(updatedPayload);
+
+            if (validateChk) {
+                window.showToast(validateChk, 3000, "warning");
+                return;
+            }
+
+            const itemsValidate = validateMenuItemsByType(updatedPayload);
+
 
       if (itemsValidate) {
         window.showToast(itemsValidate, 3000, "warning");
@@ -95,39 +97,39 @@ export async function initProductDetail() {
   }
 }
 
+
 // ✅ URL 파라미터 추출
 function getParamId(key: string): string | null {
-  const params = new URLSearchParams(window.location.search);
-  return params.get(key);
+    const params = new URLSearchParams(window.location.search);
+    return params.get(key);
 }
 
 // 이미지 설정
 async function setImage(e: any) {
-  const input = e.target as HTMLInputElement;
-  const preview = document.getElementById("logoPreview") as HTMLImageElement;
-  const fileNameEl = document.getElementById("fileName");
 
-  if (!fileNameEl) {
-    window.showToast(`에러발생`, 3000, "error");
-    return;
-  }
+    const input = e.target as HTMLInputElement;
+    const preview = document.getElementById("logoPreview") as HTMLImageElement;
+    const fileNameEl = document.getElementById("fileName");
 
-  try {
-    const { base64, fileName } = await handleImageUpload(
-      input,
-      preview,
-      fileNameEl
-    );
-    uploadedImageBase64 = base64;
-    uploadedFileName = fileName;
-  } catch (err) {
-    window.showToast(`이미지 업로드 실패: ${err}`, 3000, "warning");
-    console.warn("이미지 업로드 실패:", err);
-  }
+    if (!fileNameEl) {
+        window.showToast(`에러발생`, 3000, "error");
+        return;
+    }
+
+    try {
+        const {base64, fileName} = await handleImageUpload(input, preview, fileNameEl);
+        uploadedImageBase64 = base64;
+        uploadedFileName = fileName;
+    } catch (err) {
+        window.showToast(`이미지 업로드 실패: ${err}`, 3000, "warning");
+        console.warn("이미지 업로드 실패:", err);
+    }
+
 }
 
 // 저장 데이터
 function collectMenuDetail(userId: string): MenuDetail {
+
   const menuId = Number(getParamId("menuId") || "0"); // 또는 기존값 사용
   const no = Number(
     (document.getElementById("menu-no") as HTMLInputElement).value
@@ -216,4 +218,5 @@ function collectMenuDetail(userId: string): MenuDetail {
     state,
     items,
   };
+
 }
