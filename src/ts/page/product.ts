@@ -307,3 +307,5 @@ if (popup) {
     }
   });
 }
+
+(window as any).closeAdminPopup = closeAdminPopup;
