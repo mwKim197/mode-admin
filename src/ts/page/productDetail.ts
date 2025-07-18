@@ -1,6 +1,6 @@
 import {renderProductForm} from "../form/renderProductForm.ts";
 import {getStoredUser} from "../utils/userStorage.ts";
-import {apiGet, apiPost, apiPut} from "../api/apiHelpers.ts";
+import {apiGet, apiPut} from "../api/apiHelpers.ts";
 import {MenuDetail, MenuItemIngredient, MenuState} from "../types/product.ts";
 import {handleImageUpload} from "../utils/imageUploader.ts";
 import {validateMenuDetail, validateMenuItemsByType} from "../utils/validation.ts";
@@ -55,46 +55,47 @@ export async function initProductDetail() {
             const itemsValidate = validateMenuItemsByType(updatedPayload);
 
 
-      if (itemsValidate) {
-        window.showToast(itemsValidate, 3000, "warning");
-        return;
-      }
+            if (itemsValidate) {
+                window.showToast(itemsValidate, 3000, "warning");
+                return;
+            }
 
-      // 이미지 추가의 경우
-      const payload = {
-        ...updatedPayload,
-        ...(uploadedImageBase64 &&
-          uploadedFileName && {
-            originalFileName: uploadedFileName,
-            imageBase64: uploadedImageBase64,
-          }),
-      };
+            // 이미지 추가의 경우
+            const payload = {
+                ...updatedPayload,
+                ...(uploadedImageBase64 &&
+                    uploadedFileName && {
+                        originalFileName: uploadedFileName,
+                        imageBase64: uploadedImageBase64,
+                    }),
+            };
 
-      if (confirm("수정사항을 저장하시겠습니까?")) {
-        const putData = {
-          userId: user.userId,
-          updatedData: payload,
-        };
-        try {
-          const res = await apiPut(
-            `/model_admin_menu?func=put-update-menu`,
-            putData
-          );
+            if (confirm("수정사항을 저장하시겠습니까?")) {
+                const putData = {
+                    userId: user.userId,
+                    updatedData: payload,
+                };
+                try {
+                    const res = await apiPut(
+                        `/model_admin_menu?func=put-update-menu`,
+                        putData
+                    );
 
-          if (!res.ok) {
-            window.showToast(`수정사항 저장에 실패하였습니다.`, 3000, "error");
-            return;
-          } else {
-            window.showToast(`수정사항 저장완료.`);
-            // 저장 성공 후 product 페이지로 이동
-            setTimeout(() => {
-              window.location.href = "/html/product.html";
-            }, 1000);
-          }
-        } catch (e) {}
-      }
-    });
-  }
+                    if (!res.ok) {
+                        window.showToast(`수정사항 저장에 실패하였습니다.`, 3000, "error");
+                        return;
+                    } else {
+                        window.showToast(`수정사항 저장완료.`);
+                        // 저장 성공 후 product 페이지로 이동
+                        setTimeout(() => {
+                            window.location.href = "/html/product.html";
+                        }, 1000);
+                    }
+                } catch (e) {
+                }
+            }
+        });
+    }
 }
 
 
@@ -130,93 +131,93 @@ async function setImage(e: any) {
 // 저장 데이터
 function collectMenuDetail(userId: string): MenuDetail {
 
-  const menuId = Number(getParamId("menuId") || "0"); // 또는 기존값 사용
-  const no = Number(
-    (document.getElementById("menu-no") as HTMLInputElement).value
-  );
-  const name = (document.getElementById("menu-name") as HTMLInputElement).value;
-  const price = (
-    document.getElementById("menu-price") as HTMLInputElement
-  ).value.trim();
-  const category = (
-    document.getElementById("menu-category") as HTMLSelectElement
-  ).value;
-  const cupYn =
-    (document.querySelector('input[name="cupYn"]:checked') as HTMLInputElement)
-      ?.value || "no";
-  const cup =
-    (document.querySelector('input[name="cup"]:checked') as HTMLInputElement)
-      ?.value || "";
-  const iceYn =
-    (document.querySelector('input[name="iceYn"]:checked') as HTMLInputElement)
-      ?.value || "";
-  const empty =
-    (document.querySelector('input[name="empty"]:checked') as HTMLInputElement)
-      ?.value || "";
-  const iceTime = (
-    document.getElementById("ice-time") as HTMLInputElement
-  ).value.trim();
-  const waterTime = (
-    document.getElementById("water-time") as HTMLInputElement
-  ).value.trim();
-
-  const image = ""; // 이미지 경로는 별도 처리
-
-  const state: MenuState = {
-    best: (document.getElementById("state-best") as HTMLSelectElement).value,
-    event: (document.getElementById("state-event") as HTMLSelectElement).value,
-    new: (document.getElementById("state-new") as HTMLSelectElement).value,
-  };
-
-  const items: MenuItemIngredient[] = Array.from(
-    document.querySelectorAll(".item")
-  ).map((itemEl, index) => {
-    const type =
-      (itemEl.querySelector(".item-type-select") as HTMLSelectElement)?.value ||
-      "";
-    const inputs = itemEl.querySelectorAll("input");
-
-    const value1 = String(
-      parseFloat((inputs[0] as HTMLInputElement)?.value || "0")
+    const menuId = Number(getParamId("menuId") || "0"); // 또는 기존값 사용
+    const no = Number(
+        (document.getElementById("menu-no") as HTMLInputElement).value
     );
-    const value2 = String(
-      parseFloat((inputs[1] as HTMLInputElement)?.value || "0")
-    );
-    const value3 = String(
-      parseFloat((inputs[2] as HTMLInputElement)?.value || "0")
-    );
+    const name = (document.getElementById("menu-name") as HTMLInputElement).value;
+    const price = (
+        document.getElementById("menu-price") as HTMLInputElement
+    ).value.trim();
+    const category = (
+        document.getElementById("menu-category") as HTMLSelectElement
+    ).value;
+    const cupYn =
+        (document.querySelector('input[name="cupYn"]:checked') as HTMLInputElement)
+            ?.value || "no";
+    const cup =
+        (document.querySelector('input[name="cup"]:checked') as HTMLInputElement)
+            ?.value || "";
+    const iceYn =
+        (document.querySelector('input[name="iceYn"]:checked') as HTMLInputElement)
+            ?.value || "";
+    const empty =
+        (document.querySelector('input[name="empty"]:checked') as HTMLInputElement)
+            ?.value || "";
+    const iceTime = (
+        document.getElementById("ice-time") as HTMLInputElement
+    ).value.trim();
+    const waterTime = (
+        document.getElementById("water-time") as HTMLInputElement
+    ).value.trim();
 
-    const value4 =
-      type === "garucha"
-        ? "0"
-        : String(parseFloat((inputs[3] as HTMLInputElement)?.value || "0"));
+    const image = ""; // 이미지 경로는 별도 처리
+
+    const state: MenuState = {
+        best: (document.getElementById("state-best") as HTMLSelectElement).value,
+        event: (document.getElementById("state-event") as HTMLSelectElement).value,
+        new: (document.getElementById("state-new") as HTMLSelectElement).value,
+    };
+
+    const items: MenuItemIngredient[] = Array.from(
+        document.querySelectorAll(".item")
+    ).map((itemEl, index) => {
+        const type =
+            (itemEl.querySelector(".item-type-select") as HTMLSelectElement)?.value ||
+            "";
+        const inputs = itemEl.querySelectorAll("input");
+
+        const value1 = String(
+            parseFloat((inputs[0] as HTMLInputElement)?.value || "0")
+        );
+        const value2 = String(
+            parseFloat((inputs[1] as HTMLInputElement)?.value || "0")
+        );
+        const value3 = String(
+            parseFloat((inputs[2] as HTMLInputElement)?.value || "0")
+        );
+
+        const value4 =
+            type === "garucha"
+                ? "0"
+                : String(parseFloat((inputs[3] as HTMLInputElement)?.value || "0"));
+
+        return {
+            no: String(index + 1),
+            type,
+            value1,
+            value2,
+            value3,
+            value4,
+        };
+    });
 
     return {
-      no: String(index + 1),
-      type,
-      value1,
-      value2,
-      value3,
-      value4,
+        userId,
+        menuId,
+        no,
+        name,
+        price,
+        category,
+        cupYn,
+        cup,
+        empty,
+        iceYn,
+        iceTime,
+        waterTime,
+        image,
+        state,
+        items,
     };
-  });
-
-  return {
-    userId,
-    menuId,
-    no,
-    name,
-    price,
-    category,
-    cupYn,
-    cup,
-    empty,
-    iceYn,
-    iceTime,
-    waterTime,
-    image,
-    state,
-    items,
-  };
 
 }
