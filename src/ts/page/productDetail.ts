@@ -105,8 +105,25 @@ export async function initProductDetail() {
         ) as HTMLInputElement
       )?.value;
 
+      // 일반상품인지 확인
+      const cupYnValue = (
+        document.querySelector(
+          'input[name="cupYn"]:checked'
+        ) as HTMLInputElement
+      )?.value;
+
+      const timeInputBox = document.getElementById(
+        "ice-water-time-box"
+      ) as HTMLElement;
+
       if (timeInputBox) {
-        timeInputBox.style.display = selectedValue === "no" ? "none" : "block";
+        // 일반상품이면 무조건 숨김, 음료상품이면 얼음 여부에 따라 결정
+        if (cupYnValue === "yes") {
+          timeInputBox.style.display = "none"; // 일반상품일 때는 무조건 숨김
+        } else {
+          timeInputBox.style.display =
+            selectedValue === "no" ? "none" : "block";
+        }
       }
     }
 
@@ -130,33 +147,46 @@ export async function initProductDetail() {
       "ice-water-time-box"
     ) as HTMLElement;
 
-    function toggleDrinkRelatedElements() {
-      const selectedValue = (
+    function toggleAllElements() {
+      const cupYnValue = (
         document.querySelector(
           'input[name="cupYn"]:checked'
         ) as HTMLInputElement
       )?.value;
+      const iceValue = (
+        document.querySelector(
+          'input[name="iceYn"]:checked'
+        ) as HTMLInputElement
+      )?.value;
 
-      const shouldHide = selectedValue === "yes"; // 일반상품일 때 숨김
+      const shouldHideForGeneral = cupYnValue === "yes"; // 일반상품일 때
 
+      // 각 요소들 제어
       if (itemsContainer) {
-        itemsContainer.style.display = shouldHide ? "none" : "block";
+        itemsContainer.style.display = shouldHideForGeneral ? "none" : "block";
       }
       if (cupIceSelectionBox) {
-        cupIceSelectionBox.style.display = shouldHide ? "none" : "block";
+        cupIceSelectionBox.style.display = shouldHideForGeneral
+          ? "none"
+          : "block";
       }
       if (iceWaterTimeBox) {
+        // 일반상품이면 무조건 숨김, 음료상품이면 얼음 No일 때만 숨김
+        const shouldHide = shouldHideForGeneral || iceValue === "no";
         iceWaterTimeBox.style.display = shouldHide ? "none" : "block";
       }
     }
 
-    // 라디오 버튼 변경 시 이벤트 리스너
+    // cupYn 라디오 버튼 변경 시 이벤트 리스너
     cupRadios.forEach((radio) => {
-      radio.addEventListener("change", toggleDrinkRelatedElements);
+      radio.addEventListener("change", () => {
+        toggleAllElements();
+        toggleTimeInputs(); // ✅ 이 줄 추가!
+      });
     });
 
     // 페이지 로드 시 초기 상태 설정
-    toggleDrinkRelatedElements();
+    toggleAllElements();
   }
 
   // ✅ URL 파라미터 추출
