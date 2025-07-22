@@ -1,5 +1,39 @@
 @charset "utf-8";
 
+.table-fixed th:nth-child(1),
+.table-fixed td:nth-child(1) {
+    width: 42px;
+}
+
+.table-fixed th:nth-child(2),
+.table-fixed td:nth-child(2) {
+    width: 58px;
+}
+
+.table-fixed th:nth-child(3),
+.table-fixed td:nth-child(3) {
+    width: 120px;
+}
+
+.table-fixed th:nth-child(4),
+.table-fixed td:nth-child(4) {
+    width: 53px;
+}
+
+.table-fixed th:nth-child(5),
+.table-fixed td:nth-child(5) {
+    width: 48px;
+}
+
+.table-fixed th:nth-child(6),
+.table-fixed td:nth-child(6) {
+    width: 80px;
+}
+
+.table-fixed {
+    table-layout: fixed;
+}
+
 .product-page table {
     table-layout: fixed;
     width: 100%;
@@ -21,14 +55,14 @@
     display: block;
     max-height: 60vh; /* 원하는 높이 */
     overflow-y: auto;
-    width: 100%;
+    overflow-x: auto; /* ✅ 가로 스크롤 추가 */
+    width: max-content; /* ✅ 내용 길이에 따라 가로 길이 맞춤 */
+    min-width: 100%; /* ✅ 최소한 테이블 폭 채움 */
 }
-
 
 .product-name {
     white-space: normal;
     word-break: break-all;
-    max-width: 120px;
     font-size: 0.875rem; /* text-sm */
 }
 

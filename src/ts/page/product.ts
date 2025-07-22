@@ -35,15 +35,15 @@ export function initProduct() {
 
                 return `
       <tr>
-        <td style="width:42px">${item.no}</td>
-        <td style="width:65px; text-align: center;"><img src="${imageUrl}" alt="상품 이미지" style="width:36px;height:46px; object-fit:cover;display: inline-block;"></td>
-        <td style="width:120px" class="product-name whitespace-normal break-all text-sm" onclick="window.location.href='./product-detail.html?menuId=${
+        <td >${item.no}</td>
+        <td style="text-align: center;"><img src="${imageUrl}" alt="상품 이미지" style="width:36px;height:46px; object-fit:cover;display: inline-block;"></td>
+        <td class="product-name whitespace-normal break-all text-sm" onclick="window.location.href='./product-detail.html?menuId=${
                     item.menuId
                 }'">
           ${item.name}
         </td>
-        <td style="width:53px">${Number(item.price).toLocaleString()}</td>
-        <td style="width:47px">
+        <td>${Number(item.price).toLocaleString()}</td>
+        <td>
           <label class="toggle-switch">
             <input
               type="checkbox"
@@ -52,7 +52,7 @@ export function initProduct() {
             <span class="slider"></span>
           </label>
         </td>
-        <td style="width:80px">
+        <td>
           ${
                     item.cupYn === "yes"
                         ? '<span class="tag gray disabled">제조</span>'
