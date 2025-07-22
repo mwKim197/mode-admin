@@ -1,12 +1,15 @@
 import { getStoredUser } from "../utils/userStorage.ts";
 import { apiGet } from "../api/apiHelpers.ts";
-import {createItemBlock} from "../components/ItemBlock.ts";
+import { createItemBlock } from "../components/ItemBlock.ts";
 
 const logoPreview = document.getElementById("logoPreview") as HTMLImageElement;
 const BASE_URL = "/img/"; // 예: "/img/new1.png"
 
 // 상태별 업데이트 함수
-function updateOverlay(selectEl: HTMLSelectElement, overlayEl: HTMLImageElement) {
+function updateOverlay(
+  selectEl: HTMLSelectElement,
+  overlayEl: HTMLImageElement
+) {
   const val = selectEl.value;
   if (val) {
     overlayEl.src = `${BASE_URL}${val}.png`;
@@ -16,13 +19,16 @@ function updateOverlay(selectEl: HTMLSelectElement, overlayEl: HTMLImageElement)
   }
 }
 
-function attachStateChangeHandler(stateEl: HTMLSelectElement, overlayEl: HTMLImageElement) {
+function attachStateChangeHandler(
+  stateEl: HTMLSelectElement,
+  overlayEl: HTMLImageElement
+) {
   stateEl.addEventListener("change", () => {
     const src = logoPreview?.src || "";
     const isImageSelected =
-        src.startsWith("blob:") ||
-        src.startsWith("data:") ||
-        src.includes("s3.ap-northeast-2.amazonaws.com");
+      src.startsWith("blob:") ||
+      src.startsWith("data:") ||
+      src.includes("s3.ap-northeast-2.amazonaws.com");
 
     if (!isImageSelected) {
       alert("이미지를 선택해주세요.");
@@ -38,7 +44,9 @@ const stateEvent = document.getElementById("state-event") as HTMLSelectElement;
 const stateBest = document.getElementById("state-best") as HTMLSelectElement;
 
 const overlayNew = document.getElementById("overlay-new") as HTMLImageElement;
-const overlayEvent = document.getElementById("overlay-event") as HTMLImageElement;
+const overlayEvent = document.getElementById(
+  "overlay-event"
+) as HTMLImageElement;
 const overlayBest = document.getElementById("overlay-best") as HTMLImageElement;
 
 // 핸들러 연결
@@ -55,13 +63,15 @@ export async function renderProductForm(menu?: any) {
     return;
   }
 
-  const userRes = await apiGet(`/model_user_setting?func=get-user&userId=${user.userId}`);
+  const userRes = await apiGet(
+    `/model_user_setting?func=get-user&userId=${user.userId}`
+  );
   const { user: userData } = await userRes.json();
 
   setCategoryOptions(userData.category);
 
   if (menu) {
-    applyMenuData(menu);  // 수정일 때만 데이터 채우기
+    applyMenuData(menu); // 수정일 때만 데이터 채우기
   }
 }
 
@@ -95,43 +105,86 @@ function applyMenuData(menu: any) {
   if (fileName) fileName.textContent = imageFile;
 
   // 기본 정보 입력
-  (document.getElementById("menu-no") as HTMLInputElement).value = String(menu.no);
+  (document.getElementById("menu-no") as HTMLInputElement).value = String(
+    menu.no
+  );
   (document.getElementById("menu-name") as HTMLInputElement).value = menu.name;
-  (document.getElementById("menu-price") as HTMLInputElement).value = menu.price;
-  (document.getElementById("ice-time") as HTMLInputElement).value = menu.iceTime;
-  (document.getElementById("water-time") as HTMLInputElement).value = menu.waterTime;
+  (document.getElementById("menu-price") as HTMLInputElement).value =
+    menu.price;
+  (document.getElementById("ice-time") as HTMLInputElement).value =
+    menu.iceTime;
+  (document.getElementById("water-time") as HTMLInputElement).value =
+    menu.waterTime;
 
   // 카테고리 설정
-  const categorySelect = document.getElementById("menu-category") as HTMLSelectElement;
+  const categorySelect = document.getElementById(
+    "menu-category"
+  ) as HTMLSelectElement;
   if (categorySelect) categorySelect.value = menu.category;
 
   // 컵
-  document.querySelectorAll<HTMLInputElement>('input[name="cup"]')
-    .forEach(radio => radio.checked = radio.value === menu.cup);
+  document
+    .querySelectorAll<HTMLInputElement>('input[name="cup"]')
+    .forEach((radio) => (radio.checked = radio.value === menu.cup));
 
   // 얼음 여부
-  document.querySelectorAll<HTMLInputElement>('input[name="iceYn"]')
-    .forEach(radio => radio.checked = radio.value === menu.iceYn);
+  document
+    .querySelectorAll<HTMLInputElement>('input[name="iceYn"]')
+    .forEach((radio) => (radio.checked = radio.value === menu.iceYn));
 
   // 일반상품 여부
-  document.querySelectorAll<HTMLInputElement>('input[name="cupYn"]')
-      .forEach(radio => radio.checked = radio.value === menu.cupYn);
+  document
+    .querySelectorAll<HTMLInputElement>('input[name="cupYn"]')
+    .forEach((radio) => (radio.checked = radio.value === menu.cupYn));
 
   // 품절 여부
-  document.querySelectorAll<HTMLInputElement>('input[name="empty"]')
-    .forEach(radio => radio.checked = radio.value === menu.empty);
+  document
+    .querySelectorAll<HTMLInputElement>('input[name="empty"]')
+    .forEach((radio) => (radio.checked = radio.value === menu.empty));
 
   // 상태
-  (document.getElementById("state-new") as HTMLSelectElement).value = menu.state?.new || "";
-  (document.getElementById("state-event") as HTMLSelectElement).value = menu.state?.event || "";
-  (document.getElementById("state-best") as HTMLSelectElement).value = menu.state?.best || "";
+  (document.getElementById("state-new") as HTMLSelectElement).value =
+    menu.state?.new || "";
+  (document.getElementById("state-event") as HTMLSelectElement).value =
+    menu.state?.event || "";
+  (document.getElementById("state-best") as HTMLSelectElement).value =
+    menu.state?.best || "";
 
-  // ✅ 상태 이미지 갱신
-  updateOverlay(stateNew, overlayNew);
-  updateOverlay(stateEvent, overlayEvent);
-  updateOverlay(stateBest, overlayBest);
+  // ✅ 데이터 적용 후 상태 업데이트 함수들 호출
+  setTimeout(() => {
+    // toggleDrinkRelatedElements 함수 호출
+    const event = new Event("change");
+    const cupYnRadio = document.querySelector(
+      'input[name="cupYn"]:checked'
+    ) as HTMLInputElement;
+    if (cupYnRadio) {
+      cupYnRadio.dispatchEvent(event);
+    }
+
+    // toggleTimeInputs 함수 호출
+    const iceYnRadio = document.querySelector(
+      'input[name="iceYn"]:checked'
+    ) as HTMLInputElement;
+    if (iceYnRadio) {
+      iceYnRadio.dispatchEvent(event);
+    }
+  }, 100);
 
   renderItems(menu.items);
+
+  // ✅ 데이터 설정 후 필터링 실행
+  requestAnimationFrame(() => {
+    const timeInputBox = document.getElementById(
+      "ice-water-time-box"
+    ) as HTMLElement;
+    const selectedValue = (
+      document.querySelector('input[name="iceYn"]:checked') as HTMLInputElement
+    )?.value;
+
+    if (timeInputBox) {
+      timeInputBox.style.display = selectedValue === "no" ? "none" : "block";
+    }
+  });
 }
 
 export function renderItems(items: any[]) {

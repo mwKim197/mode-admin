@@ -3,7 +3,7 @@ import { checkUserAccess, getUserData } from "./ts/common/auth.ts";
 import "./ts/page/login.ts";
 import { loadPartials } from "./ts/utils/layoutLoader.ts";
 import { ToastType } from "./ts/types/common.ts";
-import {getStoredUser} from "./ts/utils/userStorage.ts";
+import { getStoredUser } from "./ts/utils/userStorage.ts";
 import { sendMachineCommand } from "./ts/page/deviceManage.ts";
 
 // 글로벌 등록
@@ -184,12 +184,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (!user?.payType) {
     const menuList = document.querySelector(".sidemenu .menu");
-    const pointMene = [{ href: "/html/point.html", label: "포인트" }]
+    const pointMene = [{ href: "/html/point.html", label: "포인트" }];
     pointMene.forEach((item) => {
       const li = document.createElement("li");
       li.innerHTML = `<a href="${item.href}"><p>${item.label}</p></a>`;
       menuList?.appendChild(li);
     });
+
+    const logoutLi = document.createElement("li");
+    logoutLi.innerHTML = `<a href="/html/log.html"><p>로그아웃</p></a>`;
+    menuList?.appendChild(logoutLi);
   }
 
   if (adminUserInfo && adminUserInfo.grade <= 2) {
@@ -297,15 +301,22 @@ function bindGlobalDeviceEvents() {
   const userId = userInfo.userId;
 
   // [data-func] 있는 모든 버튼 및 a 태그 처리
-  document.querySelectorAll<HTMLAnchorElement | HTMLButtonElement>('a[data-func], button[data-func]').forEach((el) => {
-    el.addEventListener("click", (e) => {
-      e.preventDefault();
-      const func = el.dataset.func!;
-      const msg = el.dataset.msg || "명령이 전송되었습니다";
+  document
+    .querySelectorAll<HTMLAnchorElement | HTMLButtonElement>(
+      "a[data-func], button[data-func]"
+    )
+    .forEach((el) => {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        const func = el.dataset.func!;
+        const msg = el.dataset.msg || "명령이 전송되었습니다";
 
-      // 커피 세척 및 전체 세척 구분
-      const washData = el.id === "coffeeWash" ? { data: [{ type: "coffee" }] }
-          : el.id === "wash" ? {
+        // 커피 세척 및 전체 세척 구분
+        const washData =
+          el.id === "coffeeWash"
+            ? { data: [{ type: "coffee" }] }
+            : el.id === "wash"
+            ? {
                 data: [
                   { type: "coffee" },
                   { type: "garucha", value1: "1" },
@@ -321,26 +332,36 @@ function bindGlobalDeviceEvents() {
                   { type: "syrup", value1: "6" },
                 ],
               }
-              : undefined;
+            : undefined;
 
-      window.sendMachineCommand(userId, washData ? { func, washData } : { func }, msg);
+        window.sendMachineCommand(
+          userId,
+          washData ? { func, washData } : { func },
+          msg
+        );
+      });
     });
-  });
 
   // [data-type][data-value] 있는 모든 버튼 및 a 태그 처리 (부분세척)
-  document.querySelectorAll<HTMLAnchorElement | HTMLButtonElement>('a[data-type][data-value], button[data-type][data-value]').forEach((el) => {
-    el.addEventListener("click", (e) => {
-      e.preventDefault();
+  document
+    .querySelectorAll<HTMLAnchorElement | HTMLButtonElement>(
+      "a[data-type][data-value], button[data-type][data-value]"
+    )
+    .forEach((el) => {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
 
-      const type = el.dataset.type as "garucha" | "syrup";
-      const value1 = el.dataset.value!;
-      const msg = `${type === "garucha" ? "가루차" : "시럽"} ${value1}번 세척`;
+        const type = el.dataset.type as "garucha" | "syrup";
+        const value1 = el.dataset.value!;
+        const msg = `${
+          type === "garucha" ? "가루차" : "시럽"
+        } ${value1}번 세척`;
 
-      const washData = { data: [{ type, value1 }] };
+        const washData = { data: [{ type, value1 }] };
 
-      window.sendMachineCommand(userId, { func: "wash", washData }, msg);
+        window.sendMachineCommand(userId, { func: "wash", washData }, msg);
+      });
     });
-  });
 }
 
 // 자동로그인
@@ -358,7 +379,7 @@ async function tryAutoLogin() {
     const res = await fetch(`${API_URL}/model_admin_login?func=refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken })
+      body: JSON.stringify({ refreshToken }),
     });
 
     const data = await res.json();
