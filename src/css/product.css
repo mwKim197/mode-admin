@@ -1,9 +1,34 @@
 @charset "utf-8";
 
+.product-page table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.product-page thead {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.product-page tbody {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.product-page #menu-table-body {
+    display: block;
+    max-height: 60vh; /* 원하는 높이 */
+    overflow-y: auto;
+    width: 100%;
+}
+
+
 .product-name {
     white-space: normal;
     word-break: break-all;
-    max-width: 100px;
+    max-width: 120px;
     font-size: 0.875rem; /* text-sm */
 }
 
