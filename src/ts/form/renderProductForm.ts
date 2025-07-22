@@ -150,10 +150,25 @@ function applyMenuData(menu: any) {
   (document.getElementById("state-best") as HTMLSelectElement).value =
     menu.state?.best || "";
 
-  // ✅ 상태 이미지 갱신
-  updateOverlay(stateNew, overlayNew);
-  updateOverlay(stateEvent, overlayEvent);
-  updateOverlay(stateBest, overlayBest);
+  // ✅ 데이터 적용 후 상태 업데이트 함수들 호출
+  setTimeout(() => {
+    // toggleDrinkRelatedElements 함수 호출
+    const event = new Event("change");
+    const cupYnRadio = document.querySelector(
+      'input[name="cupYn"]:checked'
+    ) as HTMLInputElement;
+    if (cupYnRadio) {
+      cupYnRadio.dispatchEvent(event);
+    }
+
+    // toggleTimeInputs 함수 호출
+    const iceYnRadio = document.querySelector(
+      'input[name="iceYn"]:checked'
+    ) as HTMLInputElement;
+    if (iceYnRadio) {
+      iceYnRadio.dispatchEvent(event);
+    }
+  }, 100);
 
   renderItems(menu.items);
 
