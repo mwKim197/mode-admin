@@ -37,7 +37,7 @@ export function initProduct() {
       <tr>
         <td >${item.no}</td>
         <td style="text-align: center;"><img src="${imageUrl}" alt="상품 이미지" style="width:36px;height:46px; object-fit:cover;display: inline-block;"></td>
-        <td class="product-name whitespace-normal break-all text-sm" onclick="window.location.href='./product-detail.html?menuId=${
+        <td class="product-name" onclick="window.location.href='./product-detail.html?menuId=${
                     item.menuId
                 }'">
           ${item.name}

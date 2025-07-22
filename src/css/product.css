@@ -1,33 +1,140 @@
 @charset "utf-8";
 
-.table-fixed th:nth-child(1),
-.table-fixed td:nth-child(1) {
-    width: 42px;
+/* 🖥 PC 화면 (넓은 화면) */
+@media (min-width: 1024px) {
+    .table-fixed th:nth-child(1),
+    .table-fixed td:nth-child(1) {
+        width: 42px;
+    }
+
+    .table-fixed th:nth-child(2),
+    .table-fixed td:nth-child(2) {
+        width: 58px;
+    }
+
+    .table-fixed th:nth-child(3),
+    .table-fixed td:nth-child(3) {
+        width: 120px;
+    }
+
+    .table-fixed th:nth-child(4),
+    .table-fixed td:nth-child(4) {
+        width: 53px;
+    }
+
+    .table-fixed th:nth-child(5),
+    .table-fixed td:nth-child(5) {
+        width: 48px;
+    }
+
+    .table-fixed th:nth-child(6),
+    .table-fixed td:nth-child(6) {
+        width: 80px;
+    }
 }
 
-.table-fixed th:nth-child(2),
-.table-fixed td:nth-child(2) {
-    width: 58px;
+/* 💻 태블릿 화면 (768px ~ 1023px) */
+@media (max-width: 1023px) and (min-width: 768px) {
+    .table-fixed th:nth-child(1),
+    .table-fixed td:nth-child(1) {
+        width: 36px;
+    }
+
+    .table-fixed th:nth-child(2),
+    .table-fixed td:nth-child(2) {
+        width: 50px;
+    }
+
+    .table-fixed th:nth-child(3),
+    .table-fixed td:nth-child(3) {
+        width: 100px;
+    }
+
+    .table-fixed th:nth-child(4),
+    .table-fixed td:nth-child(4) {
+        width: 45px;
+    }
+
+    .table-fixed th:nth-child(5),
+    .table-fixed td:nth-child(5) {
+        width: 40px;
+    }
+
+    .table-fixed th:nth-child(6),
+    .table-fixed td:nth-child(6) {
+        width: 70px;
+    }
 }
 
-.table-fixed th:nth-child(3),
-.table-fixed td:nth-child(3) {
-    width: 120px;
+/* 📱 모바일 화면 (481px ~ 767px) */
+@media (max-width: 767px) and (min-width: 481px) {
+    .table-fixed th:nth-child(1),
+    .table-fixed td:nth-child(1) {
+        width: 30px;
+    }
+
+    .table-fixed th:nth-child(2),
+    .table-fixed td:nth-child(2) {
+        width: 40px;
+    }
+
+    .table-fixed th:nth-child(3),
+    .table-fixed td:nth-child(3) {
+        width: 80px;
+    }
+
+    .table-fixed th:nth-child(4),
+    .table-fixed td:nth-child(4) {
+        width: 40px;
+    }
+
+    .table-fixed th:nth-child(5),
+    .table-fixed td:nth-child(5) {
+        width: 35px;
+    }
+
+    .table-fixed th:nth-child(6),
+    .table-fixed td:nth-child(6) {
+        width: 60px;
+    }
 }
 
-.table-fixed th:nth-child(4),
-.table-fixed td:nth-child(4) {
-    width: 53px;
-}
+/* 📲 초소형 화면 (480px 이하) */
+@media (max-width: 480px) {
 
-.table-fixed th:nth-child(5),
-.table-fixed td:nth-child(5) {
-    width: 48px;
-}
+    .product-name {
+        max-width: 115px;
+    }
 
-.table-fixed th:nth-child(6),
-.table-fixed td:nth-child(6) {
-    width: 80px;
+    .table-fixed th:nth-child(1),
+    .table-fixed td:nth-child(1) {
+        width: 15px;
+    }
+
+    .table-fixed th:nth-child(2),
+    .table-fixed td:nth-child(2) {
+        width: 30px;
+    }
+
+    .table-fixed th:nth-child(3),
+    .table-fixed td:nth-child(3) {
+        width: 55px;
+    }
+
+    .table-fixed th:nth-child(4),
+    .table-fixed td:nth-child(4) {
+        width: 30px;
+    }
+
+    .table-fixed th:nth-child(5),
+    .table-fixed td:nth-child(5) {
+        width: 25px;
+    }
+
+    .table-fixed th:nth-child(6),
+    .table-fixed td:nth-child(6) {
+        width: 30px;
+    }
 }
 
 .table-fixed {
@@ -56,14 +163,13 @@
     max-height: 60vh; /* 원하는 높이 */
     overflow-y: auto;
     overflow-x: auto; /* ✅ 가로 스크롤 추가 */
-    width: max-content; /* ✅ 내용 길이에 따라 가로 길이 맞춤 */
     min-width: 100%; /* ✅ 최소한 테이블 폭 채움 */
 }
 
 .product-name {
-    white-space: normal;
-    word-break: break-all;
-    font-size: 0.875rem; /* text-sm */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .tr-disabled {
