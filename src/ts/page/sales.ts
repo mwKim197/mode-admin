@@ -742,7 +742,7 @@ async function updatePopupContent(rowIndex: number) {
       // 건별 데이터 팝업
       const menuItems = item.menuSummary
         .map((menu: any) => {
-          return `${menu.name} ${menu.count || 1}개`;
+          return `${menu.name} ${- menu.count || - 1}개`;
         })
         .join("<br>");
 
