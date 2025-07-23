@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.758.0",
+    "choices.js": "^9.1.0",
     "html2canvas": "^1.4.1",
     "jwt-decode": "^4.0.0",
     "suneditor": "^2.47.5"

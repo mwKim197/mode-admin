@@ -5,6 +5,8 @@ import { loadPartials } from "./ts/utils/layoutLoader.ts";
 import { ToastType } from "./ts/types/common.ts";
 import { getStoredUser } from "./ts/utils/userStorage.ts";
 import { sendMachineCommand } from "./ts/page/deviceManage.ts";
+import Choices from 'choices.js';
+import 'choices.js/public/assets/styles/choices.min.css';
 
 // 글로벌 등록
 declare global {
@@ -13,12 +15,15 @@ declare global {
     hideLoading: () => void;
     showToast: (msg: string, duration?: number, type?: ToastType) => void;
     sendMachineCommand: typeof import("./ts/page/deviceManage").sendMachineCommand;
+    Choices: typeof Choices;
   }
 }
-
 // ------- 머신조작전역등록 --------//
 window.sendMachineCommand = sendMachineCommand;
 // ------- 머신조작전역등록 --------//
+// ------- Choices 전역등록 --------//
+window.Choices = Choices;
+// ------- Choices 전역등록 --------//
 
 // ------- 로딩 딤 --------//
 
