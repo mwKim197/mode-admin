@@ -311,6 +311,23 @@ function bindGlobalDeviceEvents() {
         const func = el.dataset.func!;
         const msg = el.dataset.msg || "명령이 전송되었습니다";
 
+        // ✅ 확인창이 필요한 기능
+        if (
+          func === "wash" ||
+          func === "pl" ||
+          func === "pa" ||
+          func === "restart" ||
+          func === "shutdown"
+        ) {
+          let confirmMsg = "";
+          if (func === "wash") confirmMsg = "기기세척을 진행하시겠습니까?";
+          if (func === "pl") confirmMsg = "플라스틱컵을 배출하시겠습니까?";
+          if (func === "pa") confirmMsg = "종이컵을 배출하시겠습니까?";
+          if (func === "restart") confirmMsg = "프로그램을 재시작하시겠습니까?";
+          if (func === "shutdown") confirmMsg = "프로그램을 종료하시겠습니까?";
+          if (!confirm(confirmMsg)) return;
+        }
+
         // 커피 세척 및 전체 세척 구분
         const washData =
           el.id === "coffeeWash"
