@@ -6,7 +6,34 @@
     <link rel="stylesheet" href="/src/css/common.css" />
     <link rel="stylesheet" href="/src/css/style.css" />
     <script type="module" src="/src/main.ts"></script>
-    <style></style>
+    <style>
+      #coupon-page .data_input > div {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        overflow: hidden;
+        box-sizing: border-box;
+      }
+
+      #coupon-page .data_input > div input[type="date"] {
+        width: calc((100% - 30px) / 2);
+      }
+
+      #coupon-page .data_input > div span {
+        margin: 0 5px;
+        white-space: nowrap;
+        width: 20px;
+        text-align: center;
+      }
+
+      #coupon-page #issue-count {
+        text-align: right;
+      }
+
+      #coupon-page .btnFlex {
+        margin-top: 10px;
+      }
+    </style>
   </head>
 
   <body id="coupon-page">
@@ -40,7 +67,7 @@
                 id="open-popup"
                 style="width: auto; padding: 1rem 2rem"
               >
-                발권하기
+                발급하기
               </button>
             </div>
           </div>
@@ -120,8 +147,10 @@
               <div class="inputWrap">
                 <div class="data_input">
                   <p>발행매수</p>
-                  <input type="text" id="issue-count" required />
-                  <span>매</span>
+                  <div>
+                    <input type="text" id="issue-count" required />
+                    <span>매</span>
+                  </div>
                 </div>
               </div>
 
@@ -129,8 +158,12 @@
               <div class="inputWrap">
                 <div class="data_input">
                   <p>쿠폰선택</p>
-                  <div class="select-box">
-                    <select id="coupon-type-select" required>
+                  <div class="select">
+                    <select
+                      id="coupon-type-select"
+                      class="popup-select mb0"
+                      required
+                    >
                       <option value="">--선택--</option>
                       <option value="discount10">모든 음료</option>
                       <option value="discount10">10% 할인 쿠폰</option>
@@ -138,7 +171,6 @@
                       <option value="discount30">30% 할인 쿠폰</option>
                       <!-- 동적으로 데이터 추가해야함 -->
                     </select>
-                    <i class="fa-solid fa-chevron-down"></i>
                   </div>
                 </div>
               </div>
@@ -159,7 +191,7 @@
 
               <!-- 버튼 -->
               <div class="btnFlex">
-                <button type="submit" class="btn blue">쿠폰 발행</button>
+                <button type="submit" class="btn blue">쿠폰 발급</button>
               </div>
             </form>
           </div>
