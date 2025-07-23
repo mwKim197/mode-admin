@@ -5,41 +5,8 @@
     <link rel="stylesheet" href="/src/css/reset.css" />
     <link rel="stylesheet" href="/src/css/common.css" />
     <link rel="stylesheet" href="/src/css/style.css" />
+    <link rel="stylesheet" href="/src/css/couponList.css" />
     <script type="module" src="/src/main.ts"></script>
-    <style>
-      #coupon-page .data_input > div {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        overflow: hidden;
-        box-sizing: border-box;
-      }
-
-      #coupon-page .data_input > div input[type="date"] {
-        width: calc((100% - 30px) / 2);
-      }
-
-      #coupon-page .data_input > div span {
-        margin: 0 5px;
-        white-space: nowrap;
-        width: 20px;
-        text-align: center;
-      }
-
-      #coupon-page #issue-count {
-        text-align: right;
-      }
-
-      #coupon-page .btnFlex {
-        margin-top: 10px;
-      }
-
-      #coupon-page .popup-select {
-        height: 38.5px !important;
-        padding: 10px 14px !important;
-        border: 1px solid #ccc !important;
-      }
-    </style>
   </head>
 
   <body id="coupon-page">
@@ -171,11 +138,7 @@
                       class="popup-select mb0"
                       required
                     >
-                      <option value="">--선택--</option>
-                      <option value="discount10">모든 음료</option>
-                      <option value="discount10">10% 할인 쿠폰</option>
-                      <option value="discount20">20% 할인 쿠폰</option>
-                      <option value="discount30">30% 할인 쿠폰</option>
+                      <option value="">-- 선택 --</option>
                       <!-- 동적으로 데이터 추가해야함 -->
                     </select>
                   </div>
