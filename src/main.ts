@@ -282,6 +282,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     import("./ts/page/normalSet.ts").then((module) => {
       module.initNormalSet();
     });
+  } else if (path === "/html/couponList.html") {
+    console.log("📌 쿠폰목록 - couponList.ts 로드");
+    import("./ts/page/couponList.ts").then((module) => {
+      module.initCouponList();
+    });
   } else {
     console.log("📌 기본 페이지");
   }
