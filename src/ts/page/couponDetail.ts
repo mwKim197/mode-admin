@@ -83,9 +83,9 @@ async function sampleSelect(userId: string) {
         selectElement.appendChild(option);
       });
 
-      new window.Choices(selectElement, {
-        position: 'bottom',
-        allowHTML: true,
+      // choices.js 적용
+      const choices = new window.Choices(selectElement, {
+        position: 'auto',
         shouldSort: false,
         searchEnabled: true,
         maxItemCount: 20,
@@ -99,6 +99,10 @@ async function sampleSelect(userId: string) {
           placeholder: 'custom-select-placeholder'
         }
       });
+
+      // 디버깅용 로그
+      console.log("choices 적용됨:", choices);
+      console.log("select 요소:", selectElement);
     }
   } catch (error) {
     console.error("메뉴 데이터 로드 실패:", error);
