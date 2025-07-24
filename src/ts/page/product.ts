@@ -70,18 +70,23 @@ export function initProduct() {
       searchInput.addEventListener("keypress", function (e) {
         if (e.key === "Enter") {
           const searchTerm = searchInput.value.trim();
-          if (searchTerm) {
-            searchProducts(searchTerm);
-          }
+          searchProducts(searchTerm);
         }
       });
     }
   }
 
   function searchProducts(searchTerm: string) {
-    const filtered = allMenuItems.filter((item) =>
-      item.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    let filtered;
+
+    if (searchTerm.length > 0) {
+      filtered = allMenuItems.filter((item) =>
+          item.name?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    } else {
+      filtered = allMenuItems;
+    }
+
     renderMenuTable(filtered);
 
     if (filtered.length === 0) {
