@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <script type="module" crossorigin src="../assets/main-CaxVcynr.js"></script>
+    <link rel="stylesheet" crossorigin href="../assets/main-D6OoUF5A.css">
+    <link rel="stylesheet" crossorigin href="../assets/couponList-CTUIRGpo.css">
+    <link rel="stylesheet" crossorigin href="../assets/style-CchalFEw.css">
+  </head>
+
+  <body id="coupon-page">
+    <div id="main-content">
+      <!-- 사용자 정보 섹션 -->
+      <section class="mt8">
+        <div class="inner">
+          <div class="user-flex">
+            <div class="user">
+              <i class="fa-regular fa-circle-user"></i>
+              <p id="user-name">-</p>
+              <label class="label manager" id="user-grade"
+                ><span>-</span></label
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 쿠폰 목록 메인 페이지 -->
+      <section class="pb20">
+        <div class="inner">
+          <div class="title-flex" style="margin-bottom: 10px">
+            <h2 style="margin-bottom: 0">쿠폰목록</h2>
+
+            <!-- 발권하기 버튼 -->
+            <div class="btnFlex" style="margin-top: 0">
+              <button
+                type="button"
+                class="btn blue"
+                id="open-popup"
+                style="width: auto; padding: 1rem 2rem"
+              >
+                발급하기
+              </button>
+            </div>
+          </div>
+
+          <!-- 쿠폰 목록 테이블 추가 -->
+          <div class="tableArea">
+            <table>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>순서</th>
+                  <th>이름</th>
+                  <th>사용기한</th>
+                  <th>번호</th>
+                  <th>사용여부</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="6" style="padding: 2rem 0 0">
+                    표시할 쿠폰이 없습니다.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 팝업 -->
+    <div class="popup-overlay" id="popup" style="display: none">
+      <div class="popup">
+        <div class="popup-header">
+          <h2>쿠폰 발행</h2>
+          <button class="close-btn" id="close-popup">&times;</button>
+        </div>
+        <div class="popup-body">
+          <div class="boxStyle gr">
+            <form id="coupon-form">
+              <!-- 가맹점 입력 -->
+              <div class="inputWrap">
+                <div class="data_input">
+                  <p>가맹점</p>
+                  <input type="text" id="franchise-input" readonly />
+                </div>
+              </div>
+
+              <!-- 지점 입력 -->
+              <div class="inputWrap">
+                <div class="data_input">
+                  <p>지점</p>
+                  <input type="text" id="store-input" readonly />
+                </div>
+              </div>
+
+              <!-- 기기번호 입력 -->
+              <div class="inputWrap">
+                <div class="data_input">
+                  <p>기기번호</p>
+                  <input type="text" id="device-input" readonly />
+                </div>
+              </div>
+
+              <!-- 사용기한 -->
+              <div class="inputWrap">
+                <div class="data_input">
+                  <p>사용기한</p>
+                  <div>
+                    <input type="date" id="start-date" required />
+                    <span>~</span>
+                    <input type="date" id="end-date" required />
+                  </div>
+                </div>
+              </div>
+
+              <!-- 발행매수 -->
+              <div class="inputWrap">
+                <div class="data_input">
+                  <p>발행매수</p>
+                  <div>
+                    <input type="text" id="issue-count" required />
+                    <span>매</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 쿠폰선택 -->
+              <div class="inputWrap">
+                <div class="data_input">
+                  <p>쿠폰선택</p>
+                  <div class="select">
+                    <select
+                      id="coupon-type-select"
+                      class="popup-select mb0"
+                      required
+                    >
+                      <option value="">-- 선택 --</option>
+                      <!-- 동적으로 데이터 추가해야함 -->
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 메모 -->
+              <div class="inputWrap">
+                <div class="text_input">
+                  <p>메모</p>
+                  <textarea
+                    id="myTextarea"
+                    maxlength="200"
+                    rows="4"
+                    cols="50"
+                    placeholder="내용을 입력해주세요"
+                  ></textarea>
+                </div>
+              </div>
+
+              <!-- 버튼 -->
+              <div class="btnFlex">
+                <button type="submit" class="btn blue">쿠폰 발급</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
