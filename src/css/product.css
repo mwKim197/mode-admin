@@ -1,139 +1,16 @@
 @charset "utf-8";
 
-/* 🖥 PC 화면 (넓은 화면) */
-@media (min-width: 1024px) {
-    .table-fixed th:nth-child(1),
-    .table-fixed td:nth-child(1) {
-        width: 42px;
+@media (max-width: 460px) {
+    .product-page thead tr,
+    .product-page #menu-table-body tr {
+        grid-template-columns: 23px 40px 105px 50px 40px 60px !important;
     }
-
-    .table-fixed th:nth-child(2),
-    .table-fixed td:nth-child(2) {
-        width: 58px;
-    }
-
-    .table-fixed th:nth-child(3),
-    .table-fixed td:nth-child(3) {
-        width: 120px;
-    }
-
-    .table-fixed th:nth-child(4),
-    .table-fixed td:nth-child(4) {
-        width: 53px;
-    }
-
-    .table-fixed th:nth-child(5),
-    .table-fixed td:nth-child(5) {
-        width: 48px;
-    }
-
-    .table-fixed th:nth-child(6),
-    .table-fixed td:nth-child(6) {
-        width: 80px;
-    }
-}
-
-/* 💻 태블릿 화면 (768px ~ 1023px) */
-@media (max-width: 1023px) and (min-width: 768px) {
-    .table-fixed th:nth-child(1),
-    .table-fixed td:nth-child(1) {
-        width: 36px;
-    }
-
-    .table-fixed th:nth-child(2),
-    .table-fixed td:nth-child(2) {
-        width: 50px;
-    }
-
-    .table-fixed th:nth-child(3),
-    .table-fixed td:nth-child(3) {
-        width: 100px;
-    }
-
-    .table-fixed th:nth-child(4),
-    .table-fixed td:nth-child(4) {
-        width: 45px;
-    }
-
-    .table-fixed th:nth-child(5),
-    .table-fixed td:nth-child(5) {
-        width: 40px;
-    }
-
-    .table-fixed th:nth-child(6),
-    .table-fixed td:nth-child(6) {
-        width: 70px;
-    }
-}
-
-/* 📱 모바일 화면 (481px ~ 767px) */
-@media (max-width: 767px) and (min-width: 481px) {
-    .table-fixed th:nth-child(1),
-    .table-fixed td:nth-child(1) {
-        width: 30px;
-    }
-
-    .table-fixed th:nth-child(2),
-    .table-fixed td:nth-child(2) {
-        width: 40px;
-    }
-
-    .table-fixed th:nth-child(3),
-    .table-fixed td:nth-child(3) {
-        width: 80px;
-    }
-
-    .table-fixed th:nth-child(4),
-    .table-fixed td:nth-child(4) {
-        width: 40px;
-    }
-
-    .table-fixed th:nth-child(5),
-    .table-fixed td:nth-child(5) {
-        width: 35px;
-    }
-
-    .table-fixed th:nth-child(6),
-    .table-fixed td:nth-child(6) {
-        width: 60px;
-    }
-}
-
-/* 📲 초소형 화면 (480px 이하) */
-@media (max-width: 480px) {
 
     .product-name {
-        max-width: 115px;
-    }
-
-    .table-fixed th:nth-child(1),
-    .table-fixed td:nth-child(1) {
-        width: 15px;
-    }
-
-    .table-fixed th:nth-child(2),
-    .table-fixed td:nth-child(2) {
-        width: 30px;
-    }
-
-    .table-fixed th:nth-child(3),
-    .table-fixed td:nth-child(3) {
-        width: 55px;
-    }
-
-    .table-fixed th:nth-child(4),
-    .table-fixed td:nth-child(4) {
-        width: 30px;
-    }
-
-    .table-fixed th:nth-child(5),
-    .table-fixed td:nth-child(5) {
-        width: 25px;
-    }
-
-    .table-fixed th:nth-child(6),
-    .table-fixed td:nth-child(6) {
-        width: 30px;
+        max-width: 105px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
 
