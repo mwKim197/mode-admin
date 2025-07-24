@@ -2,10 +2,10 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8"/>
-  <script type="module" crossorigin src="../assets/main-DwR8RrJa.js"></script>
+  <script type="module" crossorigin src="../assets/main-B9kbHsQX.js"></script>
   <link rel="stylesheet" crossorigin href="../assets/main-D6OoUF5A.css">
   <link rel="stylesheet" crossorigin href="../assets/style-CchalFEw.css">
-  <link rel="stylesheet" crossorigin href="../assets/product-BfeHnXU5.css">
+  <link rel="stylesheet" crossorigin href="../assets/product-DPVYdv1m.css">
 </head>
 
 <body class="product-page">
@@ -40,7 +40,22 @@
     <!-- table -->
     <section class="pb20">
         <div class="inner">
-            <h2 class="mb20">상품</h2>
+            <div>
+                <h2 class="mb20">상품</h2>
+                <div class="input-group">
+                    <input
+                      id="searchProduct"
+                      type="text"
+                      placeholder="메뉴를 검색해주세요."
+                    />
+                    <button id="searchButton" class="btn-i search">
+                      <img src="../img/search.svg" alt="" />
+                    </button>
+                    <button id="searchReset" class="btn-i reset">
+                      <img src="../img/refresh_icon.svg" alt="" />
+                    </button>
+                  </div>
+            </div>
             <div class="tableArea">
                 <table class="table-fixed w-full min-w-[800px]">
                     <thead>
@@ -53,7 +68,7 @@
                         <th></th>
                     </tr>
                     </thead>
-                    <tbody id="menu-table-body" style="width: 410px;">
+                    <tbody id="menu-table-body">
                     <tr onclick="window.location.href='./product_set.html'">
                         <td colspan="6" style="
                         height: 56px;
