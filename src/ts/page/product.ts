@@ -3,6 +3,7 @@ import {apiGet, apiPost} from "../api/apiHelpers.ts";
 import {MenuItem} from "../types/product.ts";
 
 const changeList: { menuId: number; empty?: string; delete?: boolean }[] = [];
+let allMenuItems: MenuItem[] = [];
 
 export function initProduct() {
     // localstorage에 저장된 user 정보를 불러옴
@@ -13,33 +14,107 @@ export function initProduct() {
         return;
     }
 
-    async function fetchMenuList() {
-        const res = await apiGet(
-            `/model_admin_menu?userId=${user?.userId}&func=get-all-menu`
-        );
-        const data = await res.json();
+  initSearchFunction();
+
+  async function fetchMenuList() {
+    const res = await apiGet(
+      `/model_admin_menu?userId=${user?.userId}&func=get-all-menu`
+    );
+    const data = await res.json();
 
         return data.items as MenuItem[];
     }
 
-    function renderMenuTable(items: MenuItem[]) {
-        const tbody = document.getElementById("menu-table-body");
-        if (!tbody) return;
-        changeList.length = 0; // 기존 변경사항 모두 제거
+  async function init() {
+    try {
+      const menuItems = await fetchMenuList();
+      allMenuItems = menuItems;
+      renderMenuTable(menuItems);
+      changeList.length = 0;
+    } catch (err) {
+      console.error("❌ 메뉴 목록 불러오기 실패", err);
+    }
+  }
 
-        tbody.innerHTML = items
-            .map((item) => {
-                const imageFile = item.image?.split("\\").pop() ?? "";
-                const encodedFile = encodeURIComponent(imageFile); // ✅ 한글/공백 처리
-                const imageUrl = `https://model-narrow-road.s3.ap-northeast-2.amazonaws.com/model/${item.userId}/${encodedFile}`; // 필요 시 경로 조정
+  // ✅ 검색 기능 초기화 함수 수정
+  function initSearchFunction() {
+    const searchInput = document.getElementById(
+      "searchProduct"
+    ) as HTMLInputElement;
+    const searchButton = document.getElementById("searchButton");
+    const resetButton = document.getElementById("searchReset");
 
-                return `
+    if (searchButton) {
+      searchButton.addEventListener("click", function () {
+        const searchTerm = searchInput?.value.trim() || "";
+        if (!searchTerm) {
+          return;
+        }
+        searchProducts(searchTerm);
+      });
+    }
+
+    if (resetButton) {
+      resetButton.addEventListener("click", function () {
+        // 검색어 초기화
+        if (searchInput) {
+          searchInput.value = "";
+        }
+        // 전체 상품 데이터 다시 로드
+        renderMenuTable(allMenuItems);
+      });
+    }
+
+    // Enter 키로 검색
+    if (searchInput) {
+      searchInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          const searchTerm = searchInput.value.trim();
+          searchProducts(searchTerm);
+        }
+      });
+    }
+  }
+
+  function searchProducts(searchTerm: string) {
+    let filtered;
+
+    if (searchTerm.length > 0) {
+      filtered = allMenuItems.filter((item) =>
+          item.name?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    } else {
+      filtered = allMenuItems;
+    }
+
+    renderMenuTable(filtered);
+
+    if (filtered.length === 0) {
+      window.showToast(
+        `"${searchTerm}"에 대한 검색 결과가 없습니다.`,
+        3000,
+        "warning"
+      );
+    }
+  }
+
+  function renderMenuTable(items: MenuItem[]) {
+    const tbody = document.getElementById("menu-table-body");
+    if (!tbody) return;
+
+    tbody.innerHTML = items
+      .map((item) => {
+        const imageFile = item.image?.split("\\").pop() ?? "";
+        const encodedFile = encodeURIComponent(imageFile);
+        const imageUrl = `https://model-narrow-road.s3.ap-northeast-2.amazonaws.com/model/${item.userId}/${encodedFile}`;
+
+        return `
       <tr>
         <td >${item.no}</td>
         <td style="text-align: center;"><img src="${imageUrl}" alt="상품 이미지" style="width:36px;height:46px; object-fit:cover;display: inline-block;"></td>
         <td class="product-name" onclick="window.location.href='./product-detail.html?menuId=${
-                    item.menuId
-                }'">
+          item.menuId
+        }'">
           ${item.name}
         </td>
         <td>${Number(item.price).toLocaleString()}</td>
@@ -54,92 +129,84 @@ export function initProduct() {
         </td>
         <td>
           ${
-                    item.cupYn === "yes"
-                        ? '<span class="tag gray disabled">제조</span>'
-                        : `<span class="tag blue" data-menu='${encodeURIComponent(
-                            JSON.stringify(item)
-                        )}' onclick="onAdminOder(this)">제조</span>`
-                }
+            item.cupYn === "yes"
+              ? '<span class="tag gray disabled">제조</span>'
+              : `<span class="tag blue" data-menu='${encodeURIComponent(
+                  JSON.stringify(item)
+                )}' onclick="onAdminOder(this)">제조</span>`
+          }
           <span class="tag red" onclick="onDeleteClick(${
-                    item.menuId
-                }, event)">삭제</span>
+            item.menuId
+          }, event)">삭제</span>
         </td>
       </tr>
     `;
-            })
-            .join("");
-    }
+      })
+      .join("");
+  }
 
-    (async function init() {
-        try {
-            const menuItems = await fetchMenuList();
-            renderMenuTable(menuItems);
-            changeList.length = 0; // 기존 변경사항 모두 제거
-        } catch (err) {
-            console.error("❌ 메뉴 목록 불러오기 실패", err);
-            window.showToast(`❌ 메뉴 목록 불러오기 실패: ${err}`, 3000, "error");
-        }
-    })();
+  // ✅ 페이지 로드 시 초기화
+  init();
 }
 
 const saveBtn = document.getElementById("saveBtn") as HTMLInputElement;
 
 if (saveBtn) {
-    saveBtn.addEventListener("click", () => {
-        if (changeList.length === 0) {
-            window.showToast(`변경된 내용이 없습니다.`, 3000, "warning");
-            return;
-        }
+  saveBtn.addEventListener("click", () => {
+    if (changeList.length === 0) {
+      window.showToast(`변경된 내용이 없습니다.`, 3000, "warning");
+      return;
+    }
 
-        if (confirm("수정사항을 저장하시겠습니까?")) {
-            saveChanges().catch(() => {
-                window.showToast(`❌ 수정에 실패했습니다.`, 3000, "error");
-            });
-        }
-    });
+    if (confirm("수정사항을 저장하시겠습니까?")) {
+      saveChanges().catch(() => {
+        window.showToast(`❌ 수정에 실패했습니다.`, 3000, "error");
+      });
+    }
+  });
 }
 
 // 토글 버튼
 function onToggleChange(menuId: number, isChecked: boolean) {
-    const emptyValue = isChecked ? "no" : "yes";
-    updateChangeList(menuId, {empty: emptyValue});
+  const emptyValue = isChecked ? "no" : "yes";
+  updateChangeList(menuId, { empty: emptyValue });
 }
 
 // 삭제 버튼
 function onDeleteClick(menuId: number, event: any) {
-    updateChangeList(menuId, {delete: true});
-    const row = event.target.closest("tr");
-    if (row) row.classList.add("tr-disabled");
+  updateChangeList(menuId, { delete: true });
+  const row = event.target.closest("tr");
+  if (row) row.classList.add("tr-disabled");
 }
 
 // 주문내역 변환
 function transformToOrderData(item: any): any {
-    return {
-        orderData: {
-            orderList: [
-                {
-                    orderId: `${item.menuId}-${item.userId}`,
-                    userId: item.userId,
-                    menuId: item.menuId,
-                    name: item.name,
-                    count: 1, // ✅ 주문 개수로 사용
-                },
-            ],
+  return {
+    orderData: {
+      orderList: [
+        {
+          orderId: `${item.menuId}-${item.userId}`,
+          userId: item.userId,
+          menuId: item.menuId,
+          name: item.name,
+          count: 1, // ✅ 주문 개수로 사용
         },
-    };
+      ],
+    },
+  };
 }
 
 // 수정 목록 업데이트
 function updateChangeList(
-    menuId: number,
-    updates: { empty?: string; delete?: boolean }
+  menuId: number,
+  updates: { empty?: string; delete?: boolean }
 ) {
-    const index = changeList.findIndex((item) => item.menuId === menuId);
-    if (index !== -1) {
-        changeList[index] = {...changeList[index], ...updates};
-    } else {
-        changeList.push({menuId, ...updates});
-    }
+  const index = changeList.findIndex((item) => item.menuId === menuId);
+  if (index !== -1) {
+    changeList[index] = { ...changeList[index], ...updates };
+  } else {
+    changeList.push({ menuId, ...updates });
+  }
 }
 
 // 저장 버튼 동작
