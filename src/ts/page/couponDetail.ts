@@ -57,27 +57,23 @@ async function loadUserData() {
     if (storeInput) storeInput.value = storeName;
     if (deviceInput) deviceInput.value = user.userId;
 
-    // 메뉴 데이터 가져와서 select 박스에 추가
-    await loadMenuData(user.userId);
+    await sampleSelect(user.userId);  
   } catch (error) {
     console.error("사용자 데이터 로드 실패:", error);
   }
 }
 
-async function loadMenuData(userId: string) {
+async function sampleSelect(userId: string) {
   try {
     const response = await apiGet(
-      `/model_admin_menu?userId=${userId}&func=get-all-menu`
+        `/model_admin_menu?userId=${userId}&func=get-all-menu`
     );
     const data = await response.json();
 
-    const selectElement = document.getElementById(
-      "coupon-type-select"
-    ) as HTMLSelectElement;
+    const selectElement = document.getElementById('sample') as HTMLSelectElement;
 
     if (selectElement && data.items) {
-      // 기존 옵션들 제거 (--선택-- 제외하고)
-      selectElement.innerHTML = '<option value="">--선택--</option>';
+      selectElement.innerHTML = '';
 
       // 메뉴 데이터로 옵션 추가
       data.items.forEach((item: any) => {
@@ -85,6 +81,23 @@ async function loadMenuData(userId: string) {
         option.value = item.menuId;
         option.textContent = item.name;
         selectElement.appendChild(option);
+      });
+
+      new window.Choices(selectElement, {
+        position: 'bottom',
+        allowHTML: true,
+        shouldSort: false,
+        searchEnabled: true,
+        maxItemCount: 20,
+        renderChoiceLimit: 20,
+        classNames: {
+          containerOuter: 'custom-select',
+          containerInner: 'custom-select-inner',
+          input: 'custom-select-input',
+          listDropdown: 'custom-select-dropdown',
+          itemChoice: 'custom-select-item',
+          placeholder: 'custom-select-placeholder'
+        }
       });
     }
   } catch (error) {

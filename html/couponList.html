@@ -47,12 +47,7 @@
 
           <!-- 쿠폰 목록 테이블 추가 -->
           <div class="tableArea">
-            <div>
-              <select id="sample">
-                <option value="">-- 선택 --</option>
-                <!-- 동적으로 데이터 추가해야함 -->
-              </select>
-            </div>
+            
             <table>
               <thead>
                 <tr>
@@ -75,105 +70,6 @@
           </div>
         </div>
       </section>
-    </div>
-
-    <!-- 팝업 -->
-    <div class="popup-overlay" id="popup" style="display: none">
-      <div class="popup">
-        <div class="popup-header">
-          <h2>쿠폰 발행</h2>
-          <button class="close-btn" id="close-popup">&times;</button>
-        </div>
-        <div class="popup-body">
-          <div class="boxStyle gr">
-            <form id="coupon-form">
-              <!-- 가맹점 입력 -->
-              <div class="inputWrap">
-                <div class="data_input">
-                  <p>가맹점</p>
-                  <input type="text" id="franchise-input" readonly />
-                </div>
-              </div>
-
-              <!-- 지점 입력 -->
-              <div class="inputWrap">
-                <div class="data_input">
-                  <p>지점</p>
-                  <input type="text" id="store-input" readonly />
-                </div>
-              </div>
-
-              <!-- 기기번호 입력 -->
-              <div class="inputWrap">
-                <div class="data_input">
-                  <p>기기번호</p>
-                  <input type="text" id="device-input" readonly />
-                </div>
-              </div>
-
-              <!-- 사용기한 -->
-              <div class="inputWrap">
-                <div class="data_input">
-                  <p>사용기한</p>
-                  <div>
-                    <input type="date" id="start-date" required />
-                    <span>~</span>
-                    <input type="date" id="end-date" required />
-                  </div>
-                </div>
-              </div>
-
-              <!-- 발행매수 -->
-              <div class="inputWrap">
-                <div class="data_input">
-                  <p>발행매수</p>
-                  <div>
-                    <input type="text" id="issue-count" required />
-                    <span>매</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 쿠폰선택 -->
-              <div class="inputWrap">
-                <div class="data_input">
-                  <p>쿠폰선택</p>
-                  <div class="select">
-                    <select
-                      id="coupon-type-select"
-                      class="popup-select mb0"
-                      required
-                    >
-                      <option value="">-- 선택 --</option>
-                      <!-- 동적으로 데이터 추가해야함 -->
-                    </select>
-                  </div>
-
-                </div>
-              </div>
-
-              <!-- 메모 -->
-              <div class="inputWrap">
-                <div class="text_input">
-                  <p>메모</p>
-                  <textarea
-                    id="myTextarea"
-                    maxlength="200"
-                    rows="4"
-                    cols="50"
-                    placeholder="내용을 입력해주세요"
-                  ></textarea>
-                </div>
-              </div>
-
-              <!-- 버튼 -->
-              <div class="btnFlex">
-                <button type="submit" class="btn blue">쿠폰 발급</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
     </div>
   </body>
 </html>
