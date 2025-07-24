@@ -292,6 +292,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     import("./ts/page/couponList.ts").then((module) => {
       module.initCouponList();
     });
+  } else if (path === "/html/couponDetail.html") {
+    console.log("📌 쿠폰발행 - couponDetail.ts 로드");
+    import("./ts/page/couponDetail.ts").then((module) => {
+      module.initCouponDetail();
+    });
   } else {
     console.log("📌 기본 페이지");
   }

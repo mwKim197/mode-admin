@@ -1,0 +1,28 @@
+@charset "utf-8";
+
+#coupon-detail-page .data_input > div {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+#coupon-detail-page .data_input > div input[type="date"] {
+  width: calc((100% - 30px) / 2);
+}
+
+#coupon-detail-page .data_input > div span {
+  margin: 0 5px;
+  white-space: nowrap;
+  width: 20px;
+  text-align: center;
+}
+
+#coupon-detail-page #issue-count {
+  text-align: right;
+}
+
+#coupon-detail-page .btnFlex {
+  margin-top: 10px;
+}

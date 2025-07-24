@@ -17,33 +17,18 @@ export function initCouponList() {
   console.log("쿠폰 목록 페이지 초기화");
 
   // API에서 사용자 정보 가져와서 가맹점/지점에 넣기
-  loadUserData();
+  loadUserData();  // 이 줄 추가
 
-  // 팝업 열기/닫기 기능
-  const openPopupBtn = document.getElementById("open-popup");
-  const closePopupBtn = document.getElementById("close-popup");
-  const popup = document.getElementById("popup");
-
-  if (openPopupBtn && popup) {
-    openPopupBtn.addEventListener("click", function () {
-      popup.style.display = "flex";
+  // 발급하기 버튼 클릭 시 couponDetail 페이지로 이동
+  const openCouponDetailBtn = document.getElementById("open-coupon-detail");
+  
+  if (openCouponDetailBtn) {
+    openCouponDetailBtn.addEventListener("click", function () {
+      window.location.href = "/html/couponDetail.html";
     });
   }
 
-  if (closePopupBtn && popup) {
-    closePopupBtn.addEventListener("click", function () {
-      popup.style.display = "none";
-    });
-  }
-
-  // 팝업 배경 클릭시 닫기
-  if (popup) {
-    popup.addEventListener("click", function (e) {
-      if (e.target === this) {
-        this.style.display = "none";
-      }
-    });
-  }
+  // 팝업 관련 코드 삭제 (couponDetail로 이동)
 }
 
 async function loadUserData() {
