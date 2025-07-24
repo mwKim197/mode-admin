@@ -412,9 +412,16 @@ function bindGlobalDeviceEvents() {
 
         const type = el.dataset.type as "garucha" | "syrup";
         const value1 = el.dataset.value!;
-        const msg = `${
-          type === "garucha" ? "가루차" : "시럽"
-        } ${value1}번 세척`;
+        let number = value1;
+        if(type === "syrup") {
+          if (parseFloat(value1) === 5) {
+            number = String(4);
+          } else if (parseFloat(value1) === 6) {
+            number = String(5);
+          }
+        }
+
+        const msg = `${type === "garucha" ? "가루차" : "시럽"} ${number}번 세척`;
 
         const washData = { data: [{ type, value1 }] };
 
