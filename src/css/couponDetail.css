@@ -56,21 +56,3 @@
   background-color: #f5f5f5;
 }
 
-.custom-select-dropdown {
-  top: 100%;
-  left: 0;
-  right: 0;
-  max-height: 200px;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: var(--white);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  position: absolute;
-  z-index: 9999 !important;
-  display: none;
-}
-
-.custom-select.is-active .custom-select-dropdown {
-  display: block;
-}

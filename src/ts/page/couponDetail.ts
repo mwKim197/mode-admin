@@ -66,43 +66,54 @@ async function loadUserData() {
 async function sampleSelect(userId: string) {
   try {
     const response = await apiGet(
-        `/model_admin_menu?userId=${userId}&func=get-all-menu`
+      `/model_admin_menu?userId=${userId}&func=get-all-menu`
     );
     const data = await response.json();
 
     const selectElement = document.getElementById('sample') as HTMLSelectElement;
 
     if (selectElement && data.items) {
-      selectElement.innerHTML = '';
+      // 1. 기본 옵션 추가
+      
 
-      // 메뉴 데이터로 옵션 추가
+      // 2. 데이터 옵션 추가
       data.items.forEach((item: any) => {
+        if (!item.menuId || !item.name) return;
         const option = document.createElement("option");
         option.value = item.menuId;
         option.textContent = item.name;
         selectElement.appendChild(option);
       });
 
-      // choices.js 적용
-      const choices = new window.Choices(selectElement, {
-        position: 'auto',
-        shouldSort: false,
-        searchEnabled: true,
-        maxItemCount: 20,
-        renderChoiceLimit: 20,
-        classNames: {
-          containerOuter: 'custom-select',
-          containerInner: 'custom-select-inner',
-          input: 'custom-select-input',
-          listDropdown: 'custom-select-dropdown',
-          itemChoice: 'custom-select-item',
-          placeholder: 'custom-select-placeholder'
-        }
-      });
+      // 3. choices.js 인스턴스 변수
+      let choicesInstance: any = null;
 
-      // 디버깅용 로그
-      console.log("choices 적용됨:", choices);
-      console.log("select 요소:", selectElement);
+      // 4. 클릭(포커스) 시에만 choices.js 적용
+      selectElement.addEventListener('focus', function handler() {
+        if (!choicesInstance) {
+          // 3. choices.js 적용 직전에 <option value="">를 삭제
+          const firstOption = selectElement.querySelector('option[value=""]');
+          if (firstOption) selectElement.removeChild(firstOption);
+
+          choicesInstance = new window.Choices(selectElement, {
+            shouldSort: false,
+            searchEnabled: true,
+            position: 'auto',
+            maxItemCount: 20,
+            renderChoiceLimit: 20,
+            placeholder: true,
+            placeholderValue: '쿠폰선택',
+            classNames: {
+              containerOuter: 'custom-select',
+              containerInner: 'custom-select-inner',
+              input: 'custom-select-input',
+              itemChoice: 'custom-select-item',
+              listDropdown: 'custom-select-dropdown',
+              placeholder: 'custom-select-placeholder'
+            }
+          });
+        }
+      }, { once: true });
     }
   } catch (error) {
     console.error("메뉴 데이터 로드 실패:", error);
