@@ -174,6 +174,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const menuWrap = document.querySelector(".user-menuWrap") as HTMLElement;
     if (menuWrap) {
       menuWrap.style.display = "block"; // ✅ 보이게
+      
     }
   } else {
     const menuWrap = document.querySelector(".user-menuWrap") as HTMLElement;
@@ -289,6 +290,42 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   } else {
     console.log("📌 기본 페이지");
+  }
+
+  // === 톱니바퀴(메뉴) 팝업 바깥 클릭 시 닫기 기능 추가 ===
+  const userMenuWrap = document.querySelector(".user-menuWrap");
+  const userSetBox = document.querySelector(".user-setBox");
+  const menuBtn = userMenuWrap?.querySelector(".ani-1");
+
+  if (userMenuWrap && userSetBox && menuBtn) {
+    
+    menuBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (userSetBox.classList.contains("hidden")) {
+        userSetBox.classList.remove("hidden");
+      }
+    });
+
+    // 팝업 내부 클릭 시 이벤트 전파 막기
+    userSetBox.addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
+
+    // 팝업 바깥 클릭 시 팝업 닫기
+    document.addEventListener(
+      "click",
+      (e) => {
+        if (!userSetBox.classList.contains("hidden")) {
+          if (
+            !userSetBox.contains(e.target as Node) &&
+            !(e.target as HTMLElement).closest(".ani-1")
+          ) {
+            userSetBox.classList.add("hidden");
+          }
+        }
+      },
+      false
+    );
   }
 });
 
