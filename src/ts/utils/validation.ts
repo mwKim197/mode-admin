@@ -76,9 +76,20 @@ export function validateMenuItemsByType(detail: MenuDetail): string | null {
       }
     }
 
+    if (item.type === "garucha") {
+      if (parseFloat(item.value1) >= 7 || parseFloat(item.value1) <= 0) {
+        return `🍵 가루차값은 1~6사이입니다`;
+      }
+    }
+
     if (item.type === "syrup") {
       if (parseFloat(item.value3) < 20 && parseFloat(item.value4) < 20) {
         return `🍯 시럽 핫워터 또는 탄산수 중 하나는 20 이상이어야 합니다.`;
+      }
+    }
+    if (item.type === "syrup") {
+      if (parseFloat(item.value1) >= 6 || parseFloat(item.value1) <= 0) {
+        return `🍯 시럽값은 1~5사이입니다`;
       }
     }
   }
