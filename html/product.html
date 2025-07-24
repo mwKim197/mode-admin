@@ -41,7 +41,22 @@
     <!-- table -->
     <section class="pb20">
         <div class="inner">
-            <h2 class="mb20">상품</h2>
+            <div>
+                <h2 class="mb20">상품</h2>
+                <div class="input-group">
+                    <input
+                      id="searchProduct"
+                      type="text"
+                      placeholder="메뉴를 검색해주세요."
+                    />
+                    <button id="searchButton" class="btn-i search">
+                      <img src="/img/search.svg" alt="" />
+                    </button>
+                    <button id="searchReset" class="btn-i reset">
+                      <img src="/img/refresh_icon.svg" alt="" />
+                    </button>
+                  </div>
+            </div>
             <div class="tableArea">
                 <table class="table-fixed w-full min-w-[800px]">
                     <thead>
