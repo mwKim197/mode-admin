@@ -181,6 +181,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       menuWrap.style.display = "none"; // ✅ 숨기기
     }
   }
+  const menuList = document.querySelector(".sidemenu .menu");
+  const logoutLi = document.createElement("li");
+  logoutLi.innerHTML = `<a href="/html/log.html"><p>로그아웃</p></a>`;
+  menuList?.appendChild(logoutLi);
 
   if (!user?.payType) {
     const menuList = document.querySelector(".sidemenu .menu");
@@ -190,10 +194,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       li.innerHTML = `<a href="${item.href}"><p>${item.label}</p></a>`;
       menuList?.appendChild(li);
     });
-
-    const logoutLi = document.createElement("li");
-    logoutLi.innerHTML = `<a href="/html/log.html"><p>로그아웃</p></a>`;
-    menuList?.appendChild(logoutLi);
   }
 
   if (adminUserInfo && adminUserInfo.grade <= 2) {
