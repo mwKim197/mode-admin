@@ -244,7 +244,7 @@ const btnPopupTotalOrder = document.getElementById("btnPopupTotalOrder");
 if (btnPopupTotalOrder) {
     btnPopupTotalOrder.addEventListener("click", () => {
         if (menu) {
-            if (!confirm("현재 설정으로 전체 제조를 하시겠습니까?")) {
+            if (!confirm("원격 명령을 전송하시겠습니까?")) {
                 return;
             }
             const data = transformToOrderData(menu);
