@@ -1,0 +1,98 @@
+@charset "utf-8";
+
+#coupon-detail-page .data_input > div {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+#coupon-detail-page .data_input > div input[type="date"] {
+  width: calc((100% - 30px) / 2);
+  height: 38.5px;
+}
+
+#coupon-detail-page .data_input > div span {
+  margin: 0 5px;
+  white-space: nowrap;
+  width: 20px;
+  text-align: center;
+}
+
+#coupon-detail-page #issue-count {
+  text-align: right;
+}
+
+#coupon-detail-page .btnFlex {
+  margin-top: 10px;
+}
+
+.inputWrap .custom-select {
+  width: 100%;
+  height: 38.5px;
+}
+
+/* 드롭다운이 열렸을 때 높이 자동 조절 */
+.inputWrap .custom-select.is-open {
+  height: 300px;
+  overflow-y: auto;
+}
+
+.custom-select {
+  position: relative;
+  width: 100%;
+  font-family: var(--f-St);
+  font-size: 1.4rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: var(--white);
+  color: var(--stoke-gray);
+}
+
+.custom-select .choices__item--choice {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.custom-select .choices__item--choice:hover {
+  background-color: #f5f5f5;
+}
+
+/* choices.js의 single select 리스트 스타일링 */
+.custom-select .choices__list--single {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  min-height: 20px;
+}
+
+/* 선택 가능한 아이템 효과 */
+.custom-select .choices__item--selectable:hover {
+  background-color: #f5f5f5;
+}
+
+/* 일반적인 choices__item 기본 스타일 */
+.custom-select .choices__item {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  border: none;
+  outline: none;
+  font-size: 1.4rem;
+  line-height: 1.4;
+  background: transparent;
+}
+
+.inputWrap .data_input {
+  display: flex;
+  align-items: center;
+}
+.inputWrap .data_input > p {
+  flex: 0 0 60px;
+}
+
+.custom-select .choices__list--single .choices__item {
+  color: rgb(84, 84, 84);
+}
