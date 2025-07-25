@@ -5,7 +5,7 @@
   <script type="module" crossorigin src="../assets/main-B9kbHsQX.js"></script>
   <link rel="stylesheet" crossorigin href="../assets/main-D6OoUF5A.css">
   <link rel="stylesheet" crossorigin href="../assets/style-CchalFEw.css">
-  <link rel="stylesheet" crossorigin href="../assets/product-DPVYdv1m.css">
+  <link rel="stylesheet" crossorigin href="../assets/product-ifQdEacw.css">
 </head>
 
 <body class="product-page">
@@ -56,8 +56,17 @@
                     </button>
                   </div>
             </div>
-            <div class="tableArea">
-                <table class="table-fixed w-full min-w-[800px]">
+            <div class="table-wrapper tableArea">
+                <!-- 🔹 고정 헤더 테이블 -->
+                <table class="product-table">
+                    <colgroup>
+                        <col style="width: 23px" />
+                        <col style="width: 40px" />
+                        <col style="width: 105px" />
+                        <col style="width: 50px" />
+                        <col style="width: 40px" />
+                        <col style="width: 60px" />
+                    </colgroup>
                     <thead>
                     <tr>
                         <th>순서</th>
@@ -68,21 +77,30 @@
                         <th></th>
                     </tr>
                     </thead>
-                    <tbody id="menu-table-body">
-                    <tr onclick="window.location.href='./product_set.html'">
-                        <td colspan="6" style="
-                        height: 56px;
-                        text-align: center;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                      ">
-                            등록된 메뉴가 없습니다.
-                        </td>
-                    </tr>
-                    </tbody>
                 </table>
+
+                <!-- 스크롤 바디 테이블 -->
+                <div class="scroll-body">
+                    <table class="product-table">
+                        <colgroup>
+                            <col style="width: 23px" />
+                            <col style="width: 40px" />
+                            <col style="width: 105px" />
+                            <col style="width: 50px" />
+                            <col style="width: 40px" />
+                            <col style="width: 60px" />
+                        </colgroup>
+                        <tbody id="menu-table-body">
+                        <tr onclick="window.location.href='./product_set.html'">
+                            <td colspan="6" class="h-14 text-center flex justify-center items-center">
+                                등록된 메뉴가 없습니다.
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
             <div
                     class="hidden whitespace-normal break-all max-w-[100px] text-sm"
             ></div>
