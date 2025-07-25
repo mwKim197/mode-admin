@@ -1,8 +1,5 @@
 import { apiGet } from "../api/apiHelpers.ts";
 import { getStoredUser } from "../utils/userStorage.ts";
-// import flatpickr from "flatpickr";
-// import "flatpickr/dist/flatpickr.min.css";
-// import { Korean } from "flatpickr/dist/l10n/ko.js";
 
 export function initCouponDetail() {
   console.log("쿠폰 발행 페이지 초기화");
@@ -25,9 +22,62 @@ export function initCouponDetail() {
   if (couponForm) {
     couponForm.addEventListener("submit", function (e) {
       e.preventDefault();
-      // 쿠폰 발급 로직 구현
-      console.log("쿠폰 발급 처리");
-      // 성공 시 목록으로 이동
+
+      // 필드 값 가져오기
+      const franchise = (
+        document.getElementById("franchise-input") as HTMLInputElement
+      )?.value.trim();
+      const store = (
+        document.getElementById("store-input") as HTMLInputElement
+      )?.value.trim();
+      const device = (
+        document.getElementById("device-input") as HTMLInputElement
+      )?.value.trim();
+      const startDate = (
+        document.getElementById("start-date") as HTMLInputElement
+      )?.value.trim();
+      const endDate = (
+        document.getElementById("end-date") as HTMLInputElement
+      )?.value.trim();
+      const issueCount = (
+        document.getElementById("issue-count") as HTMLInputElement
+      )?.value.trim();
+      const coupon = (
+        document.getElementById("sample") as HTMLSelectElement
+      )?.value.trim();
+      const memo = (
+        document.getElementById("myTextarea") as HTMLTextAreaElement
+      )?.value.trim();
+
+      if (!franchise) {
+        window.showToast("가맹점을 입력해 주세요", 2000, "warning");
+        return;
+      }
+      if (!store) {
+        window.showToast("지점을 입력해 주세요", 2000, "warning");
+        return;
+      }
+      if (!device) {
+        window.showToast("기기번호를 입력해 주세요", 2000, "warning");
+        return;
+      }
+      if (!startDate) {
+        window.showToast("사용기한(시작일)을 입력해 주세요", 2000, "warning");
+        return;
+      }
+      if (!endDate) {
+        window.showToast("사용기한(종료일)을 입력해 주세요", 2000, "warning");
+        return;
+      }
+      if (!issueCount) {
+        window.showToast("발행매수를 입력해 주세요", 2000, "warning");
+        return;
+      }
+      if (!coupon) {
+        window.showToast("쿠폰을 선택해 주세요", 2000, "warning");
+        return;
+      }
+
       window.location.href = "/html/couponList.html";
     });
   }
@@ -106,38 +156,3 @@ async function sampleSelect(userId: string) {
     console.error("메뉴 데이터 로드 실패:", error);
   }
 }
-
-// flatpickr("#start-date", {
-//   locale: Korean,
-//   dateFormat: "y.m.d", // 2025.07.24
-//   altInput: true,
-//   altFormat: "y.m.d",
-//   allowInput: true,
-//   onChange: function (selectedDates, dateStr, instance) {
-//     // 2자리 연도 변환
-//     if (dateStr) {
-//       const d = selectedDates[0];
-//       const yy = String(d.getFullYear()).slice(-2);
-//       const mm = String(d.getMonth() + 1).padStart(2, "0");
-//       const dd = String(d.getDate()).padStart(2, "0");
-//       instance.input.value = `${yy}.${mm}.${dd}`;
-//     }
-//   },
-// });
-
-// flatpickr("#end-date", {
-//   locale: Korean,
-//   dateFormat: "y.m.d",
-//   altInput: true,
-//   altFormat: "y.m.d",
-//   allowInput: true,
-//   onChange: function (selectedDates, dateStr, instance) {
-//     if (dateStr) {
-//       const d = selectedDates[0];
-//       const yy = String(d.getFullYear()).slice(-2);
-//       const mm = String(d.getMonth() + 1).padStart(2, "0");
-//       const dd = String(d.getDate()).padStart(2, "0");
-//       instance.input.value = `${yy}.${mm}.${dd}`;
-//     }
-//   },
-// });

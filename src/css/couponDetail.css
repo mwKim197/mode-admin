@@ -85,22 +85,14 @@
   background: transparent;
 }
 
-/* 모든 입력 라벨(p태그) 통일 스타일 */
-.inputWrap .data_input > p,
-.inputWrap .text_input > p {
+.inputWrap .data_input {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  width: 110px;
-  min-width: 110px;
-  height: 40px;
-  font-size: 1.4rem;
-  font-weight: 500;
-  margin: 0;
-  box-sizing: border-box;
+}
+.inputWrap .data_input > p {
+  flex: 0 0 60px;
 }
 
-/* 선택된 쿠폰(선택된 값)만 #000으로 표시 */
 .custom-select .choices__list--single .choices__item {
   color: rgb(84, 84, 84);
 }
