@@ -9,7 +9,7 @@
 
 /* 헤더 셀 스타일 */
 .product-table thead tr {
-    background-color: #f8f8f8;
+    background-color: #000;
     font-weight: bold;
     height: 48px;
 }
