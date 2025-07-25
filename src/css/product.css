@@ -1,10 +1,69 @@
 @charset "utf-8";
 
+/* 전체 테이블 고정 레이아웃 */
+.product-table {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* 헤더 셀 스타일 */
+.product-table thead tr {
+    background-color: #f8f8f8;
+    font-weight: bold;
+    height: 48px;
+}
+
+/* 상품명 ellipsis */
+.product-name {
+    max-width: 105px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ✅ 스크롤 바디 래퍼 */
+.scroll-body {
+    max-height: 60vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* 테이블 wrapper */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* 모바일 대응 */
 @media (max-width: 460px) {
-    .product-page thead tr,
-    .product-page #menu-table-body tr {
-        grid-template-columns: 23px 40px 105px 50px 40px 60px !important;
+    .product-table col:nth-child(1) { width: 23px !important; }
+    .product-table col:nth-child(2) { width: 40px !important; }
+    .product-table col:nth-child(3) { width: 105px !important; }
+    .product-table col:nth-child(4) { width: 50px !important; }
+    .product-table col:nth-child(5) { width: 40px !important; }
+    .product-table col:nth-child(6) { width: 60px !important; }
+
+    .product-name {
+        max-width: 105px;
     }
+}
+
+/* ✅ 비활성화 행 */
+.tr-disabled {
+    opacity: 0.4;
+    pointer-events: none;
+    background-color: #f2f2f2;
+}
+
+/* ✅ 모바일 대응 (460px 이하일 때 col width 재정의) */
+@media (max-width: 460px) {
+    .product-table col:nth-child(1) { width: 23px !important; }
+    .product-table col:nth-child(2) { width: 40px !important; }
+    .product-table col:nth-child(3) { width: 105px !important; }
+    .product-table col:nth-child(4) { width: 50px !important; }
+    .product-table col:nth-child(5) { width: 40px !important; }
+    .product-table col:nth-child(6) { width: 60px !important; }
 
     .product-name {
         max-width: 105px;
@@ -14,47 +73,7 @@
     }
 }
 
-.table-fixed {
-    table-layout: fixed;
-}
-
-.product-page table {
-    table-layout: fixed;
-    width: 100%;
-}
-
-.product-page thead {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-}
-
-.product-page tbody {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-}
-
-.product-page #menu-table-body {
-    display: block;
-    max-height: 60vh; /* 원하는 높이 */
-    overflow-y: auto;
-    overflow-x: auto; /* ✅ 가로 스크롤 추가 */
-    min-width: 100%; /* ✅ 최소한 테이블 폭 채움 */
-}
-
-.product-name {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.tr-disabled {
-    opacity: 0.4;
-    pointer-events: none;
-    background-color: #f2f2f2;
-}
-
+/* ✅ 버튼 & 팝업 등 부가요소는 기존 유지 */
 .back-box {
     color: white;
     padding: 0.5rem;
@@ -69,7 +88,7 @@
     height: 40px;
     border: none;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.2); /* 불투명 흰색 */
+    background-color: rgba(255, 255, 255, 0.2);
     color: white;
     font-size: 20px;
     cursor: pointer;
@@ -80,7 +99,6 @@
     background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* 관리자 요청 팝업 스타일 */
 #adminActionPopup {
     display: none;
     position: fixed;
@@ -90,9 +108,9 @@
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
     z-index: 2000;
-  }
-  
-  .admin-popup-content {
+}
+
+.admin-popup-content {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -100,4 +118,4 @@
     padding: 2rem;
     border-radius: 10px;
     min-width: 300px;
-  }
+}
