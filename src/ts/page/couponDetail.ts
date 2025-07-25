@@ -9,7 +9,7 @@ export function initCouponDetail() {
 
   // 목록으로 버튼 클릭 시 couponList 페이지로 이동
   const backToListBtn = document.getElementById("back-to-list");
-  
+
   if (backToListBtn) {
     backToListBtn.addEventListener("click", function () {
       window.location.href = "/html/couponList.html";
@@ -18,7 +18,7 @@ export function initCouponDetail() {
 
   // 폼 제출 이벤트
   const couponForm = document.getElementById("coupon-form") as HTMLFormElement;
-  
+
   if (couponForm) {
     couponForm.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -57,7 +57,7 @@ async function loadUserData() {
     if (storeInput) storeInput.value = storeName;
     if (deviceInput) deviceInput.value = user.userId;
 
-    await sampleSelect(user.userId);  
+    await sampleSelect(user.userId);
   } catch (error) {
     console.error("사용자 데이터 로드 실패:", error);
   }
@@ -70,13 +70,13 @@ async function sampleSelect(userId: string) {
     );
     const data = await response.json();
 
-    const selectElement = document.getElementById('sample') as HTMLSelectElement;
+    const selectElement = document.getElementById(
+      "sample"
+    ) as HTMLSelectElement;
 
     if (selectElement && data.items) {
-      // 1. 기본 옵션 추가
-      
+      selectElement.innerHTML = '<option value="">쿠폰을 선택해주세요</option>';
 
-      // 2. 데이터 옵션 추가
       data.items.forEach((item: any) => {
         if (!item.menuId || !item.name) return;
         const option = document.createElement("option");
@@ -85,35 +85,19 @@ async function sampleSelect(userId: string) {
         selectElement.appendChild(option);
       });
 
-      // 3. choices.js 인스턴스 변수
-      let choicesInstance: any = null;
-
-      // 4. 클릭(포커스) 시에만 choices.js 적용
-      selectElement.addEventListener('focus', function handler() {
-        if (!choicesInstance) {
-          // 3. choices.js 적용 직전에 <option value="">를 삭제
-          const firstOption = selectElement.querySelector('option[value=""]');
-          if (firstOption) selectElement.removeChild(firstOption);
-
-          choicesInstance = new window.Choices(selectElement, {
-            shouldSort: false,
-            searchEnabled: true,
-            position: 'auto',
-            maxItemCount: 20,
-            renderChoiceLimit: 20,
-            placeholder: true,
-            placeholderValue: '쿠폰선택',
-            classNames: {
-              containerOuter: 'custom-select',
-              containerInner: 'custom-select-inner',
-              input: 'custom-select-input',
-              itemChoice: 'custom-select-item',
-              listDropdown: 'custom-select-dropdown',
-              placeholder: 'custom-select-placeholder'
-            }
-          });
-        }
-      }, { once: true });
+      new window.Choices(selectElement, {
+        shouldSort: false,
+        searchEnabled: false,
+        position: "auto",
+        classNames: {
+          containerOuter: "custom-select",
+          containerInner: "custom-select-inner",
+          input: "custom-select-input",
+          itemChoice: "custom-select-item",
+          listDropdown: "custom-select-dropdown",
+          placeholder: "custom-select-placeholder",
+        },
+      });
     }
   } catch (error) {
     console.error("메뉴 데이터 로드 실패:", error);
