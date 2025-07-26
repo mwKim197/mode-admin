@@ -311,7 +311,7 @@ function showPopup(notice: any): HTMLDivElement {
   // 팝업 전체 스타일
   Object.assign(popup.style, {
     position: "fixed",
-    top: "45%",
+    top: "47%",
     left: "50%",
     transform: "translate(-50%, -50%)",
     backgroundColor: "#000",

@@ -182,11 +182,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       menuWrap.style.display = "none"; // ✅ 숨기기
     }
   }
-  const menuList = document.querySelector(".sidemenu .menu");
-  const logoutLi = document.createElement("li");
-  logoutLi.innerHTML = `<a href="/html/log.html"><p>로그아웃</p></a>`;
-  menuList?.appendChild(logoutLi);
-
+  
+  // 포인트메뉴
   if (!user?.payType) {
     const menuList = document.querySelector(".sidemenu .menu");
     const pointMene = [{ href: "/html/point.html", label: "포인트" }];
@@ -196,6 +193,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       menuList?.appendChild(li);
     });
   }
+
+  // 로그아웃
+  const menuList = document.querySelector(".sidemenu .menu");
+  const logoutLi = document.createElement("li");
+  logoutLi.innerHTML = `<a href="/html/log.html"><p>로그아웃</p></a>`;
+  menuList?.appendChild(logoutLi);
 
   if (adminUserInfo && adminUserInfo.grade <= 2) {
     const menuList = document.querySelector(".sidemenu .menu");
