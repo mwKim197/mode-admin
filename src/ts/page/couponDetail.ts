@@ -1,8 +1,11 @@
 import { apiGet } from "../api/apiHelpers.ts";
 import { getStoredUser } from "../utils/userStorage.ts";
+import {renderBarcodeToCanvas} from "../utils/barcode.ts";
 
 export function initCouponDetail() {
   console.log("쿠폰 발행 페이지 초기화");
+
+  getBarcode();
 
   // API에서 사용자 정보 가져와서 가맹점/지점에 넣기
   loadUserData();
@@ -45,9 +48,9 @@ export function initCouponDetail() {
       const coupon = (
         document.getElementById("sample") as HTMLSelectElement
       )?.value.trim();
-      const memo = (
+      /*const memo = (
         document.getElementById("myTextarea") as HTMLTextAreaElement
-      )?.value.trim();
+      )?.value.trim();*/
 
       if (!franchise) {
         window.showToast("가맹점을 입력해 주세요", 2000, "warning");
@@ -155,4 +158,9 @@ async function sampleSelect(userId: string) {
   } catch (error) {
     console.error("메뉴 데이터 로드 실패:", error);
   }
+}
+
+async function getBarcode() {
+  const canvas = document.getElementById('barcode-canvas') as HTMLCanvasElement;
+  if (canvas) renderBarcodeToCanvas(123456, canvas);
 }
