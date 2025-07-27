@@ -311,7 +311,7 @@ function showPopup(notice: any): HTMLDivElement {
   // 팝업 전체 스타일
   Object.assign(popup.style, {
     position: "fixed",
-    top: "30%",
+    top: "47%",
     left: "50%",
     transform: "translate(-50%, -50%)",
     backgroundColor: "#000",
@@ -320,13 +320,13 @@ function showPopup(notice: any): HTMLDivElement {
     borderRadius: "12px",
     boxShadow: "0 8px 20px rgba(0, 0, 0, 0.4)",
     border: "2px solid #888",
-    maxWidth: "500px",
-    width: "90%",
+    maxWidth: "360px",
+    width: "70%",
     zIndex: "9999",
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
-    minHeight: "300px",
+    minHeight: "220px",
   });
 
   document.getElementById("popupArea")!.style.backgroundColor =

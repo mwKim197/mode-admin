@@ -2,10 +2,10 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8"/>
-  <script type="module" crossorigin src="../assets/main-DwR8RrJa.js"></script>
+  <script type="module" crossorigin src="../assets/main-CJPm9qUt.js"></script>
   <link rel="stylesheet" crossorigin href="../assets/main-D6OoUF5A.css">
   <link rel="stylesheet" crossorigin href="../assets/style-CchalFEw.css">
-  <link rel="stylesheet" crossorigin href="../assets/product-BfeHnXU5.css">
+  <link rel="stylesheet" crossorigin href="../assets/product-ifQdEacw.css">
 </head>
 
 <body class="product-page">
@@ -40,9 +40,33 @@
     <!-- table -->
     <section class="pb20">
         <div class="inner">
-            <h2 class="mb20">상품</h2>
-            <div class="tableArea">
-                <table class="table-fixed w-full min-w-[800px]">
+            <div>
+                <h2 class="mb20">상품</h2>
+                <div class="input-group">
+                    <input
+                      id="searchProduct"
+                      type="text"
+                      placeholder="메뉴를 검색해주세요."
+                    />
+                    <button id="searchButton" class="btn-i search">
+                      <img src="../img/search.svg" alt="" />
+                    </button>
+                    <button id="searchReset" class="btn-i reset">
+                      <img src="../img/refresh_icon.svg" alt="" />
+                    </button>
+                  </div>
+            </div>
+            <div class="table-wrapper tableArea">
+                <!-- 🔹 고정 헤더 테이블 -->
+                <table class="product-table">
+                    <colgroup>
+                        <col style="width: 23px" />
+                        <col style="width: 40px" />
+                        <col style="width: 105px" />
+                        <col style="width: 50px" />
+                        <col style="width: 40px" />
+                        <col style="width: 60px" />
+                    </colgroup>
                     <thead>
                     <tr>
                         <th>순서</th>
@@ -53,21 +77,30 @@
                         <th></th>
                     </tr>
                     </thead>
-                    <tbody id="menu-table-body" style="width: 410px;">
-                    <tr onclick="window.location.href='./product_set.html'">
-                        <td colspan="6" style="
-                        height: 56px;
-                        text-align: center;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                      ">
-                            등록된 메뉴가 없습니다.
-                        </td>
-                    </tr>
-                    </tbody>
                 </table>
+
+                <!-- 스크롤 바디 테이블 -->
+                <div class="scroll-body">
+                    <table class="product-table">
+                        <colgroup>
+                            <col style="width: 23px" />
+                            <col style="width: 40px" />
+                            <col style="width: 105px" />
+                            <col style="width: 50px" />
+                            <col style="width: 40px" />
+                            <col style="width: 60px" />
+                        </colgroup>
+                        <tbody id="menu-table-body">
+                        <tr onclick="window.location.href='./product_set.html'">
+                            <td colspan="6" class="h-14 text-center flex justify-center items-center">
+                                등록된 메뉴가 없습니다.
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
             <div
                     class="hidden whitespace-normal break-all max-w-[100px] text-sm"
             ></div>
