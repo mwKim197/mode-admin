@@ -2,120 +2,163 @@
 
 /* 전체 테이블 고정 레이아웃 */
 .product-table {
-    table-layout: fixed;
-    width: 100%;
-    border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 /* 헤더 셀 스타일 */
 .product-table thead tr {
-    background-color: #000;
-    font-weight: bold;
-    height: 48px;
+  background-color: #000;
+  font-weight: bold;
+  height: 48px;
 }
 
 /* 상품명 ellipsis */
 .product-name {
-    max-width: 105px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  max-width: 105px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ✅ 스크롤 바디 래퍼 */
 .scroll-body {
-    max-height: 60vh;
-    overflow-y: auto;
-    overflow-x: hidden;
+  max-height: 60vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* 테이블 wrapper */
 .table-wrapper {
-    width: 100%;
-    overflow-x: auto;
+  width: 100%;
+  overflow-x: auto;
 }
 
 /* 모바일 대응 */
 @media (max-width: 460px) {
-    .product-table col:nth-child(1) { width: 23px !important; }
-    .product-table col:nth-child(2) { width: 40px !important; }
-    .product-table col:nth-child(3) { width: 105px !important; }
-    .product-table col:nth-child(4) { width: 50px !important; }
-    .product-table col:nth-child(5) { width: 40px !important; }
-    .product-table col:nth-child(6) { width: 60px !important; }
+  .product-table col:nth-child(1) {
+    width: 23px !important;
+  }
+  .product-table col:nth-child(2) {
+    width: 40px !important;
+  }
+  .product-table col:nth-child(3) {
+    width: 105px !important;
+  }
+  .product-table col:nth-child(4) {
+    width: 50px !important;
+  }
+  .product-table col:nth-child(5) {
+    width: 40px !important;
+  }
+  .product-table col:nth-child(6) {
+    width: 60px !important;
+  }
 
-    .product-name {
-        max-width: 105px;
-    }
+  .product-name {
+    max-width: 105px;
+  }
 }
 
 /* ✅ 비활성화 행 */
 .tr-disabled {
-    opacity: 0.4;
-    pointer-events: none;
-    background-color: #f2f2f2;
+  opacity: 0.4;
+  pointer-events: none;
+  background-color: #f2f2f2;
 }
 
 /* ✅ 모바일 대응 (460px 이하일 때 col width 재정의) */
 @media (max-width: 460px) {
-    .product-table col:nth-child(1) { width: 23px !important; }
-    .product-table col:nth-child(2) { width: 40px !important; }
-    .product-table col:nth-child(3) { width: 105px !important; }
-    .product-table col:nth-child(4) { width: 50px !important; }
-    .product-table col:nth-child(5) { width: 40px !important; }
-    .product-table col:nth-child(6) { width: 60px !important; }
+  .product-table col:nth-child(1) {
+    width: 23px !important;
+  }
+  .product-table col:nth-child(2) {
+    width: 40px !important;
+  }
+  .product-table col:nth-child(3) {
+    width: 105px !important;
+  }
+  .product-table col:nth-child(4) {
+    width: 50px !important;
+  }
+  .product-table col:nth-child(5) {
+    width: 40px !important;
+  }
+  .product-table col:nth-child(6) {
+    width: 60px !important;
+  }
 
-    .product-name {
-        max-width: 105px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+  .product-name {
+    max-width: 105px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
-/* ✅ 버튼 & 팝업 등 부가요소는 기존 유지 */
+
 .back-box {
-    color: white;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
+  position: fixed;
+  right: -1%;
+  bottom: -196%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+  color: white;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  display: flex; 
+  justify-content: flex-end;
+  align-items: center;
+}
+
+
+body[data-page="product-add"] .back-box,
+body[data-page="product-detail"] .back-box {
+  display: flex;
 }
 
 .back-button {
-    width: 40px;
-    height: 40px;
-    border: none;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.2);
-    color: white;
-    font-size: 20px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .back-button:hover {
-    background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 #adminActionPopup {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 2000;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
 }
 
 .admin-popup-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 2rem;
-    border-radius: 10px;
-    min-width: 300px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 2rem;
+  border-radius: 10px;
+  min-width: 300px;
 }
+
+
+body[data-page="product-add"] .pb20,
+body[data-page="product-detail"] .pb20 {
+  margin-top: 70px; 
+}
+
+

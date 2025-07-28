@@ -13,6 +13,12 @@ let uploadedImageBase64: string;
 let uploadedFileName: string;
 
 export async function initProductDetail() {
+    
+    const backBox = document.querySelector('.back-box') as HTMLElement;
+    if (backBox) {
+        backBox.style.display = 'flex';
+    }
+
     const menuId = getParamId("menuId");
     if (!menuId) return;
 
