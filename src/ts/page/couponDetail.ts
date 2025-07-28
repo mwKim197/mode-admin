@@ -1,6 +1,6 @@
-import { apiGet } from "../api/apiHelpers.ts";
+import { apiGet, apiPost } from "../api/apiHelpers.ts";
 import { getStoredUser } from "../utils/userStorage.ts";
-import {renderBarcodeToCanvas} from "../utils/barcode.ts";
+import { renderBarcodeToCanvas } from "../utils/barcode.ts";
 
 export function initCouponDetail() {
   console.log("쿠폰 발행 페이지 초기화");
@@ -23,7 +23,7 @@ export function initCouponDetail() {
   const couponForm = document.getElementById("coupon-form") as HTMLFormElement;
 
   if (couponForm) {
-    couponForm.addEventListener("submit", function (e) {
+    couponForm.addEventListener("submit", async function (e) {
       e.preventDefault();
 
       // 필드 값 가져오기
@@ -48,10 +48,11 @@ export function initCouponDetail() {
       const coupon = (
         document.getElementById("sample") as HTMLSelectElement
       )?.value.trim();
-      /*const memo = (
+      const memo = (
         document.getElementById("myTextarea") as HTMLTextAreaElement
-      )?.value.trim();*/
+      )?.value.trim();
 
+      // 유효성 검사
       if (!franchise) {
         window.showToast("가맹점을 입력해 주세요", 2000, "warning");
         return;
@@ -81,7 +82,54 @@ export function initCouponDetail() {
         return;
       }
 
-      window.location.href = "/html/couponList.html";
+      // 선택된 쿠폰의 이름 가져오기
+      const selectElement = document.getElementById(
+        "sample"
+      ) as HTMLSelectElement;
+      const selectedOption =
+        selectElement?.options[selectElement.selectedIndex];
+      const selectedMenuName = selectedOption?.textContent || "";
+
+      try {
+        const user = getStoredUser();
+        if (!user) {
+          window.showToast("사용자 정보가 없습니다.", 2000, "error");
+          return;
+        }
+
+        // API 요청 데이터 구성
+        const payload = {
+          userId: user.userId,
+          title: `${selectedMenuName} 무료`,
+          menuId: coupon,
+          count: parseInt(issueCount),
+          startsAt: startDate,
+          expiresAt: endDate,
+        };
+
+        // 쿠폰 발급 API 호출
+        const response = await apiPost("/model_coupon?func=setCoupon", payload);
+
+        if (response.ok) {
+          window.showToast(
+            "쿠폰이 성공적으로 발급되었습니다.",
+            3000,
+            "success"
+          );
+          setTimeout(() => {
+            window.location.href = "/html/couponList.html";
+          }, 1000);
+        } else {
+          const errorData = await response.json();
+          window.showToast(
+            `쿠폰 발급 실패: ${errorData.message || "오류가 발생했습니다."}`,
+            3000,
+            "error"
+          );
+        }
+      } catch (error) {
+        window.showToast("쿠폰 발급 중 오류가 발생했습니다.", 3000, "error");
+      }
     });
   }
 }
@@ -161,6 +209,6 @@ async function sampleSelect(userId: string) {
 }
 
 async function getBarcode() {
-  const canvas = document.getElementById('barcode-canvas') as HTMLCanvasElement;
+  const canvas = document.getElementById("barcode-canvas") as HTMLCanvasElement;
   if (canvas) renderBarcodeToCanvas(123456, canvas);
 }
