@@ -129,6 +129,8 @@ function renderCouponTable(coupons: any[]) {
 
   coupons.forEach((coupon, index) => {
     const row = document.createElement("tr");
+    row.classList.add("coupon-row");
+    row.setAttribute("data-coupon-index", index.toString());
 
     const formatDate = (dateString: string) => {
       const date = new Date(dateString);
@@ -150,9 +152,6 @@ function renderCouponTable(coupons: any[]) {
       <td>${startsAt}~${expiresAt}</td>
       <td>
         ${coupon.couponCode}
-        <!-- <canvas id="barcode-${
-          coupon.couponId
-        }" width="150" height="40"></canvas> -->
       </td>
       <td>미구현</td>
     `;
@@ -160,24 +159,61 @@ function renderCouponTable(coupons: any[]) {
     tbody.appendChild(row);
 
     // 개별 체크박스 이벤트 리스너 추가
-    const checkbox = row.querySelector(
-      'input[type="checkbox"]'
-    ) as HTMLInputElement;
+    const checkbox = row.querySelector('input[type="checkbox"]') as HTMLInputElement;
     if (checkbox) {
       checkbox.addEventListener("change", updateSelectAllCheckbox);
+      // 체크박스 클릭 시 이벤트 전파 방지
+      checkbox.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
     }
 
-    // 저장된 couponCode로 바코드 생성
-    setTimeout(() => {
-      const barcodeCanvas = row.querySelector(
-        `#barcode-${coupon.couponId}`
-      ) as HTMLCanvasElement;
-      if (barcodeCanvas && coupon.couponCode) {
-        renderBarcodeToCanvas(coupon.couponCode, barcodeCanvas);
-      }
-    }, 100);
+    // 행 클릭 이벤트 추가 (쿠폰 팝업 표시)
+    row.addEventListener("click", () => {
+      showCouponPopup();
+    });
   });
 
   // 테이블 렌더링 후 전체 선택 체크박스 상태 초기화
   updateSelectAllCheckbox();
+
+  // 팝업 닫기 이벤트 리스너 추가
+  initCouponPopupEvents();
+}
+
+// 쿠폰 팝업 표시
+function showCouponPopup() {
+  const popup = document.getElementById("coupon-popup") as HTMLElement;
+  
+  if (popup) {
+    popup.style.display = "flex";
+  }
+}
+
+// 쿠폰 팝업 닫기
+function hideCouponPopup() {
+  const popup = document.getElementById("coupon-popup") as HTMLElement;
+  if (popup) {
+    popup.style.display = "none";
+  }
+}
+
+// 팝업 이벤트 초기화
+function initCouponPopupEvents() {
+  const closeBtn = document.querySelector("#coupon-popup .close-btn") as HTMLElement;
+  const popupOverlay = document.getElementById("coupon-popup") as HTMLElement;
+
+  // 닫기 버튼 클릭
+  if (closeBtn) {
+    closeBtn.addEventListener("click", hideCouponPopup);
+  }
+
+  // 오버레이 클릭 시 닫기
+  if (popupOverlay) {
+    popupOverlay.addEventListener("click", (e) => {
+      if (e.target === popupOverlay) {
+        hideCouponPopup();
+      }
+    });
+  }
 }
