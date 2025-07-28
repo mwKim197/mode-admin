@@ -1,1 +1,16 @@
 @charset "utf-8";
+
+#coupon-page .tableArea th:first-child,
+#coupon-page .tableArea td:first-child {
+  text-align: center;
+  vertical-align: middle;
+}
+
+#coupon-page .tableArea input[type="checkbox"] {
+  margin: 0 auto;
+  vertical-align: middle;
+}
+
+#coupon-page .tableArea td {
+  vertical-align: middle;
+}

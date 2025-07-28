@@ -97,36 +97,70 @@ export function initCouponDetail() {
           return;
         }
 
-        // API 요청 데이터 구성
-        const payload = {
-          userId: user.userId,
-          title: `${selectedMenuName} 무료`,
-          menuId: coupon,
-          count: parseInt(issueCount),
-          startsAt: startDate,
-          expiresAt: endDate,
-        };
+        const issueCountNum = parseInt(issueCount);
+        let successCount = 0;
+        let errorCount = 0;
 
-        // 쿠폰 발급 API 호출
-        const response = await apiPost("/model_coupon?func=setCoupon", payload);
+        // 발행매수만큼 개별 POST 요청 보내기
+        for (let i = 0; i < issueCountNum; i++) {
+          try {
+            // API 요청 데이터 구성 (count는 항상 1)
+            const payload = {
+              userId: user.userId,
+              title: `${selectedMenuName} 무료`,
+              menuId: coupon,
+              count: 1,
+              startsAt: startDate,
+              expiresAt: endDate,
+            };
 
-        if (response.ok) {
+            // 쿠폰 발급 API 호출
+            const response = await apiPost(
+              "/model_coupon?func=setCoupon",
+              payload
+            );
+
+            if (response.ok) {
+              successCount++;
+            } else {
+              errorCount++;
+              const errorData = await response.json();
+              console.error(
+                `쿠폰 발급 실패 (${i + 1}/${issueCountNum}):`,
+                errorData.message
+              );
+            }
+          } catch (error) {
+            errorCount++;
+            console.error(
+              `쿠폰 발급 중 오류 발생 (${i + 1}/${issueCountNum}):`,
+              error
+            );
+          }
+        }
+
+        // 결과 메시지 표시
+        if (successCount === issueCountNum) {
           window.showToast(
-            "쿠폰이 성공적으로 발급되었습니다.",
+            `${successCount}개의 쿠폰이 성공적으로 발급되었습니다.`,
             3000,
             "success"
           );
-          setTimeout(() => {
-            window.location.href = "/html/couponList.html";
-          }, 1000);
-        } else {
-          const errorData = await response.json();
+        } else if (successCount > 0) {
           window.showToast(
-            `쿠폰 발급 실패: ${errorData.message || "오류가 발생했습니다."}`,
+            `${successCount}개 발급 성공, ${errorCount}개 발급 실패`,
             3000,
-            "error"
+            "warning"
           );
+        } else {
+          window.showToast("쿠폰 발급에 실패했습니다.", 3000, "error");
+          return;
         }
+
+        // 성공 시 목록 페이지로 이동
+        setTimeout(() => {
+          window.location.href = "/html/couponList.html";
+        }, 1000);
       } catch (error) {
         window.showToast("쿠폰 발급 중 오류가 발생했습니다.", 3000, "error");
       }

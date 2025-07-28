@@ -28,6 +28,56 @@ export function initCouponList() {
       window.location.href = "/html/couponDetail.html";
     });
   }
+
+  // 전체 선택 체크박스 이벤트 리스너 추가
+  initSelectAllCheckbox();
+}
+
+// 전체 선택 체크박스 초기화
+function initSelectAllCheckbox() {
+  const selectAllCheckbox = document.querySelector(
+    'thead input[type="checkbox"]'
+  ) as HTMLInputElement;
+
+  if (selectAllCheckbox) {
+    selectAllCheckbox.addEventListener("change", function () {
+      const isChecked = this.checked;
+      const dataCheckboxes = document.querySelectorAll(
+        'tbody input[type="checkbox"]'
+      ) as NodeListOf<HTMLInputElement>;
+
+      dataCheckboxes.forEach((checkbox) => {
+        checkbox.checked = isChecked;
+      });
+    });
+  }
+}
+
+// 개별 체크박스 상태에 따른 전체 선택 체크박스 상태 업데이트
+function updateSelectAllCheckbox() {
+  const selectAllCheckbox = document.querySelector(
+    'thead input[type="checkbox"]'
+  ) as HTMLInputElement;
+  const dataCheckboxes = document.querySelectorAll(
+    'tbody input[type="checkbox"]'
+  ) as NodeListOf<HTMLInputElement>;
+
+  if (selectAllCheckbox && dataCheckboxes.length > 0) {
+    const checkedCount = Array.from(dataCheckboxes).filter(
+      (checkbox) => checkbox.checked
+    ).length;
+
+    if (checkedCount === 0) {
+      selectAllCheckbox.checked = false;
+      selectAllCheckbox.indeterminate = false;
+    } else if (checkedCount === dataCheckboxes.length) {
+      selectAllCheckbox.checked = true;
+      selectAllCheckbox.indeterminate = false;
+    } else {
+      selectAllCheckbox.checked = false;
+      selectAllCheckbox.indeterminate = true;
+    }
+  }
 }
 
 // 쿠폰 목록 API 호출
@@ -83,8 +133,8 @@ function renderCouponTable(coupons: any[]) {
     const formatDate = (dateString: string) => {
       const date = new Date(dateString);
       const year = String(date.getFullYear()).slice(-2);
-      const month = date.getMonth() + 1;
-      const day = date.getDate();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
       return `${year}.${month}.${day}`;
     };
 
@@ -109,6 +159,14 @@ function renderCouponTable(coupons: any[]) {
 
     tbody.appendChild(row);
 
+    // 개별 체크박스 이벤트 리스너 추가
+    const checkbox = row.querySelector(
+      'input[type="checkbox"]'
+    ) as HTMLInputElement;
+    if (checkbox) {
+      checkbox.addEventListener("change", updateSelectAllCheckbox);
+    }
+
     // 저장된 couponCode로 바코드 생성
     setTimeout(() => {
       const barcodeCanvas = row.querySelector(
@@ -119,4 +177,7 @@ function renderCouponTable(coupons: any[]) {
       }
     }, 100);
   });
+
+  // 테이블 렌더링 후 전체 선택 체크박스 상태 초기화
+  updateSelectAllCheckbox();
 }
