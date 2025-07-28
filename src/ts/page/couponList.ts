@@ -1,4 +1,3 @@
-import { apiGet } from "../api/apiHelpers.ts";
 import { getStoredUser } from "../utils/userStorage.ts";
 
 export function initCoupon() {

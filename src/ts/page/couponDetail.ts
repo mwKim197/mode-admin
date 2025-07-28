@@ -45,9 +45,9 @@ export function initCouponDetail() {
       const coupon = (
         document.getElementById("sample") as HTMLSelectElement
       )?.value.trim();
-      const memo = (
+      /*const memo = (
         document.getElementById("myTextarea") as HTMLTextAreaElement
-      )?.value.trim();
+      )?.value.trim();*/
 
       if (!franchise) {
         window.showToast("가맹점을 입력해 주세요", 2000, "warning");
