@@ -1,5 +1,6 @@
 @charset "utf-8";
 
+/* 쿠폰리스트 페이지 체크박스 중앙 정렬 */
 #coupon-page .tableArea th:first-child,
 #coupon-page .tableArea td:first-child {
   text-align: center;
@@ -11,6 +12,118 @@
   vertical-align: middle;
 }
 
+/* 쿠폰리스트 테이블 셀 중앙 정렬 */
 #coupon-page .tableArea td {
   vertical-align: middle;
+}
+
+/* 쿠폰 팝업 스타일 */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.popup {
+  background: #323232;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 90%;
+  position: relative;
+  overflow: hidden;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #eee;
+}
+
+.popup-header h2 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #999;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.popup-body {
+  padding: 0; 
+}
+
+.coupon-container {
+  position: relative;
+  width: 100%;
+  display: block;
+}
+
+#coupon-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.coupon-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  text-align: center;
+  pointer-events: none;
+  color: #333;
+  font-weight: bold;
+}
+
+.coupon-title {
+  font-size: 3rem;
+  margin-bottom: -2rem;
+  color: #2c3e50;
+}
+
+.coupon-code {
+  font-size: 1.2rem;
+  margin-bottom: 0.6rem;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.coupon-period {
+  font-size: 1.0rem;
+  margin-bottom: 0.4rem;
+  color: #7f8c8d;
+}
+
+.coupon-store {
+  font-size: 0.9rem;
+  color: #95a5a6;
+}
+
+/* 테이블 행 클릭 가능하게 */
+#coupon-page .tableArea tbody tr {
+  cursor: pointer;
+}
+
+#coupon-page .tableArea tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
