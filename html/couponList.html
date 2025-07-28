@@ -37,7 +37,7 @@
               <button
                 type="button"
                 class="btn blue"
-                id="open-coupon-detail" 
+                id="open-coupon-detail"
                 style="width: auto; padding: 1rem 2rem"
               >
                 발급하기
@@ -47,11 +47,10 @@
 
           <!-- 쿠폰 목록 테이블 추가 -->
           <div class="tableArea">
-            
             <table>
               <thead>
                 <tr>
-                  <th></th>
+                  <th><input type="checkbox" /></th>
                   <th>순서</th>
                   <th>이름</th>
                   <th>사용기한</th>
@@ -59,7 +58,7 @@
                   <th>사용여부</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="coupon-table-body">
                 <tr>
                   <td colspan="6" style="padding: 2rem 0 0">
                     표시할 쿠폰이 없습니다.
