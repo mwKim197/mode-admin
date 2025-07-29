@@ -100,7 +100,7 @@ export async function initProductDetail() {
         });
 
         // 얼음 Yes/No 선택에 따른 시간 입력 박스 표시/숨김
-        const iceRadios = document.querySelectorAll('input[name="iceYn"]');
+        //const iceRadios = document.querySelectorAll('input[name="iceYn"]');
 
         function toggleTimeInputs() {
             const selectedValue = (
@@ -132,9 +132,9 @@ export async function initProductDetail() {
         }
 
         // 라디오 버튼 변경 시 이벤트 리스너
-        iceRadios.forEach((radio) => {
+        /*iceRadios.forEach((radio) => {
             radio.addEventListener("change", toggleTimeInputs);
-        });
+        });*/
 
         // 페이지 로드 시 초기 상태 설정
         toggleTimeInputs();

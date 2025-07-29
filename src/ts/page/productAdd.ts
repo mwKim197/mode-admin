@@ -30,8 +30,6 @@ export async function initProductAdd() {
   // 빈 폼 렌더링 (기존 데이터 없이)
   await renderProductForm(null);
 
-  
-
   const logoUpload = document.getElementById("logoUpload") as HTMLInputElement;
   logoUpload.addEventListener("change", async (e) => {
     await setImage(e);
@@ -96,7 +94,7 @@ export async function initProductAdd() {
     });
 
     // 얼음 Yes/No 선택에 따른 시간 입력 박스 표시/숨김
-    const iceRadios = document.querySelectorAll('input[name="iceYn"]');
+    //const iceRadios = document.querySelectorAll('input[name="iceYn"]');
     const timeInputBox = document.getElementById(
       "ice-water-time-box"
     ) as HTMLElement;
@@ -114,10 +112,10 @@ export async function initProductAdd() {
     }
 
     // 라디오 버튼 변경 시 이벤트 리스너
-    iceRadios.forEach((radio) => {
+    /*iceRadios.forEach((radio) => {
       radio.addEventListener("change", toggleTimeInputs);
     });
-
+*/
     // 페이지 로드 시 초기 상태 설정
     toggleTimeInputs();
 
