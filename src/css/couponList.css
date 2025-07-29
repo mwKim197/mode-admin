@@ -12,12 +12,6 @@
   vertical-align: middle;
 }
 
-/* 쿠폰리스트 테이블 셀 중앙 정렬 */
-#coupon-page .tableArea td {
-  vertical-align: middle;
-}
-
-/* 검색창 스타일 - 상품페이지와 동일하게 */
 .search-container {
   margin-top: 20px;
   margin-bottom: 20px;
@@ -73,7 +67,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+
   border-bottom: 1px solid #eee;
 }
 
@@ -88,10 +82,6 @@
   font-size: 2rem;
   cursor: pointer;
   color: #999;
-}
-
-.close-btn:hover {
-  color: #333;
 }
 
 .popup-body {
@@ -125,14 +115,14 @@
 
 .coupon-period {
   font-size: 2rem;
-  margin-top: 30px;
+  margin-top: 40px;
   margin-bottom: 0.4rem;
-  color: #7f8c8d;
+  color: #e0462e;
 }
 
 .coupon-title {
   font-size: 2.5rem;
-  margin-top: 140px;
+  margin-top: 130px;
   color: #2c3e50;
 }
 
@@ -141,8 +131,17 @@
   color: #2c3e50;
 }
 
+.coupon-title.small {
+  font-size: 1.8rem;
+}
+
+.coupon-free.small {
+  font-size: 1.8rem;
+}
+
 .coupon-store {
-  font-size: 1.6rem;
+  font-size: 1.8rem;
+  margin-top: 3px;
   color: #3498db;
   font-weight: bold;
 }
@@ -150,7 +149,7 @@
 .coupon-id {
   font-size: 1rem;
   font-weight: bold;
-  color: #e74c3c;
+  color: #e2dede;
 }
 
 #coupon-barcode {
@@ -162,11 +161,18 @@
   margin-right: auto;
 }
 
-/* 테이블 행 클릭 가능하게 */
 #coupon-page .tableArea tbody tr {
   cursor: pointer;
 }
 
 #coupon-page .tableArea tbody tr:hover {
   background-color: rgba(0, 0, 0, 0.05);
+}
+
+.btnsave-img {
+  margin-top: 10px;
+}
+
+.save-img {
+  margin-top: 10px;
 }
