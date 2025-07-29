@@ -328,12 +328,12 @@ if (btnCupDispense) {
         if (menu) {
             const cupType = menu.cup;
             if (cupType === "plastic") {
-                if (confirm("플라스틱 컵을 배출하시겠습니까?")) {
+                if (confirm("원격 명령을 전송하시겠습니까?")) {
                     sendMachineCommand("pl");
                     closeAdminPopup(); // 공통 함수 호출
                 }
             } else if (cupType === "paper") {
-                if (confirm("종이컵을 배출하시겠습니까?")) {
+                if (confirm("원격 명령을 전송하시겠습니까?")) {
                     sendMachineCommand("pa");
                     closeAdminPopup(); // 공통 함수 호출
                 }
@@ -347,7 +347,7 @@ const btnIceWaterDispense = document.getElementById("btnIceWaterDispense");
 if (btnIceWaterDispense) {
     btnIceWaterDispense.addEventListener("click", () => {
         if (menu) {
-            if (confirm("얼음/물을 배출하시겠습니까?")) {
+            if (confirm("원격 명령을 전송하시겠습니까?")) {
                 sendMachineCommand("ice", menu);
                 closeAdminPopup(); // 공통 함수 호출
             }
@@ -359,7 +359,7 @@ if (btnIceWaterDispense) {
 const btnPopupDrinkOrder = document.getElementById("btnPopupDrinkOrder");
 if (btnPopupDrinkOrder) {
     btnPopupDrinkOrder.addEventListener("click", () => {
-        if (confirm("현재 설정으로 음료를 투출하시겠습니까?")) {
+        if (confirm("원격 명령을 전송하시겠습니까?")) {
             if (menu) {
                 sendMachineCommand("drink", menu);
                 closeAdminPopup(); // 공통 함수 호출
