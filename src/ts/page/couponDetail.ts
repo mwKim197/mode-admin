@@ -1,11 +1,13 @@
 import { apiGet, apiPost } from "../api/apiHelpers.ts";
 import { getStoredUser } from "../utils/userStorage.ts";
-import { renderBarcodeToCanvas } from "../utils/barcode.ts";
+// ❌ 바코드 import 제거
+// import { renderBarcodeToCanvas } from "../utils/barcode.ts";
 
 export function initCouponDetail() {
   console.log("쿠폰 발행 페이지 초기화");
 
-  getBarcode();
+  // ❌ 바코드 생성 함수 호출 제거
+  // getBarcode();
 
   // API에서 사용자 정보 가져와서 가맹점/지점에 넣기
   loadUserData();
@@ -90,6 +92,13 @@ export function initCouponDetail() {
         selectElement?.options[selectElement.selectedIndex];
       const selectedMenuName = selectedOption?.textContent || "";
 
+      // ✅ 확인창 표시
+      const confirmMessage = "쿠폰을 발행하시겠습니까?";
+
+      if (!confirm(confirmMessage)) {
+        return; // 사용자가 취소를 선택한 경우
+      }
+
       try {
         const user = getStoredUser();
         if (!user) {
@@ -141,11 +150,7 @@ export function initCouponDetail() {
 
         // 결과 메시지 표시
         if (successCount === issueCountNum) {
-          window.showToast(
-            `${successCount}개의 쿠폰이 성공적으로 발급되었습니다.`,
-            3000,
-            "success"
-          );
+          window.showToast("쿠폰 발행이 완료되었습니다.", 3000, "success");
         } else if (successCount > 0) {
           window.showToast(
             `${successCount}개 발급 성공, ${errorCount}개 발급 실패`,
@@ -240,9 +245,4 @@ async function sampleSelect(userId: string) {
   } catch (error) {
     console.error("메뉴 데이터 로드 실패:", error);
   }
-}
-
-async function getBarcode() {
-  const canvas = document.getElementById("barcode-canvas") as HTMLCanvasElement;
-  if (canvas) renderBarcodeToCanvas(123456, canvas);
 }
