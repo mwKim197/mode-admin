@@ -2,6 +2,9 @@ import { apiGet } from "../api/apiHelpers.ts";
 import { getStoredUser } from "../utils/userStorage.ts";
 import { renderBarcodeToCanvas } from "../utils/barcode.ts";
 
+let allCoupons: any[] = []; // 전체 쿠폰 데이터 저장
+let searchTimeout: NodeJS.Timeout | null = null; // 실시간 검색을 위한 타이머
+
 export function initCoupon() {
   console.log("✅ coupon.ts 로드됨");
 
@@ -31,6 +34,89 @@ export function initCouponList() {
 
   // 전체 선택 체크박스 이벤트 리스너 추가
   initSelectAllCheckbox();
+
+  // 검색 기능 초기화
+  initSearchFunction();
+}
+
+// 검색 기능 초기화
+function initSearchFunction() {
+  const searchInput = document.getElementById(
+    "searchCoupon"
+  ) as HTMLInputElement;
+  const searchBtn = document.getElementById(
+    "searchButton"
+  ) as HTMLButtonElement;
+  const resetBtn = document.getElementById("searchReset") as HTMLButtonElement;
+
+  if (!searchInput || !searchBtn || !resetBtn) {
+    console.error("검색 요소를 찾을 수 없습니다!");
+    return;
+  }
+
+  // 검색 버튼 클릭 이벤트
+  searchBtn.addEventListener("click", () => {
+    const searchTerm = searchInput.value.trim();
+    performSearch(searchTerm);
+  });
+
+  // 리셋 버튼 클릭 이벤트
+  resetBtn.addEventListener("click", () => {
+    searchInput.value = "";
+    performSearch("");
+  });
+
+  // Enter 키 이벤트
+  searchInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      const searchTerm = searchInput.value.trim();
+      performSearch(searchTerm);
+    }
+  });
+
+  // ✅ 실시간 검색 기능 추가
+  searchInput.addEventListener("input", function () {
+    const searchTerm = searchInput.value.trim();
+
+    // 기존 타이머가 있으면 취소 (디바운스 효과)
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    // 300ms 후에 검색 실행 (너무 빠른 타이핑에 대한 성능 최적화)
+    searchTimeout = setTimeout(() => {
+      performRealTimeSearch(searchTerm);
+    }, 300);
+  });
+}
+
+// 실시간 검색 실행 (디바운스 적용)
+function performRealTimeSearch(searchTerm: string) {
+  console.log("실시간 검색:", searchTerm);
+  performSearch(searchTerm);
+}
+
+// 검색 실행
+function performSearch(searchTerm: string) {
+  console.log("검색 실행:", searchTerm);
+
+  if (!searchTerm) {
+    // 검색어가 없으면 전체 목록 표시
+    renderCouponTable(allCoupons);
+    return;
+  }
+
+  // 쿠폰명 또는 쿠폰코드로 필터링
+  const filteredCoupons = allCoupons.filter((coupon) => {
+    const title = coupon.title?.toLowerCase() || "";
+    const couponCode = coupon.couponCode?.toLowerCase() || "";
+    const search = searchTerm.toLowerCase();
+
+    return title.includes(search) || couponCode.includes(search);
+  });
+
+  console.log(`검색 결과: ${filteredCoupons.length}개 쿠폰`);
+  renderCouponTable(filteredCoupons);
 }
 
 // 전체 선택 체크박스 초기화
@@ -95,7 +181,9 @@ async function loadCouponList() {
     const data = await response.json();
 
     if (response.ok) {
-      renderCouponTable(data.items);
+      // ✅ 전체 데이터를 저장 (검색용)
+      allCoupons = data.items || [];
+      renderCouponTable(allCoupons);
     } else {
       window.showToast("쿠폰 목록을 불러오는데 실패했습니다.", 3000, "error");
     }
@@ -158,7 +246,9 @@ function renderCouponTable(coupons: any[]) {
     tbody.appendChild(row);
 
     // 개별 체크박스 이벤트 리스너 추가
-    const checkbox = row.querySelector('input[type="checkbox"]') as HTMLInputElement;
+    const checkbox = row.querySelector(
+      'input[type="checkbox"]'
+    ) as HTMLInputElement;
     if (checkbox) {
       checkbox.addEventListener("change", updateSelectAllCheckbox);
       // 체크박스 클릭 시 이벤트 전파 방지
@@ -183,7 +273,7 @@ function renderCouponTable(coupons: any[]) {
 // 쿠폰 팝업 표시
 function showCouponPopup() {
   const popup = document.getElementById("coupon-popup") as HTMLElement;
-  
+
   if (popup) {
     popup.style.display = "flex";
   }
@@ -199,7 +289,9 @@ function hideCouponPopup() {
 
 // 팝업 이벤트 초기화
 function initCouponPopupEvents() {
-  const closeBtn = document.querySelector("#coupon-popup .close-btn") as HTMLElement;
+  const closeBtn = document.querySelector(
+    "#coupon-popup .close-btn"
+  ) as HTMLElement;
   const popupOverlay = document.getElementById("coupon-popup") as HTMLElement;
 
   // 닫기 버튼 클릭

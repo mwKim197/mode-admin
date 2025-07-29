@@ -17,6 +17,35 @@
   vertical-align: middle;
 }
 
+/* 검색창 스타일 - 상품페이지와 동일하게 */
+.search-container {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.search-box {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
+  margin-bottom: 2rem;
+  justify-content: space-between;
+}
+
+#searchCoupon {
+  min-width: 65px;
+  padding: 1rem 1.2rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  flex: 1;
+}
+
+#searchCoupon:focus {
+  outline: none;
+  border-color: var(--point-color, #007bff);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
 /* 쿠폰 팝업 스타일 */
 .popup-overlay {
   position: fixed;
@@ -66,7 +95,7 @@
 }
 
 .popup-body {
-  padding: 0; 
+  padding: 0;
 }
 
 .coupon-container {
@@ -109,7 +138,7 @@
 }
 
 .coupon-period {
-  font-size: 1.0rem;
+  font-size: 1rem;
   margin-bottom: 0.4rem;
   color: #7f8c8d;
 }
