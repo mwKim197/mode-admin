@@ -13,6 +13,7 @@ let currentHistoryPage = 1;
 const historyLimit = 10;
 let pageKeyMap: { [page: number]: PageKey } = {};
 let isEditMode = false; // 신규등록
+let searchTimeout: NodeJS.Timeout | null = null; // ✅ 실시간 검색을 위한 타이머 추가
 type PointMode = "create" | "update"; // 포인트 저장, 수정
 
 // 클래스 import
@@ -114,18 +115,42 @@ export async function initPoint() {
             window.showToast("검색어를 입력해주세요.", 2000, "warning");
             return;
         }
-
-        const filtered = items.filter(
-            (item) => item.mileageNo?.includes(keyword) || item.tel?.includes(keyword)
-        );
-        renderTable(filtered);
+        performSearch(keyword, true); // 검색 버튼 클릭 시 토스트 메시지 표시
     });
 
     resetBtn.addEventListener("click", () => {
         searchInput.value = "";
         renderTable(items); // 전체 리스트로 초기화
     });
-    //--- 마일리지 써치 세팅 ---//
+
+    // ✅ Enter 키로 검색 (기존 기능과 동일)
+    searchInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+            const keyword = searchInput.value.trim();
+            if (!keyword) {
+                window.showToast("검색어를 입력해주세요.", 2000, "warning");
+                return;
+            }
+            performSearch(keyword, true); // Enter 키 시에도 토스트 메시지 표시
+        }
+    });
+
+    // ✅ 실시간 검색 기능 추가
+    searchInput.addEventListener("input", function () {
+        const keyword = searchInput.value.trim();
+        
+        // 기존 타이머가 있으면 취소 (디바운스 효과)
+        if (searchTimeout) {
+            clearTimeout(searchTimeout);
+        }
+
+        // 300ms 후에 검색 실행 (너무 빠른 타이핑에 대한 성능 최적화)
+        searchTimeout = setTimeout(() => {
+            performSearch(keyword, false); // 실시간 검색 시 토스트 메시지 표시하지 않음
+        }, 300);
+    });
+    //--- 마일리지 검색 기능 수정 ---//
+
     //--- 마일리지 상세 세팅 ---//
     const closeButtons = document.querySelectorAll(".popupCloseBtn");
 
@@ -211,6 +236,27 @@ export async function initPoint() {
 
     //--- 마일리지 삭제 세팅 ---//
     await getPointList();
+}
+
+// ✅ 검색 기능을 통합하는 새로운 함수
+function performSearch(keyword: string, showToast: boolean) {
+    let filtered;
+
+    if (keyword.length > 0) {
+        filtered = items.filter(
+            (item) => item.mileageNo?.includes(keyword) || item.tel?.includes(keyword)
+        );
+    } else {
+        // 검색어가 없으면 전체 목록 표시
+        filtered = items;
+    }
+
+    renderTable(filtered);
+
+    // 검색 버튼이나 Enter 키를 눌렀을 때만 토스트 메시지 표시
+    if (showToast && filtered.length === 0 && keyword.length > 0) {
+        window.showToast(`"${keyword}"에 대한 검색 결과가 없습니다.`, 2000, "warning");
+    }
 }
 
 // 팝업 오픈
