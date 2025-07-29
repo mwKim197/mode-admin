@@ -4,6 +4,7 @@ import {MenuItem} from "../types/product.ts";
 
 const changeList: { menuId: number; empty?: string; delete?: boolean }[] = [];
 let allMenuItems: MenuItem[] = [];
+let searchTimeout: NodeJS.Timeout | null = null; 
 
 export function initProduct() {
     // localstorage에 저장된 user 정보를 불러옴
@@ -47,9 +48,6 @@ export function initProduct() {
     if (searchButton) {
       searchButton.addEventListener("click", function () {
         const searchTerm = searchInput?.value.trim() || "";
-        if (!searchTerm) {
-          return;
-        }
         searchProducts(searchTerm);
       });
     }
@@ -73,9 +71,40 @@ export function initProduct() {
           searchProducts(searchTerm);
         }
       });
+
+      // ✅ 실시간 검색 기능 추가
+      searchInput.addEventListener("input", function () {
+        const searchTerm = searchInput.value.trim();
+        
+        if (searchTimeout) {
+          clearTimeout(searchTimeout);
+        }
+
+        searchTimeout = setTimeout(() => {
+          performRealTimeSearch(searchTerm);
+        }, 300);
+      });
     }
   }
 
+  // ✅ 실시간 검색을 위한 새로운 함수
+  function performRealTimeSearch(searchTerm: string) {
+    let filtered;
+
+    if (searchTerm.length > 0) {
+      filtered = allMenuItems.filter((item) =>
+          item.name?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    } else {
+      // 검색어가 없으면 전체 목록 표시
+      filtered = allMenuItems;
+    }
+
+    renderMenuTable(filtered);
+
+  }
+
+  // 기존 검색 함수 (검색 버튼용)
   function searchProducts(searchTerm: string) {
     let filtered;
 
@@ -89,7 +118,8 @@ export function initProduct() {
 
     renderMenuTable(filtered);
 
-    if (filtered.length === 0) {
+    // 검색 버튼을 눌렀을 때만 토스트 메시지 표시
+    if (filtered.length === 0 && searchTerm.length > 0) {
       window.showToast(
         `"${searchTerm}"에 대한 검색 결과가 없습니다.`,
         3000,
@@ -328,12 +358,12 @@ if (btnCupDispense) {
         if (menu) {
             const cupType = menu.cup;
             if (cupType === "plastic") {
-                if (confirm("플라스틱 컵을 배출하시겠습니까?")) {
+                if (confirm("원격 명령을 전송하시겠습니까?")) {
                     sendMachineCommand("pl");
                     closeAdminPopup(); // 공통 함수 호출
                 }
             } else if (cupType === "paper") {
-                if (confirm("종이컵을 배출하시겠습니까?")) {
+                if (confirm("원격 명령을 전송하시겠습니까?")) {
                     sendMachineCommand("pa");
                     closeAdminPopup(); // 공통 함수 호출
                 }
@@ -347,7 +377,7 @@ const btnIceWaterDispense = document.getElementById("btnIceWaterDispense");
 if (btnIceWaterDispense) {
     btnIceWaterDispense.addEventListener("click", () => {
         if (menu) {
-            if (confirm("얼음/물을 배출하시겠습니까?")) {
+            if (confirm("원격 명령을 전송하시겠습니까?")) {
                 sendMachineCommand("ice", menu);
                 closeAdminPopup(); // 공통 함수 호출
             }
@@ -359,7 +389,7 @@ if (btnIceWaterDispense) {
 const btnPopupDrinkOrder = document.getElementById("btnPopupDrinkOrder");
 if (btnPopupDrinkOrder) {
     btnPopupDrinkOrder.addEventListener("click", () => {
-        if (confirm("현재 설정으로 음료를 투출하시겠습니까?")) {
+        if (confirm("원격 명령을 전송하시겠습니까?")) {
             if (menu) {
                 sendMachineCommand("drink", menu);
                 closeAdminPopup(); // 공통 함수 호출
