@@ -1,6 +1,7 @@
 import { apiGet } from "../api/apiHelpers.ts";
 import { getStoredUser } from "../utils/userStorage.ts";
-import { renderBarcodeToCanvas } from "../utils/barcode.ts";
+import { renderBarcodeToCanvas } from "../utils/barcode.ts"; // ✅ 바코드 import 다시 추가
+import html2canvas from "html2canvas"; // ✅ html2canvas import 추가
 
 let allCoupons: any[] = []; // 전체 쿠폰 데이터 저장
 let searchTimeout: NodeJS.Timeout | null = null; // 실시간 검색을 위한 타이머
@@ -242,7 +243,6 @@ function renderCouponTable(coupons: any[]) {
     };
 
     const expiresAt = formatDate(coupon.expiresAt);
-
     const displayTitle = coupon.title.replace(" 무료", "");
 
     row.innerHTML = `
@@ -250,9 +250,7 @@ function renderCouponTable(coupons: any[]) {
       <td>${index + 1}</td>
       <td>${displayTitle}</td>
       <td>~${expiresAt}</td>
-      <td>
-        ${coupon.couponCode}
-      </td>
+      <td>${coupon.couponCode}</td>
       <td>미구현</td>
     `;
 
@@ -288,58 +286,59 @@ function showCouponPopup(couponData: any) {
   const popup = document.getElementById("coupon-popup") as HTMLElement;
 
   if (popup) {
-    // 쿠폰 데이터를 SVG 위에 오버레이로 표시
     updateCouponOverlay(couponData);
     popup.style.display = "flex";
   }
 }
 
-// ✅ 쿠폰 오버레이 데이터 업데이트 (바코드 포함)
 function updateCouponOverlay(couponData: any) {
-  // 날짜 포맷팅 함수
+  // 날짜 포맷팅 함수 수정
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    const year = String(date.getFullYear()).slice(-2);
+    const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
-    return `${year}.${month}.${day}`;
+    const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
+    const weekday = weekdays[date.getDay()];
+    return `${year}년 ${month}월 ${day}일(${weekday})`;
   };
 
   // 쿠폰 제목 (무료 제거)
   const title = couponData.title.replace(" 무료", "");
 
-  // 기간 포맷팅
-  const startDate = formatDate(couponData.startsAt);
+  // 기간 포맷팅 - 만료일만 표시
   const endDate = formatDate(couponData.expiresAt);
-  const period = `${startDate} ~ ${endDate}`;
+  const period = `${endDate}까지`;
 
   // 지점명 (user 객체에서 가져오기)
   const storeName = userInfo?.storeName || "전체 지점";
 
-  // 오버레이 HTML 업데이트
+  // ✅ 제목 길이에 따른 스타일 클래스 결정
+  const titleLength = title.length;
+  const titleClass = titleLength >= 10 ? "coupon-title small" : "coupon-title";
+  const freeClass = titleLength >= 10 ? "coupon-free small" : "coupon-free";
+
+  // 오버레이 HTML 업데이트 (바코드 포함) - 5px 위로 올림
   const couponOverlay = document.querySelector(
     ".coupon-overlay"
   ) as HTMLElement;
   if (couponOverlay) {
     couponOverlay.innerHTML = ` 
-      <div class="coupon-period">${period}</div>
-      
-      <div class="coupon-title">${title}</div>
-      <div class="coupon-free">1잔 무료</div>
-      <div class="coupon-store">${storeName}</div>
-      <div class="coupon-id">${couponData.couponId}</div>
-      <canvas id="coupon-barcode"></canvas>  
+      <div class="coupon-period" style="transform: translateY(-7px);">${period}</div>
+      <div class="${titleClass}" style="transform: translateY(-7px);">${title}</div>
+      <div class="${freeClass}" style="transform: translateY(-7px);">1잔 무료</div>
+      <div class="coupon-store" style="transform: translateY(-7px);">${storeName}</div>
+      <div class="coupon-id" style="transform: translateY(-7px);">${couponData.couponId}</div>
+      <canvas id="coupon-barcode" style="transform: translateY(-7px);"></canvas>  
     `;
   }
 
-  // ✅ 바코드 생성 (배경 투명)
   setTimeout(() => {
     const barcodeCanvas = document.getElementById(
       "coupon-barcode"
     ) as HTMLCanvasElement;
     if (barcodeCanvas) {
       try {
-        // 바코드 생성 with 투명 배경
         renderBarcodeToCanvas(couponData.couponCode, barcodeCanvas);
         console.log("바코드 생성 완료:", couponData.couponCode);
       } catch (error) {
@@ -347,6 +346,102 @@ function updateCouponOverlay(couponData: any) {
       }
     }
   }, 100);
+}
+
+async function saveCouponPopupAsImage() {
+  try {
+    const couponContainer = document.querySelector(
+      "#coupon-popup .coupon-container"
+    ) as HTMLElement;
+    if (!couponContainer) {
+      window.showToast("쿠폰 이미지를 찾을 수 없습니다.", 3000, "error");
+      return;
+    }
+
+    const elementsToHide = [couponContainer.querySelector(".save-img")].filter(
+      Boolean
+    ) as HTMLElement[];
+
+    const originalDisplays = elementsToHide.map((el) => el.style.display);
+    elementsToHide.forEach((el) => (el.style.display = "none"));
+
+    // 스타일 저장
+    const originalStyles = {
+      position: couponContainer.style.position,
+      width: couponContainer.style.width,
+      height: couponContainer.style.height,
+      margin: couponContainer.style.margin,
+      padding: couponContainer.style.padding,
+    };
+
+    // ✅ 원래 크기 유지하면서 캡처용 스타일 적용
+    Object.assign(couponContainer.style, {
+      position: "relative",
+      margin: "0",
+      padding: "0",
+    });
+
+    // 캡처 실행
+    setTimeout(() => {
+      html2canvas(couponContainer, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: null,
+      })
+        .then((canvas) => {
+          const roundedCanvas = document.createElement("canvas");
+          const ctx = roundedCanvas.getContext("2d");
+
+          roundedCanvas.width = canvas.width;
+          roundedCanvas.height = canvas.height;
+
+          if (ctx) {
+            ctx.beginPath();
+            ctx.roundRect(0, 0, canvas.width, canvas.height, 10);
+            ctx.clip();
+            ctx.drawImage(canvas, 0, 0);
+          }
+
+          // 다운로드
+          const fileName = `쿠폰_${new Date().toISOString().slice(0, 10)}.png`;
+          downloadURI(roundedCanvas.toDataURL("image/png"), fileName);
+
+          // 스타일 복구
+          restoreStyles();
+          window.showToast(
+            "쿠폰 이미지가 성공적으로 저장되었습니다.",
+            3000,
+            "success"
+          );
+        })
+        .catch((error) => {
+          console.error("이미지 저장 실패:", error);
+          window.showToast("이미지 저장에 실패했습니다.", 3000, "error");
+          restoreStyles();
+        });
+    }, 100);
+
+    // 스타일 복구 함수
+    function restoreStyles() {
+      Object.assign(couponContainer.style, originalStyles);
+      elementsToHide.forEach((el, index) => {
+        el.style.display = originalDisplays[index];
+      });
+    }
+  } catch (error) {
+    console.error("이미지 저장 실패:", error);
+    window.showToast("이미지 저장에 실패했습니다.", 3000, "error");
+  }
+}
+
+// 이미지 다운로드 함수
+function downloadURI(uri: string, name: string) {
+  const link = document.createElement("a");
+  link.download = name;
+  link.href = uri;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
 // 쿠폰 팝업 닫기
@@ -367,10 +462,18 @@ function initCouponPopupEvents() {
     "#coupon-popup .close-btn"
   ) as HTMLElement;
   const popupOverlay = document.getElementById("coupon-popup") as HTMLElement;
+  const saveImgBtn = document.querySelector(
+    "#coupon-popup .save-img"
+  ) as HTMLElement;
 
   // 닫기 버튼 클릭
   if (closeBtn) {
     closeBtn.addEventListener("click", hideCouponPopup);
+  }
+
+  // 이미지 저장 버튼 클릭
+  if (saveImgBtn) {
+    saveImgBtn.addEventListener("click", saveCouponPopupAsImage);
   }
 
   // 오버레이 클릭 시 닫기
