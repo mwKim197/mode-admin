@@ -140,7 +140,6 @@ function renderCouponTable(coupons: any[]) {
       return `${year}.${month}.${day}`;
     };
 
-    const startsAt = formatDate(coupon.startsAt);
     const expiresAt = formatDate(coupon.expiresAt);
 
     const displayTitle = coupon.title.replace(" 무료", "");
@@ -149,7 +148,7 @@ function renderCouponTable(coupons: any[]) {
       <td><input type="checkbox" /></td>
       <td>${index + 1}</td>
       <td>${displayTitle}</td>
-      <td>${startsAt}~${expiresAt}</td>
+      <td>~${expiresAt}</td>
       <td>
         ${coupon.couponCode}
       </td>
