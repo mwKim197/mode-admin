@@ -48,9 +48,9 @@ export function initCouponDetail() {
       const coupon = (
         document.getElementById("sample") as HTMLSelectElement
       )?.value.trim();
-      const memo = (
+      /*const memo = (
         document.getElementById("myTextarea") as HTMLTextAreaElement
-      )?.value.trim();
+      )?.value.trim();*/
 
       // 유효성 검사
       if (!franchise) {

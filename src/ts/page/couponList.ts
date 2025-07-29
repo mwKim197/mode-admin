@@ -1,4 +1,3 @@
-import { apiGet } from "../api/apiHelpers.ts";
 import { getStoredUser } from "../utils/userStorage.ts";
 import { renderBarcodeToCanvas } from "../utils/barcode.ts";
 
