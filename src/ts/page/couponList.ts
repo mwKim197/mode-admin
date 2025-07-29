@@ -4,6 +4,7 @@ import { renderBarcodeToCanvas } from "../utils/barcode.ts";
 
 let allCoupons: any[] = []; // 전체 쿠폰 데이터 저장
 let searchTimeout: NodeJS.Timeout | null = null; // 실시간 검색을 위한 타이머
+let userInfo: any = null; // 사용자 정보 저장 (지점명 포함)
 
 export function initCoupon() {
   console.log("✅ coupon.ts 로드됨");
@@ -20,8 +21,8 @@ export function initCoupon() {
 export function initCouponList() {
   console.log("쿠폰 목록 페이지 초기화");
 
-  // 쿠폰 목록 로드
-  loadCouponList();
+  // 사용자 정보 및 쿠폰 목록 로드
+  loadUserInfoAndCoupons();
 
   // 발급하기 버튼 클릭 시 couponDetail 페이지로 이동
   const openCouponDetailBtn = document.getElementById("open-coupon-detail");
@@ -37,6 +38,44 @@ export function initCouponList() {
 
   // 검색 기능 초기화
   initSearchFunction();
+}
+
+// ✅ 사용자 정보와 쿠폰 목록을 동시에 로드
+async function loadUserInfoAndCoupons() {
+  const user = getStoredUser();
+  if (!user) {
+    window.showToast("사용자 정보가 없습니다.", 2000, "error");
+    return;
+  }
+
+  try {
+    // 병렬로 두 API 호출
+    const [userResponse, couponResponse] = await Promise.all([
+      apiGet(`/model_user_setting?func=get-user&userId=${user.userId}`),
+      apiGet(`/model_coupon?func=coupon&userId=${user.userId}`),
+    ]);
+
+    // 사용자 정보 처리
+    if (userResponse.ok) {
+      const userData = await userResponse.json();
+      userInfo = userData.user; // ✅ user 객체 안의 데이터를 저장
+      console.log("사용자 정보 로드 완료:", userInfo);
+    } else {
+      console.error("사용자 정보 로드 실패");
+    }
+
+    // 쿠폰 목록 처리
+    if (couponResponse.ok) {
+      const couponData = await couponResponse.json();
+      allCoupons = couponData.items || [];
+      renderCouponTable(allCoupons);
+    } else {
+      window.showToast("쿠폰 목록을 불러오는데 실패했습니다.", 3000, "error");
+    }
+  } catch (error) {
+    console.error("API 호출 오류:", error);
+    window.showToast("데이터를 불러오는데 실패했습니다.", 3000, "error");
+  }
 }
 
 // 검색 기능 초기화
@@ -166,32 +205,6 @@ function updateSelectAllCheckbox() {
   }
 }
 
-// 쿠폰 목록 API 호출
-async function loadCouponList() {
-  try {
-    const user = getStoredUser();
-    if (!user) {
-      window.showToast("사용자 정보가 없습니다.", 2000, "error");
-      return;
-    }
-
-    const response = await apiGet(
-      `/model_coupon?func=coupon&userId=${user.userId}`
-    );
-    const data = await response.json();
-
-    if (response.ok) {
-      // ✅ 전체 데이터를 저장 (검색용)
-      allCoupons = data.items || [];
-      renderCouponTable(allCoupons);
-    } else {
-      window.showToast("쿠폰 목록을 불러오는데 실패했습니다.", 3000, "error");
-    }
-  } catch (error) {
-    window.showToast("쿠폰 목록을 불러오는데 실패했습니다.", 3000, "error");
-  }
-}
-
 // 쿠폰 테이블 렌더링
 function renderCouponTable(coupons: any[]) {
   const tbody = document.getElementById("coupon-table-body");
@@ -257,26 +270,83 @@ function renderCouponTable(coupons: any[]) {
       });
     }
 
-    // 행 클릭 이벤트 추가 (쿠폰 팝업 표시)
+    // ✅ 행 클릭 이벤트 추가 (쿠폰 데이터와 함께 팝업 표시)
     row.addEventListener("click", () => {
-      showCouponPopup();
+      showCouponPopup(coupon);
     });
   });
 
   // 테이블 렌더링 후 전체 선택 체크박스 상태 초기화
   updateSelectAllCheckbox();
 
-  // 팝업 닫기 이벤트 리스너 추가
+  // 팝업 닫기 이벤트 리스너 추가 (한 번만 실행)
   initCouponPopupEvents();
 }
 
-// 쿠폰 팝업 표시
-function showCouponPopup() {
+// ✅ 쿠폰 팝업 표시 (데이터 포함)
+function showCouponPopup(couponData: any) {
   const popup = document.getElementById("coupon-popup") as HTMLElement;
 
   if (popup) {
+    // 쿠폰 데이터를 SVG 위에 오버레이로 표시
+    updateCouponOverlay(couponData);
     popup.style.display = "flex";
   }
+}
+
+// ✅ 쿠폰 오버레이 데이터 업데이트 (바코드 포함)
+function updateCouponOverlay(couponData: any) {
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = String(date.getFullYear()).slice(-2);
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}.${month}.${day}`;
+  };
+
+  // 쿠폰 제목 (무료 제거)
+  const title = couponData.title.replace(" 무료", "");
+
+  // 기간 포맷팅
+  const startDate = formatDate(couponData.startsAt);
+  const endDate = formatDate(couponData.expiresAt);
+  const period = `${startDate} ~ ${endDate}`;
+
+  // 지점명 (user 객체에서 가져오기)
+  const storeName = userInfo?.storeName || "전체 지점";
+
+  // 오버레이 HTML 업데이트
+  const couponOverlay = document.querySelector(
+    ".coupon-overlay"
+  ) as HTMLElement;
+  if (couponOverlay) {
+    couponOverlay.innerHTML = ` 
+      <div class="coupon-period">${period}</div>
+      
+      <div class="coupon-title">${title}</div>
+      <div class="coupon-free">1잔 무료</div>
+      <div class="coupon-store">${storeName}</div>
+      <div class="coupon-id">${couponData.couponId}</div>
+      <canvas id="coupon-barcode"></canvas>  
+    `;
+  }
+
+  // ✅ 바코드 생성 (배경 투명)
+  setTimeout(() => {
+    const barcodeCanvas = document.getElementById(
+      "coupon-barcode"
+    ) as HTMLCanvasElement;
+    if (barcodeCanvas) {
+      try {
+        // 바코드 생성 with 투명 배경
+        renderBarcodeToCanvas(couponData.couponCode, barcodeCanvas);
+        console.log("바코드 생성 완료:", couponData.couponCode);
+      } catch (error) {
+        console.error("바코드 생성 실패:", error);
+      }
+    }
+  }, 100);
 }
 
 // 쿠폰 팝업 닫기
@@ -287,8 +357,12 @@ function hideCouponPopup() {
   }
 }
 
-// 팝업 이벤트 초기화
+// 팝업 이벤트 초기화 (중복 실행 방지)
+let popupEventsInitialized = false;
+
 function initCouponPopupEvents() {
+  if (popupEventsInitialized) return;
+
   const closeBtn = document.querySelector(
     "#coupon-popup .close-btn"
   ) as HTMLElement;
@@ -307,4 +381,6 @@ function initCouponPopupEvents() {
       }
     });
   }
+
+  popupEventsInitialized = true;
 }

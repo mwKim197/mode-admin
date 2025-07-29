@@ -71,7 +71,7 @@
                   <th>순서</th>
                   <th>이름</th>
                   <th>사용기한</th>
-                  <th>번호</th>
+                  <th>코드</th>
                   <th>사용여부</th>
                 </tr>
               </thead>
@@ -98,7 +98,10 @@
             <div class="coupon-container">
               <img id="coupon-image" src="/img/coupon.svg" alt="쿠폰" />
 
-              <div class="coupon-overlay"></div>
+              <div class="coupon-overlay">
+                <!-- 바코드 캔버스 추가 -->
+                <canvas id="coupon-barcode"></canvas>
+              </div>
             </div>
           </div>
         </div>
