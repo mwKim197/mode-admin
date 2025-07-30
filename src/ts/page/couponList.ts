@@ -420,9 +420,11 @@ function renderCouponTable(coupons: any[]) {
     const expiresAt = formatDate(coupon.expiresAt);
     const displayTitle = coupon.title.replace(" 무료", "");
 
+    const itemNumber = (currentPage - 1) * pageLimit + index + 1;
+
     row.innerHTML = `
       <td><input type="checkbox" /></td>
-      <td>${index + 1}</td>
+      <td>${itemNumber}</td>
       <td>${displayTitle}</td>
       <td>~${expiresAt}</td>
       <td>${coupon.couponCode}</td>
