@@ -257,7 +257,7 @@ async function sampleSelect(userId: string) {
 
       new window.Choices(selectElement, {
         shouldSort: false,
-        searchEnabled: false,
+        searchEnabled: true,
         position: "auto",
         classNames: {
           containerOuter: "custom-select",
