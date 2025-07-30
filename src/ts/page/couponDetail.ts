@@ -84,6 +84,22 @@ export function initCouponDetail() {
         return;
       }
 
+      // ✅ 발행매수 유효성 검사 추가
+      const issueCountNum = parseInt(issueCount);
+      if (isNaN(issueCountNum) || issueCountNum < 1 || issueCountNum > 99) {
+        window.showToast(
+          "발행매수는 1~99개 사이로 입력해주세요",
+          2000,
+          "warning"
+        );
+        return;
+      }
+
+      // ✅ 날짜 범위 유효성 검사 추가
+      if (!validateDateRange(startDate, endDate)) {
+        return;
+      }
+
       // 선택된 쿠폰의 이름 가져오기
       const selectElement = document.getElementById(
         "sample"
@@ -106,14 +122,11 @@ export function initCouponDetail() {
           return;
         }
 
-        const issueCountNum = parseInt(issueCount);
         let successCount = 0;
         let errorCount = 0;
 
-        // 발행매수만큼 개별 POST 요청 보내기
         for (let i = 0; i < issueCountNum; i++) {
           try {
-            // API 요청 데이터 구성 (count는 항상 1)
             const payload = {
               userId: user.userId,
               title: `${selectedMenuName} 무료`,
@@ -173,6 +186,20 @@ export function initCouponDetail() {
   }
 }
 
+function validateDateRange(startDate: string, endDate: string): boolean {
+  if (!startDate || !endDate) {
+    window.showToast("시작일과 종료일을 모두 선택해주세요.", 3000, "warning");
+    return false;
+  }
+
+  if (startDate > endDate) {
+    window.showToast("시작일은 종료일보다 클 수 없습니다.", 3000, "error");
+    return false;
+  }
+
+  return true;
+}
+
 async function loadUserData() {
   try {
     const user = getStoredUser();
@@ -230,7 +257,7 @@ async function sampleSelect(userId: string) {
 
       new window.Choices(selectElement, {
         shouldSort: false,
-        searchEnabled: false,
+        searchEnabled: true,
         position: "auto",
         classNames: {
           containerOuter: "custom-select",
