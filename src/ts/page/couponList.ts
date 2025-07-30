@@ -7,6 +7,12 @@ let allCoupons: any[] = []; // 전체 쿠폰 데이터 저장
 let searchTimeout: NodeJS.Timeout | null = null; // 실시간 검색을 위한 타이머
 let userInfo: any = null; // 사용자 정보 저장 (지점명 포함)
 
+// ✅ 페이지네이션 관련 변수 추가
+let pageKeys: any[] = []; // 페이지 키 배열
+let totalItems = 0; // 전체 아이템 수
+let currentPage = 1;
+const pageLimit = 20; // 한 페이지당 20개 (10개씩 2번 호출)
+
 export function initCoupon() {
   console.log("✅ coupon.ts 로드됨");
 
@@ -52,7 +58,7 @@ export function initCouponList() {
   initSearchFunction();
 }
 
-// ✅ 사용자 정보와 쿠폰 목록을 동시에 로드
+// ✅ 사용자 정보와 쿠폰 목록을 동시에 로드 (페이지네이션 적용)
 async function loadUserInfoAndCoupons() {
   const user = getStoredUser();
   if (!user) {
@@ -62,9 +68,8 @@ async function loadUserInfoAndCoupons() {
 
   try {
     // 병렬로 두 API 호출
-    const [userResponse, couponResponse] = await Promise.all([
+    const [userResponse] = await Promise.all([
       apiGet(`/model_user_setting?func=get-user&userId=${user.userId}`),
-      apiGet(`/model_coupon?func=coupon&userId=${user.userId}`),
     ]);
 
     // 사용자 정보 처리
@@ -76,21 +81,175 @@ async function loadUserInfoAndCoupons() {
       console.error("사용자 정보 로드 실패");
     }
 
-    // 쿠폰 목록 처리
-    if (couponResponse.ok) {
-      const couponData = await couponResponse.json();
-      allCoupons = couponData.items || [];
-      renderCouponTable(allCoupons);
-    } else {
-      window.showToast("쿠폰 목록을 불러오는데 실패했습니다.", 3000, "error");
-    }
+    // ✅ 쿠폰 목록 로드 (페이지네이션 적용)
+    await getCouponList(user.userId);
   } catch (error) {
     console.error("API 호출 오류:", error);
     window.showToast("데이터를 불러오는데 실패했습니다.", 3000, "error");
   }
 }
 
-// 검색 기능 초기화
+// ✅ 쿠폰 목록 로드 함수 (페이지네이션 적용) - 수정
+async function getCouponList(userId: string) {
+  try {
+    // 첫 번째 API 요청
+    let firstApiUrl = `/model_coupon?func=coupon&userId=${userId}`;
+    if (searchTerm) {
+      firstApiUrl += `&search=${encodeURIComponent(searchTerm)}`;
+    }
+
+    // 페이지네이션 키 추가 (첫 페이지가 아닌 경우)
+    if (currentPage > 1 && pageKeys.length > 0) {
+      const keyIndex = (currentPage - 1) * 2 - 1;
+      if (pageKeys[keyIndex]) {
+        firstApiUrl += `&pageKey=${JSON.stringify(pageKeys[keyIndex])}`;
+      }
+    }
+
+    console.log(" 첫 번째 API 요청 URL:", firstApiUrl);
+    const firstResponse = await apiGet(firstApiUrl);
+    const firstData = await firstResponse.json();
+    console.log("📦 첫 번째 응답 데이터:", firstData);
+    console.log("📦 첫 번째 응답 items 개수:", firstData.items?.length || 0);
+
+    // ✅ 첫 페이지에서만 pageKeys 수집
+    if (currentPage === 1) {
+      pageKeys = [];
+      totalItems = firstData.total || 0;
+
+      // pageKeys 파싱
+      if (firstData.pageKeys) {
+        try {
+          pageKeys = JSON.parse(firstData.pageKeys);
+          console.log("📋 pageKeys 파싱 결과:", pageKeys);
+        } catch (e) {
+          console.error("pageKeys 파싱 실패:", e);
+        }
+      }
+    }
+
+    // 두 번째 API 요청 (조건부)
+    let secondApiUrl = `/model_coupon?func=coupon&userId=${userId}`;
+    if (searchTerm) {
+      secondApiUrl += `&search=${encodeURIComponent(searchTerm)}`;
+    }
+
+    // 두 번째 요청용 pageKey (필요한 경우만)
+    let needSecondRequest = false;
+
+    if (currentPage === 1) {
+      if (pageKeys[0]) {
+        secondApiUrl += `&pageKey=${JSON.stringify(pageKeys[0])}`;
+        needSecondRequest = true;
+      }
+    } else {
+      const keyIndex = (currentPage - 1) * 2;
+      if (pageKeys[keyIndex]) {
+        secondApiUrl += `&pageKey=${JSON.stringify(pageKeys[keyIndex])}`;
+        needSecondRequest = true;
+      }
+    }
+
+    // 두 번째 요청이 필요한 경우만 실행
+    if (needSecondRequest) {
+      console.log(" 두 번째 API 요청 URL:", secondApiUrl);
+      const secondResponse = await apiGet(secondApiUrl);
+      if (secondResponse.ok) {
+        const secondData = await secondResponse.json();
+
+        const combinedItems = [
+          ...(firstData.items || []),
+          ...(secondData.items || []),
+        ];
+        allCoupons = combinedItems;
+      } else {
+        allCoupons = firstData.items || [];
+      }
+    } else {
+      // 두 번째 요청이 불필요한 경우
+      allCoupons = firstData.items || [];
+    }
+
+    renderCouponTable(allCoupons);
+    renderPagination();
+  } catch (error) {
+    console.error("쿠폰 목록 로드 실패:", error);
+    window.showToast("쿠폰 목록을 불러오는데 실패했습니다.", 3000, "error");
+  }
+}
+
+function renderPagination() {
+  const totalPages = Math.ceil(totalItems / pageLimit);
+
+  // 페이지네이션 컨테이너 찾기 또는 생성
+  let paginationContainer = document.getElementById("pagination-container");
+  if (!paginationContainer) {
+    paginationContainer = document.createElement("div");
+    paginationContainer.id = "pagination-container";
+    paginationContainer.className = "pagination";
+
+    // 테이블 다음에 삽입
+    const tableArea = document.querySelector(".tableArea");
+    if (tableArea && tableArea.parentNode) {
+      tableArea.parentNode.insertBefore(
+        paginationContainer,
+        tableArea.nextSibling
+      );
+    }
+  }
+
+  if (totalPages <= 1) {
+    paginationContainer.style.display = "none";
+    return;
+  }
+
+  paginationContainer.style.display = "flex";
+  paginationContainer.innerHTML = "";
+
+  // 이전 페이지 버튼
+  if (currentPage > 1) {
+    const prevBtn = document.createElement("button");
+    prevBtn.textContent = "이전";
+    prevBtn.className = "pagination-btn";
+    prevBtn.addEventListener("click", () => {
+      currentPage--;
+      getCouponList(getStoredUser()?.userId || "");
+    });
+    paginationContainer.appendChild(prevBtn);
+  }
+
+  // 페이지 번호들
+  const startPage = Math.max(1, currentPage - 2);
+  const endPage = Math.min(totalPages, currentPage + 2);
+
+  for (let i = startPage; i <= endPage; i++) {
+    const pageBtn = document.createElement("button");
+    pageBtn.textContent = i.toString();
+    pageBtn.className = `pagination-btn ${i === currentPage ? "active" : ""}`;
+    pageBtn.addEventListener("click", () => {
+      currentPage = i;
+      getCouponList(getStoredUser()?.userId || "");
+    });
+    paginationContainer.appendChild(pageBtn);
+  }
+
+  // 다음 페이지 버튼
+  if (currentPage < totalPages) {
+    const nextBtn = document.createElement("button");
+    nextBtn.textContent = "다음";
+    nextBtn.className = "pagination-btn";
+    nextBtn.addEventListener("click", () => {
+      currentPage++;
+      getCouponList(getStoredUser()?.userId || "");
+    });
+    paginationContainer.appendChild(nextBtn);
+  }
+}
+
+// ✅ 검색 관련 변수 추가
+let searchTerm = "";
+
+// 검색 기능 초기화 (수정)
 function initSearchFunction() {
   const searchInput = document.getElementById(
     "searchCoupon"
@@ -107,8 +266,8 @@ function initSearchFunction() {
 
   // 검색 버튼 클릭 이벤트
   searchBtn.addEventListener("click", () => {
-    const searchTerm = searchInput.value.trim();
-    performSearch(searchTerm);
+    const searchValue = searchInput.value.trim();
+    performSearch(searchValue);
   });
 
   // 리셋 버튼 클릭 이벤트
@@ -120,52 +279,59 @@ function initSearchFunction() {
   // Enter 키 이벤트
   searchInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
-      const searchTerm = searchInput.value.trim();
-      performSearch(searchTerm);
+      const searchValue = searchInput.value.trim();
+      performSearch(searchValue);
     }
   });
 
+  // 실시간 검색
   searchInput.addEventListener("input", function () {
-    const searchTerm = searchInput.value.trim();
+    const searchValue = searchInput.value.trim();
 
-    // 기존 타이머가 있으면 취소 (디바운스 효과)
     if (searchTimeout) {
       clearTimeout(searchTimeout);
     }
 
     searchTimeout = setTimeout(() => {
-      performRealTimeSearch(searchTerm);
+      performRealTimeSearch(searchValue);
     }, 300);
   });
 }
 
-// 실시간 검색 실행 (디바운스 적용)
-function performRealTimeSearch(searchTerm: string) {
-  console.log("실시간 검색:", searchTerm);
-  performSearch(searchTerm);
-}
+// 실시간 검색 실행 (클라이언트 사이드 필터링)
+function performRealTimeSearch(searchValue: string) {
+  console.log("실시간 검색:", searchValue);
 
-// 검색 실행
-function performSearch(searchTerm: string) {
-  console.log("검색 실행:", searchTerm);
-
-  if (!searchTerm) {
-    // 검색어가 없으면 전체 목록 표시
+  if (!searchValue.trim()) {
+    // 검색어가 없으면 전체 데이터 표시
     renderCouponTable(allCoupons);
     return;
   }
 
-  // 쿠폰명 또는 쿠폰코드로 필터링
+  // 현재 전체 데이터에서 필터링
   const filteredCoupons = allCoupons.filter((coupon) => {
-    const title = coupon.title?.toLowerCase() || "";
-    const couponCode = coupon.couponCode?.toLowerCase() || "";
-    const search = searchTerm.toLowerCase();
+    const title = coupon.title.toLowerCase();
+    const couponCode = coupon.couponCode.toLowerCase();
+    const searchLower = searchValue.toLowerCase();
 
-    return title.includes(search) || couponCode.includes(search);
+    return title.includes(searchLower) || couponCode.includes(searchLower);
   });
 
-  console.log(`검색 결과: ${filteredCoupons.length}개 쿠폰`);
+  // 필터링된 결과 표시
   renderCouponTable(filteredCoupons);
+}
+
+// 검색 실행 (수정)
+function performSearch(searchValue: string) {
+  console.log("검색 실행:", searchValue);
+
+  searchTerm = searchValue;
+  currentPage = 1; // 검색 시 첫 페이지로 이동
+
+  const user = getStoredUser();
+  if (user) {
+    getCouponList(user.userId);
+  }
 }
 
 // 전체 선택 체크박스 초기화
