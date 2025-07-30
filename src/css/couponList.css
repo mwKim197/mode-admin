@@ -176,3 +176,11 @@
 .save-img {
   margin-top: 10px;
 }
+
+.coupon-list-btn {
+  width: 120px !important;
+  padding: 1rem 2rem !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -34,6 +34,17 @@ export function initCouponList() {
     });
   }
 
+  // ✅ 이미지 저장 버튼 이벤트 리스너 추가
+  const saveSelectedCouponsBtn = document.getElementById(
+    "save-selected-coupons"
+  );
+  if (saveSelectedCouponsBtn) {
+    saveSelectedCouponsBtn.addEventListener(
+      "click",
+      saveSelectedCouponsAsImages
+    );
+  }
+
   // 전체 선택 체크박스 이벤트 리스너 추가
   initSelectAllCheckbox();
 
@@ -487,3 +498,184 @@ function initCouponPopupEvents() {
 
   popupEventsInitialized = true;
 }
+
+// ✅ 체크된 쿠폰들을 한 번에 이미지 저장하는 함수 (수정)
+async function saveSelectedCouponsAsImages() {
+  const checkedCheckboxes = document.querySelectorAll(
+    'tbody input[type="checkbox"]:checked'
+  ) as NodeListOf<HTMLInputElement>;
+
+  if (checkedCheckboxes.length === 0) {
+    window.showToast("저장할 쿠폰을 선택해주세요.", 3000, "warning");
+    return;
+  }
+
+  console.log(`${checkedCheckboxes.length}개의 쿠폰 이미지 저장 시작`);
+
+  // 로딩 표시
+  const saveBtn = document.getElementById(
+    "save-selected-coupons"
+  ) as HTMLButtonElement;
+  const originalText = saveBtn.textContent;
+  saveBtn.textContent = "저장 중...";
+  saveBtn.disabled = true;
+
+  try {
+    // 체크된 쿠폰들의 인덱스 수집
+    const selectedIndices: number[] = [];
+    checkedCheckboxes.forEach((checkbox) => {
+      const row = checkbox.closest("tr") as HTMLElement;
+      const index = parseInt(row.getAttribute("data-coupon-index") || "0");
+      selectedIndices.push(index);
+    });
+
+    // 현재 표시된 쿠폰 목록에서 선택된 쿠폰들 추출
+    const selectedCoupons = selectedIndices
+      .map((index) => allCoupons[index])
+      .filter(Boolean);
+
+    // 각 쿠폰에 대해 이미지 생성 및 저장
+    for (let i = 0; i < selectedCoupons.length; i++) {
+      const coupon = selectedCoupons[i];
+      console.log(
+        `${i + 1}/${selectedCoupons.length} 쿠폰 처리 중: ${coupon.title}`
+      );
+
+      // 쿠폰 팝업을 숨겨진 상태로 생성
+      await generateCouponImage(coupon);
+    }
+
+    window.showToast(
+      `${selectedCoupons.length}개의 쿠폰 이미지가 저장되었습니다.`,
+      3000,
+      "success"
+    );
+
+    // ✅ 저장 완료 후 페이지 새로고침
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000); // 1초 후 새로고침 (토스트 메시지 확인 시간)
+  } catch (error) {
+    console.error("이미지 저장 실패:", error);
+    window.showToast("이미지 저장에 실패했습니다.", 3000, "error");
+  } finally {
+    // 버튼 상태 복구 (새로고침되므로 불필요하지만 안전을 위해)
+    saveBtn.textContent = originalText;
+    saveBtn.disabled = false;
+  }
+}
+
+// ✅ 개별 쿠폰 이미지 생성 함수 (수정)
+async function generateCouponImage(couponData: any): Promise<void> {
+  return new Promise((resolve, reject) => {
+    try {
+      // ✅ 팝업을 실제로 열고 숨기는 방식으로 변경
+      const popup = document.getElementById("coupon-popup") as HTMLElement;
+
+      // 팝업을 화면에 표시 (사용자에게는 보이지 않게)
+      popup.style.display = "flex";
+      popup.style.position = "fixed";
+      popup.style.top = "-9999px";
+      popup.style.left = "-9999px";
+      popup.style.zIndex = "-1";
+
+      // 쿠폰 오버레이 업데이트 (기존 함수 사용)
+      updateCouponOverlay(couponData);
+
+      // 바코드 렌더링 후 이미지 생성
+      setTimeout(async () => {
+        try {
+          const barcodeCanvas = document.getElementById(
+            "coupon-barcode"
+          ) as HTMLCanvasElement;
+          if (barcodeCanvas) {
+            renderBarcodeToCanvas(couponData.couponCode, barcodeCanvas);
+          }
+
+          // ✅ 기존 팝업 저장 로직과 동일하게 처리
+          const couponContainer = document.querySelector(
+            "#coupon-popup .coupon-container"
+          ) as HTMLElement;
+
+          // 저장 버튼 숨기기
+          const saveBtn = couponContainer.querySelector(
+            ".save-img"
+          ) as HTMLElement;
+          const originalDisplay = saveBtn ? saveBtn.style.display : "";
+          if (saveBtn) saveBtn.style.display = "none";
+
+          // ✅ 기존 스타일 저장 및 복구 로직과 동일
+          const originalStyles = {
+            position: couponContainer.style.position,
+            width: couponContainer.style.width,
+            height: couponContainer.style.height,
+            margin: couponContainer.style.margin,
+            padding: couponContainer.style.padding,
+          };
+
+          // 스타일 적용
+          Object.assign(couponContainer.style, {
+            position: "relative",
+            margin: "0",
+            padding: "0",
+          });
+
+          // 캡처 실행
+          setTimeout(async () => {
+            try {
+              const canvas = await html2canvas(couponContainer, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: null,
+              });
+
+              // 둥근 모서리 적용
+              const roundedCanvas = document.createElement("canvas");
+              const ctx = roundedCanvas.getContext("2d");
+              roundedCanvas.width = canvas.width;
+              roundedCanvas.height = canvas.height;
+
+              if (ctx) {
+                ctx.beginPath();
+                ctx.roundRect(0, 0, canvas.width, canvas.height, 10);
+                ctx.clip();
+                ctx.drawImage(canvas, 0, 0);
+              }
+
+              // 파일명 생성
+              const safeTitle = couponData.title
+                .replace(/[^\w\s가-힣]/g, "")
+                .replace(/\s+/g, "_");
+              const fileName = `${safeTitle}_${couponData.couponCode}.png`;
+
+              // 다운로드
+              downloadURI(roundedCanvas.toDataURL("image/png"), fileName);
+
+              // ✅ 스타일 복구
+              Object.assign(couponContainer.style, originalStyles);
+              if (saveBtn) saveBtn.style.display = originalDisplay;
+
+              // 팝업 숨기기
+              popup.style.display = "none";
+
+              resolve();
+            } catch (error) {
+              // 에러 시에도 스타일 복구
+              Object.assign(couponContainer.style, originalStyles);
+              if (saveBtn) saveBtn.style.display = originalDisplay;
+              popup.style.display = "none";
+              reject(error);
+            }
+          }, 100);
+        } catch (error) {
+          popup.style.display = "none";
+          reject(error);
+        }
+      }, 200);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+// ✅ updateCouponOverlayForImage 함수는 제거 (기존 updateCouponOverlay 사용)
