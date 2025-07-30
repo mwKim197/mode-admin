@@ -125,7 +125,6 @@ function initSearchFunction() {
     }
   });
 
-  // ✅ 실시간 검색 기능 추가
   searchInput.addEventListener("input", function () {
     const searchTerm = searchInput.value.trim();
 
@@ -134,7 +133,6 @@ function initSearchFunction() {
       clearTimeout(searchTimeout);
     }
 
-    // 300ms 후에 검색 실행 (너무 빠른 타이핑에 대한 성능 최적화)
     searchTimeout = setTimeout(() => {
       performRealTimeSearch(searchTerm);
     }, 300);
@@ -279,7 +277,6 @@ function renderCouponTable(coupons: any[]) {
       });
     }
 
-    // ✅ 행 클릭 이벤트 추가 (쿠폰 데이터와 함께 팝업 표시)
     row.addEventListener("click", () => {
       showCouponPopup(coupon);
     });
@@ -303,7 +300,6 @@ function showCouponPopup(couponData: any) {
 }
 
 function updateCouponOverlay(couponData: any) {
-  // 날짜 포맷팅 함수 수정
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
@@ -314,22 +310,14 @@ function updateCouponOverlay(couponData: any) {
     return `${year}년 ${month}월 ${day}일(${weekday})`;
   };
 
-  // 쿠폰 제목 (무료 제거)
   const title = couponData.title.replace(" 무료", "");
-
-  // 기간 포맷팅 - 만료일만 표시
   const endDate = formatDate(couponData.expiresAt);
   const period = `${endDate}까지`;
-
-  // 지점명 (user 객체에서 가져오기)
   const storeName = userInfo?.storeName || "전체 지점";
-
-  // ✅ 제목 길이에 따른 스타일 클래스 결정
   const titleLength = title.length;
   const titleClass = titleLength >= 10 ? "coupon-title small" : "coupon-title";
   const freeClass = titleLength >= 10 ? "coupon-free small" : "coupon-free";
 
-  // 오버레이 HTML 업데이트 (바코드 포함) - 5px 위로 올림
   const couponOverlay = document.querySelector(
     ".coupon-overlay"
   ) as HTMLElement;
@@ -369,6 +357,13 @@ async function saveCouponPopupAsImage() {
       return;
     }
 
+    // ✅ 현재 표시된 쿠폰 데이터 가져오기
+    const currentCouponData = getCurrentCouponData();
+    if (!currentCouponData) {
+      window.showToast("쿠폰 데이터를 찾을 수 없습니다.", 3000, "error");
+      return;
+    }
+
     const elementsToHide = [couponContainer.querySelector(".save-img")].filter(
       Boolean
     ) as HTMLElement[];
@@ -385,7 +380,6 @@ async function saveCouponPopupAsImage() {
       padding: couponContainer.style.padding,
     };
 
-    // ✅ 원래 크기 유지하면서 캡처용 스타일 적용
     Object.assign(couponContainer.style, {
       position: "relative",
       margin: "0",
@@ -413,8 +407,12 @@ async function saveCouponPopupAsImage() {
             ctx.drawImage(canvas, 0, 0);
           }
 
+          const safeTitle = currentCouponData.title
+            .replace(/[^\w\s가-힣]/g, "")
+            .replace(/\s+/g, "_");
+          const fileName = `${safeTitle}_${currentCouponData.couponCode}.png`;
+
           // 다운로드
-          const fileName = `쿠폰_${new Date().toISOString().slice(0, 10)}.png`;
           downloadURI(roundedCanvas.toDataURL("image/png"), fileName);
 
           // 스타일 복구
@@ -443,6 +441,19 @@ async function saveCouponPopupAsImage() {
     console.error("이미지 저장 실패:", error);
     window.showToast("이미지 저장에 실패했습니다.", 3000, "error");
   }
+}
+
+function getCurrentCouponData(): any {
+  const popup = document.getElementById("coupon-popup");
+  if (popup && popup.style.display === "flex") {
+    // 쿠폰 ID나 다른 식별자를 통해 현재 쿠폰 찾기
+    const couponIdElement = popup.querySelector(".coupon-id");
+    if (couponIdElement) {
+      const couponId = couponIdElement.textContent;
+      return allCoupons.find((coupon) => coupon.couponId === couponId);
+    }
+  }
+  return null;
 }
 
 // 이미지 다운로드 함수
@@ -499,7 +510,6 @@ function initCouponPopupEvents() {
   popupEventsInitialized = true;
 }
 
-// ✅ 체크된 쿠폰들을 한 번에 이미지 저장하는 함수 (수정)
 async function saveSelectedCouponsAsImages() {
   const checkedCheckboxes = document.querySelectorAll(
     'tbody input[type="checkbox"]:checked'
@@ -521,7 +531,6 @@ async function saveSelectedCouponsAsImages() {
   saveBtn.disabled = true;
 
   try {
-    // 체크된 쿠폰들의 인덱스 수집
     const selectedIndices: number[] = [];
     checkedCheckboxes.forEach((checkbox) => {
       const row = checkbox.closest("tr") as HTMLElement;
@@ -529,7 +538,6 @@ async function saveSelectedCouponsAsImages() {
       selectedIndices.push(index);
     });
 
-    // 현재 표시된 쿠폰 목록에서 선택된 쿠폰들 추출
     const selectedCoupons = selectedIndices
       .map((index) => allCoupons[index])
       .filter(Boolean);
@@ -554,12 +562,11 @@ async function saveSelectedCouponsAsImages() {
     // ✅ 저장 완료 후 페이지 새로고침
     setTimeout(() => {
       window.location.reload();
-    }, 1000); // 1초 후 새로고침 (토스트 메시지 확인 시간)
+    }, 1000);
   } catch (error) {
     console.error("이미지 저장 실패:", error);
     window.showToast("이미지 저장에 실패했습니다.", 3000, "error");
   } finally {
-    // 버튼 상태 복구 (새로고침되므로 불필요하지만 안전을 위해)
     saveBtn.textContent = originalText;
     saveBtn.disabled = false;
   }
@@ -569,10 +576,8 @@ async function saveSelectedCouponsAsImages() {
 async function generateCouponImage(couponData: any): Promise<void> {
   return new Promise((resolve, reject) => {
     try {
-      // ✅ 팝업을 실제로 열고 숨기는 방식으로 변경
       const popup = document.getElementById("coupon-popup") as HTMLElement;
 
-      // 팝업을 화면에 표시 (사용자에게는 보이지 않게)
       popup.style.display = "flex";
       popup.style.position = "fixed";
       popup.style.top = "-9999px";
@@ -604,7 +609,6 @@ async function generateCouponImage(couponData: any): Promise<void> {
           const originalDisplay = saveBtn ? saveBtn.style.display : "";
           if (saveBtn) saveBtn.style.display = "none";
 
-          // ✅ 기존 스타일 저장 및 복구 로직과 동일
           const originalStyles = {
             position: couponContainer.style.position,
             width: couponContainer.style.width,
@@ -613,7 +617,6 @@ async function generateCouponImage(couponData: any): Promise<void> {
             padding: couponContainer.style.padding,
           };
 
-          // 스타일 적용
           Object.assign(couponContainer.style, {
             position: "relative",
             margin: "0",
