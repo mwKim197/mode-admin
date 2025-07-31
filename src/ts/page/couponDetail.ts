@@ -1,13 +1,8 @@
 import { apiGet, apiPost } from "../api/apiHelpers.ts";
 import { getStoredUser } from "../utils/userStorage.ts";
-// ❌ 바코드 import 제거
-// import { renderBarcodeToCanvas } from "../utils/barcode.ts";
 
 export function initCouponDetail() {
   console.log("쿠폰 발행 페이지 초기화");
-
-  // ❌ 바코드 생성 함수 호출 제거
-  // getBarcode();
 
   // API에서 사용자 정보 가져와서 가맹점/지점에 넣기
   loadUserData();
@@ -195,29 +190,30 @@ function validateDateRange(startDate: string, endDate: string): boolean {
     return false;
   }
 
+  // ✅ 날짜만 비교하도록 수정 (시간 제거)
   const today = new Date();
-  today.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
+  const todayStr = today.toISOString().split("T")[0]; // YYYY-MM-DD 형식
 
-  const startDateObj = new Date(startDate);
-  const endDateObj = new Date(endDate);
+  const startDateObj = new Date(startDate + "T00:00:00");
 
-  // 시작날짜가 오늘보다 이전인지 확인
-  if (startDateObj < today) {
+  // ✅ 시작날짜가 오늘보다 이전인지 확인 (날짜만 비교)
+  if (startDate < todayStr) {
     window.showToast("시작날짜는 오늘 이후로 설정해주세요.", 3000, "warning");
     return false;
   }
 
-  // 시작날짜가 종료날짜보다 늦은지 확인
-  if (startDateObj > endDateObj) {
+  // ✅ 시작날짜가 종료날짜보다 늦은지 확인
+  if (startDate > endDate) {
     window.showToast("시작일은 종료일보다 클 수 없습니다.", 3000, "warning");
     return false;
   }
 
-  // 종료날짜가 시작날짜 + 1년을 초과하는지 확인
+  // ✅ 종료날짜가 시작날짜 + 1년을 초과하는지 확인 (정확히 365일)
   const maxEndDate = new Date(startDateObj);
-  maxEndDate.setFullYear(startDateObj.getFullYear() + 1);
+  maxEndDate.setDate(maxEndDate.getDate() + 365); // 정확히 365일 후
+  const maxEndDateStr = maxEndDate.toISOString().split("T")[0];
 
-  if (endDateObj > maxEndDate) {
+  if (endDate > maxEndDateStr) {
     window.showToast(
       "종료날짜는 시작날짜로부터 1년 이내로 설정해주세요.",
       3000,
@@ -326,7 +322,7 @@ function initDateInputs() {
     if (startDate) {
       const startDateObj = new Date(startDate);
       const maxEndDate = new Date(startDateObj);
-      maxEndDate.setFullYear(startDateObj.getFullYear() + 1);
+      maxEndDate.setDate(maxEndDate.getDate() + 365);
 
       const maxEndDateStr = maxEndDate.toISOString().split("T")[0];
 
@@ -345,11 +341,14 @@ function initDateInputs() {
     if (endDate) {
       const endDateObj = new Date(endDate);
       const minStartDate = new Date(endDateObj);
-      minStartDate.setFullYear(endDateObj.getFullYear() - 1);
+      minStartDate.setDate(minStartDate.getDate() - 365);
 
       const minStartDateStr = minStartDate.toISOString().split("T")[0];
 
-      startDateInput.max = minStartDateStr;
+      const todayDate = new Date(today).getTime();
+      const minStartDateNum = new Date(minStartDateStr).getTime();
+      const maxDate = Math.max(todayDate, minStartDateNum);
+      startDateInput.min = new Date(maxDate).toISOString().split("T")[0];
     }
   });
 }
