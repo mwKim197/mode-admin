@@ -12,6 +12,9 @@ export function initCouponDetail() {
   // API에서 사용자 정보 가져와서 가맹점/지점에 넣기
   loadUserData();
 
+  // 날짜 입력 필드 초기화 및 이벤트 리스너 추가
+  initDateInputs();
+
   // 목록으로 버튼 클릭 시 couponList 페이지로 이동
   const backToListBtn = document.getElementById("back-to-list");
 
@@ -192,8 +195,34 @@ function validateDateRange(startDate: string, endDate: string): boolean {
     return false;
   }
 
-  if (startDate > endDate) {
-    window.showToast("시작일은 종료일보다 클 수 없습니다.", 3000, "error");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
+
+  const startDateObj = new Date(startDate);
+  const endDateObj = new Date(endDate);
+
+  // 시작날짜가 오늘보다 이전인지 확인
+  if (startDateObj < today) {
+    window.showToast("시작날짜는 오늘 이후로 설정해주세요.", 3000, "warning");
+    return false;
+  }
+
+  // 시작날짜가 종료날짜보다 늦은지 확인
+  if (startDateObj > endDateObj) {
+    window.showToast("시작일은 종료일보다 클 수 없습니다.", 3000, "warning");
+    return false;
+  }
+
+  // 종료날짜가 시작날짜 + 1년을 초과하는지 확인
+  const maxEndDate = new Date(startDateObj);
+  maxEndDate.setFullYear(startDateObj.getFullYear() + 1);
+
+  if (endDateObj > maxEndDate) {
+    window.showToast(
+      "종료날짜는 시작날짜로부터 1년 이내로 설정해주세요.",
+      3000,
+      "warning"
+    );
     return false;
   }
 
@@ -272,4 +301,55 @@ async function sampleSelect(userId: string) {
   } catch (error) {
     console.error("메뉴 데이터 로드 실패:", error);
   }
+}
+
+function initDateInputs() {
+  const startDateInput = document.getElementById(
+    "start-date"
+  ) as HTMLInputElement;
+  const endDateInput = document.getElementById("end-date") as HTMLInputElement;
+
+  if (!startDateInput || !endDateInput) {
+    console.error("날짜 입력 필드를 찾을 수 없습니다.");
+    return;
+  }
+
+  const today = new Date().toISOString().split("T")[0];
+
+  startDateInput.min = today;
+  startDateInput.value = today;
+
+  endDateInput.min = today;
+
+  startDateInput.addEventListener("change", function () {
+    const startDate = this.value;
+    if (startDate) {
+      const startDateObj = new Date(startDate);
+      const maxEndDate = new Date(startDateObj);
+      maxEndDate.setFullYear(startDateObj.getFullYear() + 1);
+
+      const maxEndDateStr = maxEndDate.toISOString().split("T")[0];
+
+      endDateInput.max = maxEndDateStr;
+
+      if (endDateInput.value && endDateInput.value > maxEndDateStr) {
+        endDateInput.value = maxEndDateStr;
+      }
+
+      endDateInput.min = startDate;
+    }
+  });
+
+  endDateInput.addEventListener("change", function () {
+    const endDate = this.value;
+    if (endDate) {
+      const endDateObj = new Date(endDate);
+      const minStartDate = new Date(endDateObj);
+      minStartDate.setFullYear(endDateObj.getFullYear() - 1);
+
+      const minStartDateStr = minStartDate.toISOString().split("T")[0];
+
+      startDateInput.max = minStartDateStr;
+    }
+  });
 }
