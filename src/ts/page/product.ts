@@ -1,19 +1,19 @@
-import {getStoredUser} from "../utils/userStorage.ts";
-import {apiGet, apiPost} from "../api/apiHelpers.ts";
-import {MenuItem} from "../types/product.ts";
+import { getStoredUser } from "../utils/userStorage.ts";
+import { apiGet, apiPost } from "../api/apiHelpers.ts";
+import { MenuItem } from "../types/product.ts";
 
 const changeList: { menuId: number; empty?: string; delete?: boolean }[] = [];
 let allMenuItems: MenuItem[] = [];
-let searchTimeout: NodeJS.Timeout | null = null; 
+let searchTimeout: NodeJS.Timeout | null = null;
 
 export function initProduct() {
-    // localstorage에 저장된 user 정보를 불러옴
-    const user = getStoredUser();
+  // localstorage에 저장된 user 정보를 불러옴
+  const user = getStoredUser();
 
-    if (!user) {
-        window.showToast(`❌ 사용자 정보가 없습니다.`, 3000, "error");
-        return;
-    }
+  if (!user) {
+    window.showToast(`❌ 사용자 정보가 없습니다.`, 3000, "error");
+    return;
+  }
 
   initSearchFunction();
 
@@ -23,8 +23,8 @@ export function initProduct() {
     );
     const data = await res.json();
 
-        return data.items as MenuItem[];
-    }
+    return data.items as MenuItem[];
+  }
 
   async function init() {
     try {
@@ -32,6 +32,24 @@ export function initProduct() {
       allMenuItems = menuItems;
       renderMenuTable(menuItems);
       changeList.length = 0;
+
+      setTimeout(() => {
+        const clickedProductNo = sessionStorage.getItem("clickedProductNo");
+        if (clickedProductNo) {
+          const rows = document.querySelectorAll("tbody tr");
+          for (let row of rows) {
+            const firstCell = row.querySelector("td:first-child");
+            if (
+              firstCell &&
+              firstCell.textContent?.trim() === clickedProductNo
+            ) {
+              row.scrollIntoView({ behavior: "smooth", block: "center" });
+              break;
+            }
+          }
+          sessionStorage.removeItem("clickedProductNo");
+        }
+      }, 200);
     } catch (err) {
       console.error("❌ 메뉴 목록 불러오기 실패", err);
     }
@@ -75,7 +93,7 @@ export function initProduct() {
       // ✅ 실시간 검색 기능 추가
       searchInput.addEventListener("input", function () {
         const searchTerm = searchInput.value.trim();
-        
+
         if (searchTimeout) {
           clearTimeout(searchTimeout);
         }
@@ -93,7 +111,7 @@ export function initProduct() {
 
     if (searchTerm.length > 0) {
       filtered = allMenuItems.filter((item) =>
-          item.name?.toLowerCase().includes(searchTerm.toLowerCase())
+        item.name?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     } else {
       // 검색어가 없으면 전체 목록 표시
@@ -101,7 +119,6 @@ export function initProduct() {
     }
 
     renderMenuTable(filtered);
-
   }
 
   // 기존 검색 함수 (검색 버튼용)
@@ -110,7 +127,7 @@ export function initProduct() {
 
     if (searchTerm.length > 0) {
       filtered = allMenuItems.filter((item) =>
-          item.name?.toLowerCase().includes(searchTerm.toLowerCase())
+        item.name?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     } else {
       filtered = allMenuItems;
@@ -142,9 +159,10 @@ export function initProduct() {
       <tr>
         <td >${item.no}</td>
         <td style="text-align: center;"><img src="${imageUrl}" alt="상품 이미지" style="width:36px;height:46px; object-fit:cover;display: inline-block;"></td>
-        <td class="product-name" onclick="window.location.href='./product-detail.html?menuId=${
-          item.menuId
-        }'">
+        <td class="product-name" onclick="
+  sessionStorage.setItem('clickedProductNo', '${item.no}');
+  window.location.href='./product-detail.html?menuId=${item.menuId}'
+">
           ${item.name}
         </td>
         <td>${Number(item.price).toLocaleString()}</td>
@@ -219,7 +237,7 @@ function transformToOrderData(item: any): any {
           userId: item.userId,
           menuId: item.menuId,
           name: item.name,
-          count: 1, // ✅ 주문 개수로 사용
+          count: 1,
         },
       ],
     },
@@ -241,70 +259,70 @@ function updateChangeList(
 
 // 저장 버튼 동작
 async function saveChanges() {
-    const user = getStoredUser();
-    if (!user) return;
+  const user = getStoredUser();
+  if (!user) return;
 
-    const body = {
-        userId: user.userId,
-        items: changeList,
-    };
+  const body = {
+    userId: user.userId,
+    items: changeList,
+  };
 
-    try {
-        const res = await apiPost(
-            `/model_admin_menu?func=bulk-update-or-delete`,
-            body
-        );
+  try {
+    const res = await apiPost(
+      `/model_admin_menu?func=bulk-update-or-delete`,
+      body
+    );
 
-        if (res.ok) {
-            window.showToast(`변경 사항 저장 완료`);
-            location.reload(); // 또는 init() 호출
-        } else {
-            const err = await res.json();
-            console.error("❌ 저장 실패:", err.message);
-            window.showToast(`❌ 저장 실패: ${err.message} `, 3000, "error");
-        }
-    } catch (err) {
-        console.error("❌ 저장 오류:", err);
-        window.showToast(`❌ 저장 오류: ${err} `, 3000, "error");
+    if (res.ok) {
+      window.showToast(`변경 사항 저장 완료`);
+      location.reload(); // 또는 init() 호출
+    } else {
+      const err = await res.json();
+      console.error("❌ 저장 실패:", err.message);
+      window.showToast(`❌ 저장 실패: ${err.message} `, 3000, "error");
     }
+  } catch (err) {
+    console.error("❌ 저장 오류:", err);
+    window.showToast(`❌ 저장 오류: ${err} `, 3000, "error");
+  }
 }
 
 async function sendMachineCommand(func: string, data: any = {}) {
-    const user = getStoredUser();
-    if (!user) {
-        window.showToast(`❌ 사용자 정보가 없습니다.`, 3000, "error");
-        return;
-    }
-    const payload = {
-        func,
-        userId: user.userId,
-        ...(func === "order" ? {orderData: data.orderData} : {}),
-        ...(func === "drink" ? {orderData: {recipe: data}} : {}),
-        ...(func === "ice"
-            ? {
-                orderData: {
-                    recipe: {
-                        iceTime: data.iceTime,
-                        waterTime: data.waterTime,
-                        name: data.name,
-                    },
-                },
-            }
-            : {}),
-    };
+  const user = getStoredUser();
+  if (!user) {
+    window.showToast(`❌ 사용자 정보가 없습니다.`, 3000, "error");
+    return;
+  }
+  const payload = {
+    func,
+    userId: user.userId,
+    ...(func === "order" ? { orderData: data.orderData } : {}),
+    ...(func === "drink" ? { orderData: { recipe: data } } : {}),
+    ...(func === "ice"
+      ? {
+          orderData: {
+            recipe: {
+              iceTime: data.iceTime,
+              waterTime: data.waterTime,
+              name: data.name,
+            },
+          },
+        }
+      : {}),
+  };
 
-    // ✅ 요청만 보내고 응답 기다리지 않음
-    apiPost("/model_machine_controll", payload)
-        .then(() => {
-            window.showToast(`${func} 명령 전송 완료`);
-        })
-        .catch((err) => {
-            console.error(`❌ ${func} 명령 전송 실패:`, err);
-            window.showToast(`❌ ${func} 명령 전송 실패: ${err} `, 3000, "error");
-        });
+  // ✅ 요청만 보내고 응답 기다리지 않음
+  apiPost("/model_machine_controll", payload)
+    .then(() => {
+      window.showToast(`${func} 명령 전송 완료`);
+    })
+    .catch((err) => {
+      console.error(`❌ ${func} 명령 전송 실패:`, err);
+      window.showToast(`❌ ${func} 명령 전송 실패: ${err} `, 3000, "error");
+    });
 
-    // ✅ 바로 UI 알림
-    window.showToast(`${func} 명령 전송`);
+  // ✅ 바로 UI 알림
+  window.showToast(`${func} 명령 전송`);
 }
 
 // 맨 아래에 추가하세요
@@ -317,95 +335,95 @@ let menu: any = null;
 
 // 어드민 주문 - 팝업 열기로 변경
 function onAdminOder(el: HTMLElement) {
-    const itemStr = decodeURIComponent(el.dataset.menu || "{}");
-    const item = JSON.parse(itemStr);
-    menu = item; // menu로 통일
+  const itemStr = decodeURIComponent(el.dataset.menu || "{}");
+  const item = JSON.parse(itemStr);
+  menu = item; // menu로 통일
 
-    // 팝업 열기
-    const popup = document.getElementById("adminActionPopup");
-    if (popup) {
-        popup.style.display = "block";
-    }
+  // 팝업 열기
+  const popup = document.getElementById("adminActionPopup");
+  if (popup) {
+    popup.style.display = "block";
+  }
 }
 
 // 팝업 닫기 공통 함수
 function closeAdminPopup() {
-    const popup = document.getElementById("adminActionPopup");
-    if (popup) {
-        popup.style.display = "none";
-    }
+  const popup = document.getElementById("adminActionPopup");
+  if (popup) {
+    popup.style.display = "none";
+  }
 }
 
 // 전체주문
 const btnPopupTotalOrder = document.getElementById("btnPopupTotalOrder");
 if (btnPopupTotalOrder) {
-    btnPopupTotalOrder.addEventListener("click", () => {
-        if (menu) {
-            if (!confirm("원격 명령을 전송하시겠습니까?")) {
-                return;
-            }
-            const data = transformToOrderData(menu);
-            sendMachineCommand("order", data);
-            closeAdminPopup(); // 공통 함수 호출
-        }
-    });
+  btnPopupTotalOrder.addEventListener("click", () => {
+    if (menu) {
+      if (!confirm("원격 명령을 전송하시겠습니까?")) {
+        return;
+      }
+      const data = transformToOrderData(menu);
+      sendMachineCommand("order", data);
+      closeAdminPopup(); // 공통 함수 호출
+    }
+  });
 }
 
 // 컵 배출
 const btnCupDispense = document.getElementById("btnCupDispense");
 if (btnCupDispense) {
-    btnCupDispense.addEventListener("click", () => {
-        if (menu) {
-            const cupType = menu.cup;
-            if (cupType === "plastic") {
-                if (confirm("원격 명령을 전송하시겠습니까?")) {
-                    sendMachineCommand("pl");
-                    closeAdminPopup(); // 공통 함수 호출
-                }
-            } else if (cupType === "paper") {
-                if (confirm("원격 명령을 전송하시겠습니까?")) {
-                    sendMachineCommand("pa");
-                    closeAdminPopup(); // 공통 함수 호출
-                }
-            }
+  btnCupDispense.addEventListener("click", () => {
+    if (menu) {
+      const cupType = menu.cup;
+      if (cupType === "plastic") {
+        if (confirm("원격 명령을 전송하시겠습니까?")) {
+          sendMachineCommand("pl");
+          closeAdminPopup(); // 공통 함수 호출
         }
-    });
+      } else if (cupType === "paper") {
+        if (confirm("원격 명령을 전송하시겠습니까?")) {
+          sendMachineCommand("pa");
+          closeAdminPopup(); // 공통 함수 호출
+        }
+      }
+    }
+  });
 }
 
 // 얼음/물 배출
 const btnIceWaterDispense = document.getElementById("btnIceWaterDispense");
 if (btnIceWaterDispense) {
-    btnIceWaterDispense.addEventListener("click", () => {
-        if (menu) {
-            if (confirm("원격 명령을 전송하시겠습니까?")) {
-                sendMachineCommand("ice", menu);
-                closeAdminPopup(); // 공통 함수 호출
-            }
-        }
-    });
+  btnIceWaterDispense.addEventListener("click", () => {
+    if (menu) {
+      if (confirm("원격 명령을 전송하시겠습니까?")) {
+        sendMachineCommand("ice", menu);
+        closeAdminPopup(); // 공통 함수 호출
+      }
+    }
+  });
 }
 
 // 음료 투출
 const btnPopupDrinkOrder = document.getElementById("btnPopupDrinkOrder");
 if (btnPopupDrinkOrder) {
-    btnPopupDrinkOrder.addEventListener("click", () => {
-        if (confirm("원격 명령을 전송하시겠습니까?")) {
-            if (menu) {
-                sendMachineCommand("drink", menu);
-                closeAdminPopup(); // 공통 함수 호출
-            }
-        }
-    });
+  btnPopupDrinkOrder.addEventListener("click", () => {
+    if (confirm("원격 명령을 전송하시겠습니까?")) {
+      if (menu) {
+        sendMachineCommand("drink", menu);
+        closeAdminPopup(); // 공통 함수 호출
+      }
+    }
+  });
 }
 
 // 팝업 바깥 클릭 시 닫기
 const popup = document.getElementById("adminActionPopup");
 if (popup) {
-    popup.addEventListener("click", (e) => {
-        if (e.target === popup) {
-            popup.style.display = "none";
-        }
-    });
+  popup.addEventListener("click", (e) => {
+    if (e.target === popup) {
+      popup.style.display = "none";
+    }
+  });
 }
 
 (window as any).closeAdminPopup = closeAdminPopup;
