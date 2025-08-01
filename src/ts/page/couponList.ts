@@ -206,17 +206,29 @@ function renderPagination() {
   paginationContainer.style.display = "flex";
   paginationContainer.innerHTML = "";
 
-  // 이전 페이지 버튼
-  if (currentPage > 1) {
-    const prevBtn = document.createElement("button");
-    prevBtn.textContent = "이전";
-    prevBtn.className = "pagination-btn";
-    prevBtn.addEventListener("click", () => {
+  // ✅ 맨 앞 버튼 (항상 표시, 첫 페이지에서는 비활성화)
+  const firstBtn = document.createElement("button");
+  firstBtn.textContent = "<<";
+  firstBtn.className = `pagination-btn ${currentPage === 1 ? "disabled" : ""}`;
+  firstBtn.addEventListener("click", () => {
+    if (currentPage !== 1) {
+      currentPage = 1;
+      getCouponList(getStoredUser()?.userId || "");
+    }
+  });
+  paginationContainer.appendChild(firstBtn);
+
+  // ✅ 이전 페이지 버튼 (항상 표시, 첫 페이지에서는 비활성화)
+  const prevBtn = document.createElement("button");
+  prevBtn.textContent = "<";
+  prevBtn.className = `pagination-btn ${currentPage === 1 ? "disabled" : ""}`;
+  prevBtn.addEventListener("click", () => {
+    if (currentPage > 1) {
       currentPage--;
       getCouponList(getStoredUser()?.userId || "");
-    });
-    paginationContainer.appendChild(prevBtn);
-  }
+    }
+  });
+  paginationContainer.appendChild(prevBtn);
 
   // 페이지 번호들
   const startPage = Math.max(1, currentPage - 2);
@@ -225,6 +237,7 @@ function renderPagination() {
   for (let i = startPage; i <= endPage; i++) {
     const pageBtn = document.createElement("button");
     pageBtn.textContent = i.toString();
+    // ✅ 현재 페이지인지 확인하여 active 클래스 추가
     pageBtn.className = `pagination-btn ${i === currentPage ? "active" : ""}`;
     pageBtn.addEventListener("click", () => {
       currentPage = i;
@@ -233,17 +246,33 @@ function renderPagination() {
     paginationContainer.appendChild(pageBtn);
   }
 
-  // 다음 페이지 버튼
-  if (currentPage < totalPages) {
-    const nextBtn = document.createElement("button");
-    nextBtn.textContent = "다음";
-    nextBtn.className = "pagination-btn";
-    nextBtn.addEventListener("click", () => {
+  // ✅ 다음 페이지 버튼 (항상 표시, 마지막 페이지에서는 비활성화)
+  const nextBtn = document.createElement("button");
+  nextBtn.textContent = ">";
+  nextBtn.className = `pagination-btn ${
+    currentPage === totalPages ? "disabled" : ""
+  }`;
+  nextBtn.addEventListener("click", () => {
+    if (currentPage < totalPages) {
       currentPage++;
       getCouponList(getStoredUser()?.userId || "");
-    });
-    paginationContainer.appendChild(nextBtn);
-  }
+    }
+  });
+  paginationContainer.appendChild(nextBtn);
+
+  // ✅ 맨 뒤 버튼 (항상 표시, 마지막 페이지에서는 비활성화)
+  const lastBtn = document.createElement("button");
+  lastBtn.textContent = ">>";
+  lastBtn.className = `pagination-btn ${
+    currentPage === totalPages ? "disabled" : ""
+  }`;
+  lastBtn.addEventListener("click", () => {
+    if (currentPage !== totalPages) {
+      currentPage = totalPages;
+      getCouponList(getStoredUser()?.userId || "");
+    }
+  });
+  paginationContainer.appendChild(lastBtn);
 }
 
 // ✅ 검색 관련 변수 추가
