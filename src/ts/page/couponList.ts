@@ -1,17 +1,16 @@
 import { apiGet } from "../api/apiHelpers.ts";
 import { getStoredUser } from "../utils/userStorage.ts";
-import { renderBarcodeToCanvas } from "../utils/barcode.ts"; // ✅ 바코드 import 다시 추가
-import html2canvas from "html2canvas"; // ✅ html2canvas import 추가
+import { renderBarcodeToCanvas } from "../utils/barcode.ts";
+import html2canvas from "html2canvas";
 
-let allCoupons: any[] = []; // 전체 쿠폰 데이터 저장
-let searchTimeout: NodeJS.Timeout | null = null; // 실시간 검색을 위한 타이머
-let userInfo: any = null; // 사용자 정보 저장 (지점명 포함)
+let allCoupons: any[] = [];
+let searchTimeout: NodeJS.Timeout | null = null;
+let userInfo: any = null;
 
-// ✅ 페이지네이션 관련 변수 추가
-let pageKeys: any[] = []; // 페이지 키 배열
-let totalItems = 0; // 전체 아이템 수
+let pageKeys: any[] = [];
+let totalItems = 0;
 let currentPage = 1;
-const pageLimit = 20; // 한 페이지당 20개 (10개씩 2번 호출)
+const pageLimit = 20;
 
 export function initCoupon() {
   console.log("✅ coupon.ts 로드됨");
@@ -40,7 +39,7 @@ export function initCouponList() {
     });
   }
 
-  // ✅ 이미지 저장 버튼 이벤트 리스너 추가
+  // 이미지 저장 버튼 이벤트 리스너 추가
   const saveSelectedCouponsBtn = document.getElementById(
     "save-selected-coupons"
   );
@@ -58,7 +57,7 @@ export function initCouponList() {
   initSearchFunction();
 }
 
-// ✅ 사용자 정보와 쿠폰 목록을 동시에 로드 (페이지네이션 적용)
+// 사용자 정보와 쿠폰 목록을 동시에 로드 (페이지네이션 적용)
 async function loadUserInfoAndCoupons() {
   const user = getStoredUser();
   if (!user) {
@@ -67,21 +66,18 @@ async function loadUserInfoAndCoupons() {
   }
 
   try {
-    // 병렬로 두 API 호출
     const [userResponse] = await Promise.all([
       apiGet(`/model_user_setting?func=get-user&userId=${user.userId}`),
     ]);
 
-    // 사용자 정보 처리
     if (userResponse.ok) {
       const userData = await userResponse.json();
-      userInfo = userData.user; // ✅ user 객체 안의 데이터를 저장
+      userInfo = userData.user;
       console.log("사용자 정보 로드 완료:", userInfo);
     } else {
       console.error("사용자 정보 로드 실패");
     }
 
-    // ✅ 쿠폰 목록 로드 (페이지네이션 적용)
     await getCouponList(user.userId);
   } catch (error) {
     console.error("API 호출 오류:", error);
@@ -89,16 +85,13 @@ async function loadUserInfoAndCoupons() {
   }
 }
 
-// ✅ 쿠폰 목록 로드 함수 (페이지네이션 적용) - 수정
 async function getCouponList(userId: string) {
   try {
-    // 첫 번째 API 요청
     let firstApiUrl = `/model_coupon?func=coupon&userId=${userId}`;
     if (searchTerm) {
       firstApiUrl += `&search=${encodeURIComponent(searchTerm)}`;
     }
 
-    // 페이지네이션 키 추가 (첫 페이지가 아닌 경우)
     if (currentPage > 1 && pageKeys.length > 0) {
       const keyIndex = (currentPage - 1) * 2 - 1;
       if (pageKeys[keyIndex]) {
@@ -106,13 +99,10 @@ async function getCouponList(userId: string) {
       }
     }
 
-    console.log(" 첫 번째 API 요청 URL:", firstApiUrl);
     const firstResponse = await apiGet(firstApiUrl);
     const firstData = await firstResponse.json();
-    console.log("📦 첫 번째 응답 데이터:", firstData);
-    console.log("📦 첫 번째 응답 items 개수:", firstData.items?.length || 0);
 
-    // ✅ 첫 페이지에서만 pageKeys 수집
+    // 첫 페이지에서만 pageKeys 수집
     if (currentPage === 1) {
       pageKeys = [];
       totalItems = firstData.total || 0;
@@ -128,13 +118,11 @@ async function getCouponList(userId: string) {
       }
     }
 
-    // 두 번째 API 요청 (조건부)
     let secondApiUrl = `/model_coupon?func=coupon&userId=${userId}`;
     if (searchTerm) {
       secondApiUrl += `&search=${encodeURIComponent(searchTerm)}`;
     }
 
-    // 두 번째 요청용 pageKey (필요한 경우만)
     let needSecondRequest = false;
 
     if (currentPage === 1) {
@@ -150,7 +138,6 @@ async function getCouponList(userId: string) {
       }
     }
 
-    // 두 번째 요청이 필요한 경우만 실행
     if (needSecondRequest) {
       console.log(" 두 번째 API 요청 URL:", secondApiUrl);
       const secondResponse = await apiGet(secondApiUrl);
@@ -181,14 +168,12 @@ async function getCouponList(userId: string) {
 function renderPagination() {
   const totalPages = Math.ceil(totalItems / pageLimit);
 
-  // 페이지네이션 컨테이너 찾기 또는 생성
   let paginationContainer = document.getElementById("pagination-container");
   if (!paginationContainer) {
     paginationContainer = document.createElement("div");
     paginationContainer.id = "pagination-container";
     paginationContainer.className = "pagination";
 
-    // 테이블 다음에 삽입
     const tableArea = document.querySelector(".tableArea");
     if (tableArea && tableArea.parentNode) {
       tableArea.parentNode.insertBefore(
@@ -206,25 +191,35 @@ function renderPagination() {
   paginationContainer.style.display = "flex";
   paginationContainer.innerHTML = "";
 
-  // 이전 페이지 버튼
-  if (currentPage > 1) {
-    const prevBtn = document.createElement("button");
-    prevBtn.textContent = "이전";
-    prevBtn.className = "pagination-btn";
-    prevBtn.addEventListener("click", () => {
+  const firstBtn = document.createElement("button");
+  firstBtn.textContent = "<<";
+  firstBtn.className = `pagination-btn ${currentPage === 1 ? "disabled" : ""}`;
+  firstBtn.addEventListener("click", () => {
+    if (currentPage !== 1) {
+      currentPage = 1;
+      getCouponList(getStoredUser()?.userId || "");
+    }
+  });
+  paginationContainer.appendChild(firstBtn);
+
+  const prevBtn = document.createElement("button");
+  prevBtn.textContent = "<";
+  prevBtn.className = `pagination-btn ${currentPage === 1 ? "disabled" : ""}`;
+  prevBtn.addEventListener("click", () => {
+    if (currentPage > 1) {
       currentPage--;
       getCouponList(getStoredUser()?.userId || "");
-    });
-    paginationContainer.appendChild(prevBtn);
-  }
+    }
+  });
+  paginationContainer.appendChild(prevBtn);
 
-  // 페이지 번호들
   const startPage = Math.max(1, currentPage - 2);
   const endPage = Math.min(totalPages, currentPage + 2);
 
   for (let i = startPage; i <= endPage; i++) {
     const pageBtn = document.createElement("button");
     pageBtn.textContent = i.toString();
+
     pageBtn.className = `pagination-btn ${i === currentPage ? "active" : ""}`;
     pageBtn.addEventListener("click", () => {
       currentPage = i;
@@ -233,54 +228,61 @@ function renderPagination() {
     paginationContainer.appendChild(pageBtn);
   }
 
-  // 다음 페이지 버튼
-  if (currentPage < totalPages) {
-    const nextBtn = document.createElement("button");
-    nextBtn.textContent = "다음";
-    nextBtn.className = "pagination-btn";
-    nextBtn.addEventListener("click", () => {
+  const nextBtn = document.createElement("button");
+  nextBtn.textContent = ">";
+  nextBtn.className = `pagination-btn ${
+    currentPage === totalPages ? "disabled" : ""
+  }`;
+  nextBtn.addEventListener("click", () => {
+    if (currentPage < totalPages) {
       currentPage++;
       getCouponList(getStoredUser()?.userId || "");
-    });
-    paginationContainer.appendChild(nextBtn);
-  }
+    }
+  });
+  paginationContainer.appendChild(nextBtn);
+
+  const lastBtn = document.createElement("button");
+  lastBtn.textContent = ">>";
+  lastBtn.className = `pagination-btn ${
+    currentPage === totalPages ? "disabled" : ""
+  }`;
+  lastBtn.addEventListener("click", () => {
+    if (currentPage !== totalPages) {
+      currentPage = totalPages;
+      getCouponList(getStoredUser()?.userId || "");
+    }
+  });
+  paginationContainer.appendChild(lastBtn);
 }
 
-// ✅ 검색 관련 변수 추가
 let searchTerm = "";
 
-// 검색 기능 초기화 (수정)
 function initSearchFunction() {
   const searchInput = document.getElementById(
     "searchCoupon"
   ) as HTMLInputElement;
-  const searchBtn = document.getElementById(
-    "searchButton"
-  ) as HTMLButtonElement;
   const resetBtn = document.getElementById("searchReset") as HTMLButtonElement;
 
-  if (!searchInput || !searchBtn || !resetBtn) {
-    console.error("검색 요소를 찾을 수 없습니다!");
+  if (!searchInput || !resetBtn) {
     return;
   }
 
-  // 검색 버튼 클릭 이벤트
-  searchBtn.addEventListener("click", () => {
-    const searchValue = searchInput.value.trim();
-    performSearch(searchValue);
-  });
+  // ✅ 검색 버튼 이벤트 리스너 제거
 
   // 리셋 버튼 클릭 이벤트
   resetBtn.addEventListener("click", () => {
     searchInput.value = "";
-    performSearch("");
+    // 실시간 검색으로 전체 데이터 표시
+    renderCouponTable(allCoupons, false);
+    renderPagination();
   });
 
   // Enter 키 이벤트
   searchInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
+      // Enter 키도 실시간 검색과 동일하게 처리
       const searchValue = searchInput.value.trim();
-      performSearch(searchValue);
+      performRealTimeSearch(searchValue);
     }
   });
 
@@ -298,27 +300,65 @@ function initSearchFunction() {
   });
 }
 
-// 실시간 검색 실행 (클라이언트 사이드 필터링)
-function performRealTimeSearch(searchValue: string) {
-  console.log("실시간 검색:", searchValue);
-
+//  실시간 검색 실행
+async function performRealTimeSearch(searchValue: string) {
   if (!searchValue.trim()) {
-    // 검색어가 없으면 전체 데이터 표시
     renderCouponTable(allCoupons);
+    renderPagination();
     return;
   }
 
-  // 현재 전체 데이터에서 필터링
-  const filteredCoupons = allCoupons.filter((coupon) => {
-    const title = coupon.title.toLowerCase();
-    const couponCode = coupon.couponCode.toLowerCase();
-    const searchLower = searchValue.toLowerCase();
+  const koreanConsonants = /^[ㄱ-ㅎ]+$/;
+  if (koreanConsonants.test(searchValue)) {
+    renderCouponTable(allCoupons);
+    renderPagination();
+    return;
+  }
 
-    return title.includes(searchLower) || couponCode.includes(searchLower);
-  });
+  if (searchValue.length < 1) {
+    renderCouponTable(allCoupons);
+    renderPagination();
+    return;
+  }
 
-  // 필터링된 결과 표시
-  renderCouponTable(filteredCoupons);
+  try {
+    const user = getStoredUser();
+    if (!user) return;
+
+    const isKorean = /[가-힣]/.test(searchValue);
+    const isNumber = /^\d+$/.test(searchValue);
+
+    let apiUrl = `/model_coupon?func=couponDetail&userId=${user.userId}`;
+
+    if (isKorean) {
+      apiUrl += `&title=${encodeURIComponent(searchValue)}`;
+    } else if (isNumber) {
+      apiUrl += `&couponCode=${searchValue}`;
+    }
+
+    const response = await apiGet(apiUrl);
+    if (response.ok) {
+      const data = await response.json();
+      const searchResults = data.items || [];
+
+      renderCouponTable(searchResults, true);
+
+      // ✅ 검색 중에는 페이지네이션 숨기기
+      const paginationContainer = document.getElementById(
+        "pagination-container"
+      );
+      if (paginationContainer) {
+        paginationContainer.style.display = "none";
+      }
+    } else {
+      renderCouponTable(allCoupons, false);
+      renderCouponTable(allCoupons);
+      renderPagination();
+    }
+  } catch (error) {
+    renderCouponTable(allCoupons);
+    renderPagination();
+  }
 }
 
 // 검색 실행 (수정)
@@ -326,7 +366,7 @@ function performSearch(searchValue: string) {
   console.log("검색 실행:", searchValue);
 
   searchTerm = searchValue;
-  currentPage = 1; // 검색 시 첫 페이지로 이동
+  currentPage = 1;
 
   const user = getStoredUser();
   if (user) {
@@ -382,18 +422,16 @@ function updateSelectAllCheckbox() {
 }
 
 // 쿠폰 테이블 렌더링
-function renderCouponTable(coupons: any[]) {
+function renderCouponTable(coupons: any[], isSearchResult: boolean = false) {
   const tbody = document.getElementById("coupon-table-body");
 
   if (!tbody) {
-    console.error("tbody 요소를 찾을 수 없습니다!");
     return;
   }
 
   tbody.innerHTML = "";
 
   if (!coupons || coupons.length === 0) {
-    console.log("쿠폰 데이터가 없습니다.");
     const emptyRow = document.createElement("tr");
     emptyRow.innerHTML = `
       <td colspan="6" class="text-center">발급된 쿠폰이 없습니다.</td>
@@ -401,8 +439,6 @@ function renderCouponTable(coupons: any[]) {
     tbody.appendChild(emptyRow);
     return;
   }
-
-  console.log(`${coupons.length}개의 쿠폰을 렌더링합니다.`);
 
   coupons.forEach((coupon, index) => {
     const row = document.createElement("tr");
@@ -420,7 +456,10 @@ function renderCouponTable(coupons: any[]) {
     const expiresAt = formatDate(coupon.expiresAt);
     const displayTitle = coupon.title.replace(" 무료", "");
 
-    const itemNumber = (currentPage - 1) * pageLimit + index + 1;
+    // ✅ 검색 결과인지에 따라 번호 계산 방식 변경
+    const itemNumber = isSearchResult
+      ? index + 1
+      : (currentPage - 1) * pageLimit + index + 1;
 
     row.innerHTML = `
       <td><input type="checkbox" /></td>
@@ -453,17 +492,49 @@ function renderCouponTable(coupons: any[]) {
   // 테이블 렌더링 후 전체 선택 체크박스 상태 초기화
   updateSelectAllCheckbox();
 
-  // 팝업 닫기 이벤트 리스너 추가 (한 번만 실행)
+  // 팝업 닫기 이벤트 리스너 추가
   initCouponPopupEvents();
 }
 
-// ✅ 쿠폰 팝업 표시 (데이터 포함)
 function showCouponPopup(couponData: any) {
   const popup = document.getElementById("coupon-popup") as HTMLElement;
 
   if (popup) {
     updateCouponOverlay(couponData);
     popup.style.display = "flex";
+  }
+}
+
+// 메뉴 이미지 로드 함수
+async function loadMenuImage(menuId: string, title: string) {
+  try {
+    const user = getStoredUser();
+    if (!user) return;
+
+    const response = await apiGet(
+      `/model_admin_menu?userId=${user.userId}&menuId=${menuId}&func=get-menu-by-id`
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+
+      if (data.image) {
+        const imageFile = data.image?.split("\\").pop() ?? "";
+        const encodedFile = encodeURIComponent(imageFile);
+        const imageUrl = `https://model-narrow-road.s3.ap-northeast-2.amazonaws.com/model/${data.userId}/${encodedFile}`;
+
+        const menuImage = document.querySelector(
+          ".coupon-menu-image"
+        ) as HTMLImageElement;
+        if (menuImage) {
+          menuImage.src = imageUrl;
+          menuImage.alt = title;
+          console.log("메뉴 이미지 로드 완료:", imageUrl);
+        }
+      }
+    }
+  } catch (error) {
+    console.error("메뉴 이미지 로드 실패:", error);
   }
 }
 
@@ -492,12 +563,16 @@ function updateCouponOverlay(couponData: any) {
   if (couponOverlay) {
     couponOverlay.innerHTML = ` 
       <div class="coupon-period" style="transform: translateY(-7px);">${period}</div>
+      <img class="coupon-menu-image" src="" alt="${title}" style="transform: translateY(-7px);" />
       <div class="${titleClass}" style="transform: translateY(-7px);">${title}</div>
       <div class="${freeClass}" style="transform: translateY(-7px);">1잔 무료</div>
       <div class="coupon-store" style="transform: translateY(-7px);">${storeName}</div>
       <div class="coupon-id" style="transform: translateY(-7px);">${couponData.couponId}</div>
       <canvas id="coupon-barcode" style="transform: translateY(-7px);"></canvas>  
     `;
+
+    // ✅ 메뉴 이미지 로드
+    loadMenuImage(couponData.menuId, title);
   }
 
   setTimeout(() => {
@@ -533,7 +608,7 @@ function hideCouponPopup() {
   }
 }
 
-// 팝업 이벤트 초기화 (이미지 저장 기능 제거)
+// 팝업 이벤트 초기화
 let popupEventsInitialized = false;
 
 function initCouponPopupEvents() {
@@ -610,7 +685,6 @@ async function saveSelectedCouponsAsImages() {
       "success"
     );
 
-    // ✅ 저장 완료 후 페이지 새로고침
     setTimeout(() => {
       window.location.reload();
     }, 1000);
@@ -623,9 +697,9 @@ async function saveSelectedCouponsAsImages() {
   }
 }
 
-// ✅ 개별 쿠폰 이미지 생성 함수 (수정)
+// 개별 쿠폰 이미지 생성 함수 수정
 async function generateCouponImage(couponData: any): Promise<void> {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
       const popup = document.getElementById("coupon-popup") as HTMLElement;
 
@@ -635,10 +709,10 @@ async function generateCouponImage(couponData: any): Promise<void> {
       popup.style.left = "-9999px";
       popup.style.zIndex = "-1";
 
-      // ✅ 캡처용 오버레이 업데이트 함수 호출 (coupon-period 5px 위로)
-      updateCouponOverlayForCapture(couponData);
+      // ✅ 캡처용 오버레이 업데이트 (await 추가)
+      await updateCouponOverlayForCapture(couponData);
 
-      // 바코드 렌더링 후 이미지 생성
+      // ✅ 바코드 렌더링 후 캡처 실행
       setTimeout(async () => {
         try {
           const barcodeCanvas = document.getElementById(
@@ -696,25 +770,20 @@ async function generateCouponImage(couponData: any): Promise<void> {
                 ctx.drawImage(canvas, 0, 0);
               }
 
-              // 파일명 생성
               const safeTitle = couponData.title
                 .replace(/[^\w\s가-힣]/g, "")
                 .replace(/\s+/g, "_");
               const fileName = `${safeTitle}_${couponData.couponCode}.png`;
 
-              // 다운로드
               downloadURI(roundedCanvas.toDataURL("image/png"), fileName);
 
-              // ✅ 스타일 복구
               Object.assign(couponContainer.style, originalStyles);
               if (saveBtn) saveBtn.style.display = originalDisplay;
 
-              // 팝업 숨기기
               popup.style.display = "none";
 
               resolve();
             } catch (error) {
-              // 에러 시에도 스타일 복구
               Object.assign(couponContainer.style, originalStyles);
               if (saveBtn) saveBtn.style.display = originalDisplay;
               popup.style.display = "none";
@@ -732,8 +801,8 @@ async function generateCouponImage(couponData: any): Promise<void> {
   });
 }
 
-// ✅ 캡처용 오버레이 업데이트 함수 추가 (coupon-period 5px 위로)
-function updateCouponOverlayForCapture(couponData: any) {
+// 캡처용 오버레이 업데이트 함수
+async function updateCouponOverlayForCapture(couponData: any): Promise<void> {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
@@ -758,11 +827,76 @@ function updateCouponOverlayForCapture(couponData: any) {
   if (couponOverlay) {
     couponOverlay.innerHTML = ` 
       <div class="coupon-period" style="transform: translateY(-15px);">${period}</div>
+      <img class="coupon-menu-image" src="" alt="${title}" style="transform: translateY(-7px);" />
       <div class="${titleClass}" style="transform: translateY(-7px);">${title}</div>
       <div class="${freeClass}" style="transform: translateY(-7px);">1잔 무료</div>
       <div class="coupon-store" style="transform: translateY(-7px);">${storeName}</div>
       <div class="coupon-id" style="transform: translateY(-7px);">${couponData.couponId}</div>
       <canvas id="coupon-barcode" style="transform: translateY(-7px);"></canvas>  
     `;
+
+    await loadMenuImageForCapture(couponData.menuId, title);
   }
+}
+
+// 캡처용 메뉴 이미지 로드 함수
+async function loadMenuImageForCapture(
+  menuId: string,
+  title: string
+): Promise<void> {
+  return new Promise((resolve) => {
+    try {
+      const user = getStoredUser();
+      if (!user) {
+        console.log("❌ 사용자 정보 없음");
+        resolve();
+        return;
+      }
+
+      console.log("🔍 이미지 로드 시작:", menuId, title);
+
+      apiGet(
+        `/model_admin_menu?userId=${user.userId}&menuId=${menuId}&func=get-menu-by-id`
+      )
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          }
+          throw new Error("API 응답 실패");
+        })
+        .then((data) => {
+          console.log(" API 응답 데이터:", data);
+
+          if (data.image) {
+            const imageFile = data.image?.split("\\").pop() ?? "";
+            const encodedFile = encodeURIComponent(imageFile);
+            const imageUrl = `https://model-narrow-road.s3.ap-northeast-2.amazonaws.com/model/${data.userId}/${encodedFile}`;
+
+            console.log("🖼️ 이미지 URL:", imageUrl);
+
+            // ✅ 단순히 이미지 src 설정 (Base64 변환 제거)
+            const menuImage = document.querySelector(
+              ".coupon-menu-image"
+            ) as HTMLImageElement;
+            if (menuImage) {
+              menuImage.src = imageUrl;
+              menuImage.alt = title;
+              console.log("✅ 이미지 설정 완료");
+            } else {
+              console.log("❌ 이미지 요소를 찾을 수 없음");
+            }
+          } else {
+            console.log("❌ 이미지 데이터 없음");
+          }
+          resolve();
+        })
+        .catch((error) => {
+          console.error("❌ API 호출 실패:", error);
+          resolve();
+        });
+    } catch (error) {
+      console.error("❌ 함수 실행 실패:", error);
+      resolve();
+    }
+  });
 }
