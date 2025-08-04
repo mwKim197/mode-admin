@@ -1,0 +1,27 @@
+.notice-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.notice-table th,
+.notice-table td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.notice-table th {
+  color: #ddd;
+  font-weight: bold;
+}
+
+.notice-table tbody tr:hover {
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
+
+.table-wrapper {
+  max-height: 500px;
+  overflow-y: auto;
+}
