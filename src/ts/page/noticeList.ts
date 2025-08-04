@@ -30,7 +30,6 @@ export function initNoticeList() {
 
 async function loadNoticeList() {
   try {
-    // ✅ 전체 URL 대신 상대 경로 사용
     const response = await apiGet("/model_admin_notice?func=get-posts");
     if (response.ok) {
       const data = await response.json();
@@ -57,15 +56,21 @@ function renderNoticeTable(notices: NoticeItem[]) {
     return;
   }
 
-  tbody.innerHTML = notices
+  const sortedNotices = notices.sort((a, b) => {
+    const dateA = a.startDate ? new Date(a.startDate).getTime() : 0;
+    const dateB = b.startDate ? new Date(b.startDate).getTime() : 0;
+    return dateB - dateA; // 내림차순 (최신이 위쪽)
+  });
+
+  tbody.innerHTML = sortedNotices
     .map((notice, index) => {
-      const noticeTypeText = getNoticeTypeText(notice.noticeType);
-      const formattedDate = formatDate(notice.timestamp);
+      const tagInfo = getTagInfo(notice.noticeType);
+      const formattedDate = formatDateRange(notice.startDate, notice.endDate);
 
       return `
       <tr data-content-id="${notice.contentId}">
         <td>${index + 1}</td>
-        <td>${noticeTypeText}</td>
+        <td><span class="tag ${tagInfo.color}">${tagInfo.label}</span></td>
         <td>${notice.title}</td>
         <td>${formattedDate}</td>
       </tr>
@@ -73,7 +78,6 @@ function renderNoticeTable(notices: NoticeItem[]) {
     })
     .join("");
 
-  // ✅ 이벤트 리스너 추가
   addTableRowListeners();
 }
 
@@ -92,18 +96,38 @@ function addTableRowListeners() {
   });
 }
 
-function getNoticeTypeText(noticeType: string): string {
-  const typeMap: { [key: string]: string } = {
-    emergency: "긴급",
-    patch: "패치",
-    normal: "일반",
-    event: "이벤트",
-  };
-  return typeMap[noticeType] || noticeType;
+function getTagInfo(type: string) {
+  switch (type) {
+    case "emergency":
+      return { label: "긴급", color: "red" };
+    case "patch":
+      return { label: "패치", color: "blue" };
+    case "event":
+      return { label: "이벤트", color: "org" };
+    default:
+      return { label: "안내", color: "" };
+  }
 }
 
-function formatDate(timestamp: string): string {
-  const date = new Date(timestamp);
+function formatDateRange(startDate: string, endDate: string): string {
+  const start = startDate ? formatDate(startDate) : "";
+  const end = endDate ? formatDate(endDate) : "";
+
+  if (start && end) {
+    return `${start} ~ ${end}`;
+  } else if (start) {
+    return start;
+  } else if (end) {
+    return end;
+  } else {
+    return "날짜 정보 없음";
+  }
+}
+
+function formatDate(dateString: string): string {
+  if (!dateString) return "";
+
+  const date = new Date(dateString);
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
