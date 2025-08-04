@@ -228,7 +228,6 @@ function renderPagination() {
     paginationContainer.appendChild(pageBtn);
   }
 
-  // ✅ 다음 페이지 버튼 (항상 표시, 마지막 페이지에서는 비활성화)
   const nextBtn = document.createElement("button");
   nextBtn.textContent = ">";
   nextBtn.className = `pagination-btn ${
@@ -308,22 +307,22 @@ function initSearchFunction() {
 
 //  실시간 검색 실행
 async function performRealTimeSearch(searchValue: string) {
-  console.log("실시간 검색:", searchValue);
-
   if (!searchValue.trim()) {
-    // 검색어가 없으면 현재 페이지 데이터 표시
     renderCouponTable(allCoupons);
+    renderPagination();
     return;
   }
 
   const koreanConsonants = /^[ㄱ-ㅎ]+$/;
   if (koreanConsonants.test(searchValue)) {
     renderCouponTable(allCoupons);
+    renderPagination();
     return;
   }
 
   if (searchValue.length < 1) {
     renderCouponTable(allCoupons);
+    renderPagination();
     return;
   }
 
@@ -342,24 +341,28 @@ async function performRealTimeSearch(searchValue: string) {
       apiUrl += `&couponCode=${searchValue}`;
     }
 
-    console.log("🔍 실시간 검색 API 호출:", apiUrl);
-
     const response = await apiGet(apiUrl);
     if (response.ok) {
       const data = await response.json();
       const searchResults = data.items || [];
 
-      console.log("🔍 검색 결과:", searchResults.length, "개");
-      renderCouponTable(searchResults);
+      renderCouponTable(searchResults, true);
+
+      // ✅ 검색 중에는 페이지네이션 숨기기
+      const paginationContainer = document.getElementById(
+        "pagination-container"
+      );
+      if (paginationContainer) {
+        paginationContainer.style.display = "none";
+      }
     } else {
-      console.error("실시간 검색 실패");
-      // ✅ 에러 시에도 현재 데이터 유지 (빈 화면 방지)
+      renderCouponTable(allCoupons, false);
       renderCouponTable(allCoupons);
+      renderPagination();
     }
   } catch (error) {
-    console.error("실시간 검색 오류:", error);
-    // ✅ 에러 시에도 현재 데이터 유지 (빈 화면 방지)
     renderCouponTable(allCoupons);
+    renderPagination();
   }
 }
 
@@ -368,7 +371,7 @@ function performSearch(searchValue: string) {
   console.log("검색 실행:", searchValue);
 
   searchTerm = searchValue;
-  currentPage = 1; // 검색 시 첫 페이지로 이동
+  currentPage = 1;
 
   const user = getStoredUser();
   if (user) {
@@ -424,18 +427,16 @@ function updateSelectAllCheckbox() {
 }
 
 // 쿠폰 테이블 렌더링
-function renderCouponTable(coupons: any[]) {
+function renderCouponTable(coupons: any[], isSearchResult: boolean = false) {
   const tbody = document.getElementById("coupon-table-body");
 
   if (!tbody) {
-    console.error("tbody 요소를 찾을 수 없습니다!");
     return;
   }
 
   tbody.innerHTML = "";
 
   if (!coupons || coupons.length === 0) {
-    console.log("쿠폰 데이터가 없습니다.");
     const emptyRow = document.createElement("tr");
     emptyRow.innerHTML = `
       <td colspan="6" class="text-center">발급된 쿠폰이 없습니다.</td>
@@ -443,8 +444,6 @@ function renderCouponTable(coupons: any[]) {
     tbody.appendChild(emptyRow);
     return;
   }
-
-  console.log(`${coupons.length}개의 쿠폰을 렌더링합니다.`);
 
   coupons.forEach((coupon, index) => {
     const row = document.createElement("tr");
@@ -462,7 +461,10 @@ function renderCouponTable(coupons: any[]) {
     const expiresAt = formatDate(coupon.expiresAt);
     const displayTitle = coupon.title.replace(" 무료", "");
 
-    const itemNumber = (currentPage - 1) * pageLimit + index + 1;
+    // ✅ 검색 결과인지에 따라 번호 계산 방식 변경
+    const itemNumber = isSearchResult
+      ? index + 1
+      : (currentPage - 1) * pageLimit + index + 1;
 
     row.innerHTML = `
       <td><input type="checkbox" /></td>
