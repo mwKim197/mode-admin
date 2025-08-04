@@ -1,17 +1,16 @@
 import { apiGet } from "../api/apiHelpers.ts";
 import { getStoredUser } from "../utils/userStorage.ts";
-import { renderBarcodeToCanvas } from "../utils/barcode.ts"; // ✅ 바코드 import 다시 추가
-import html2canvas from "html2canvas"; // ✅ html2canvas import 추가
+import { renderBarcodeToCanvas } from "../utils/barcode.ts";
+import html2canvas from "html2canvas";
 
-let allCoupons: any[] = []; // 전체 쿠폰 데이터 저장
-let searchTimeout: NodeJS.Timeout | null = null; // 실시간 검색을 위한 타이머
-let userInfo: any = null; // 사용자 정보 저장 (지점명 포함)
+let allCoupons: any[] = [];
+let searchTimeout: NodeJS.Timeout | null = null;
+let userInfo: any = null;
 
-// ✅ 페이지네이션 관련 변수 추가
-let pageKeys: any[] = []; // 페이지 키 배열
-let totalItems = 0; // 전체 아이템 수
+let pageKeys: any[] = [];
+let totalItems = 0;
 let currentPage = 1;
-const pageLimit = 20; // 한 페이지당 20개 (10개씩 2번 호출)
+const pageLimit = 20;
 
 export function initCoupon() {
   console.log("✅ coupon.ts 로드됨");
@@ -40,7 +39,7 @@ export function initCouponList() {
     });
   }
 
-  // ✅ 이미지 저장 버튼 이벤트 리스너 추가
+  // 이미지 저장 버튼 이벤트 리스너 추가
   const saveSelectedCouponsBtn = document.getElementById(
     "save-selected-coupons"
   );
@@ -58,7 +57,7 @@ export function initCouponList() {
   initSearchFunction();
 }
 
-// ✅ 사용자 정보와 쿠폰 목록을 동시에 로드 (페이지네이션 적용)
+// 사용자 정보와 쿠폰 목록을 동시에 로드 (페이지네이션 적용)
 async function loadUserInfoAndCoupons() {
   const user = getStoredUser();
   if (!user) {
@@ -67,21 +66,18 @@ async function loadUserInfoAndCoupons() {
   }
 
   try {
-    // 병렬로 두 API 호출
     const [userResponse] = await Promise.all([
       apiGet(`/model_user_setting?func=get-user&userId=${user.userId}`),
     ]);
 
-    // 사용자 정보 처리
     if (userResponse.ok) {
       const userData = await userResponse.json();
-      userInfo = userData.user; // ✅ user 객체 안의 데이터를 저장
+      userInfo = userData.user;
       console.log("사용자 정보 로드 완료:", userInfo);
     } else {
       console.error("사용자 정보 로드 실패");
     }
 
-    // ✅ 쿠폰 목록 로드 (페이지네이션 적용)
     await getCouponList(user.userId);
   } catch (error) {
     console.error("API 호출 오류:", error);
@@ -89,16 +85,13 @@ async function loadUserInfoAndCoupons() {
   }
 }
 
-// ✅ 쿠폰 목록 로드 함수 (페이지네이션 적용) - 수정
 async function getCouponList(userId: string) {
   try {
-    // 첫 번째 API 요청
     let firstApiUrl = `/model_coupon?func=coupon&userId=${userId}`;
     if (searchTerm) {
       firstApiUrl += `&search=${encodeURIComponent(searchTerm)}`;
     }
 
-    // 페이지네이션 키 추가 (첫 페이지가 아닌 경우)
     if (currentPage > 1 && pageKeys.length > 0) {
       const keyIndex = (currentPage - 1) * 2 - 1;
       if (pageKeys[keyIndex]) {
@@ -106,13 +99,10 @@ async function getCouponList(userId: string) {
       }
     }
 
-    console.log(" 첫 번째 API 요청 URL:", firstApiUrl);
     const firstResponse = await apiGet(firstApiUrl);
     const firstData = await firstResponse.json();
-    console.log("📦 첫 번째 응답 데이터:", firstData);
-    console.log("📦 첫 번째 응답 items 개수:", firstData.items?.length || 0);
 
-    // ✅ 첫 페이지에서만 pageKeys 수집
+    // 첫 페이지에서만 pageKeys 수집
     if (currentPage === 1) {
       pageKeys = [];
       totalItems = firstData.total || 0;
@@ -128,13 +118,11 @@ async function getCouponList(userId: string) {
       }
     }
 
-    // 두 번째 API 요청 (조건부)
     let secondApiUrl = `/model_coupon?func=coupon&userId=${userId}`;
     if (searchTerm) {
       secondApiUrl += `&search=${encodeURIComponent(searchTerm)}`;
     }
 
-    // 두 번째 요청용 pageKey (필요한 경우만)
     let needSecondRequest = false;
 
     if (currentPage === 1) {
@@ -150,7 +138,6 @@ async function getCouponList(userId: string) {
       }
     }
 
-    // 두 번째 요청이 필요한 경우만 실행
     if (needSecondRequest) {
       console.log(" 두 번째 API 요청 URL:", secondApiUrl);
       const secondResponse = await apiGet(secondApiUrl);
@@ -181,14 +168,12 @@ async function getCouponList(userId: string) {
 function renderPagination() {
   const totalPages = Math.ceil(totalItems / pageLimit);
 
-  // 페이지네이션 컨테이너 찾기 또는 생성
   let paginationContainer = document.getElementById("pagination-container");
   if (!paginationContainer) {
     paginationContainer = document.createElement("div");
     paginationContainer.id = "pagination-container";
     paginationContainer.className = "pagination";
 
-    // 테이블 다음에 삽입
     const tableArea = document.querySelector(".tableArea");
     if (tableArea && tableArea.parentNode) {
       tableArea.parentNode.insertBefore(
@@ -206,7 +191,6 @@ function renderPagination() {
   paginationContainer.style.display = "flex";
   paginationContainer.innerHTML = "";
 
-  // ✅ 맨 앞 버튼 (항상 표시, 첫 페이지에서는 비활성화)
   const firstBtn = document.createElement("button");
   firstBtn.textContent = "<<";
   firstBtn.className = `pagination-btn ${currentPage === 1 ? "disabled" : ""}`;
@@ -218,7 +202,6 @@ function renderPagination() {
   });
   paginationContainer.appendChild(firstBtn);
 
-  // ✅ 이전 페이지 버튼 (항상 표시, 첫 페이지에서는 비활성화)
   const prevBtn = document.createElement("button");
   prevBtn.textContent = "<";
   prevBtn.className = `pagination-btn ${currentPage === 1 ? "disabled" : ""}`;
@@ -230,14 +213,13 @@ function renderPagination() {
   });
   paginationContainer.appendChild(prevBtn);
 
-  // 페이지 번호들
   const startPage = Math.max(1, currentPage - 2);
   const endPage = Math.min(totalPages, currentPage + 2);
 
   for (let i = startPage; i <= endPage; i++) {
     const pageBtn = document.createElement("button");
     pageBtn.textContent = i.toString();
-    // ✅ 현재 페이지인지 확인하여 active 클래스 추가
+
     pageBtn.className = `pagination-btn ${i === currentPage ? "active" : ""}`;
     pageBtn.addEventListener("click", () => {
       currentPage = i;
@@ -260,7 +242,6 @@ function renderPagination() {
   });
   paginationContainer.appendChild(nextBtn);
 
-  // ✅ 맨 뒤 버튼 (항상 표시, 마지막 페이지에서는 비활성화)
   const lastBtn = document.createElement("button");
   lastBtn.textContent = ">>";
   lastBtn.className = `pagination-btn ${
@@ -275,10 +256,8 @@ function renderPagination() {
   paginationContainer.appendChild(lastBtn);
 }
 
-// ✅ 검색 관련 변수 추가
 let searchTerm = "";
 
-// 검색 기능 초기화 (수정)
 function initSearchFunction() {
   const searchInput = document.getElementById(
     "searchCoupon"
@@ -327,7 +306,7 @@ function initSearchFunction() {
   });
 }
 
-// ✅ 실시간 검색 실행 (서버사이드 검색)
+//  실시간 검색 실행
 async function performRealTimeSearch(searchValue: string) {
   console.log("실시간 검색:", searchValue);
 
@@ -337,7 +316,12 @@ async function performRealTimeSearch(searchValue: string) {
     return;
   }
 
-  // ✅ 최소 검색어 길이 제한
+  const koreanConsonants = /^[ㄱ-ㅎ]+$/;
+  if (koreanConsonants.test(searchValue)) {
+    renderCouponTable(allCoupons);
+    return;
+  }
+
   if (searchValue.length < 1) {
     renderCouponTable(allCoupons);
     return;
@@ -347,7 +331,6 @@ async function performRealTimeSearch(searchValue: string) {
     const user = getStoredUser();
     if (!user) return;
 
-    // ✅ 검색어 분석 (한글/숫자 구분)
     const isKorean = /[가-힣]/.test(searchValue);
     const isNumber = /^\d+$/.test(searchValue);
 
@@ -512,11 +495,10 @@ function renderCouponTable(coupons: any[]) {
   // 테이블 렌더링 후 전체 선택 체크박스 상태 초기화
   updateSelectAllCheckbox();
 
-  // 팝업 닫기 이벤트 리스너 추가 (한 번만 실행)
+  // 팝업 닫기 이벤트 리스너 추가
   initCouponPopupEvents();
 }
 
-// ✅ 쿠폰 팝업 표시 (데이터 포함)
 function showCouponPopup(couponData: any) {
   const popup = document.getElementById("coupon-popup") as HTMLElement;
 
@@ -526,7 +508,7 @@ function showCouponPopup(couponData: any) {
   }
 }
 
-// ✅ 메뉴 이미지 로드 함수 수정
+// 메뉴 이미지 로드 함수
 async function loadMenuImage(menuId: string, title: string) {
   try {
     const user = getStoredUser();
@@ -540,7 +522,6 @@ async function loadMenuImage(menuId: string, title: string) {
       const data = await response.json();
 
       if (data.image) {
-        // ✅ 상품페이지와 동일한 S3 URL 방식 사용
         const imageFile = data.image?.split("\\").pop() ?? "";
         const encodedFile = encodeURIComponent(imageFile);
         const imageUrl = `https://model-narrow-road.s3.ap-northeast-2.amazonaws.com/model/${data.userId}/${encodedFile}`;
@@ -630,7 +611,7 @@ function hideCouponPopup() {
   }
 }
 
-// 팝업 이벤트 초기화 (이미지 저장 기능 제거)
+// 팝업 이벤트 초기화
 let popupEventsInitialized = false;
 
 function initCouponPopupEvents() {
@@ -707,7 +688,6 @@ async function saveSelectedCouponsAsImages() {
       "success"
     );
 
-    // ✅ 저장 완료 후 페이지 새로고침
     setTimeout(() => {
       window.location.reload();
     }, 1000);
@@ -720,7 +700,7 @@ async function saveSelectedCouponsAsImages() {
   }
 }
 
-// ✅ 개별 쿠폰 이미지 생성 함수 수정 (이미지 로드 완료 후 캡처)
+// 개별 쿠폰 이미지 생성 함수 수정
 async function generateCouponImage(couponData: any): Promise<void> {
   return new Promise(async (resolve, reject) => {
     try {
@@ -793,25 +773,20 @@ async function generateCouponImage(couponData: any): Promise<void> {
                 ctx.drawImage(canvas, 0, 0);
               }
 
-              // 파일명 생성
               const safeTitle = couponData.title
                 .replace(/[^\w\s가-힣]/g, "")
                 .replace(/\s+/g, "_");
               const fileName = `${safeTitle}_${couponData.couponCode}.png`;
 
-              // 다운로드
               downloadURI(roundedCanvas.toDataURL("image/png"), fileName);
 
-              // ✅ 스타일 복구
               Object.assign(couponContainer.style, originalStyles);
               if (saveBtn) saveBtn.style.display = originalDisplay;
 
-              // 팝업 숨기기
               popup.style.display = "none";
 
               resolve();
             } catch (error) {
-              // 에러 시에도 스타일 복구
               Object.assign(couponContainer.style, originalStyles);
               if (saveBtn) saveBtn.style.display = originalDisplay;
               popup.style.display = "none";
@@ -829,7 +804,7 @@ async function generateCouponImage(couponData: any): Promise<void> {
   });
 }
 
-// ✅ 캡처용 오버레이 업데이트 함수 수정 (Base64 이미지 사용)
+// 캡처용 오버레이 업데이트 함수
 async function updateCouponOverlayForCapture(couponData: any): Promise<void> {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -863,17 +838,16 @@ async function updateCouponOverlayForCapture(couponData: any): Promise<void> {
       <canvas id="coupon-barcode" style="transform: translateY(-7px);"></canvas>  
     `;
 
-    // ✅ 캡처용 Base64 이미지 로드
     await loadMenuImageForCapture(couponData.menuId, title);
   }
 }
 
-// ✅ 캡처용 메뉴 이미지 로드 함수 (간단하게)
+// 캡처용 메뉴 이미지 로드 함수
 async function loadMenuImageForCapture(
   menuId: string,
   title: string
 ): Promise<void> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     try {
       const user = getStoredUser();
       if (!user) {
