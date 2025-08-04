@@ -63,9 +63,7 @@ function renderNoticeTable(notices: NoticeItem[]) {
       const formattedDate = formatDate(notice.timestamp);
 
       return `
-      <tr onclick="window.location.href='./noticeDetail.html?id=${
-        notice.contentId
-      }'">
+      <tr data-content-id="${notice.contentId}">
         <td>${index + 1}</td>
         <td>${noticeTypeText}</td>
         <td>${notice.title}</td>
@@ -74,6 +72,24 @@ function renderNoticeTable(notices: NoticeItem[]) {
     `;
     })
     .join("");
+
+  // ✅ 이벤트 리스너 추가
+  addTableRowListeners();
+}
+
+function addTableRowListeners() {
+  const rows = document.querySelectorAll(
+    "#notice-table-body tr[data-content-id]"
+  );
+
+  rows.forEach((row) => {
+    row.addEventListener("click", () => {
+      const contentId = row.getAttribute("data-content-id");
+      if (contentId) {
+        window.location.href = `./noticeDetail.html?id=${contentId}`;
+      }
+    });
+  });
 }
 
 function getNoticeTypeText(noticeType: string): string {
