@@ -327,27 +327,57 @@ function initSearchFunction() {
   });
 }
 
-// 실시간 검색 실행 (클라이언트 사이드 필터링)
-function performRealTimeSearch(searchValue: string) {
+// ✅ 실시간 검색 실행 (서버사이드 검색)
+async function performRealTimeSearch(searchValue: string) {
   console.log("실시간 검색:", searchValue);
 
   if (!searchValue.trim()) {
-    // 검색어가 없으면 전체 데이터 표시
+    // 검색어가 없으면 현재 페이지 데이터 표시
     renderCouponTable(allCoupons);
     return;
   }
 
-  // 현재 전체 데이터에서 필터링
-  const filteredCoupons = allCoupons.filter((coupon) => {
-    const title = coupon.title.toLowerCase();
-    const couponCode = coupon.couponCode.toLowerCase();
-    const searchLower = searchValue.toLowerCase();
+  // ✅ 최소 검색어 길이 제한
+  if (searchValue.length < 1) {
+    renderCouponTable(allCoupons);
+    return;
+  }
 
-    return title.includes(searchLower) || couponCode.includes(searchLower);
-  });
+  try {
+    const user = getStoredUser();
+    if (!user) return;
 
-  // 필터링된 결과 표시
-  renderCouponTable(filteredCoupons);
+    // ✅ 검색어 분석 (한글/숫자 구분)
+    const isKorean = /[가-힣]/.test(searchValue);
+    const isNumber = /^\d+$/.test(searchValue);
+
+    let apiUrl = `/model_coupon?func=couponDetail&userId=${user.userId}`;
+
+    if (isKorean) {
+      apiUrl += `&title=${encodeURIComponent(searchValue)}`;
+    } else if (isNumber) {
+      apiUrl += `&couponCode=${searchValue}`;
+    }
+
+    console.log("🔍 실시간 검색 API 호출:", apiUrl);
+
+    const response = await apiGet(apiUrl);
+    if (response.ok) {
+      const data = await response.json();
+      const searchResults = data.items || [];
+
+      console.log("🔍 검색 결과:", searchResults.length, "개");
+      renderCouponTable(searchResults);
+    } else {
+      console.error("실시간 검색 실패");
+      // ✅ 에러 시에도 현재 데이터 유지 (빈 화면 방지)
+      renderCouponTable(allCoupons);
+    }
+  } catch (error) {
+    console.error("실시간 검색 오류:", error);
+    // ✅ 에러 시에도 현재 데이터 유지 (빈 화면 방지)
+    renderCouponTable(allCoupons);
+  }
 }
 
 // 검색 실행 (수정)
