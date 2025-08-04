@@ -261,33 +261,28 @@ function initSearchFunction() {
   const searchInput = document.getElementById(
     "searchCoupon"
   ) as HTMLInputElement;
-  const searchBtn = document.getElementById(
-    "searchButton"
-  ) as HTMLButtonElement;
   const resetBtn = document.getElementById("searchReset") as HTMLButtonElement;
 
-  if (!searchInput || !searchBtn || !resetBtn) {
-    console.error("검색 요소를 찾을 수 없습니다!");
+  if (!searchInput || !resetBtn) {
     return;
   }
 
-  // 검색 버튼 클릭 이벤트
-  searchBtn.addEventListener("click", () => {
-    const searchValue = searchInput.value.trim();
-    performSearch(searchValue);
-  });
+  // ✅ 검색 버튼 이벤트 리스너 제거
 
   // 리셋 버튼 클릭 이벤트
   resetBtn.addEventListener("click", () => {
     searchInput.value = "";
-    performSearch("");
+    // 실시간 검색으로 전체 데이터 표시
+    renderCouponTable(allCoupons, false);
+    renderPagination();
   });
 
   // Enter 키 이벤트
   searchInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
+      // Enter 키도 실시간 검색과 동일하게 처리
       const searchValue = searchInput.value.trim();
-      performSearch(searchValue);
+      performRealTimeSearch(searchValue);
     }
   });
 
