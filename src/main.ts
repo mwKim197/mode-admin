@@ -5,8 +5,8 @@ import { loadPartials } from "./ts/utils/layoutLoader.ts";
 import { ToastType } from "./ts/types/common.ts";
 import { getStoredUser } from "./ts/utils/userStorage.ts";
 import { sendMachineCommand } from "./ts/page/deviceManage.ts";
-import Choices from 'choices.js';
-import 'choices.js/public/assets/styles/choices.min.css';
+import Choices from "choices.js";
+import "choices.js/public/assets/styles/choices.min.css";
 
 // 글로벌 등록
 declare global {
@@ -179,7 +179,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const menuWrap = document.querySelector(".user-menuWrap") as HTMLElement;
     if (menuWrap) {
       menuWrap.style.display = "block"; // ✅ 보이게
-      
     }
   } else {
     const menuWrap = document.querySelector(".user-menuWrap") as HTMLElement;
@@ -187,7 +186,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       menuWrap.style.display = "none"; // ✅ 숨기기
     }
   }
-  
+
   // 포인트메뉴
   if (!user?.payType) {
     const menuList = document.querySelector(".sidemenu .menu");
@@ -301,6 +300,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     import("./ts/page/couponDetail.ts").then((module) => {
       module.initCouponDetail();
     });
+  } else if (path === "/html/noticeList.html") {
+    console.log("📌 공지사항목록 - noticeList.ts 로드");
+    import("./ts/page/noticeList.ts").then((module) => {
+      module.initNoticeList();
+    });
+  } else if (path === "/html/noticeDetail.html") {
+    console.log("📌 공지사항상세 - noticeDetail.ts 로드");
+    import("./ts/page/noticeDetail.ts").then((module) => {
+      module.initNoticeDetail();
+    });
   } else {
     console.log("📌 기본 페이지");
   }
@@ -311,7 +320,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const menuBtn = userMenuWrap?.querySelector(".ani-1");
 
   if (userMenuWrap && userSetBox && menuBtn) {
-    
     menuBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       if (userSetBox.classList.contains("hidden")) {
@@ -426,7 +434,7 @@ function bindGlobalDeviceEvents() {
         const type = el.dataset.type as "garucha" | "syrup";
         const value1 = el.dataset.value!;
         let number = value1;
-        if(type === "syrup") {
+        if (type === "syrup") {
           if (parseFloat(value1) === 5) {
             number = String(4);
           } else if (parseFloat(value1) === 6) {
@@ -434,7 +442,9 @@ function bindGlobalDeviceEvents() {
           }
         }
 
-        const msg = `${type === "garucha" ? "가루차" : "시럽"} ${number}번 세척`;
+        const msg = `${
+          type === "garucha" ? "가루차" : "시럽"
+        } ${number}번 세척`;
 
         const washData = { data: [{ type, value1 }] };
 

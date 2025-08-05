@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/css/reset.css" />
+    <link rel="stylesheet" href="/src/css/common.css" />
+    <link rel="stylesheet" href="/src/css/style.css" />
+    <link rel="stylesheet" href="/src/css/noticeList.css" />
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body>
+    <div id="main-content">
+      <section class="mt8">
+        <div class="inner">
+          <div class="user-flex">
+            <div class="user">
+              <i class="fa-regular fa-circle-user"></i>
+              <p id="user-name">zero001 님</p>
+              <label class="label manager" id="user-grade">
+                <span>총괄관리자</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="pb20">
+        <div class="inner">
+          <div>
+            <h2 class="mb20">공지사항</h2>
+          </div>
+          <div class="table-wrapper tableArea">
+            <table class="notice-table">
+              <colgroup>
+                <col style="width: 60px" />
+                <col style="width: 100px" />
+                <col style="width: 300px" />
+                <col style="width: 120px" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="notice-table-body">
+                <tr>
+                  <td colspan="4" class="text-center">
+                    공지사항을 불러오는 중...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
