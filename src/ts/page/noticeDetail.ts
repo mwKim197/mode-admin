@@ -25,6 +25,11 @@ export function initNoticeDetail() {
     return;
   }
 
+  const backBox = document.querySelector(".back-box") as HTMLElement;
+  if (backBox) {
+    backBox.style.display = "flex";
+  }
+
   const urlParams = new URLSearchParams(window.location.search);
   const contentId = urlParams.get("id");
 

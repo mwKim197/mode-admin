@@ -29,3 +29,41 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+
+.back-box {
+  position: fixed;
+  right: -1%;
+  bottom: -196%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+  color: white;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.back-button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.back-button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+body[data-page="notice-detail"] .back-box {
+  display: flex;
+}
+
+body[data-page="notice-detail"] .pb20 {
+  margin-top: 30px;
+}
