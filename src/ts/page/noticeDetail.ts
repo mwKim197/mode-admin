@@ -39,18 +39,13 @@ export function initNoticeDetail() {
 
 async function loadNoticeDetail(contentId: string) {
   try {
-    const response = await apiGet("/model_admin_notice?func=get-posts");
+    const response = await apiGet(
+      `/model_admin_notice?func=get-notice&contentType=admin&contentId=${contentId}`
+    );
     if (response.ok) {
       const data = await response.json();
-      const notice = data.find(
-        (item: NoticeDetail) => item.contentId === parseInt(contentId)
-      );
 
-      if (notice) {
-        renderNoticeDetail(notice);
-      } else {
-        window.showToast("공지사항을 찾을 수 없습니다.", 3000, "error");
-      }
+      renderNoticeDetail(data);
     } else {
       window.showToast("공지사항을 불러오는데 실패했습니다.", 3000, "error");
     }
@@ -68,14 +63,8 @@ function renderNoticeDetail(notice: NoticeDetail) {
 
   const dateEl = document.getElementById("notice-date");
   if (dateEl) {
-    const startDate = formatDate(notice.startDate);
-    const endDate = notice.endDate ? formatDate(notice.endDate) : "";
-
-    if (endDate) {
-      dateEl.textContent = `${startDate} ~ ${endDate}`;
-    } else {
-      dateEl.textContent = startDate;
-    }
+    const formattedDate = formatDate(notice.timestamp);
+    dateEl.textContent = formattedDate;
   }
 
   const imagesContainer = document.getElementById("notice-images");
