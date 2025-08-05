@@ -29,11 +29,15 @@
 }
 
 .tag.red {
-  background-color: #ff4444;
+  border-color: var(--red);
+  color: var(--red);
+  background: #fff5f5;
 }
 
 .tag.blue {
-  background-color: #4444ff;
+  border-color: var(--point-color);
+  color: var(--point-color);
+  background: #f1f7fe;
 }
 
 .tag.org {
