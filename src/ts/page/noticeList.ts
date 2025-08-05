@@ -24,13 +24,14 @@ export function initNoticeList() {
     return;
   }
 
-  // 공지사항 목록 로드
   loadNoticeList();
 }
 
 async function loadNoticeList() {
   try {
-    const response = await apiGet("/model_admin_notice?func=get-posts");
+    const response = await apiGet(
+      "/model_admin_notice?func=get-notice-list&contentType=admin"
+    );
     if (response.ok) {
       const data = await response.json();
       renderNoticeTable(data);
@@ -57,15 +58,15 @@ function renderNoticeTable(notices: NoticeItem[]) {
   }
 
   const sortedNotices = notices.sort((a, b) => {
-    const dateA = a.startDate ? new Date(a.startDate).getTime() : 0;
-    const dateB = b.startDate ? new Date(b.startDate).getTime() : 0;
-    return dateB - dateA; // 내림차순 (최신이 위쪽)
+    const dateA = new Date(a.timestamp).getTime();
+    const dateB = new Date(b.timestamp).getTime();
+    return dateB - dateA;
   });
 
   tbody.innerHTML = sortedNotices
     .map((notice, index) => {
       const tagInfo = getTagInfo(notice.noticeType);
-      const formattedDate = formatDateRange(notice.startDate, notice.endDate);
+      const formattedDate = formatDate(notice.timestamp);
 
       return `
       <tr data-content-id="${notice.contentId}">
@@ -109,25 +110,10 @@ function getTagInfo(type: string) {
   }
 }
 
-function formatDateRange(startDate: string, endDate: string): string {
-  const start = startDate ? formatDate(startDate) : "";
-  const end = endDate ? formatDate(endDate) : "";
+function formatDate(timestamp: string): string {
+  if (!timestamp) return "";
 
-  if (start && end) {
-    return `${start} ~ ${end}`;
-  } else if (start) {
-    return start;
-  } else if (end) {
-    return end;
-  } else {
-    return "날짜 정보 없음";
-  }
-}
-
-function formatDate(dateString: string): string {
-  if (!dateString) return "";
-
-  const date = new Date(dateString);
+  const date = new Date(timestamp);
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
