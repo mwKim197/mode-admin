@@ -1,0 +1,50 @@
+.notice-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.notice-table th,
+.notice-table td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.notice-table td {
+  height: 50px;
+}
+
+.notice-table tbody tr:hover {
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
+
+.tag {
+  border-radius: 4px;
+  font-weight: bold;
+  display: inline-block;
+  width: auto;
+  text-align: center;
+}
+
+.tag.red {
+  background-color: #ff4444;
+}
+
+.tag.blue {
+  background-color: #4444ff;
+}
+
+.tag.org {
+  background-color: #ff8800;
+}
+
+.tag.gray {
+  background-color: #888888;
+}
+
+.table-wrapper {
+  max-height: 500px;
+  overflow-y: auto;
+}
