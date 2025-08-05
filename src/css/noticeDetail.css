@@ -13,12 +13,6 @@
   font-size: 14px;
 }
 
-.notice-detail-header-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .notice-images-container {
   display: flex;
   flex-direction: column;

@@ -25,8 +25,6 @@ export function initNoticeDetail() {
     return;
   }
 
-  addBackButtonListener();
-
   const urlParams = new URLSearchParams(window.location.search);
   const contentId = urlParams.get("id");
 
@@ -89,13 +87,4 @@ function formatDate(dateString: string): string {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}.${month}.${day}`;
-}
-
-function addBackButtonListener() {
-  const backButton = document.getElementById("back-button");
-  if (backButton) {
-    backButton.addEventListener("click", () => {
-      history.back();
-    });
-  }
 }
