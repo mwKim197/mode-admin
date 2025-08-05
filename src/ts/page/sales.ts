@@ -746,15 +746,11 @@ async function updatePopupContent(rowIndex: number) {
         })
         .join("<br>");
 
-      const date = new Date(item.timestamp);
-      const formattedDate = `${date.getFullYear()}-${String(
-        date.getMonth() + 1
-      ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")} ${String(
-        date.getHours()
-      ).padStart(2, "0")}:${String(date.getMinutes()).padStart(
-        2,
-        "0"
-      )}:${String(date.getSeconds()).padStart(2, "0")}`;
+      // 건별 데이터 렌더링
+      const date = String(item.timestamp).split("T");
+      const dateStr = date[0];
+      const timeStr = date[1].substring(0, 5);
+      const formattedDate = `${dateStr} ${timeStr}`;
 
       const usedPoints = item.point === 0 ? "0P" : `${item.point}P`;
 
