@@ -97,7 +97,6 @@
   }
 }
 
-
 .back-box {
   position: fixed;
   right: -1%;
@@ -107,11 +106,10 @@
   color: white;
   padding: 0.5rem;
   border-radius: 0.5rem;
-  display: flex; 
+  display: flex;
   justify-content: flex-end;
   align-items: center;
 }
-
 
 body[data-page="product-add"] .back-box,
 body[data-page="product-detail"] .back-box {
@@ -155,10 +153,13 @@ body[data-page="product-detail"] .back-box {
   min-width: 300px;
 }
 
-
 body[data-page="product-add"] .pb20,
 body[data-page="product-detail"] .pb20 {
-  margin-top: 70px; 
+  margin-top: 70px;
 }
 
-
+.tr-disabled .tag.red {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 10;
+}
