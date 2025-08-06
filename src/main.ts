@@ -190,8 +190,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 포인트메뉴
   if (!user?.payType) {
     const menuList = document.querySelector(".sidemenu .menu");
-    const pointMenu = [{ href: "/html/point.html", label: "포인트" }];
-    pointMenu.forEach((item) => {
+    const pointMene = [{ href: "/html/point.html", label: "포인트" }];
+    pointMene.forEach((item) => {
       const li = document.createElement("li");
       li.innerHTML = `<a href="${item.href}"><p>${item.label}</p></a>`;
       menuList?.appendChild(li);
