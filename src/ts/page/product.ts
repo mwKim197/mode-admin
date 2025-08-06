@@ -222,9 +222,22 @@ function onToggleChange(menuId: number, isChecked: boolean) {
 
 // 삭제 버튼
 function onDeleteClick(menuId: number, event: any) {
-  updateChangeList(menuId, { delete: true });
+  event.stopPropagation();
+
   const row = event.target.closest("tr");
-  if (row) row.classList.add("tr-disabled");
+  if (!row) return;
+
+  const existingIndex = changeList.findIndex(
+    (item) => item.menuId === menuId && item.delete === true
+  );
+
+  if (existingIndex !== -1) {
+    changeList.splice(existingIndex, 1);
+    row.classList.remove("tr-disabled");
+  } else {
+    changeList.push({ menuId, delete: true });
+    row.classList.add("tr-disabled");
+  }
 }
 
 // 주문내역 변환
