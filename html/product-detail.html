@@ -27,7 +27,6 @@
 
       <section class="pb20">
         <div class="inner" id="section-container">
-
           <!-- 이미지 업로드 -->
           <div class="boxStyle gr mb20">
             <div class="set-box">
@@ -202,6 +201,22 @@
                 <p class="fs14">물 시간</p>
                 <input type="text" id="water-time" value="0" />
               </div>
+            </div>
+          </div>
+
+          <!-- 바코드 박스 (일반상품 선택 시 표시) -->
+          <div id="barcode-box" class="boxStyle gr mb20" style="display: none">
+            <h2 class="mb20">바코드</h2>
+            <div class="input-group">
+              <button type="button" class="btn-outline" id="barcode-scan-btn">
+                바코드스캔
+              </button>
+              <input
+                type="text"
+                id="barcode-input"
+                placeholder="바코드를 입력 또는 스캔하세요"
+                class="form-input"
+              />
             </div>
           </div>
 
