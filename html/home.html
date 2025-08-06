@@ -70,7 +70,6 @@
   </section>
 
   <!-- 빠른재고 -->
-  <!--[TODO] 2차 개발
   <section>
     <div class="inner">
       <div class="boxStyle wt">
@@ -119,7 +118,7 @@
         </div>
       </div>
     </div>
-  </section>-->
+  </section>
 
   <!-- 공지사항 -->
   <section>
@@ -136,6 +135,50 @@
 </body>
 
 <script>
+  const fills = document.querySelectorAll(".progress-fill");
+  const buttons = document.querySelectorAll(".refresh-btn");
+  const values = Array.from({ length: fills.length }, () => 50); // 초기 50%
 
+  function animateProgress(index, value, changeColor = false) {
+    const fill = fills[index];
+
+    // 초기화
+    fill.style.transition = "none";
+    fill.style.width = "0%";
+    fill.textContent = "0%";
+    fill.style.backgroundColor = ""; // 색상 초기화
+
+    // 강제 리렌더링
+    void fill.offsetWidth;
+
+    // 애니메이션 시작
+    fill.style.transition = "width 1s ease";
+    fill.style.width = value + "%";
+
+    setTimeout(() => {
+      fill.textContent = value + "%";
+      if (changeColor) {
+        fill.style.backgroundColor = "#2B7FE8"; // 파란색으로
+      }
+    }, 1000);
+  }
+
+  function replayAnimation(index) {
+    animateProgress(index, 100, true);
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    // 초기 렌더링
+    values.forEach((val, idx) => {
+      animateProgress(idx, val);
+    });
+
+    // 각 버튼에 이벤트 연결
+    buttons.forEach((btn, index) => {
+      btn.addEventListener("click", () => {
+        replayAnimation(index);
+      });
+    });
+  });
 </script>
 </html>
