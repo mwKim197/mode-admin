@@ -14,10 +14,9 @@ let uploadedImageBase64: string;
 let uploadedFileName: string;
 
 export async function initProductAdd() {
-  
-  const backBox = document.querySelector('.back-box') as HTMLElement;
+  const backBox = document.querySelector(".back-box") as HTMLElement;
   if (backBox) {
-    backBox.style.display = 'flex';
+    backBox.style.display = "flex";
   }
 
   const user = getStoredUser();
@@ -149,6 +148,12 @@ export async function initProductAdd() {
       if (iceWaterTimeBox) {
         iceWaterTimeBox.style.display = shouldHide ? "none" : "block";
       }
+
+      // ✅ 바코드 박스 토글 추가
+      const barcodeBox = document.getElementById("barcode-box") as HTMLElement;
+      if (barcodeBox) {
+        barcodeBox.style.display = shouldHide ? "block" : "none"; // 일반상품일 때 표시
+      }
     }
 
     // 라디오 버튼 변경 시 이벤트 리스너
@@ -276,4 +281,3 @@ function collectMenuDetail(userId: string): MenuDetail {
     items,
   };
 }
-
