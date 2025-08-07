@@ -227,8 +227,6 @@ function initBarcodeScanner() {
       const barcode = barcodeInput.value.trim();
 
       if (barcode.length > 0) {
-        console.log("Enter로 바코드 확인:", barcode);
-        // 토스트 메시지 제거 - console.log만 유지
         handleBarcodeInput(barcode);
       }
     }
