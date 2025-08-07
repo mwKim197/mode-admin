@@ -149,10 +149,10 @@ export async function initProductAdd() {
         iceWaterTimeBox.style.display = shouldHide ? "none" : "block";
       }
 
-      // ✅ 바코드 박스 토글 추가
+      // 바코드 박스 토글 추가
       const barcodeBox = document.getElementById("barcode-box") as HTMLElement;
       if (barcodeBox) {
-        barcodeBox.style.display = shouldHide ? "block" : "none"; // 일반상품일 때 표시
+        barcodeBox.style.display = shouldHide ? "block" : "none";
       }
     }
 
@@ -163,6 +163,8 @@ export async function initProductAdd() {
 
     // 페이지 로드 시 초기 상태 설정
     toggleDrinkRelatedElements();
+
+    initBarcodeScanner();
   }
 }
 
@@ -187,6 +189,57 @@ async function setImage(e: any) {
   } catch (err) {
     window.showToast("이미지 업로드 실패", 3000, "error");
     console.warn("이미지 업로드 실패:", err);
+  }
+}
+
+// 바코드 스캔 기능 함수 추가
+function initBarcodeScanner() {
+  const barcodeInput = document.getElementById(
+    "barcode-input"
+  ) as HTMLInputElement;
+  const barcodeScanBtn = document.getElementById(
+    "barcode-scan-btn"
+  ) as HTMLButtonElement;
+
+  if (!barcodeInput || !barcodeScanBtn) {
+    console.log("바코드 요소를 찾을 수 없습니다");
+    return;
+  }
+
+  barcodeScanBtn.addEventListener("click", () => {
+    barcodeInput.focus();
+    window.showToast("바코드를 스캔하세요", 2000);
+  });
+
+  barcodeInput.addEventListener("input", (e) => {
+    const barcode = (e.target as HTMLInputElement).value;
+    console.log("바코드 입력됨:", barcode);
+
+    if (barcode.length >= 6) {
+      handleBarcodeInput(barcode);
+    }
+  });
+
+  // Enter 키 감지 (일부 바코드 스캐너는 Enter를 자동으로 보냄)
+  barcodeInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const barcode = barcodeInput.value.trim();
+
+      if (barcode.length > 0) {
+        handleBarcodeInput(barcode);
+      }
+    }
+  });
+}
+
+// 바코드 입력 처리 함수
+function handleBarcodeInput(barcode: string) {
+  console.log("바코드 처리:", barcode);
+
+  const menuNoInput = document.getElementById("menu-no") as HTMLInputElement;
+  if (menuNoInput) {
+    menuNoInput.value = barcode;
   }
 }
 
