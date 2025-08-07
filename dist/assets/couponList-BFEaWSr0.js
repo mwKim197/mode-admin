@@ -1,0 +1,1 @@
+import{g as n}from"./main-BuK2NTGw.js";function e(){if(console.log("✅ coupon.ts 로드됨"),!n()){window.showToast("❌ 사용자 정보가 없습니다.",3e3,"error");return}}function i(){console.log("쿠폰 목록 페이지 초기화");const o=document.getElementById("open-coupon-detail");o&&o.addEventListener("click",function(){window.location.href="/html/couponDetail.html"})}export{e as initCoupon,i as initCouponList};
