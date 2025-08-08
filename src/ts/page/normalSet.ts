@@ -6,6 +6,9 @@ let logoFile: File | null = null;
 let iconFile: File | null = null;
 let logoBase64: string = "";
 let iconBase64: string = "";
+// 삭제 플래그 추가
+let logoDeleted: boolean = false;
+let iconDeleted: boolean = false;
 
 export function initNormalSet() {
   // 페이지 로드 시 매장 정보 가져오기
@@ -270,8 +273,8 @@ async function saveStoreInfo() {
       hasChanges = true;
     }
 
-    // 파일 변경사항 체크
-    if (logoFile || iconFile) {
+    // 파일 변경사항 체크 (새 파일 업로드 또는 삭제)
+    if (logoFile || iconFile || logoDeleted || iconDeleted) {
       hasFileChanges = true;
     }
 
@@ -343,11 +346,21 @@ async function saveStoreInfo() {
       if (logoFile) {
         updateData.logoFileName = logoFile.name;
         updateData.logoBase64 = logoBase64;
+      } else if (logoDeleted) {
+        // 로고 삭제 시 모든 로고 관련 필드를 빈 값으로 전송
+        updateData.logoFileName = "";
+        updateData.logoBase64 = "";
+        updateData.logoUrl = "";
       }
 
       if (iconFile) {
         updateData.iconFileName = iconFile.name;
         updateData.iconBase64 = iconBase64;
+      } else if (iconDeleted) {
+        // 아이콘 삭제 시 모든 아이콘 관련 필드를 빈 값으로 전송
+        updateData.iconFileName = "";
+        updateData.iconBase64 = "";
+        updateData.iconUrl = "";
       }
 
       const response = await apiPut(
@@ -394,6 +407,20 @@ async function saveStoreInfo() {
       iconFile = null;
       iconBase64 = "";
     }
+
+    logoDeleted = false;
+    iconDeleted = false;
+
+    if (originalUserData) {
+      if (logoDeleted) {
+        originalUserData.logoUrl = "";
+        originalUserData.logoBase64 = "";
+      }
+      if (iconDeleted) {
+        originalUserData.iconUrl = "";
+        originalUserData.iconBase64 = "";
+      }
+    }
   } catch (error) {
     window.showToast("저장 중 오류가 발생했습니다.", 3000, "error");
   }
@@ -411,6 +438,20 @@ function initFileUploadHandlers() {
   const iconUpload = document.getElementById("iconUpload") as HTMLInputElement;
   if (iconUpload) {
     iconUpload.addEventListener("change", handleIconUpload);
+  }
+
+  // 로고 삭제 버튼
+  const logoDeleteBtn = document.querySelector(
+    ".icon-header button"
+  ) as HTMLButtonElement;
+  if (logoDeleteBtn) {
+    logoDeleteBtn.addEventListener("click", handleLogoDelete);
+  }
+  // 아이콘 삭제 버튼
+  const iconDeleteBtns = document.querySelectorAll(".icon-header button");
+  const iconDeleteBtn = iconDeleteBtns[1] as HTMLButtonElement;
+  if (iconDeleteBtn) {
+    iconDeleteBtn.addEventListener("click", handleIconDelete);
   }
 }
 
@@ -475,6 +516,8 @@ async function handleLogoUpload(event: Event) {
   // Base64 변환
   logoFile = file;
   logoBase64 = await fileToBase64(file);
+  // 새 파일 업로드 시 삭제 플래그 해제
+  logoDeleted = false;
 
   // 파일명 표시
   const fileNameElement = document.getElementById("fileName");
@@ -518,6 +561,8 @@ async function handleIconUpload(event: Event) {
   // Base64 변환
   iconFile = file;
   iconBase64 = await fileToBase64(file);
+  // 새 파일 업로드 시 삭제 플래그 해제
+  iconDeleted = false;
 
   // 파일명 표시
   const iconFileNameElement = document.getElementById("iconFileName");
@@ -533,5 +578,85 @@ async function handleIconUpload(event: Event) {
     const previewBase64 = await fileToBase64WithHeader(file);
     previewElement.src = previewBase64;
     previewElement.style.display = "block";
+  }
+}
+
+// 로고 파일 삭제 처리
+function handleLogoDelete() {
+  // 기존 이미지가 없으면 삭제하지 않음
+  if (!originalUserData?.logoUrl && !originalUserData?.logoBase64) {
+    return;
+  }
+
+  // 파일 변수 초기화
+  logoFile = null;
+  logoBase64 = "";
+
+  logoDeleted = true;
+
+  // 파일 입력 초기화
+  const logoUpload = document.getElementById("logoUpload") as HTMLInputElement;
+  if (logoUpload) {
+    logoUpload.value = "";
+  }
+
+  // 파일명 표시 숨기기
+  const fileNameElement = document.getElementById("fileName");
+  if (fileNameElement) {
+    fileNameElement.textContent = "";
+  }
+
+  // 미리보기 숨기기
+  const previewElement = document.getElementById(
+    "logoPreview"
+  ) as HTMLImageElement;
+  if (previewElement) {
+    previewElement.src = "";
+    previewElement.style.display = "none";
+  }
+
+  if (originalUserData) {
+    originalUserData.logoUrl = "";
+    originalUserData.logoBase64 = "";
+  }
+}
+
+// 아이콘 파일 삭제 처리
+function handleIconDelete() {
+  // 기존 이미지가 없으면 삭제하지 않음
+  if (!originalUserData?.iconUrl && !originalUserData?.iconBase64) {
+    return;
+  }
+
+  // 파일 변수 초기화
+  iconFile = null;
+  iconBase64 = "";
+
+  iconDeleted = true;
+
+  // 파일 입력 초기화
+  const iconUpload = document.getElementById("iconUpload") as HTMLInputElement;
+  if (iconUpload) {
+    iconUpload.value = "";
+  }
+
+  // 파일명 표시 숨기기
+  const iconFileNameElement = document.getElementById("iconFileName");
+  if (iconFileNameElement) {
+    iconFileNameElement.textContent = "";
+  }
+
+  // 미리보기 숨기기
+  const previewElement = document.getElementById(
+    "iconPreview"
+  ) as HTMLImageElement;
+  if (previewElement) {
+    previewElement.src = "";
+    previewElement.style.display = "none";
+  }
+
+  if (originalUserData) {
+    originalUserData.iconUrl = "";
+    originalUserData.iconBase64 = "";
   }
 }

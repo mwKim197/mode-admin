@@ -11,6 +11,8 @@ export interface ModelUser {
   washTime?: string;
   logoBase64?: string; // S3 URL 대신 Base64
   iconBase64?: string; // S3 URL 대신 Base64
+  logoUrl?: string; // S3 URL
+  iconUrl?: string; // S3 URL
   url?: string;
   payType?: boolean;
   category?: Array<{
