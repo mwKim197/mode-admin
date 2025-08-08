@@ -585,6 +585,11 @@ async function handleIconUpload(event: Event) {
 
 // 로고 파일 삭제 처리
 function handleLogoDelete() {
+  // 기존 이미지가 없으면 삭제하지 않음
+  if (!originalUserData?.logoUrl && !originalUserData?.logoBase64) {
+    return;
+  }
+
   // 파일 변수 초기화
   logoFile = null;
   logoBase64 = "";
@@ -620,6 +625,11 @@ function handleLogoDelete() {
 
 // 아이콘 파일 삭제 처리
 function handleIconDelete() {
+  // 기존 이미지가 없으면 삭제하지 않음
+  if (!originalUserData?.iconUrl && !originalUserData?.iconBase64) {
+    return;
+  }
+
   // 파일 변수 초기화
   iconFile = null;
   iconBase64 = "";
