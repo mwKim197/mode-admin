@@ -5,7 +5,26 @@ section.mt80.pb20 input[type="password"] {
   width: 50%;
 }
 
-/* normalSet 페이지에서 .in-box 안의 input 크기 늘리기 */
 section.mt80.pb20 .in-box input[type="text"] {
-  width: 50px; 
+  width: 50px;
+}
+
+.icon-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.icon-header p {
+  margin: 0;
+}
+
+.icon-header button {
+  background: var(--point-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
 }
