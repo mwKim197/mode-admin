@@ -407,11 +407,10 @@ async function saveStoreInfo() {
       iconFile = null;
       iconBase64 = "";
     }
-    // 삭제 플래그도 초기화
+
     logoDeleted = false;
     iconDeleted = false;
 
-    // 원본 데이터 업데이트 (삭제된 경우)
     if (originalUserData) {
       if (logoDeleted) {
         originalUserData.logoUrl = "";
@@ -448,8 +447,7 @@ function initFileUploadHandlers() {
   if (logoDeleteBtn) {
     logoDeleteBtn.addEventListener("click", handleLogoDelete);
   }
-
-  // 아이콘 삭제 버튼 (두 번째 icon-header의 버튼)
+  // 아이콘 삭제 버튼
   const iconDeleteBtns = document.querySelectorAll(".icon-header button");
   const iconDeleteBtn = iconDeleteBtns[1] as HTMLButtonElement;
   if (iconDeleteBtn) {
