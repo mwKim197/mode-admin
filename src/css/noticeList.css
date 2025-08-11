@@ -16,36 +16,42 @@
 }
 
 .notice-table tbody tr:hover {
-  background-color: #f9f9f9;
   cursor: pointer;
 }
 
-.tag {
+.notice-tag {
   border-radius: 4px;
   font-weight: bold;
   display: inline-block;
-  width: auto;
+  width: 58px;
   text-align: center;
+  font-size: 1.2rem;
+  padding: 0.3rem;
+  border: 1px solid;
 }
 
-.tag.red {
+.notice-tag.red {
   border-color: var(--red);
   color: var(--red);
   background: #fff5f5;
 }
 
-.tag.blue {
+.notice-tag.blue {
   border-color: var(--point-color);
   color: var(--point-color);
   background: #f1f7fe;
 }
 
-.tag.org {
-  background-color: #ff8800;
+.notice-tag.org {
+  border-color: var(--orange);
+  color: var(--orange);
+  background: #fef9f0;
 }
 
-.tag.gray {
-  background-color: #888888;
+.notice-tag.gray {
+  border-color: #999;
+  color: #999;
+  background: #f5f5f5;
 }
 
 .table-wrapper {
