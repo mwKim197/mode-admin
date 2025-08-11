@@ -128,16 +128,12 @@ async function loadNotices() {
       noticeFlex.insertAdjacentHTML("beforeend", html);
     });
 
-    // ✅ 클릭 이벤트 추가 (공지사항 박스 클릭 시 팝업)
+    // ✅ 클릭 이벤트 수정 (공지사항 박스 클릭 시 디테일 페이지로 이동)
     document.querySelectorAll(".notice-item").forEach((item) => {
       item.addEventListener("click", () => {
         const contentId = item.getAttribute("data-content-id");
-        const clickedNotice = notices.find(
-          (n: any) => n.contentId == contentId
-        );
-        if (clickedNotice) {
-          const popup = showPopup(clickedNotice);
-          document.getElementById("popupArea")?.appendChild(popup);
+        if (contentId) {
+          window.location.href = `/html/noticeDetail.html?id=${contentId}`;
         }
       });
     });
@@ -167,16 +163,11 @@ async function loadNotices() {
       slider.insertAdjacentHTML("beforeend", html);
     });
 
-    // ✅ 슬라이더에서도 클릭 이벤트 추가
     slider.querySelectorAll(".notice-item").forEach((item) => {
       item.addEventListener("click", () => {
         const contentId = item.getAttribute("data-content-id");
-        const clickedNotice = notices.find(
-          (n: any) => n.contentId == contentId
-        );
-        if (clickedNotice) {
-          const popup = showPopup(clickedNotice);
-          document.getElementById("popupArea")?.appendChild(popup);
+        if (contentId) {
+          window.location.href = `/html/noticeDetail.html?id=${contentId}`;
         }
       });
     });
