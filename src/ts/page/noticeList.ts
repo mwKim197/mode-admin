@@ -71,9 +71,7 @@ function renderNoticeTable(notices: NoticeItem[]) {
       return `
       <tr data-content-id="${notice.contentId}">
         <td>${index + 1}</td>
-        <td><span class="notice-tag ${tagInfo.color}">${
-        tagInfo.label
-      }</span></td>
+        <td><span class="tag ${tagInfo.color}">${tagInfo.label}</span></td>
         <td>${notice.title}</td>
         <td>${formattedDate}</td>
       </tr>
