@@ -1,0 +1,46 @@
+.menu-merge-page .product-table thead th {
+  vertical-align: middle;
+  text-align: center;
+}
+
+.menu-merge-page .product-table thead th input[type="checkbox"] {
+  margin: 0;
+  vertical-align: middle;
+}
+
+/* 계정 선택 영역 스타일 */
+.account-selection-container {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.selection-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.selection-row:last-child {
+  margin-bottom: 0;
+}
+
+.selection-label {
+  font-weight: bold;
+  color: white;
+}
+
+.account-select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  width: 100%;
+}
+
+.account-select:focus {
+  outline: none;
+  border-color: #007bff;
+}
