@@ -7,6 +7,7 @@ import { getStoredUser } from "./ts/utils/userStorage.ts";
 import { sendMachineCommand } from "./ts/page/deviceManage.ts";
 import Choices from "choices.js";
 import "choices.js/public/assets/styles/choices.min.css";
+import { initMenuMerge } from "./ts/page/menuMerge.ts";
 
 // 글로벌 등록
 declare global {
@@ -310,6 +311,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     import("./ts/page/noticeDetail.ts").then((module) => {
       module.initNoticeDetail();
     });
+  } else if (path === "/html/menuMerge.html") {
+    initMenuMerge();
   } else {
     console.log("📌 기본 페이지");
   }
