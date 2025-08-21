@@ -4,6 +4,10 @@ import { MenuItem } from "../types/product.ts";
 
 let allMenuItems: MenuItem[] = [];
 
+// 전역 변수로 선택값 저장
+let selectedSourceAccount: string = "";
+let selectedTargetAccount: string = "";
+
 export async function initMenuMerge() {
   console.log("✅ menuMerge.ts 로드됨");
 
@@ -99,15 +103,25 @@ function populateAccountSelects(users: any[]) {
   }
 }
 
-// 이벤트 리스너 초기화 함수에 추가
 function initEventListeners() {
   const sourceSelect = document.getElementById("sourceAccount");
   if (sourceSelect) {
     sourceSelect.addEventListener("change", async (e: Event) => {
       const target = e.target as HTMLSelectElement;
+      selectedSourceAccount = target.value;
+      console.log("보낼 계정 선택:", selectedSourceAccount);
       if (target.value) {
         await loadMenuList(target.value);
       }
+    });
+  }
+
+  const targetSelect = document.getElementById("targetAccount");
+  if (targetSelect) {
+    targetSelect.addEventListener("change", (e: Event) => {
+      const target = e.target as HTMLSelectElement;
+      selectedTargetAccount = target.value;
+      console.log("받을 계정 선택:", selectedTargetAccount);
     });
   }
 
@@ -133,8 +147,6 @@ function initEventListeners() {
 // 메뉴 목록 로드
 async function loadMenuList(userId: string) {
   try {
-    console.log(`메뉴 목록 로드 시작: ${userId}`);
-
     const response = await apiGet(
       `/model_admin_menu?userId=${userId}&func=get-all-menu`
     );
@@ -143,7 +155,6 @@ async function loadMenuList(userId: string) {
     if (data.items && Array.isArray(data.items)) {
       allMenuItems = data.items as MenuItem[];
       renderMenuTable(allMenuItems);
-      console.log(`메뉴 목록 로드 완료: ${allMenuItems.length}개`);
     } else {
       console.error("메뉴 목록을 가져올 수 없습니다.");
       window.showToast("메뉴 목록을 불러오는데 실패했습니다.", 3000, "error");
