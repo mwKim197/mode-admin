@@ -58,7 +58,7 @@ function populateAccountSelects(users: any[]) {
     users.forEach((user) => {
       const option = document.createElement("option");
       option.value = user.userId;
-      option.textContent = `${user.storeName} (${user.userId})`;
+      option.textContent = `${user.userId}/${user.storeName}`;
       sourceSelect.appendChild(option);
     });
 
