@@ -39,7 +39,7 @@ async function loadAccountList() {
   }
 }
 
-// 계정 선택 옵션 생성 (couponDetail의 sampleSelect와 동일한 방식)
+// 계정 선택 옵션 생성
 function populateAccountSelects(users: any[]) {
   const sourceSelect = document.getElementById(
     "sourceAccount"
@@ -58,7 +58,6 @@ function populateAccountSelects(users: any[]) {
       sourceSelect.appendChild(option);
     });
 
-    // couponDetail과 동일한 Choices 초기화
     new window.Choices(sourceSelect, {
       shouldSort: false,
       searchEnabled: true,
@@ -100,7 +99,7 @@ function populateAccountSelects(users: any[]) {
   }
 }
 
-// 이벤트 리스너 초기화
+// 이벤트 리스너 초기화 함수에 추가
 function initEventListeners() {
   const sourceSelect = document.getElementById("sourceAccount");
   if (sourceSelect) {
@@ -122,6 +121,13 @@ function initEventListeners() {
       toggleAllMenuSelection(isChecked);
     });
   }
+
+  // 개별 체크박스 이벤트 리스너 추가
+  document.addEventListener("change", (e) => {
+    if ((e.target as HTMLElement).classList.contains("menu-checkbox")) {
+      updateSelectAllCheckbox();
+    }
+  });
 }
 
 // 메뉴 목록 로드
@@ -158,7 +164,7 @@ function renderMenuTable(items: MenuItem[]) {
   if (items.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="6" class="h-14 text-center flex justify-center items-center">
+        <td colspan="5" class="h-14 text-center flex justify-center items-center">
           복사할 계정을 선택하면 메뉴 목록이 표시됩니다.
         </td>
       </tr>
@@ -185,7 +191,6 @@ function renderMenuTable(items: MenuItem[]) {
           </td>
           <td>${item.name}</td>
           <td>${Number(item.price).toLocaleString()}원</td>
-          <td>${item.empty === "no" ? "진열" : "숨김"}</td>
         </tr>
       `;
     })
@@ -204,4 +209,31 @@ function toggleAllMenuSelection(isChecked: boolean) {
   checkboxes.forEach((checkbox) => {
     checkbox.checked = isChecked;
   });
+}
+
+// 헤더 체크박스 상태 업데이트 함수 추가
+function updateSelectAllCheckbox() {
+  const selectAllCheckbox = document.getElementById(
+    "selectAll"
+  ) as HTMLInputElement;
+  const menuCheckboxes = document.querySelectorAll(
+    ".menu-checkbox"
+  ) as NodeListOf<HTMLInputElement>;
+
+  if (selectAllCheckbox && menuCheckboxes.length > 0) {
+    const checkedCount = Array.from(menuCheckboxes).filter(
+      (checkbox) => checkbox.checked
+    ).length;
+
+    if (checkedCount === 0) {
+      selectAllCheckbox.checked = false;
+      selectAllCheckbox.indeterminate = false;
+    } else if (checkedCount === menuCheckboxes.length) {
+      selectAllCheckbox.checked = true;
+      selectAllCheckbox.indeterminate = false;
+    } else {
+      selectAllCheckbox.checked = false;
+      selectAllCheckbox.indeterminate = true;
+    }
+  }
 }

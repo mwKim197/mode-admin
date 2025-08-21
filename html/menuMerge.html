@@ -31,18 +31,27 @@
       <section class="pb20">
         <div class="inner">
           <h2 class="mb20">메뉴 복사</h2>
-          <!-- 계정 선택 영역 -->
-          <div class="account-selection-container">
-            <div class="selection-row">
-              <label class="selection-label">메뉴를 보낼 계정:</label>
+          <div class="inputWrap">
+            <div class="data_input">
+              <p>메뉴를 보낼 계정</p>
               <div class="select">
-                <select id="sourceAccount" class="popup-select mb0"></select>
+                <select
+                  id="sourceAccount"
+                  class="popup-select mb0"
+                  required
+                ></select>
               </div>
             </div>
-            <div class="selection-row">
-              <label class="selection-label">메뉴를 받을 계정:</label>
+          </div>
+          <div class="inputWrap">
+            <div class="data_input">
+              <p>메뉴를 받을 계정</p>
               <div class="select">
-                <select id="targetAccount" class="popup-select mb0"></select>
+                <select
+                  id="targetAccount"
+                  class="popup-select mb0"
+                  required
+                ></select>
               </div>
             </div>
           </div>
@@ -61,7 +70,6 @@
                 <col style="width: 40px" />
                 <col style="width: 105px" />
                 <col style="width: 50px" />
-                <col style="width: 40px" />
               </colgroup>
               <thead>
                 <tr>
@@ -72,7 +80,6 @@
                   <th>이미지</th>
                   <th>상품명</th>
                   <th>가격</th>
-                  <th>진열</th>
                 </tr>
               </thead>
             </table>
@@ -86,12 +93,11 @@
                   <col style="width: 40px" />
                   <col style="width: 105px" />
                   <col style="width: 50px" />
-                  <col style="width: 40px" />
                 </colgroup>
                 <tbody id="menu-table-body">
                   <tr>
                     <td
-                      colspan="6"
+                      colspan="5"
                       class="h-14 text-center flex justify-center items-center"
                     ></td>
                   </tr>
