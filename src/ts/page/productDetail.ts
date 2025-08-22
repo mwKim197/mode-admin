@@ -88,7 +88,6 @@ export async function initProductDetail() {
             return;
           } else {
             window.showToast(`수정사항 저장완료.`);
-            // 저장 성공 후 product 페이지로 이동
             setTimeout(() => {
               window.location.href = "/html/product.html";
             }, 1000);
@@ -98,7 +97,7 @@ export async function initProductDetail() {
     });
 
     // 얼음 Yes/No 선택에 따른 시간 입력 박스 표시/숨김
-    //const iceRadios = document.querySelectorAll('input[name="iceYn"]');
+    const iceRadios = document.querySelectorAll('input[name="iceYn"]');
 
     function toggleTimeInputs() {
       const selectedValue = (
@@ -119,9 +118,8 @@ export async function initProductDetail() {
       ) as HTMLElement;
 
       if (timeInputBox) {
-        // 일반상품이면 무조건 숨김, 음료상품이면 얼음 여부에 따라 결정
         if (cupYnValue === "yes") {
-          timeInputBox.style.display = "none"; // 일반상품일 때는 무조건 숨김
+          timeInputBox.style.display = "none";
         } else {
           timeInputBox.style.display =
             selectedValue === "no" ? "none" : "block";
@@ -130,9 +128,9 @@ export async function initProductDetail() {
     }
 
     // 라디오 버튼 변경 시 이벤트 리스너
-    /*iceRadios.forEach((radio) => {
-            radio.addEventListener("change", toggleTimeInputs);
-        });*/
+    iceRadios.forEach((radio) => {
+      radio.addEventListener("change", toggleTimeInputs);
+    });
 
     // 페이지 로드 시 초기 상태 설정
     toggleTimeInputs();
@@ -189,7 +187,7 @@ export async function initProductDetail() {
     cupRadios.forEach((radio) => {
       radio.addEventListener("change", () => {
         toggleAllElements();
-        toggleTimeInputs(); // ✅ 이 줄 추가!
+        toggleTimeInputs();
       });
     });
 
@@ -271,6 +269,10 @@ export async function initProductDetail() {
     const waterTime = (
       document.getElementById("water-time") as HTMLInputElement
     ).value.trim();
+    const barcode =
+      (
+        document.getElementById("barcode-input") as HTMLInputElement
+      )?.value?.trim() || "";
 
     const image = ""; // 이미지 경로는 별도 처리
 
@@ -327,6 +329,7 @@ export async function initProductDetail() {
       iceYn,
       iceTime,
       waterTime,
+      barcode,
       image,
       state,
       items,
@@ -352,34 +355,4 @@ function initBarcodeScanner() {
     barcodeInput.focus();
     window.showToast("바코드를 스캔하세요", 2000);
   });
-
-  barcodeInput.addEventListener("input", (e) => {
-    const barcode = (e.target as HTMLInputElement).value;
-    console.log("바코드 입력됨:", barcode);
-
-    if (barcode.length >= 6) {
-      handleBarcodeInput(barcode);
-    }
-  });
-
-  barcodeInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const barcode = barcodeInput.value.trim();
-
-      if (barcode.length > 0) {
-        handleBarcodeInput(barcode);
-      }
-    }
-  });
-}
-
-// 바코드 입력 처리 함수
-function handleBarcodeInput(barcode: string) {
-  console.log("바코드 처리:", barcode);
-
-  const menuNoInput = document.getElementById("menu-no") as HTMLInputElement;
-  if (menuNoInput) {
-    menuNoInput.value = barcode;
-  }
 }
