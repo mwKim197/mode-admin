@@ -14,10 +14,9 @@ let uploadedImageBase64: string;
 let uploadedFileName: string;
 
 export async function initProductAdd() {
-  
-  const backBox = document.querySelector('.back-box') as HTMLElement;
+  const backBox = document.querySelector(".back-box") as HTMLElement;
   if (backBox) {
-    backBox.style.display = 'flex';
+    backBox.style.display = "flex";
   }
 
   const user = getStoredUser();
@@ -94,7 +93,7 @@ export async function initProductAdd() {
     });
 
     // 얼음 Yes/No 선택에 따른 시간 입력 박스 표시/숨김
-    //const iceRadios = document.querySelectorAll('input[name="iceYn"]');
+    const iceRadios = document.querySelectorAll('input[name="iceYn"]');
     const timeInputBox = document.getElementById(
       "ice-water-time-box"
     ) as HTMLElement;
@@ -112,10 +111,10 @@ export async function initProductAdd() {
     }
 
     // 라디오 버튼 변경 시 이벤트 리스너
-    /*iceRadios.forEach((radio) => {
+    iceRadios.forEach((radio) => {
       radio.addEventListener("change", toggleTimeInputs);
     });
-*/
+
     // 페이지 로드 시 초기 상태 설정
     toggleTimeInputs();
 
@@ -276,4 +275,3 @@ function collectMenuDetail(userId: string): MenuDetail {
     items,
   };
 }
-
