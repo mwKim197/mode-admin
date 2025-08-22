@@ -40,6 +40,7 @@ export interface MenuDetail {
   iceYn: string; // "yes" | "no"
   iceTime: string;
   waterTime: string;
+  barcode: string;
   image: string;
   state: MenuState;
   items: MenuItemIngredient[];

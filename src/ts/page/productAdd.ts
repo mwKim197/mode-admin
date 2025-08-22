@@ -2,6 +2,7 @@
 import { renderProductForm } from "../form/renderProductForm.ts";
 import { getStoredUser } from "../utils/userStorage.ts";
 import { apiPost } from "../api/apiHelpers.ts";
+import { fetchWithoutLoading } from "../api/api.ts";
 import { MenuDetail, MenuItemIngredient, MenuState } from "../types/product.ts";
 import { handleImageUpload } from "../utils/imageUploader.ts";
 import {
@@ -93,7 +94,7 @@ export async function initProductAdd() {
     });
 
     // 얼음 Yes/No 선택에 따른 시간 입력 박스 표시/숨김
-    //const iceRadios = document.querySelectorAll('input[name="iceYn"]');
+    const iceRadios = document.querySelectorAll('input[name="iceYn"]');
     const timeInputBox = document.getElementById(
       "ice-water-time-box"
     ) as HTMLElement;
@@ -111,10 +112,10 @@ export async function initProductAdd() {
     }
 
     // 라디오 버튼 변경 시 이벤트 리스너
-    /*iceRadios.forEach((radio) => {
+    iceRadios.forEach((radio) => {
       radio.addEventListener("change", toggleTimeInputs);
     });
-*/
+
     // 페이지 로드 시 초기 상태 설정
     toggleTimeInputs();
 
@@ -149,7 +150,6 @@ export async function initProductAdd() {
         iceWaterTimeBox.style.display = shouldHide ? "none" : "block";
       }
 
-      // 바코드 박스 토글 추가
       const barcodeBox = document.getElementById("barcode-box") as HTMLElement;
       if (barcodeBox) {
         barcodeBox.style.display = shouldHide ? "block" : "none";
@@ -206,41 +206,58 @@ function initBarcodeScanner() {
     return;
   }
 
-  barcodeScanBtn.addEventListener("click", () => {
-    barcodeInput.focus();
-    window.showToast("바코드를 스캔하세요", 2000);
-  });
-
-  barcodeInput.addEventListener("input", (e) => {
-    const barcode = (e.target as HTMLInputElement).value;
-    console.log("바코드 입력됨:", barcode);
-
-    if (barcode.length >= 6) {
-      handleBarcodeInput(barcode);
-    }
-  });
-
-  // Enter 키 감지 (일부 바코드 스캐너는 Enter를 자동으로 보냄)
-  barcodeInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const barcode = barcodeInput.value.trim();
-
-      if (barcode.length > 0) {
-        handleBarcodeInput(barcode);
+  // 바코드 스캔 버튼 클릭 시 API 호출
+  barcodeScanBtn.addEventListener("click", async () => {
+    try {
+      const user = getStoredUser();
+      if (!user) {
+        window.showToast("사용자 정보가 없습니다.", 3000, "error");
+        return;
       }
+
+      const firstResponse = await apiPost("/model_machine_controll", {
+        userId: user.userId,
+        func: "barcode",
+      });
+
+      if (firstResponse.ok) {
+        window.showToast("바코드를 스캔해주세요", 2000);
+
+        const checkBarcode = setInterval(async () => {
+          const secondResponse = await fetchWithoutLoading(
+            "/model_barcode_scan?func=barcode-claim-latest",
+            {
+              method: "POST",
+              body: JSON.stringify({
+                userId: user.userId,
+              }),
+            }
+          );
+
+          if (secondResponse.ok) {
+            const barcodeData = await secondResponse.json();
+
+            if (barcodeData.found && barcodeData.code) {
+              clearInterval(checkBarcode);
+
+              const barcodeInput = document.getElementById(
+                "barcode-input"
+              ) as HTMLInputElement;
+              if (barcodeInput) {
+                barcodeInput.value = barcodeData.code;
+                barcodeInput.setAttribute("data-field", "barcode");
+              }
+            }
+          }
+        }, 1000);
+      } else {
+        window.showToast("바코드 스캔 시작에 실패했습니다.", 3000, "error");
+      }
+    } catch (error) {
+      console.error("바코드 스캔 API 오류:", error);
+      window.showToast("바코드 스캔 중 오류가 발생했습니다.", 3000, "error");
     }
   });
-}
-
-// 바코드 입력 처리 함수
-function handleBarcodeInput(barcode: string) {
-  console.log("바코드 처리:", barcode);
-
-  const menuNoInput = document.getElementById("menu-no") as HTMLInputElement;
-  if (menuNoInput) {
-    menuNoInput.value = barcode;
-  }
 }
 
 // 📌 기존 collectMenuDetail 복사 사용
@@ -274,6 +291,10 @@ function collectMenuDetail(userId: string): MenuDetail {
   const waterTime = (
     document.getElementById("water-time") as HTMLInputElement
   ).value.trim();
+  const barcode =
+    (
+      document.getElementById("barcode-input") as HTMLInputElement
+    )?.value.trim() || "";
 
   const image = ""; // 이미지 경로는 별도 처리
 
@@ -329,6 +350,7 @@ function collectMenuDetail(userId: string): MenuDetail {
     iceYn,
     iceTime,
     waterTime,
+    barcode,
     image,
     state,
     items,

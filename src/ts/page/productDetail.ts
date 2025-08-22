@@ -1,6 +1,7 @@
 import { renderProductForm } from "../form/renderProductForm.ts";
 import { getStoredUser } from "../utils/userStorage.ts";
-import { apiGet, apiPut } from "../api/apiHelpers.ts";
+import { apiGet, apiPut, apiPost } from "../api/apiHelpers.ts";
+import { fetchWithoutLoading } from "../api/api.ts";
 import { MenuDetail, MenuItemIngredient, MenuState } from "../types/product.ts";
 import { handleImageUpload } from "../utils/imageUploader.ts";
 import {
@@ -88,7 +89,6 @@ export async function initProductDetail() {
             return;
           } else {
             window.showToast(`수정사항 저장완료.`);
-            // 저장 성공 후 product 페이지로 이동
             setTimeout(() => {
               window.location.href = "/html/product.html";
             }, 1000);
@@ -98,7 +98,7 @@ export async function initProductDetail() {
     });
 
     // 얼음 Yes/No 선택에 따른 시간 입력 박스 표시/숨김
-    //const iceRadios = document.querySelectorAll('input[name="iceYn"]');
+    const iceRadios = document.querySelectorAll('input[name="iceYn"]');
 
     function toggleTimeInputs() {
       const selectedValue = (
@@ -119,9 +119,8 @@ export async function initProductDetail() {
       ) as HTMLElement;
 
       if (timeInputBox) {
-        // 일반상품이면 무조건 숨김, 음료상품이면 얼음 여부에 따라 결정
         if (cupYnValue === "yes") {
-          timeInputBox.style.display = "none"; // 일반상품일 때는 무조건 숨김
+          timeInputBox.style.display = "none";
         } else {
           timeInputBox.style.display =
             selectedValue === "no" ? "none" : "block";
@@ -130,9 +129,9 @@ export async function initProductDetail() {
     }
 
     // 라디오 버튼 변경 시 이벤트 리스너
-    /*iceRadios.forEach((radio) => {
-            radio.addEventListener("change", toggleTimeInputs);
-        });*/
+    iceRadios.forEach((radio) => {
+      radio.addEventListener("change", toggleTimeInputs);
+    });
 
     // 페이지 로드 시 초기 상태 설정
     toggleTimeInputs();
@@ -189,13 +188,12 @@ export async function initProductDetail() {
     cupRadios.forEach((radio) => {
       radio.addEventListener("change", () => {
         toggleAllElements();
-        toggleTimeInputs(); // ✅ 이 줄 추가!
+        toggleTimeInputs();
       });
     });
 
     // 페이지 로드 시 초기 상태 설정
     toggleAllElements();
-
     initBarcodeScanner();
   }
 
@@ -271,6 +269,10 @@ export async function initProductDetail() {
     const waterTime = (
       document.getElementById("water-time") as HTMLInputElement
     ).value.trim();
+    const barcode =
+      (
+        document.getElementById("barcode-input") as HTMLInputElement
+      )?.value?.trim() || "";
 
     const image = ""; // 이미지 경로는 별도 처리
 
@@ -327,6 +329,7 @@ export async function initProductDetail() {
       iceYn,
       iceTime,
       waterTime,
+      barcode,
       image,
       state,
       items,
@@ -334,7 +337,7 @@ export async function initProductDetail() {
   }
 }
 
-// 바코드 스캔 기능 함수 추가
+// 바코드 스캔 기능 함수 수정
 function initBarcodeScanner() {
   const barcodeInput = document.getElementById(
     "barcode-input"
@@ -348,38 +351,56 @@ function initBarcodeScanner() {
     return;
   }
 
-  barcodeScanBtn.addEventListener("click", () => {
-    barcodeInput.focus();
-    window.showToast("바코드를 스캔하세요", 2000);
-  });
-
-  barcodeInput.addEventListener("input", (e) => {
-    const barcode = (e.target as HTMLInputElement).value;
-    console.log("바코드 입력됨:", barcode);
-
-    if (barcode.length >= 6) {
-      handleBarcodeInput(barcode);
-    }
-  });
-
-  barcodeInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const barcode = barcodeInput.value.trim();
-
-      if (barcode.length > 0) {
-        handleBarcodeInput(barcode);
+  // 바코드 스캔 버튼 클릭 시 API 호출
+  barcodeScanBtn.addEventListener("click", async () => {
+    try {
+      const user = getStoredUser();
+      if (!user) {
+        window.showToast("사용자 정보가 없습니다.", 3000, "error");
+        return;
       }
+
+      const firstResponse = await apiPost("/model_machine_controll", {
+        userId: user.userId,
+        func: "barcode",
+      });
+
+      if (firstResponse.ok) {
+        window.showToast("바코드를 스캔해주세요", 2000);
+
+        const checkBarcode = setInterval(async () => {
+          const secondResponse = await fetchWithoutLoading(
+            "/model_barcode_scan?func=barcode-claim-latest",
+            {
+              method: "POST",
+              body: JSON.stringify({
+                userId: user.userId,
+              }),
+            }
+          );
+
+          if (secondResponse.ok) {
+            const barcodeData = await secondResponse.json();
+
+            if (barcodeData.found && barcodeData.code) {
+              clearInterval(checkBarcode);
+
+              const barcodeInput = document.getElementById(
+                "barcode-input"
+              ) as HTMLInputElement;
+              if (barcodeInput) {
+                barcodeInput.value = barcodeData.code;
+                barcodeInput.setAttribute("data-field", "barcode");
+              }
+            }
+          }
+        }, 1000);
+      } else {
+        window.showToast("바코드 스캔 시작에 실패했습니다.", 3000, "error");
+      }
+    } catch (error) {
+      console.error("바코드 스캔 API 오류:", error);
+      window.showToast("바코드 스캔 중 오류가 발생했습니다.", 3000, "error");
     }
   });
-}
-
-// 바코드 입력 처리 함수
-function handleBarcodeInput(barcode: string) {
-  console.log("바코드 처리:", barcode);
-
-  const menuNoInput = document.getElementById("menu-no") as HTMLInputElement;
-  if (menuNoInput) {
-    menuNoInput.value = barcode;
-  }
 }
