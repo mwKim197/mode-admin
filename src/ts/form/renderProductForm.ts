@@ -115,6 +115,12 @@ function applyMenuData(menu: any) {
     menu.iceTime;
   (document.getElementById("water-time") as HTMLInputElement).value =
     menu.waterTime;
+  const barcodeInput = document.getElementById(
+    "barcode-input"
+  ) as HTMLInputElement;
+  if (barcodeInput && menu.barcode) {
+    barcodeInput.value = menu.barcode;
+  }
 
   // 카테고리 설정
   const categorySelect = document.getElementById(

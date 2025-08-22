@@ -221,10 +221,7 @@ function initBarcodeScanner() {
       });
 
       if (firstResponse.ok) {
-        window.showToast(
-          "바코드 스캔을 시작했습니다. 바코드를 스캔해주세요.",
-          2000
-        );
+        window.showToast("바코드를 스캔해주세요", 2000);
 
         const checkBarcode = setInterval(async () => {
           const secondResponse = await fetchWithoutLoading(
@@ -249,7 +246,6 @@ function initBarcodeScanner() {
               if (barcodeInput) {
                 barcodeInput.value = barcodeData.code;
                 barcodeInput.setAttribute("data-field", "barcode");
-                window.showToast("바코드 스캔이 완료되었습니다.", 2000);
               }
             }
           }

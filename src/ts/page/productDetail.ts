@@ -1,6 +1,7 @@
 import { renderProductForm } from "../form/renderProductForm.ts";
 import { getStoredUser } from "../utils/userStorage.ts";
-import { apiGet, apiPut } from "../api/apiHelpers.ts";
+import { apiGet, apiPut, apiPost } from "../api/apiHelpers.ts";
+import { fetchWithoutLoading } from "../api/api.ts";
 import { MenuDetail, MenuItemIngredient, MenuState } from "../types/product.ts";
 import { handleImageUpload } from "../utils/imageUploader.ts";
 import {
@@ -193,7 +194,6 @@ export async function initProductDetail() {
 
     // 페이지 로드 시 초기 상태 설정
     toggleAllElements();
-
     initBarcodeScanner();
   }
 
@@ -337,7 +337,7 @@ export async function initProductDetail() {
   }
 }
 
-// 바코드 스캔 기능 함수 추가
+// 바코드 스캔 기능 함수 수정
 function initBarcodeScanner() {
   const barcodeInput = document.getElementById(
     "barcode-input"
@@ -351,8 +351,56 @@ function initBarcodeScanner() {
     return;
   }
 
-  barcodeScanBtn.addEventListener("click", () => {
-    barcodeInput.focus();
-    window.showToast("바코드를 스캔하세요", 2000);
+  // 바코드 스캔 버튼 클릭 시 API 호출
+  barcodeScanBtn.addEventListener("click", async () => {
+    try {
+      const user = getStoredUser();
+      if (!user) {
+        window.showToast("사용자 정보가 없습니다.", 3000, "error");
+        return;
+      }
+
+      const firstResponse = await apiPost("/model_machine_controll", {
+        userId: user.userId,
+        func: "barcode",
+      });
+
+      if (firstResponse.ok) {
+        window.showToast("바코드를 스캔해주세요", 2000);
+
+        const checkBarcode = setInterval(async () => {
+          const secondResponse = await fetchWithoutLoading(
+            "/model_barcode_scan?func=barcode-claim-latest",
+            {
+              method: "POST",
+              body: JSON.stringify({
+                userId: user.userId,
+              }),
+            }
+          );
+
+          if (secondResponse.ok) {
+            const barcodeData = await secondResponse.json();
+
+            if (barcodeData.found && barcodeData.code) {
+              clearInterval(checkBarcode);
+
+              const barcodeInput = document.getElementById(
+                "barcode-input"
+              ) as HTMLInputElement;
+              if (barcodeInput) {
+                barcodeInput.value = barcodeData.code;
+                barcodeInput.setAttribute("data-field", "barcode");
+              }
+            }
+          }
+        }, 1000);
+      } else {
+        window.showToast("바코드 스캔 시작에 실패했습니다.", 3000, "error");
+      }
+    } catch (error) {
+      console.error("바코드 스캔 API 오류:", error);
+      window.showToast("바코드 스캔 중 오류가 발생했습니다.", 3000, "error");
+    }
   });
 }
