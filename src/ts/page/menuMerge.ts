@@ -1,4 +1,4 @@
-import { apiGet } from "../api/apiHelpers.ts";
+import { apiGet, apiPost } from "../api/apiHelpers.ts";
 import { getStoredUser } from "../utils/userStorage.ts";
 import { MenuItem } from "../types/product.ts";
 
@@ -142,6 +142,12 @@ function initEventListeners() {
       updateSelectAllCheckbox();
     }
   });
+
+  // 복사하기 버튼 이벤트 리스너 추가
+  const copyButton = document.getElementById("copyButton");
+  if (copyButton) {
+    copyButton.addEventListener("click", handleCopyMenus);
+  }
 }
 
 // 메뉴 목록 로드
@@ -158,11 +164,13 @@ async function loadMenuList(userId: string) {
     } else {
       console.error("메뉴 목록을 가져올 수 없습니다.");
       window.showToast("메뉴 목록을 불러오는데 실패했습니다.", 3000, "error");
+      allMenuItems = []; // 빈 배열로 초기화
       displayMenuList([]);
     }
   } catch (error) {
     console.error("메뉴 목록 로드 실패:", error);
     window.showToast("메뉴 목록을 불러오는데 실패했습니다.", 3000, "error");
+    allMenuItems = [];
     displayMenuList([]);
   }
 }
@@ -194,7 +202,7 @@ function renderMenuTable(items: MenuItem[]) {
           <td><input type="checkbox" class="menu-checkbox" value="${
             item.menuId
           }" /></td>
-          <td>${item.no || index + 1}</td>
+          <td>${index + 1}</td>  <!-- item.no 대신 index + 1 사용 -->
           <td style="text-align: center;">
             <img src="${imageUrl}" alt="${
         item.name
@@ -245,6 +253,73 @@ function updateSelectAllCheckbox() {
     } else {
       selectAllCheckbox.checked = false;
       selectAllCheckbox.indeterminate = true;
+    }
+  }
+}
+
+// 메뉴 복사 처리 함수
+async function handleCopyMenus() {
+  if (!selectedSourceAccount || !selectedTargetAccount) {
+    window.showToast(
+      "보낼 계정과 받을 계정을 모두 선택해주세요.",
+      3000,
+      "warning"
+    );
+    return;
+  }
+
+  // 선택된 메뉴 확인
+  const selectedCheckboxes = document.querySelectorAll(
+    ".menu-checkbox:checked"
+  ) as NodeListOf<HTMLInputElement>;
+
+  if (selectedCheckboxes.length === 0) {
+    window.showToast("복사할 메뉴를 선택해주세요.", 3000, "warning");
+    return;
+  }
+
+  const selectedMenuIds = Array.from(selectedCheckboxes).map((checkbox) =>
+    parseInt(checkbox.value)
+  );
+
+  const currentUser = getStoredUser();
+  const isExistingAccount =
+    currentUser && selectedTargetAccount === currentUser.userId;
+
+  const requestBody = {
+    sourceUserId: selectedSourceAccount,
+    targetUserId: selectedTargetAccount,
+    menuIds: selectedMenuIds,
+    renameImageWithNewMenuId: isExistingAccount,
+  };
+
+  console.log("복사 요청 데이터:", requestBody);
+
+  if (
+    confirm(`선택된 ${selectedMenuIds.length}개의 메뉴를 복사하시겠습니까?`)
+  ) {
+    try {
+      const response = await apiPost(
+        "/model_admin_menu?func=duplicate-selected",
+        requestBody
+      );
+
+      if (response.ok) {
+        window.showToast("메뉴 복사가 완료되었습니다.", 3000, "success");
+
+        selectedCheckboxes.forEach((checkbox) => (checkbox.checked = false));
+        updateSelectAllCheckbox();
+      } else {
+        const errorData = await response.json();
+        window.showToast(
+          `메뉴 복사 실패: ${errorData.message || "알 수 없는 오류"}`,
+          3000,
+          "error"
+        );
+      }
+    } catch (error) {
+      console.error("메뉴 복사 중 오류:", error);
+      window.showToast("메뉴 복사 중 오류가 발생했습니다.", 3000, "error");
     }
   }
 }
