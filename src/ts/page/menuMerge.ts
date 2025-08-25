@@ -202,7 +202,7 @@ function renderMenuTable(items: MenuItem[]) {
           <td><input type="checkbox" class="menu-checkbox" value="${
             item.menuId
           }" /></td>
-          <td>${index + 1}</td>  <!-- item.no 대신 index + 1 사용 -->
+          <td>${index + 1}</td> 
           <td style="text-align: center;">
             <img src="${imageUrl}" alt="${
         item.name
