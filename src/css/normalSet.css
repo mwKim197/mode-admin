@@ -70,10 +70,9 @@ section.mt80.pb20 .in-box input[type="text"] {
 
 .category-item {
   position: relative;
-  width: 100%; /* 전체 너비 사용 */
+  width: 100%;
 }
 
-/* 카테고리 아이템 내부의 data_input 스타일 조정 */
 .category-item.data_input {
   width: 100%;
   max-width: 100%;
