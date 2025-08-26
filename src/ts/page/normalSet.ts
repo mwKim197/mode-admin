@@ -16,7 +16,7 @@ export function initNormalSet() {
 
   initSaveButtonHandler();
   initFileUploadHandlers();
-  initCategoryHandlers(); // 카테고리 핸들러 추가
+  initCategoryHandlers();
 }
 
 function initCategoryHandlers() {
@@ -40,7 +40,7 @@ function addCategory() {
   const container = document.getElementById("category-container");
   if (!container) return;
 
-  const categoryCount = container.children.length + 1;
+  const categoryCount = container.querySelectorAll(".category-item").length + 1;
 
   const newCategory = document.createElement("div");
   newCategory.className = "data_input category-item";
@@ -52,7 +52,6 @@ function addCategory() {
     </div>
   `;
 
-  //삭제 버튼에 이벤트 리스너 추가
   const deleteButton = newCategory.querySelector(".delete-category");
   if (deleteButton) {
     deleteButton.addEventListener("click", () =>
@@ -65,20 +64,29 @@ function addCategory() {
 
 // 카테고리 삭제 함수
 function deleteCategory(button: HTMLButtonElement) {
-  const categoryItem = button.closest(".category-item");
-  if (!categoryItem) return;
-
-  categoryItem.remove();
-
   const container = document.getElementById("category-container");
   if (!container) return;
 
+  const categoryItem = button.closest(".category-item");
+  if (!categoryItem) return;
+
+  const firstItem = container.querySelector(".category-item");
+  if (categoryItem === firstItem) {
+    window.showToast(
+      "카테고리는 최소 1개 이상 입력해야 합니다.",
+      3000,
+      "warning"
+    );
+    return;
+  }
+
+  categoryItem.remove();
+
+  // 번호 재정렬
   const categories = container.querySelectorAll(".category-item");
   categories.forEach((item, index) => {
     const label = item.querySelector("p");
-    if (label) {
-      label.textContent = `카테고리 ${index + 1}`;
-    }
+    if (label) label.textContent = `카테고리 ${index + 1}`;
   });
 }
 
@@ -237,6 +245,7 @@ function loadCategoryData(categories: any[]) {
 
   container.innerHTML = "";
 
+  // 기존 데이터 렌더
   if (categories && categories.length > 0) {
     categories.forEach((category, index) => {
       const categoryItem = document.createElement("div");
@@ -244,21 +253,14 @@ function loadCategoryData(categories: any[]) {
       categoryItem.innerHTML = `
         <p>카테고리 ${index + 1}</p>
         <div class="category-input-group">
-          <input type="text" value="${
-            category.name || ""
-          }" placeholder="예: 커피, 음료, 디저트 등" />
+          <input type="text" value="${category.name || ""}"  />
           <button type="button" class="btn-i delete-category">-</button>
         </div>
       `;
-
-      // 삭제 버튼에 이벤트 리스너 추가
-      const deleteButton = categoryItem.querySelector(".delete-category");
-      if (deleteButton) {
-        deleteButton.addEventListener("click", () =>
-          deleteCategory(deleteButton as HTMLButtonElement)
-        );
-      }
-
+      const del = categoryItem.querySelector(
+        ".delete-category"
+      ) as HTMLButtonElement;
+      if (del) del.addEventListener("click", () => deleteCategory(del));
       container.appendChild(categoryItem);
     });
   } else {
@@ -272,16 +274,20 @@ function loadCategoryData(categories: any[]) {
           <button type="button" class="btn-i delete-category">-</button>
         </div>
       `;
-
-      // 삭제 버튼에 이벤트 리스너 추가
-      const deleteButton = categoryItem.querySelector(".delete-category");
-      if (deleteButton) {
-        deleteButton.addEventListener("click", () =>
-          deleteCategory(deleteButton as HTMLButtonElement)
-        );
-      }
-
+      const del = categoryItem.querySelector(
+        ".delete-category"
+      ) as HTMLButtonElement;
+      if (del) del.addEventListener("click", () => deleteCategory(del));
       container.appendChild(categoryItem);
+    }
+  }
+
+  const firstItem = container.querySelector(".category-item");
+  if (firstItem) {
+    const firstInput = firstItem.querySelector("input") as HTMLInputElement;
+    if (firstInput) {
+      firstInput.value = "전체메뉴";
+      firstInput.disabled = true;
     }
   }
 }
@@ -332,9 +338,13 @@ async function saveStoreInfo() {
     const categoryInputs = document.querySelectorAll(
       "#category-container .category-input-group input"
     );
-    const currentCategories = Array.from(categoryInputs)
+    const categories = Array.from(categoryInputs)
       .map((input, index) => {
         const value = (input as HTMLInputElement).value.trim();
+        if (index === 0) {
+          // 첫 번째는 항상 전체메뉴 고정
+          return { name: "전체메뉴", no: "0", item: "all" };
+        }
         if (value) {
           return {
             name: value,
@@ -344,15 +354,15 @@ async function saveStoreInfo() {
         }
         return null;
       })
-      .filter((category) => category !== null);
+      .filter((c) => c !== null);
 
     // 카테고리 변경사항 체크
     const originalCategories = originalUserData?.category || [];
-    if (currentCategories.length !== originalCategories.length) {
+    if (categories.length !== originalCategories.length) {
       hasCategoryChanges = true;
     } else {
-      for (let i = 0; i < currentCategories.length; i++) {
-        const current = currentCategories[i];
+      for (let i = 0; i < categories.length; i++) {
+        const current = categories[i];
         const original = originalCategories[i];
         if (!original || current?.name !== original.name) {
           hasCategoryChanges = true;
@@ -503,8 +513,8 @@ async function saveStoreInfo() {
       }
 
       // 카테고리 데이터 추가 (변경된 경우만)
-      if (hasCategoryChanges && currentCategories.length > 0) {
-        updateData.category = currentCategories;
+      if (hasCategoryChanges && categories.length > 0) {
+        updateData.category = categories;
       }
 
       // 파일 업로드 데이터 추가
@@ -584,7 +594,7 @@ async function saveStoreInfo() {
         originalUserData.iconBase64 = "";
       }
       if (hasCategoryChanges) {
-        originalUserData.category = currentCategories;
+        originalUserData.category = categories;
       }
     }
   } catch (error) {

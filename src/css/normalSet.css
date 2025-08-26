@@ -38,9 +38,12 @@ section.mt80.pb20 .in-box input[type="text"] {
   max-width: 100%;
 }
 
+.category-item p {
+  width: 140px !important;
+}
+
 .category-input-group input {
   flex: 1;
-  max-width: calc(100% - 50px);
 }
 
 .delete-category {
@@ -53,7 +56,7 @@ section.mt80.pb20 .in-box input[type="text"] {
   cursor: pointer;
   font-size: 1.6rem;
   font-weight: bold;
-  flex-shrink: 0; /* 버튼 크기 고정 */
+  flex-shrink: 0;
 }
 
 .delete-category:hover {
