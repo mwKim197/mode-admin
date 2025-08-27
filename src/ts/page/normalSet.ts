@@ -10,6 +10,13 @@ let iconBase64: string = "";
 let logoDeleted: boolean = false;
 let iconDeleted: boolean = false;
 
+// 전역 변수로 삭제 대기 중인 카테고리 정보 저장
+let pendingDeleteCategories: Array<{
+  name: string;
+  item: string;
+  element: Element;
+}> = [];
+
 export function initNormalSet() {
   // 페이지 로드 시 매장 정보 가져오기
   loadStoreInfo();
@@ -62,7 +69,7 @@ function addCategory() {
   container.appendChild(newCategory);
 }
 
-// 카테고리 삭제 함수
+// 카테고리 삭제 함수 (수정됨)
 function deleteCategory(button: HTMLButtonElement) {
   const container = document.getElementById("category-container");
   if (!container) return;
@@ -80,6 +87,26 @@ function deleteCategory(button: HTMLButtonElement) {
     return;
   }
 
+  // 삭제하려는 카테고리 정보 수집
+  const categoryInput = categoryItem.querySelector("input") as HTMLInputElement;
+  const categoryValue = categoryInput.value.trim();
+
+  // 기존 카테고리에서 item 값 찾기
+  const categoryIndex = Array.from(
+    container.querySelectorAll(".category-item")
+  ).indexOf(categoryItem);
+  const originalCategory = originalUserData?.category?.[categoryIndex];
+  const itemValue =
+    originalCategory?.item || categoryValue.toLowerCase().replace(/\s+/g, "_");
+
+  // 삭제 대기 목록에 추가
+  pendingDeleteCategories.push({
+    name: categoryValue,
+    item: itemValue,
+    element: categoryItem as Element,
+  });
+
+  // 화면상으로는 즉시 삭제
   categoryItem.remove();
 
   // 번호 재정렬
@@ -292,7 +319,7 @@ function loadCategoryData(categories: any[]) {
   }
 }
 
-// 매장 정보 저장 함수
+// 매장 정보 저장 함수 (수정됨)
 async function saveStoreInfo() {
   try {
     const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
@@ -342,23 +369,29 @@ async function saveStoreInfo() {
       .map((input, index) => {
         const value = (input as HTMLInputElement).value.trim();
         if (index === 0) {
-          // 첫 번째는 항상 전체메뉴 고정
-          return { name: "전체메뉴", no: "0", item: "all" };
+          return { name: "전체메뉴", no: "0", item: "all" }; // item 포함
         }
         if (value) {
+          // 기존 카테고리에서 item 값 찾기
+          const originalCategory = originalUserData?.category?.[index];
+          const itemValue =
+            originalCategory?.item || value.toLowerCase().replace(/\s+/g, "_");
+
           return {
             name: value,
             no: index.toString(),
-            item: value.toLowerCase().replace(/\s+/g, "_"),
+            item: itemValue, // ✅ 기존 item 값 포함
           };
         }
         return null;
       })
       .filter((c) => c !== null);
 
-    // 카테고리 변경사항 체크
+    // 카테고리 변경사항 체크 (삭제 대기 중인 카테고리 포함)
     const originalCategories = originalUserData?.category || [];
-    if (categories.length !== originalCategories.length) {
+    const hasPendingDeletes = pendingDeleteCategories.length > 0;
+
+    if (categories.length !== originalCategories.length || hasPendingDeletes) {
       hasCategoryChanges = true;
     } else {
       for (let i = 0; i < categories.length; i++) {
@@ -456,6 +489,11 @@ async function saveStoreInfo() {
 
     // 일반 정보 업데이트 (비밀번호 제외)
     if (hasChanges || hasFileChanges || hasCategoryChanges) {
+      // 삭제 대기 중인 카테고리들 처리
+      if (hasPendingDeletes) {
+        await processPendingCategoryDeletes(currentUserId);
+      }
+
       const updateData: any = {
         userId: currentUserId,
         adminId: currentUserId,
@@ -566,6 +604,9 @@ async function saveStoreInfo() {
 
     window.showToast("변경사항이 저장되었습니다.", 3000, "success");
 
+    // 저장 성공 시 삭제 대기 목록 초기화
+    pendingDeleteCategories = [];
+
     // 저장 성공 시 비밀번호 필드를 ******로 초기화
     if (passwordInput) {
       passwordInput.value = "******";
@@ -594,11 +635,122 @@ async function saveStoreInfo() {
         originalUserData.iconBase64 = "";
       }
       if (hasCategoryChanges) {
-        originalUserData.category = categories;
+        // item 속성을 추가하여 타입 맞춤
+        originalUserData.category = categories.map((cat, index) => ({
+          ...cat,
+          item:
+            originalUserData?.category?.[index]?.item ||
+            cat.name.toLowerCase().replace(/\s+/g, "_"),
+        }));
       }
     }
   } catch (error) {
     window.showToast("저장 중 오류가 발생했습니다.", 3000, "error");
+  }
+}
+
+// 삭제 대기 중인 카테고리들 처리 함수 (새로 추가)
+async function processPendingCategoryDeletes(userId: string) {
+  for (const pendingCategory of pendingDeleteCategories) {
+    try {
+      console.log(`카테고리 ${pendingCategory.name} 처리 시작`);
+
+      // 전송할 데이터 확인
+      console.log(`전송할 데이터:`, {
+        userId: userId,
+        category: pendingCategory.item,
+        categoryName: pendingCategory.name,
+      });
+
+      // 1. 카테고리 사용 여부 확인
+      const checkResponse = await fetch(
+        `https://api.narrowroad-model.com/model_user_setting?func=check-category-usage&userId=${userId}&category=${pendingCategory.item}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          // body 제거
+        }
+      );
+
+      console.log(
+        `check-category-usage 응답:`,
+        checkResponse.status,
+        checkResponse.ok
+      );
+
+      if (!checkResponse.ok) {
+        throw new Error(
+          `카테고리 사용 여부 확인 실패: ${checkResponse.status}`
+        );
+      }
+
+      const checkResult = await checkResponse.json();
+      console.log(`check-category-usage 결과:`, checkResult);
+
+      if (checkResult.hasAny) {
+        console.log(
+          `카테고리 ${pendingCategory.name} 사용 중 - 이동 처리 시작`
+        );
+
+        // 2. 사용 중인 카테고리: 메뉴를 전체메뉴로 이동
+        const moveResponse = await fetch(
+          `https://api.narrowroad-model.com/model_user_setting?func=move-category-to-all&userId=${userId}&category=${pendingCategory.item}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            // body 제거
+          }
+        );
+
+        console.log(
+          `move-category-to-all 응답:`,
+          moveResponse.status,
+          moveResponse.ok
+        );
+
+        if (!moveResponse.ok) {
+          throw new Error(`카테고리 이동 실패: ${moveResponse.status}`);
+        }
+
+        const moveResult = await moveResponse.json();
+        console.log(`move-category-to-all 결과:`, moveResult);
+
+        if (!moveResult.success) {
+          throw new Error("카테고리 이동에 실패했습니다.");
+        }
+      } else {
+        console.log(
+          `카테고리 ${pendingCategory.name} 사용되지 않음 - 바로 삭제`
+        );
+      }
+
+      console.log(`카테고리 ${pendingCategory.name} 처리 완료`);
+    } catch (error) {
+      console.error(`카테고리 ${pendingCategory.name} 처리 중 오류:`, error);
+
+      // 오류 발생 시 화면 복원
+      const container = document.getElementById("category-container");
+      if (container) {
+        container.appendChild(pendingCategory.element);
+
+        // 번호 재정렬
+        const categories = container.querySelectorAll(".category-item");
+        categories.forEach((item, index) => {
+          const label = item.querySelector("p");
+          if (label) label.textContent = `카테고리 ${index + 1}`;
+        });
+      }
+
+      window.showToast(
+        `카테고리 ${pendingCategory.name} 삭제 중 오류가 발생했습니다.`,
+        3000,
+        "error"
+      );
+    }
   }
 }
 
