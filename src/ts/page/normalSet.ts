@@ -91,10 +91,11 @@ function deleteCategory(button: HTMLButtonElement) {
   const categoryInput = categoryItem.querySelector("input") as HTMLInputElement;
   const categoryValue = categoryInput.value.trim();
 
-  // 기존 카테고리에서 item 값 찾기
-  const categoryIndex = Array.from(
+  // 삭제 전에 올바른 인덱스 찾기
+  const allCategoryItems = Array.from(
     container.querySelectorAll(".category-item")
-  ).indexOf(categoryItem);
+  );
+  const categoryIndex = allCategoryItems.indexOf(categoryItem);
   const originalCategory = originalUserData?.category?.[categoryIndex];
   const itemValue =
     originalCategory?.item || categoryValue.toLowerCase().replace(/\s+/g, "_");
@@ -102,7 +103,7 @@ function deleteCategory(button: HTMLButtonElement) {
   // 삭제 대기 목록에 추가
   pendingDeleteCategories.push({
     name: categoryValue,
-    item: itemValue,
+    item: itemValue, // ✅ 올바른 item 값
     element: categoryItem as Element,
   });
 
@@ -369,18 +370,20 @@ async function saveStoreInfo() {
       .map((input, index) => {
         const value = (input as HTMLInputElement).value.trim();
         if (index === 0) {
-          return { name: "전체메뉴", no: "0", item: "all" }; // item 포함
+          return { name: "전체메뉴", no: "0", item: "all" };
         }
         if (value) {
-          // 기존 카테고리에서 item 값 찾기
-          const originalCategory = originalUserData?.category?.[index];
+          // 기존 카테고리에서 이름으로 item 값 찾기
+          const originalCategory = originalUserData?.category?.find(
+            (cat) => cat.name === value
+          );
           const itemValue =
             originalCategory?.item || value.toLowerCase().replace(/\s+/g, "_");
 
           return {
             name: value,
             no: index.toString(),
-            item: itemValue, // ✅ 기존 item 값 포함
+            item: itemValue, // ✅ 이름으로 정확한 item 값 찾기
           };
         }
         return null;
@@ -663,15 +666,8 @@ async function processPendingCategoryDeletes(userId: string) {
       });
 
       // 1. 카테고리 사용 여부 확인
-      const checkResponse = await fetch(
-        `https://api.narrowroad-model.com/model_user_setting?func=check-category-usage&userId=${userId}&category=${pendingCategory.item}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          // body 제거
-        }
+      const checkResponse = await apiGet(
+        `/model_user_setting?func=check-category-usage&userId=${userId}&category=${pendingCategory.item}`
       );
 
       console.log(
@@ -696,13 +692,16 @@ async function processPendingCategoryDeletes(userId: string) {
 
         // 2. 사용 중인 카테고리: 메뉴를 전체메뉴로 이동
         const moveResponse = await fetch(
-          `https://api.narrowroad-model.com/model_user_setting?func=move-category-to-all&userId=${userId}&category=${pendingCategory.item}`,
+          `/model_user_setting?func=move-category-to-all`,
           {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
             },
-            // body 제거
+            body: JSON.stringify({
+              userId: userId,
+              category: pendingCategory.item,
+            }),
           }
         );
 
