@@ -365,7 +365,9 @@ async function saveStoreInfo() {
           return { name: "전체메뉴", no: "0", item: "all" };
         }
         if (value) {
-          const originalCategory = originalUserData?.category?.[index];
+          const originalCategory = originalUserData?.category?.find(
+            (cat) => cat.name === value
+          );
           const itemValue =
             originalCategory?.item || value.toLowerCase().replace(/\s+/g, "_");
 
@@ -659,11 +661,7 @@ async function processPendingCategoryDeletes(userId: string) {
         `/model_user_setting?func=check-category-usage&userId=${userId}&category=${pendingCategory.item}`
       );
 
-      console.log(
-        `check-category-usage 응답:`,
-        checkResponse.status,
-        checkResponse.ok
-      );
+      console.log(`응답:`, checkResponse.status, checkResponse.ok);
 
       if (!checkResponse.ok) {
         throw new Error(
@@ -672,12 +670,10 @@ async function processPendingCategoryDeletes(userId: string) {
       }
 
       const checkResult = await checkResponse.json();
-      console.log(`check-category-usage 결과:`, checkResult);
+      console.log(`결과:`, checkResult);
 
       if (checkResult.hasAny) {
-        console.log(
-          `카테고리 ${pendingCategory.name} 사용 중 - 이동 처리 시작`
-        );
+        console.log(`카테고리 ${pendingCategory.name} 사용 중`);
 
         //전체메뉴로 이동
         const moveResponse = await fetch(
@@ -694,18 +690,14 @@ async function processPendingCategoryDeletes(userId: string) {
           }
         );
 
-        console.log(
-          `move-category-to-all 응답:`,
-          moveResponse.status,
-          moveResponse.ok
-        );
+        console.log(`응답:`, moveResponse.status, moveResponse.ok);
 
         if (!moveResponse.ok) {
           throw new Error(`카테고리 이동 실패: ${moveResponse.status}`);
         }
 
         const moveResult = await moveResponse.json();
-        console.log(`move-category-to-all 결과:`, moveResult);
+        console.log(`결과:`, moveResult);
 
         if (!moveResult.success) {
           throw new Error("카테고리 이동에 실패했습니다.");
