@@ -6,11 +6,9 @@ let logoFile: File | null = null;
 let iconFile: File | null = null;
 let logoBase64: string = "";
 let iconBase64: string = "";
-// 삭제 플래그 추가
 let logoDeleted: boolean = false;
 let iconDeleted: boolean = false;
 
-// 전역 변수로 삭제 대기 중인 카테고리 정보 저장
 let pendingDeleteCategories: Array<{
   name: string;
   item: string;
@@ -18,9 +16,7 @@ let pendingDeleteCategories: Array<{
 }> = [];
 
 export function initNormalSet() {
-  // 페이지 로드 시 매장 정보 가져오기
   loadStoreInfo();
-
   initSaveButtonHandler();
   initFileUploadHandlers();
   initCategoryHandlers();
@@ -69,7 +65,7 @@ function addCategory() {
   container.appendChild(newCategory);
 }
 
-// 카테고리 삭제 함수 (수정됨)
+// 카테고리 삭제 함수
 function deleteCategory(button: HTMLButtonElement) {
   const container = document.getElementById("category-container");
   if (!container) return;
@@ -91,7 +87,6 @@ function deleteCategory(button: HTMLButtonElement) {
   const categoryInput = categoryItem.querySelector("input") as HTMLInputElement;
   const categoryValue = categoryInput.value.trim();
 
-  // 삭제 전에 올바른 인덱스 찾기
   const allCategoryItems = Array.from(
     container.querySelectorAll(".category-item")
   );
@@ -100,17 +95,14 @@ function deleteCategory(button: HTMLButtonElement) {
   const itemValue =
     originalCategory?.item || categoryValue.toLowerCase().replace(/\s+/g, "_");
 
-  // 삭제 대기 목록에 추가
   pendingDeleteCategories.push({
     name: categoryValue,
-    item: itemValue, // ✅ 올바른 item 값
+    item: itemValue,
     element: categoryItem as Element,
   });
 
-  // 화면상으로는 즉시 삭제
   categoryItem.remove();
 
-  // 번호 재정렬
   const categories = container.querySelectorAll(".category-item");
   categories.forEach((item, index) => {
     const label = item.querySelector("p");
@@ -208,7 +200,7 @@ async function loadStoreInfo() {
         pointCheckbox.checked = !data.user.payType; // payType의 반대값
       }
 
-      // 카테고리 데이터 로드 및 표시
+      // 카테고리 데이터
       loadCategoryData(data.user.category || []);
 
       // 로고 이미지 표시
@@ -266,7 +258,7 @@ async function loadStoreInfo() {
   }
 }
 
-// 카테고리 데이터 로드 및 표시 함수
+// 카테고리 데이터
 function loadCategoryData(categories: any[]) {
   const container = document.getElementById("category-container");
   if (!container) return;
@@ -373,7 +365,6 @@ async function saveStoreInfo() {
           return { name: "전체메뉴", no: "0", item: "all" };
         }
         if (value) {
-          // 기존 카테고리에서 이름으로 item 값 찾기
           const originalCategory = originalUserData?.category?.find(
             (cat) => cat.name === value
           );
@@ -383,14 +374,14 @@ async function saveStoreInfo() {
           return {
             name: value,
             no: index.toString(),
-            item: itemValue, // ✅ 이름으로 정확한 item 값 찾기
+            item: itemValue,
           };
         }
         return null;
       })
       .filter((c) => c !== null);
 
-    // 카테고리 변경사항 체크 (삭제 대기 중인 카테고리 포함)
+    // 카테고리 변경사항 체크
     const originalCategories = originalUserData?.category || [];
     const hasPendingDeletes = pendingDeleteCategories.length > 0;
 
@@ -652,7 +643,7 @@ async function saveStoreInfo() {
   }
 }
 
-// 삭제 대기 중인 카테고리들 처리 함수 (새로 추가)
+// 삭제 대기 중인 카테고리들 처리 함수
 async function processPendingCategoryDeletes(userId: string) {
   for (const pendingCategory of pendingDeleteCategories) {
     try {
@@ -665,7 +656,7 @@ async function processPendingCategoryDeletes(userId: string) {
         categoryName: pendingCategory.name,
       });
 
-      // 1. 카테고리 사용 여부 확인
+      //카테고리 사용 여부 확인
       const checkResponse = await apiGet(
         `/model_user_setting?func=check-category-usage&userId=${userId}&category=${pendingCategory.item}`
       );
@@ -690,11 +681,11 @@ async function processPendingCategoryDeletes(userId: string) {
           `카테고리 ${pendingCategory.name} 사용 중 - 이동 처리 시작`
         );
 
-        // 2. 사용 중인 카테고리: 메뉴를 전체메뉴로 이동
+        //전체메뉴로 이동
         const moveResponse = await fetch(
-          `/model_user_setting?func=move-category-to-all`,
+          `https://api.narrowroad-model.com/model_user_setting?func=move-category-to-all`,
           {
-            method: "GET",
+            method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
