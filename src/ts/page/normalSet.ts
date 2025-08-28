@@ -365,9 +365,7 @@ async function saveStoreInfo() {
           return { name: "전체메뉴", no: "0", item: "all" };
         }
         if (value) {
-          const originalCategory = originalUserData?.category?.find(
-            (cat) => cat.name === value
-          );
+          const originalCategory = originalUserData?.category?.[index];
           const itemValue =
             originalCategory?.item || value.toLowerCase().replace(/\s+/g, "_");
 
