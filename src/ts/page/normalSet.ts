@@ -257,7 +257,7 @@ function loadCategoryData(categories: any[]) {
 
   // 전체메뉴 제외하고 렌더링
   const visibleCategories = (categories || []).filter(
-    (c: any) => c?.no !== "0" && c?.item !== "0"
+    (c: any) => c && c.no !== "0" && c.item !== "all" && c.item !== "0"
   );
 
   if (visibleCategories.length > 0) {
