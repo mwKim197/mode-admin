@@ -328,28 +328,31 @@ async function saveStoreInfo() {
     const categoryInputs = document.querySelectorAll(
       "#category-container .category-input-group input"
     );
-    const categories = Array.from(categoryInputs)
-      .map((input, index) => {
-        const value = (input as HTMLInputElement).value.trim();
-        if (index === 0) {
-          return { name: "전체메뉴", no: "0", item: "all" };
-        }
-        if (value) {
-          const originalCategory = originalUserData?.category?.find(
-            (cat) => cat.name === value
-          );
-          const itemValue =
-            originalCategory?.item || value.toLowerCase().replace(/\s+/g, "_");
 
-          return {
-            name: value,
-            no: index.toString(),
-            item: itemValue,
-          };
-        }
-        return null;
+    const visibleCategories = Array.from(categoryInputs)
+      .map((input, idx) => {
+        const value = (input as HTMLInputElement).value.trim();
+        if (!value) return null;
+
+        const originalCategory = originalUserData?.category?.find(
+          (cat) => cat.name === value
+        );
+
+        const no = (idx + 1).toString();
+        const item = originalCategory?.item || no;
+
+        return { name: value, no, item };
       })
-      .filter((c) => c !== null);
+      .filter((c) => c !== null) as Array<{
+      name: string;
+      no: string;
+      item: string;
+    }>;
+
+    const categories = [
+      { name: "전체메뉴", no: "0", item: "all" },
+      ...visibleCategories,
+    ];
 
     // 카테고리 변경사항 체크
     const originalCategories = originalUserData?.category || [];
