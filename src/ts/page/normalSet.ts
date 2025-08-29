@@ -43,12 +43,20 @@ function addCategory() {
   const container = document.getElementById("category-container");
   if (!container) return;
 
-  const categoryCount = container.querySelectorAll(".category-item").length + 1;
+  const currentCount = container.querySelectorAll(".category-item").length;
+  if (currentCount >= 9) {
+    window.showToast(
+      "카테고리는 최대 9개까지 추가할 수 있습니다.",
+      3000,
+      "warning"
+    );
+    return;
+  }
 
   const newCategory = document.createElement("div");
   newCategory.className = "data_input category-item";
   newCategory.innerHTML = `
-    <p>카테고리 ${categoryCount}</p>
+    <p>카테고리${currentCount + 1}</p>
     <div class="category-input-group">
       <input type="text"/>
       <button type="button" class="btn-i delete-category">-</button>
@@ -73,25 +81,13 @@ function deleteCategory(button: HTMLButtonElement) {
   const categoryItem = button.closest(".category-item");
   if (!categoryItem) return;
 
-  const firstItem = container.querySelector(".category-item");
-  if (categoryItem === firstItem) {
-    window.showToast(
-      "카테고리는 최소 1개 이상 입력해야 합니다.",
-      3000,
-      "warning"
-    );
-    return;
-  }
-
   // 삭제하려는 카테고리 정보 수집
   const categoryInput = categoryItem.querySelector("input") as HTMLInputElement;
   const categoryValue = categoryInput.value.trim();
 
-  const allCategoryItems = Array.from(
-    container.querySelectorAll(".category-item")
+  const originalCategory = originalUserData?.category?.find(
+    (c) => c.name === categoryValue
   );
-  const categoryIndex = allCategoryItems.indexOf(categoryItem);
-  const originalCategory = originalUserData?.category?.[categoryIndex];
   const itemValue =
     originalCategory?.item || categoryValue.toLowerCase().replace(/\s+/g, "_");
 
@@ -265,15 +261,21 @@ function loadCategoryData(categories: any[]) {
 
   container.innerHTML = "";
 
-  // 기존 데이터 렌더
-  if (categories && categories.length > 0) {
-    categories.forEach((category, index) => {
+  // 전체메뉴 제외하고 렌더링
+  const visibleCategories = (categories || []).filter(
+    (c: any) => c?.no !== "0" && c?.item !== "0"
+  );
+
+  if (visibleCategories.length > 0) {
+    visibleCategories.forEach((category) => {
+      const itemVal = String(category.item ?? "");
+
       const categoryItem = document.createElement("div");
       categoryItem.className = "data_input category-item";
       categoryItem.innerHTML = `
-        <p>카테고리 ${index + 1}</p>
+        <p>카테고리${itemVal}</p>
         <div class="category-input-group">
-          <input type="text" value="${category.name || ""}"  />
+          <input type="text" value="${category.name || ""}" />
           <button type="button" class="btn-i delete-category">-</button>
         </div>
       `;
@@ -288,7 +290,7 @@ function loadCategoryData(categories: any[]) {
       const categoryItem = document.createElement("div");
       categoryItem.className = "data_input category-item";
       categoryItem.innerHTML = `
-        <p>카테고리 ${i}</p>
+        <p>카테고리</p>
         <div class="category-input-group">
           <input type="text"/>
           <button type="button" class="btn-i delete-category">-</button>
@@ -299,15 +301,6 @@ function loadCategoryData(categories: any[]) {
       ) as HTMLButtonElement;
       if (del) del.addEventListener("click", () => deleteCategory(del));
       container.appendChild(categoryItem);
-    }
-  }
-
-  const firstItem = container.querySelector(".category-item");
-  if (firstItem) {
-    const firstInput = firstItem.querySelector("input") as HTMLInputElement;
-    if (firstInput) {
-      firstInput.value = "전체메뉴";
-      firstInput.disabled = true;
     }
   }
 }
