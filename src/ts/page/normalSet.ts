@@ -279,23 +279,6 @@ function loadCategoryData(categories: any[]) {
       if (del) del.addEventListener("click", () => deleteCategory(del));
       container.appendChild(categoryItem);
     });
-  } else {
-    for (let i = 1; i <= 5; i++) {
-      const categoryItem = document.createElement("div");
-      categoryItem.className = "data_input category-item";
-      categoryItem.innerHTML = `
-        <p>카테고리</p>
-        <div class="category-input-group">
-          <input type="text"/>
-          <button type="button" class="btn-i delete-category">-</button>
-        </div>
-      `;
-      const del = categoryItem.querySelector(
-        ".delete-category"
-      ) as HTMLButtonElement;
-      if (del) del.addEventListener("click", () => deleteCategory(del));
-      container.appendChild(categoryItem);
-    }
   }
 }
 
