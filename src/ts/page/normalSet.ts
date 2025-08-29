@@ -98,12 +98,6 @@ function deleteCategory(button: HTMLButtonElement) {
   });
 
   categoryItem.remove();
-
-  const categories = container.querySelectorAll(".category-item");
-  categories.forEach((item, index) => {
-    const label = item.querySelector("p");
-    if (label) label.textContent = `카테고리 ${index + 1}`;
-  });
 }
 
 // 저장 버튼 이벤트 핸들러
