@@ -6,16 +6,98 @@ let logoFile: File | null = null;
 let iconFile: File | null = null;
 let logoBase64: string = "";
 let iconBase64: string = "";
-// 삭제 플래그 추가
 let logoDeleted: boolean = false;
 let iconDeleted: boolean = false;
 
-export function initNormalSet() {
-  // 페이지 로드 시 매장 정보 가져오기
-  loadStoreInfo();
+let pendingDeleteCategories: Array<{
+  name: string;
+  item: string;
+  element: Element;
+}> = [];
 
+export function initNormalSet() {
+  loadStoreInfo();
   initSaveButtonHandler();
   initFileUploadHandlers();
+  initCategoryHandlers();
+}
+
+function initCategoryHandlers() {
+  // 삭제 버튼 이벤트 리스너 추가
+  const deleteButtons = document.querySelectorAll(".delete-category");
+  deleteButtons.forEach((button) => {
+    button.addEventListener("click", () =>
+      deleteCategory(button as HTMLButtonElement)
+    );
+  });
+
+  // 추가 버튼 이벤트 리스너 추가
+  const addButton = document.querySelector(".category-actions .btn-outline");
+  if (addButton) {
+    addButton.addEventListener("click", addCategory);
+  }
+}
+
+// 카테고리 추가 함수
+function addCategory() {
+  const container = document.getElementById("category-container");
+  if (!container) return;
+
+  const currentCount = container.querySelectorAll(".category-item").length;
+  if (currentCount >= 9) {
+    window.showToast(
+      "카테고리는 최대 9개까지 추가할 수 있습니다.",
+      3000,
+      "warning"
+    );
+    return;
+  }
+
+  const newCategory = document.createElement("div");
+  newCategory.className = "data_input category-item";
+  newCategory.innerHTML = `
+    <p>카테고리${currentCount + 1}</p>
+    <div class="category-input-group">
+      <input type="text"/>
+      <button type="button" class="btn-i delete-category">-</button>
+    </div>
+  `;
+
+  const deleteButton = newCategory.querySelector(".delete-category");
+  if (deleteButton) {
+    deleteButton.addEventListener("click", () =>
+      deleteCategory(deleteButton as HTMLButtonElement)
+    );
+  }
+
+  container.appendChild(newCategory);
+}
+
+// 카테고리 삭제 함수
+function deleteCategory(button: HTMLButtonElement) {
+  const container = document.getElementById("category-container");
+  if (!container) return;
+
+  const categoryItem = button.closest(".category-item");
+  if (!categoryItem) return;
+
+  // 삭제하려는 카테고리 정보 수집
+  const categoryInput = categoryItem.querySelector("input") as HTMLInputElement;
+  const categoryValue = categoryInput.value.trim();
+
+  const originalCategory = originalUserData?.category?.find(
+    (c) => c.name === categoryValue
+  );
+  const itemValue =
+    originalCategory?.item || categoryValue.toLowerCase().replace(/\s+/g, "_");
+
+  pendingDeleteCategories.push({
+    name: categoryValue,
+    item: itemValue,
+    element: categoryItem as Element,
+  });
+
+  categoryItem.remove();
 }
 
 // 저장 버튼 이벤트 핸들러
@@ -108,6 +190,9 @@ async function loadStoreInfo() {
         pointCheckbox.checked = !data.user.payType; // payType의 반대값
       }
 
+      // 카테고리 데이터
+      loadCategoryData(data.user.category || []);
+
       // 로고 이미지 표시
       if (data.user.logoUrl) {
         const logoPreview = document.getElementById(
@@ -163,7 +248,41 @@ async function loadStoreInfo() {
   }
 }
 
-// 매장 정보 저장 함수
+// 카테고리 데이터
+function loadCategoryData(categories: any[]) {
+  const container = document.getElementById("category-container");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  // 전체메뉴 제외하고 렌더링
+  const visibleCategories = (categories || []).filter(
+    (c: any) => c?.no !== "0" && c?.item !== "0"
+  );
+
+  if (visibleCategories.length > 0) {
+    visibleCategories.forEach((category) => {
+      const itemVal = String(category.item ?? "");
+
+      const categoryItem = document.createElement("div");
+      categoryItem.className = "data_input category-item";
+      categoryItem.innerHTML = `
+        <p>카테고리${itemVal}</p>
+        <div class="category-input-group">
+          <input type="text" value="${category.name || ""}" />
+          <button type="button" class="btn-i delete-category">-</button>
+        </div>
+      `;
+      const del = categoryItem.querySelector(
+        ".delete-category"
+      ) as HTMLButtonElement;
+      if (del) del.addEventListener("click", () => deleteCategory(del));
+      container.appendChild(categoryItem);
+    });
+  }
+}
+
+// 매장 정보 저장 함수 (수정됨)
 async function saveStoreInfo() {
   try {
     const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
@@ -183,7 +302,7 @@ async function saveStoreInfo() {
     const telInput = document.querySelector("#tel-input") as HTMLInputElement;
     const businessNoInput = document.getElementById(
       "businessNo"
-    ) as HTMLInputElement; // 추가
+    ) as HTMLInputElement;
     const remoteAddressInput = document.querySelector(
       "#remote-address"
     ) as HTMLInputElement;
@@ -196,14 +315,61 @@ async function saveStoreInfo() {
     const washTimeInput = document.querySelector(
       "#wash-time-input"
     ) as HTMLInputElement;
-    // 포인트 사용 체크박스 선택자 수정
     const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
     const pointCheckbox = allCheckboxes[0] as HTMLInputElement;
 
     // 수정된 필드만 추가
     let hasChanges = false;
     let hasPasswordChange = false;
-    let hasFileChanges = false; // 파일 변경 체크 추가
+    let hasFileChanges = false;
+    let hasCategoryChanges = false;
+
+    // 카테고리 데이터 수집 및 변경사항 체크
+    const categoryInputs = document.querySelectorAll(
+      "#category-container .category-input-group input"
+    );
+
+    const visibleCategories = Array.from(categoryInputs)
+      .map((input, idx) => {
+        const value = (input as HTMLInputElement).value.trim();
+        if (!value) return null;
+
+        const originalCategory = originalUserData?.category?.find(
+          (cat) => cat.name === value
+        );
+
+        const no = (idx + 1).toString();
+        const item = originalCategory?.item || no;
+
+        return { name: value, no, item };
+      })
+      .filter((c) => c !== null) as Array<{
+      name: string;
+      no: string;
+      item: string;
+    }>;
+
+    const categories = [
+      { name: "전체메뉴", no: "0", item: "all" },
+      ...visibleCategories,
+    ];
+
+    // 카테고리 변경사항 체크
+    const originalCategories = originalUserData?.category || [];
+    const hasPendingDeletes = pendingDeleteCategories.length > 0;
+
+    if (categories.length !== originalCategories.length || hasPendingDeletes) {
+      hasCategoryChanges = true;
+    } else {
+      for (let i = 0; i < categories.length; i++) {
+        const current = categories[i];
+        const original = originalCategories[i];
+        if (!original || current?.name !== original.name) {
+          hasCategoryChanges = true;
+          break;
+        }
+      }
+    }
 
     // 매장명이 수정되었는지 확인
     if (
@@ -218,7 +384,7 @@ async function saveStoreInfo() {
       hasChanges = true;
     }
 
-    // 사업자등록번호가 수정되었는지 확인 (추가)
+    // 사업자등록번호가 수정되었는지 확인
     if (
       businessNoInput &&
       businessNoInput.value !== originalUserData?.businessNo
@@ -226,7 +392,7 @@ async function saveStoreInfo() {
       hasChanges = true;
     }
 
-    // 원격 주소가 수정되었는지 확인 (실제로 변경된 경우만)
+    // 원격 주소가 수정되었는지 확인
     if (
       remoteAddressInput &&
       remoteAddressInput.value !== originalUserData?.remoteAddress
@@ -243,13 +409,12 @@ async function saveStoreInfo() {
       hasChanges = true;
     }
 
-    // 비밀번호가 수정되었는지 확인 (******가 아닌 경우만)
+    // 비밀번호가 수정되었는지 확인
     if (
       passwordInput &&
       passwordInput.value !== "" &&
       passwordInput.value !== "******"
     ) {
-      // 비밀번호 유효성 검사
       if (passwordInput.value.length < 6) {
         window.showToast(
           "비밀번호는 6자리 이상이어야 합니다.",
@@ -273,19 +438,29 @@ async function saveStoreInfo() {
       hasChanges = true;
     }
 
-    // 파일 변경사항 체크 (새 파일 업로드 또는 삭제)
+    // 파일 변경사항 체크
     if (logoFile || iconFile || logoDeleted || iconDeleted) {
       hasFileChanges = true;
     }
 
     // 수정할 내용이 없으면 저장하지 않음
-    if (!hasChanges && !hasPasswordChange && !hasFileChanges) {
+    if (
+      !hasChanges &&
+      !hasPasswordChange &&
+      !hasFileChanges &&
+      !hasCategoryChanges
+    ) {
       window.showToast("변경사항이 없습니다.", 3000, "warning");
       return;
     }
 
     // 일반 정보 업데이트 (비밀번호 제외)
-    if (hasChanges || hasFileChanges) {
+    if (hasChanges || hasFileChanges || hasCategoryChanges) {
+      // 삭제 대기 중인 카테고리들 처리
+      if (hasPendingDeletes) {
+        await processPendingCategoryDeletes(currentUserId);
+      }
+
       const updateData: any = {
         userId: currentUserId,
         adminId: currentUserId,
@@ -304,7 +479,7 @@ async function saveStoreInfo() {
         updateData.tel = telInput.value;
       }
 
-      // 사업자등록번호 추가 (변경된 경우만) - 추가
+      // 사업자등록번호 추가 (변경된 경우만)
       if (
         businessNoInput &&
         businessNoInput.value !== originalUserData?.businessNo
@@ -342,12 +517,16 @@ async function saveStoreInfo() {
         updateData.limitCount = parseInt(currentLimitCount);
       }
 
+      // 카테고리 데이터 추가 (변경된 경우만)
+      if (hasCategoryChanges && categories.length > 0) {
+        updateData.category = categories;
+      }
+
       // 파일 업로드 데이터 추가
       if (logoFile) {
         updateData.logoFileName = logoFile.name;
         updateData.logoBase64 = logoBase64;
       } else if (logoDeleted) {
-        // 로고 삭제 시 모든 로고 관련 필드를 빈 값으로 전송
         updateData.logoFileName = "";
         updateData.logoBase64 = "";
         updateData.logoUrl = "";
@@ -357,7 +536,6 @@ async function saveStoreInfo() {
         updateData.iconFileName = iconFile.name;
         updateData.iconBase64 = iconBase64;
       } else if (iconDeleted) {
-        // 아이콘 삭제 시 모든 아이콘 관련 필드를 빈 값으로 전송
         updateData.iconFileName = "";
         updateData.iconBase64 = "";
         updateData.iconUrl = "";
@@ -393,6 +571,9 @@ async function saveStoreInfo() {
 
     window.showToast("변경사항이 저장되었습니다.", 3000, "success");
 
+    // 저장 성공 시 삭제 대기 목록 초기화
+    pendingDeleteCategories = [];
+
     // 저장 성공 시 비밀번호 필드를 ******로 초기화
     if (passwordInput) {
       passwordInput.value = "******";
@@ -420,9 +601,109 @@ async function saveStoreInfo() {
         originalUserData.iconUrl = "";
         originalUserData.iconBase64 = "";
       }
+      if (hasCategoryChanges) {
+        // item 속성을 추가하여 타입 맞춤
+        originalUserData.category = categories.map((cat, index) => ({
+          ...cat,
+          item:
+            originalUserData?.category?.[index]?.item ||
+            cat.name.toLowerCase().replace(/\s+/g, "_"),
+        }));
+      }
     }
   } catch (error) {
     window.showToast("저장 중 오류가 발생했습니다.", 3000, "error");
+  }
+}
+
+// 삭제 대기 중인 카테고리들 처리 함수
+async function processPendingCategoryDeletes(userId: string) {
+  for (const pendingCategory of pendingDeleteCategories) {
+    try {
+      console.log(`카테고리 ${pendingCategory.name} 처리 시작`);
+
+      // 전송할 데이터 확인
+      console.log(`전송할 데이터:`, {
+        userId: userId,
+        category: pendingCategory.item,
+        categoryName: pendingCategory.name,
+      });
+
+      //카테고리 사용 여부 확인
+      const checkResponse = await apiGet(
+        `/model_user_setting?func=check-category-usage&userId=${userId}&category=${pendingCategory.item}`
+      );
+
+      console.log(`응답:`, checkResponse.status, checkResponse.ok);
+
+      if (!checkResponse.ok) {
+        throw new Error(
+          `카테고리 사용 여부 확인 실패: ${checkResponse.status}`
+        );
+      }
+
+      const checkResult = await checkResponse.json();
+      console.log(`결과:`, checkResult);
+
+      if (checkResult.hasAny) {
+        console.log(`카테고리 ${pendingCategory.name} 사용 중`);
+
+        //전체메뉴로 이동
+        const moveResponse = await fetch(
+          `https://api.narrowroad-model.com/model_user_setting?func=move-category-to-all`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: userId,
+              category: pendingCategory.item,
+            }),
+          }
+        );
+
+        console.log(`응답:`, moveResponse.status, moveResponse.ok);
+
+        if (!moveResponse.ok) {
+          throw new Error(`카테고리 이동 실패: ${moveResponse.status}`);
+        }
+
+        const moveResult = await moveResponse.json();
+        console.log(`결과:`, moveResult);
+
+        if (!moveResult.success) {
+          throw new Error("카테고리 이동에 실패했습니다.");
+        }
+      } else {
+        console.log(
+          `카테고리 ${pendingCategory.name} 사용되지 않음 - 바로 삭제`
+        );
+      }
+
+      console.log(`카테고리 ${pendingCategory.name} 처리 완료`);
+    } catch (error) {
+      console.error(`카테고리 ${pendingCategory.name} 처리 중 오류:`, error);
+
+      // 오류 발생 시 화면 복원
+      const container = document.getElementById("category-container");
+      if (container) {
+        container.appendChild(pendingCategory.element);
+
+        // 번호 재정렬
+        const categories = container.querySelectorAll(".category-item");
+        categories.forEach((item, index) => {
+          const label = item.querySelector("p");
+          if (label) label.textContent = `카테고리 ${index + 1}`;
+        });
+      }
+
+      window.showToast(
+        `카테고리 ${pendingCategory.name} 삭제 중 오류가 발생했습니다.`,
+        3000,
+        "error"
+      );
+    }
   }
 }
 
