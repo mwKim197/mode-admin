@@ -47,7 +47,7 @@ export async function initProductDetail() {
   if (saveBtn) {
     saveBtn.addEventListener("click", async () => {
       const updatedPayload = collectMenuDetail(user.userId);
-
+      console.log(updatedPayload);
       const validateChk = validateMenuDetail(updatedPayload);
 
       if (validateChk) {

@@ -28,9 +28,7 @@ export function validateMenuDetail(detail: MenuDetail): string | null {
     return "📛 물 시간은 0부터 10까지의 소수 첫째 자리까지 입력해주세요.";
   }
 
-  if (detail.cupYn === "no" && detail.items.length === 0) return "📛 음료상품은 항목을 추가해야합니다.";
-
-  if (detail.cupYn === "no") {
+  if (detail.cupYn === "no" && detail.items.length > 0) {
     for (let i = 0; i < detail.items.length; i++) {
       const item = detail.items[i];
       if (!item.type) return `📛 ${i + 1}번째 재료의 타입을 선택해주세요.`;
