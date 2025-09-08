@@ -150,10 +150,10 @@ export async function initProductAdd() {
         iceWaterTimeBox.style.display = shouldHide ? "none" : "block";
       }
 
-      const barcodeBox = document.getElementById("barcode-box") as HTMLElement;
+      /*const barcodeBox = document.getElementById("barcode-box") as HTMLElement;
       if (barcodeBox) {
         barcodeBox.style.display = shouldHide ? "block" : "none";
-      }
+      }*/
     }
 
     // 라디오 버튼 변경 시 이벤트 리스너

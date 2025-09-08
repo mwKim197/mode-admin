@@ -321,6 +321,7 @@ export async function initProductDetail() {
             iceYn,
             iceTime,
             waterTime,
+            barcode: "",
             image,
             state,
             items,
@@ -328,70 +329,3 @@ export async function initProductDetail() {
     }
 }
 
-// 바코드 스캔 기능 함수 수정
-function initBarcodeScanner() {
-  const barcodeInput = document.getElementById(
-    "barcode-input"
-  ) as HTMLInputElement;
-  const barcodeScanBtn = document.getElementById(
-    "barcode-scan-btn"
-  ) as HTMLButtonElement;
-
-  if (!barcodeInput || !barcodeScanBtn) {
-    console.log("바코드 요소를 찾을 수 없습니다");
-    return;
-  }
-
-  // 바코드 스캔 버튼 클릭 시 API 호출
-  barcodeScanBtn.addEventListener("click", async () => {
-    try {
-      const user = getStoredUser();
-      if (!user) {
-        window.showToast("사용자 정보가 없습니다.", 3000, "error");
-        return;
-      }
-
-      const firstResponse = await apiPost("/model_machine_controll", {
-        userId: user.userId,
-        func: "barcode",
-      });
-
-      if (firstResponse.ok) {
-        window.showToast("바코드를 스캔해주세요", 2000);
-
-        const checkBarcode = setInterval(async () => {
-          const secondResponse = await fetchWithoutLoading(
-            "/model_barcode_scan?func=barcode-claim-latest",
-            {
-              method: "POST",
-              body: JSON.stringify({
-                userId: user.userId,
-              }),
-            }
-          );
-
-          if (secondResponse.ok) {
-            const barcodeData = await secondResponse.json();
-
-            if (barcodeData.found && barcodeData.code) {
-              clearInterval(checkBarcode);
-
-              const barcodeInput = document.getElementById(
-                "barcode-input"
-              ) as HTMLInputElement;
-              if (barcodeInput) {
-                barcodeInput.value = barcodeData.code;
-                barcodeInput.setAttribute("data-field", "barcode");
-              }
-            }
-          }
-        }, 1000);
-      } else {
-        window.showToast("바코드 스캔 시작에 실패했습니다.", 3000, "error");
-      }
-    } catch (error) {
-      console.error("바코드 스캔 API 오류:", error);
-      window.showToast("바코드 스캔 중 오류가 발생했습니다.", 3000, "error");
-    }
-  });
-}
