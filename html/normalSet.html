@@ -74,14 +74,14 @@
             <div class="data_input">
               <p>포인트 사용</p>
               <label class="toggle-switch">
-                <input type="checkbox" />
+                <input type="checkbox" id="point-check" />
                 <span class="slider"></span>
               </label>
             </div>
             <div class="data_input">
               <p>한번에 결제 가능한 최대 잔 수</p>
               <span class="in-box">
-                <input type="text" />
+                <input type="text" id="limit-count"/>
                 <p>잔</p>
               </span>
             </div>
@@ -95,7 +95,7 @@
             <div class="data_input">
               <p>vcat 사용</p>
               <label class="toggle-switch">
-                <input type="checkbox" />
+                <input type="checkbox" id="vcat-check" />
                 <span class="slider"></span>
               </label>
             </div>
@@ -220,7 +220,7 @@
           <!-- 재고설정 -->
 
          <hr class="borderSt-dot">
-         <div class="productSet">
+         <div class="productSet" style="display: none">
           <h2 class="mb20">재고 설정</h2>
 
           <!-- 컵 -->

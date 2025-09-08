@@ -15,6 +15,7 @@ export interface ModelUser {
   iconUrl?: string; // S3 URL
   url?: string;
   payType?: boolean;
+  vcat?: boolean;
   category?: Array<{
     name: string;
     no: string;

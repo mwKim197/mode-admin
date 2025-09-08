@@ -181,13 +181,20 @@ async function loadStoreInfo() {
       if (remoteAddressInput) {
         remoteAddressInput.value = data.user.remoteAddress || "";
       }
-
+      
       // 포인트 사용 체크박스 설정
-      // payType이 false면 체크박스 켜짐 (true), payType이 true면 체크박스 꺼짐 (false)
-      const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-      const pointCheckbox = allCheckboxes[0] as HTMLInputElement;
+      const pointCheckbox = document.getElementById(
+          "point-check"
+      ) as HTMLInputElement;
       if (pointCheckbox) {
         pointCheckbox.checked = !data.user.payType; // payType의 반대값
+      }
+
+      const vcatCheckbox = document.getElementById(
+          "vcat-check"
+      ) as HTMLInputElement;
+      if (vcatCheckbox) {
+        vcatCheckbox.checked = data.user.vcat; // vcat의 반대값
       }
 
       // 카테고리 데이터
@@ -309,14 +316,18 @@ async function saveStoreInfo() {
     const passwordInput = document.querySelector(
       'input[type="password"]'
     ) as HTMLInputElement;
-    const limitCountInput = document.querySelector(
-      '.in-box input[type="text"]'
+    const limitCountInput = document.getElementById(
+      "limit-count"
     ) as HTMLInputElement;
-    const washTimeInput = document.querySelector(
-      "#wash-time-input"
+    const washTimeInput = document.getElementById(
+      "wash-time-input"
     ) as HTMLInputElement;
-    const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-    const pointCheckbox = allCheckboxes[0] as HTMLInputElement;
+    const pointCheckbox = document.getElementById(
+        "point-check"
+    ) as HTMLInputElement;
+    const vcatCheckbox = document.getElementById(
+        "vcat-check"
+    ) as HTMLInputElement;
 
     // 수정된 필드만 추가
     let hasChanges = false;
@@ -406,6 +417,10 @@ async function saveStoreInfo() {
     }
 
     if (pointCheckbox && pointCheckbox.checked !== !originalUserData?.payType) {
+      hasChanges = true;
+    }
+
+    if (vcatCheckbox && vcatCheckbox.checked !== originalUserData?.vcat) {
       hasChanges = true;
     }
 
@@ -506,6 +521,14 @@ async function saveStoreInfo() {
         pointCheckbox.checked !== !originalUserData?.payType
       ) {
         updateData.payType = !pointCheckbox.checked;
+      }
+
+      // vcat 사용 추가 (변경된 경우만)
+      if (
+          vcatCheckbox &&
+          vcatCheckbox.checked !== originalUserData?.vcat
+      ) {
+        updateData.vcat = vcatCheckbox.checked;
       }
 
       // 한번에 결제 가능한 최대 잔 수 추가 (변경된 경우만)
