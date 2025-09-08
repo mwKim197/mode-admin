@@ -150,17 +150,17 @@ export function initProduct() {
     if (!tbody) return;
 
     tbody.innerHTML = items
-      .map((item) => {
+      .map((item, index) => {
         const imageFile = item.image?.split("\\").pop() ?? "";
         const encodedFile = encodeURIComponent(imageFile);
         const imageUrl = `https://model-narrow-road.s3.ap-northeast-2.amazonaws.com/model/${item.userId}/${encodedFile}`;
 
         return `
       <tr>
-        <td >${item.no}</td>
+        <td >${index + 1}</td>
         <td style="text-align: center;"><img src="${imageUrl}" alt="상품 이미지" style="width:36px;height:46px; object-fit:cover;display: inline-block;"></td>
         <td class="product-name" onclick="
-  sessionStorage.setItem('clickedProductNo', '${item.no}');
+  sessionStorage.setItem('clickedProductNo', '${index + 1}');
   window.location.href='./product-detail.html?menuId=${item.menuId}'
 ">
           ${item.name}

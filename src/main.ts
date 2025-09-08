@@ -7,6 +7,7 @@ import { getStoredUser } from "./ts/utils/userStorage.ts";
 import { sendMachineCommand } from "./ts/page/deviceManage.ts";
 import Choices from "choices.js";
 import "choices.js/public/assets/styles/choices.min.css";
+import { initMenuMerge } from "./ts/page/menuMerge.ts";
 
 // 글로벌 등록
 declare global {
@@ -144,14 +145,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     bindGlobalDeviceEvents();
   }
 
-  const adminUserInfo = await getUserData();
+  const userInfo = await getUserData();
 
-  if (adminUserInfo) {
+  if (userInfo) {
     const userNameEl = document.getElementById("user-name");
     const userGradeEl = document.getElementById("user-grade");
 
     if (userNameEl) {
-      userNameEl.textContent = `${adminUserInfo.adminId} 님`;
+      userNameEl.textContent = `${userInfo.adminId} 님`;
     }
 
     if (userGradeEl) {
@@ -161,13 +162,13 @@ document.addEventListener("DOMContentLoaded", async () => {
           2: "운영관리자",
           3: "프랜차이즈",
           4: "일반회원",
-        }[adminUserInfo.grade] || "일반회원";
+        }[userInfo.grade] || "일반회원";
 
       userGradeEl.innerHTML = `<span>${gradeText}</span>`;
       userGradeEl.classList.remove("manager", "franchise", "store"); // 필요 시
-      if (adminUserInfo.grade === 1) userGradeEl.classList.add("manager");
-      if (adminUserInfo.grade === 3) userGradeEl.classList.add("franchise");
-      if (adminUserInfo.grade === 4) userGradeEl.classList.add("store");
+      if (userInfo.grade === 1) userGradeEl.classList.add("manager");
+      if (userInfo.grade === 3) userGradeEl.classList.add("franchise");
+      if (userInfo.grade === 4) userGradeEl.classList.add("store");
     }
   }
 
@@ -187,39 +188,139 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // 포인트메뉴
-  if (!user?.payType) {
-    const menuList = document.querySelector(".sidemenu .menu");
-    const pointMene = [{ href: "/html/point.html", label: "포인트" }];
-    pointMene.forEach((item) => {
+  // ----- Types -----
+  type Grade = number | string;
+
+  interface UserInfo {
+    grade?: Grade;
+    [key: string]: unknown;
+  }
+
+  interface MenuItem {
+    href: string;
+    label: string;
+    target?: '_blank' | '_self' | '_parent' | '_top';
+    rel?: string;
+  }
+
+// userInfo 예: { grade: 3, ... }, grade <= 2면 관리자
+  const isAdmin = (info?: UserInfo | null): boolean => {
+    if (!info || info.grade == null) return false;
+    const n = typeof info.grade === 'string' ? Number(info.grade) : info.grade;
+    return Number.isFinite(n as number) && (n as number) <= 2;
+  };
+
+// 1) 공통(일반) 메뉴
+  const generalMenus: MenuItem[] = [
+    { href: "/html/home.html", label: "Home" },
+    { href: "/html/noticeList.html", label: "공지사항" },
+    { href: "/html/product.html", label: "상품" },
+    { href: "/html/sales.html", label: "매출" },
+    { href: "/html/deviceManage.html", label: "기기관리" },
+    { href: "http://modelzero.shop/", label: "쇼핑몰", target: "_blank", rel: "noopener noreferrer" },
+    { href: "http://pf.kakao.com/_mIxiYG/chat", label: "A/S접수", target: "_blank", rel: "noopener noreferrer" },
+    { href: "/html/normalSet.html", label: "일반설정" },
+    /*{ href: "/html/couponList.html", label: "쿠폰" },*/
+    { href: "/html/log.html", label: "로그아웃" },
+  ];
+
+// 2) 관리자 전용 메뉴
+  const adminMenus: MenuItem[] = [
+    { href: "/html/home.html", label: "Home" },
+    { href: "/html/noticeList.html", label: "공지사항" },
+    { href: "/html/user-register.html", label: "매장계정생성" },
+    { href: "/html/menuMerge.html", label: "레시피복사" },
+    { href: "/html/notice.html?type=admin",   label: "관리자 공지사항" },
+    { href: "/html/notice.html?type=notice",  label: "홈페이지 공지사항" },
+    { href: "/html/notice.html?type=store",   label: "설치매장" },
+    { href: "/html/notice.html?type=news",    label: "언론보도" },
+    { href: "/html/notice.html?type=machine", label: "머신사용설명" },
+    { href: "/html/empowerment.html",         label: "권한 관리" },
+    { href: "/html/log.html", label: "로그아웃" },
+  ];
+
+  // ✅ 포인트 메뉴 정의
+  const pointMenu: MenuItem = { href: "/html/point.html", label: "포인트" };
+
+// 3) 메뉴 렌더 함수
+  function renderMenu(containerSelector: string, items: MenuItem[]): void {
+    const menuList = document.querySelector<HTMLUListElement>(containerSelector);
+    if (!menuList) return;
+
+    menuList.replaceChildren(); // 기존 항목 비우기
+
+    items.forEach((item) => {
       const li = document.createElement("li");
-      li.innerHTML = `<a href="${item.href}"><p>${item.label}</p></a>`;
-      menuList?.appendChild(li);
+      const a  = document.createElement("a");
+      const p  = document.createElement("p");
+
+      a.href = item.href;
+      if (item.target) a.target = item.target;
+      if (item.rel)    a.rel    = item.rel;
+
+      p.textContent = item.label;
+      a.appendChild(p);
+      li.appendChild(a);
+      menuList.appendChild(li);
     });
   }
 
-  // 로그아웃
-  const menuList = document.querySelector(".sidemenu .menu");
-  const logoutLi = document.createElement("li");
-  logoutLi.innerHTML = `<a href="/html/log.html"><p>로그아웃</p></a>`;
-  menuList?.appendChild(logoutLi);
+  // 🔧 유틸: 특정 항목 존재 여부 + 원하는 위치에 삽입
+  function upsertMenuItem(
+      items: MenuItem[],
+      item: MenuItem,
+      opts: { insertAfterHref?: string; insertAfterLabel?: string } = {}
+  ): MenuItem[] {
+    const exists = items.some(
+        (it) => it.href === item.href || it.label === item.label
+    );
+    if (exists) return items;
 
-  if (adminUserInfo && adminUserInfo.grade <= 2) {
-    const menuList = document.querySelector(".sidemenu .menu");
+    let insertIndex = items.length;
+    if (opts.insertAfterHref) {
+      const i = items.findIndex((it) => it.href === opts.insertAfterHref);
+      if (i >= 0) insertIndex = i + 1;
+    } else if (opts.insertAfterLabel) {
+      const i = items.findIndex((it) => it.label === opts.insertAfterLabel);
+      if (i >= 0) insertIndex = i + 1;
+    }
 
-    const adminMenus = [
-      { href: "/html/notice.html?type=admin", label: "관리자 공지사항" },
-      { href: "/html/notice.html?type=notice", label: "홈페이지 공지사항" },
-      { href: "/html/notice.html?type=store", label: "설치매장" },
-      { href: "/html/notice.html?type=news", label: "언론보도" },
-      { href: "/html/notice.html?type=machine", label: "머신사용설명" },
-      { href: "/html/empowerment.html", label: "권한 관리" },
-    ];
+    const next = items.slice();
+    next.splice(insertIndex, 0, item);
+    return next;
+  }
 
-    adminMenus.forEach((item) => {
-      const li = document.createElement("li");
-      li.innerHTML = `<a href="${item.href}"><p>${item.label}</p></a>`;
-      menuList?.appendChild(li);
+// 4) 사용자 등급에 따라 구성
+  (function initSideMenu(): void {
+    let menus: MenuItem[] = isAdmin(userInfo)
+        ? adminMenus  // 관리자: 일반 + 관리자 메뉴
+        : generalMenus;
+
+    if (!user?.payType) {
+      menus = upsertMenuItem(menus, pointMenu, { insertAfterLabel: "매출" });
+    }
+
+    renderMenu(".sidemenu .menu", menus);
+    highlightActiveMenu(".sidemenu .menu"); // (선택) 현재 페이지 활성화 표시
+  })();
+
+// (선택) 현재 경로와 링크가 같으면 active 클래스 추가
+  function highlightActiveMenu(containerSelector: string): void {
+    const container = document.querySelector<HTMLUListElement>(containerSelector);
+    if (!container) return;
+
+    const here = location.pathname + location.search;
+
+    container.querySelectorAll<HTMLAnchorElement>("a").forEach((a) => {
+      try {
+        const url = new URL(a.href, location.origin);
+        const isSame =
+            a.target !== "_blank" &&
+            (url.pathname + url.search === here);
+        if (isSame) a.classList.add("active");
+      } catch {
+        // malformed href 등 무시
+      }
     });
   }
 
@@ -309,6 +410,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.log("📌 공지사항상세 - noticeDetail.ts 로드");
     import("./ts/page/noticeDetail.ts").then((module) => {
       module.initNoticeDetail();
+    });
+  } else if (path === "/html/menuMerge.html") {
+    initMenuMerge();
+  } else if (path === "/html/user-register.html") {
+    console.log("📌 사용자 등록 - user-register.ts 로드");
+    import("./ts/page/user-register.ts").then((module) => {
+      module.initUserRegister();
     });
   } else {
     console.log("📌 기본 페이지");

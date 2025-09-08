@@ -2,6 +2,7 @@
 import { renderProductForm } from "../form/renderProductForm.ts";
 import { getStoredUser } from "../utils/userStorage.ts";
 import { apiPost } from "../api/apiHelpers.ts";
+import { fetchWithoutLoading } from "../api/api.ts";
 import { MenuDetail, MenuItemIngredient, MenuState } from "../types/product.ts";
 import { handleImageUpload } from "../utils/imageUploader.ts";
 import {
@@ -148,6 +149,11 @@ export async function initProductAdd() {
       if (iceWaterTimeBox) {
         iceWaterTimeBox.style.display = shouldHide ? "none" : "block";
       }
+
+      const barcodeBox = document.getElementById("barcode-box") as HTMLElement;
+      if (barcodeBox) {
+        barcodeBox.style.display = shouldHide ? "block" : "none";
+      }
     }
 
     // 라디오 버튼 변경 시 이벤트 리스너
@@ -157,6 +163,8 @@ export async function initProductAdd() {
 
     // 페이지 로드 시 초기 상태 설정
     toggleDrinkRelatedElements();
+
+    initBarcodeScanner();
   }
 }
 
@@ -182,6 +190,74 @@ async function setImage(e: any) {
     window.showToast("이미지 업로드 실패", 3000, "error");
     console.warn("이미지 업로드 실패:", err);
   }
+}
+
+// 바코드 스캔 기능 함수 추가
+function initBarcodeScanner() {
+  const barcodeInput = document.getElementById(
+    "barcode-input"
+  ) as HTMLInputElement;
+  const barcodeScanBtn = document.getElementById(
+    "barcode-scan-btn"
+  ) as HTMLButtonElement;
+
+  if (!barcodeInput || !barcodeScanBtn) {
+    console.log("바코드 요소를 찾을 수 없습니다");
+    return;
+  }
+
+  // 바코드 스캔 버튼 클릭 시 API 호출
+  barcodeScanBtn.addEventListener("click", async () => {
+    try {
+      const user = getStoredUser();
+      if (!user) {
+        window.showToast("사용자 정보가 없습니다.", 3000, "error");
+        return;
+      }
+
+      const firstResponse = await apiPost("/model_machine_controll", {
+        userId: user.userId,
+        func: "barcode",
+      });
+
+      if (firstResponse.ok) {
+        window.showToast("바코드를 스캔해주세요", 2000);
+
+        const checkBarcode = setInterval(async () => {
+          const secondResponse = await fetchWithoutLoading(
+            "/model_barcode_scan?func=barcode-claim-latest",
+            {
+              method: "POST",
+              body: JSON.stringify({
+                userId: user.userId,
+              }),
+            }
+          );
+
+          if (secondResponse.ok) {
+            const barcodeData = await secondResponse.json();
+
+            if (barcodeData.found && barcodeData.code) {
+              clearInterval(checkBarcode);
+
+              const barcodeInput = document.getElementById(
+                "barcode-input"
+              ) as HTMLInputElement;
+              if (barcodeInput) {
+                barcodeInput.value = barcodeData.code;
+                barcodeInput.setAttribute("data-field", "barcode");
+              }
+            }
+          }
+        }, 1000);
+      } else {
+        window.showToast("바코드 스캔 시작에 실패했습니다.", 3000, "error");
+      }
+    } catch (error) {
+      console.error("바코드 스캔 API 오류:", error);
+      window.showToast("바코드 스캔 중 오류가 발생했습니다.", 3000, "error");
+    }
+  });
 }
 
 // 📌 기존 collectMenuDetail 복사 사용
@@ -215,6 +291,10 @@ function collectMenuDetail(userId: string): MenuDetail {
   const waterTime = (
     document.getElementById("water-time") as HTMLInputElement
   ).value.trim();
+  const barcode =
+    (
+      document.getElementById("barcode-input") as HTMLInputElement
+    )?.value.trim() || "";
 
   const image = ""; // 이미지 경로는 별도 처리
 
@@ -270,6 +350,7 @@ function collectMenuDetail(userId: string): MenuDetail {
     iceYn,
     iceTime,
     waterTime,
+    barcode,
     image,
     state,
     items,

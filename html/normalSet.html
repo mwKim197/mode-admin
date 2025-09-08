@@ -74,14 +74,14 @@
             <div class="data_input">
               <p>포인트 사용</p>
               <label class="toggle-switch">
-                <input type="checkbox" />
+                <input type="checkbox" id="point-check" />
                 <span class="slider"></span>
               </label>
             </div>
             <div class="data_input">
               <p>한번에 결제 가능한 최대 잔 수</p>
               <span class="in-box">
-                <input type="text" />
+                <input type="text" id="limit-count"/>
                 <p>잔</p>
               </span>
             </div>
@@ -91,6 +91,13 @@
                 <input type="text" id="wash-time-input" />
                 <p>시</p>
               </span>
+            </div>
+            <div class="data_input">
+              <p>vcat 사용</p>
+              <label class="toggle-switch">
+                <input type="checkbox" id="vcat-check" />
+                <span class="slider"></span>
+              </label>
             </div>
             <!-- 개인컵은 추후개발 예정 -->
             <!-- <div class="data_input">
@@ -107,6 +114,16 @@
                 <p>원</p>
               </span>
             </div> -->
+          </div>
+
+          <!-- 카테고리설정 -->
+          <hr class="borderSt-dot" />
+          <div class="inputWrap St02">
+            <h3>카테고리설정</h3>
+            <div id="category-container"></div>
+            <div class="category-actions">
+              <button type="button" class="btn-outline">+ 카테고리 추가</button>
+            </div>
           </div>
 
           <!-- 기본정보 -->
@@ -201,12 +218,12 @@
           </div>
 
           <!-- 재고설정 -->
-          <!--[TODO] 2차 개발
+
          <hr class="borderSt-dot">
-         <div class="productSet">
+         <div class="productSet" style="display: none">
           <h2 class="mb20">재고 설정</h2>
 
-          &lt;!&ndash; 컵 &ndash;&gt;
+          <!-- 컵 -->
           <div class="proBox mb20">
             <h3 class="mb20">1. 컵설정</h3>
             <div class="flex js">
@@ -263,7 +280,7 @@
             </div>
           </div>
 
-          &lt;!&ndash; 원두 &ndash;&gt;
+          <!-- 원두 -->
           <div class="proBox mb20">
             <h3 class="mb20">2. 원두 설정</h3>
             <div class="grid col2">
@@ -333,7 +350,7 @@
             </div>
           </div>
 
-          &lt;!&ndash; 파우더 설정 &ndash;&gt;
+          <!-- 파우더 설정 -->
           <div class="proBox mb20">
             <h3 class="mb20">3. 파우더 설정</h3>
             <div class="grid col2">
@@ -535,7 +552,7 @@
             </div>
           </div>
 
-          &lt;!&ndash; 액상 &ndash;&gt;
+          <!-- 액상 -->
           <div class="proBox mb20">
             <h3 class="mb20">4. 액상 설정</h3>
             <div class="grid col2">
@@ -704,7 +721,7 @@
             </div>
           </div>
 
-         </div>-->
+         </div>
         </div>
       </section>
     </div>

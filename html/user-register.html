@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link href="/src/css/reset.css" rel="stylesheet" />
+    <link href="/src/css/common.css" rel="stylesheet" />
+    <link href="/src/css/style.css" rel="stylesheet" />
+    <link href="/src/css/user-register.css" rel="stylesheet" />
+    <script src="/src/main.ts" type="module"></script>
+  </head>
+
+  <body class="user-register-page">
+    <!-- 메인 -->
+    <div id="main-content">
+      <!-- 사용자 등록 -->
+      <section class="mt8">
+        <div class="inner">
+          <div class="user-flex">
+            <div class="user">
+              <i class="fa-regular fa-circle-user"></i>
+              <p id="user-name">관리자</p>
+              <label class="label manager" id="user-grade">
+                <span>총괄관리자</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="pb20">
+        <div class="inner">
+          <div class="title-flex" style="margin-bottom: 10px">
+            <h2 style="margin-bottom: 0">매장계정생성</h2>
+          </div>
+
+          <div class="form-container">
+            <div class="form-wrapper">
+              <form id="user-register-form" class="register-form">
+                <div class="form-group">
+                  <label for="userId" class="form-label">아이디</label>
+                  <input
+                    type="text"
+                    id="userId"
+                    required
+                    class="form-input"
+                    placeholder="아이디를 입력해주세요"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="password" class="form-label">비밀번호</label>
+                  <input
+                    type="password"
+                    id="password"
+                    required
+                    class="form-input"
+                    placeholder="비밀번호를 입력해주세요"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="confirmPassword" class="form-label"
+                    >비밀번호 확인</label
+                  >
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    required
+                    class="form-input"
+                    placeholder="비밀번호를 다시 입력해주세요"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="storeName" class="form-label">매장명</label>
+                  <input
+                    type="text"
+                    id="storeName"
+                    required
+                    class="form-input"
+                    placeholder="매장명을 입력해주세요"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="phoneNumber" class="form-label">전화번호</label>
+                  <input
+                    type="text"
+                    id="phoneNumber"
+                    required
+                    class="form-input"
+                    placeholder="전화번호를 입력해주세요"
+                  />
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn blue">생성하기</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
