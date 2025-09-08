@@ -12,11 +12,11 @@ export async function initMenuMerge() {
   console.log("✅ menuMerge.ts 로드됨");
 
   // 현재 사용자 정보 가져오기
-  const user = getStoredUser();
+/*  const user = getStoredUser();
   if (!user) {
     window.showToast("사용자 정보가 없습니다.", 3000, "error");
     return;
-  }
+  }*/
 
   // 계정 목록 로드
   await loadAccountList();

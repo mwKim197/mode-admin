@@ -1,3 +1,5 @@
+import {setStoredUser} from "../utils/userStorage.ts";
+
 const API_URL = "https://api.narrowroad-model.com"; // ✅ 전역 충돌 방지
 
 export function initLogin() {
@@ -169,7 +171,7 @@ async function handlePostLogin(data: any, autoLoginChecked: boolean = false) {
 
             if (res.ok) {
                 const { user } = await res.json();
-                localStorage.setItem("userInfo", JSON.stringify(user));
+                setStoredUser(user);
                 console.log("✅ 일반 사용자 정보 저장 완료");
             } else {
                 const errorBody = await res.text();
@@ -178,7 +180,6 @@ async function handlePostLogin(data: any, autoLoginChecked: boolean = false) {
                 return;
             }
         }
-
         // ✅ 홈으로 이동
         window.location.href = "/html/home.html";
     } catch (error) {
