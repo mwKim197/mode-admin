@@ -28,6 +28,8 @@ export async function initUserRegister() {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    window.showLoading();
+
     const userId = (document.getElementById("userId") as HTMLInputElement)
       .value;
     const password = (document.getElementById("password") as HTMLInputElement)
@@ -76,6 +78,8 @@ export async function initUserRegister() {
     } catch (error) {
       console.error("매장계정생성 오류:", error);
       window.showToast("등록 중 오류가 발생했습니다.", 3000, "error");
+    } finally {
+      window.hideLoading();
     }
   });
 }
