@@ -362,6 +362,7 @@ async function performRealTimeSearch(searchValue: string) {
 }
 
 // 검색 실행 (수정)
+/*
 function performSearch(searchValue: string) {
   console.log("검색 실행:", searchValue);
 
@@ -373,6 +374,7 @@ function performSearch(searchValue: string) {
     getCouponList(user.userId);
   }
 }
+*/
 
 // 전체 선택 체크박스 초기화
 function initSelectAllCheckbox() {
