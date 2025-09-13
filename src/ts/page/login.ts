@@ -159,7 +159,7 @@ async function handlePostLogin(data: any, autoLoginChecked: boolean = false) {
         const userInfo = await meRes.json();
 
         // 📦 일반 계정이면 userInfo 저장
-        if (userInfo.grade === 4 && userInfo.userId) {
+        if (userInfo.userId) {
             const res = await fetch(`${API_URL}/model_user_setting?func=get-user&userId=${userInfo.userId}`, {
                 method: "GET",
                 headers: {
@@ -172,7 +172,7 @@ async function handlePostLogin(data: any, autoLoginChecked: boolean = false) {
             if (res.ok) {
                 const { user } = await res.json();
                 setStoredUser(user);
-                console.log("✅ 일반 사용자 정보 저장 완료");
+                console.log("✅ 사용자 정보 저장 완료");
             } else {
                 const errorBody = await res.text();
                 console.error("❌ 사용자 정보 조회 실패:", res.status, errorBody);
