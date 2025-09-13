@@ -6,9 +6,10 @@ import {isValidDecimal1Strict, isValidIntegerStrict, parseValidDecimal1, parseVa
 export function validateMenuDetail(detail: MenuDetail): string | null {
   const menuNo = parseValidInteger(detail.no);
 
-  if (menuNo === null || menuNo < 1 || menuNo > 150) {
-    return "📛 순번은 1부터 150 사이의 정수로 입력해주세요.";
+  if (menuNo === null || menuNo < 1 || menuNo > 300) {
+    return "📛 순번은 1부터 300 사이의 정수로 입력해주세요.";
   }
+
   if (!detail.name?.trim()) return "📛 메뉴 이름을 입력해주세요.";
   if (!detail.category) return "📛 카테고리를 선택해주세요.";
   const price = detail.price;
