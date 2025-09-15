@@ -70,59 +70,80 @@ export function initLogin() {
 function handleKakaoLogin() {
     const KAKAO_CLIENT_ID = "240886095629b93f9655026145a39487";
     const KAKAO_REDIRECT_URI = "https://zeroadmin.kr/html/kakao-callback.html";
-    const kakaoAuthURL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KAKAO_CLIENT_ID}&redirect_uri=${KAKAO_REDIRECT_URI}`;
+    // 1) state 생성(보안/상관관계용) + 저장
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    const state = Array.from(bytes).map(b => b.toString(16).padStart(2, "0")).join("");
+    sessionStorage.setItem("kakao_state", state);
 
-    // 📱 모바일 환경 체크
+    // 2) 인가 URL (redirect_uri/state는 반드시 인코딩)
+    const kakaoAuthURL =
+        `https://kauth.kakao.com/oauth/authorize` +
+        `?response_type=code` +
+        `&client_id=${encodeURIComponent(KAKAO_CLIENT_ID)}` +
+        `&redirect_uri=${encodeURIComponent(KAKAO_REDIRECT_URI)}` +
+        `&state=${encodeURIComponent(state)}`;
+
+    // 환경 체크
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
-    const autoLoginChecked = (document.getElementById("agree") as HTMLInputElement).checked;
+    const agreeEl = document.getElementById("agree") as HTMLInputElement | null;
+    const autoLoginChecked = !!agreeEl?.checked;
+
+    // 3) 콜백 메시지 핸들러 (origin + type + state 검증)
+    const onMessage = async (event: MessageEvent) => {
+        if (event.origin !== window.location.origin) return;
+        const data = event.data || {};
+        if (data.type !== "kakao-auth") return;
+
+        const expectedState = sessionStorage.getItem("kakao_state");
+        if (!expectedState || data.state !== expectedState) {
+            console.warn("Invalid state", { got: data.state, expected: expectedState });
+            alert("로그인 보안 검증에 실패했습니다. 다시 시도해주세요.");
+            return;
+        }
+
+        const { code, error } = data;
+        if (error || !code) {
+            console.error("❌ Kakao OAuth error or code missing:", error);
+            alert("카카오 로그인 실패. 다시 시도하세요.");
+            return;
+        }
+
+        try {
+            const resp = await fetch(`${API_URL}/model_admin_login?func=kakao-login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code, state: expectedState }), // 서버로 state도 전달(선택)
+            });
+            const body = await resp.json();
+
+            if (resp.ok && body.accessToken) {
+                await handlePostLogin(body, autoLoginChecked);
+            } else if (resp.ok && body.redirectUrl) {
+                window.location.href = body.redirectUrl;
+            } else {
+                console.error("❌ 카카오 로그인 실패 응답:", body);
+                alert("카카오 로그인 실패. 다시 시도하세요.");
+            }
+        } catch (e) {
+            console.error("❌ 카카오 로그인 요청 오류:", e);
+            alert("서버 오류가 발생했습니다. 다시 시도하세요.");
+        }
+    };
 
     if (isMobile) {
-        console.log("📱 모바일 환경 → 리디렉트 방식");
+        // 모바일: 전체 리디렉트 플로우
         window.location.href = kakaoAuthURL;
-    } else {
-        console.log("💻 PC 환경 → 팝업 로그인 사용");
-        const loginPopup = window.open(kakaoAuthURL, "kakaoLogin", "width=500,height=700");
+        return;
+    }
 
-        const onMessage = async (event: MessageEvent) => {
-            if (event.origin !== "https://zeroadmin.kr") return;
-            const { code } = event.data;
-            if (!code) {
-                console.error("❌ 카카오 로그인 코드 없음");
-                alert("카카오 로그인 실패. 다시 시도하세요.");
-                return;
-            }
+    // 4) PC: 팝업 플로우 (리스너 먼저 등록)
+    window.addEventListener("message", onMessage, { once: true });
 
-            window.removeEventListener("message", onMessage); // ✅ 중복 방지
-            loginPopup?.close();
-
-            console.log("✅ 카카오 code 수신:", code);
-
-            try {
-                const response = await fetch(`${API_URL}/model_admin_login?func=kakao-login`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ code }),
-                });
-
-                const body = await response.json();
-
-                if (response.ok && body.accessToken) {
-                    console.log("✅ 기존 사용자 로그인 성공");
-                    await handlePostLogin(body, autoLoginChecked);
-                } else if (response.ok && body.redirectUrl) {
-                    console.log("🆕 신규 사용자 → 연동 페이지 이동");
-                    window.location.href = body.redirectUrl;
-                } else {
-                    console.error("❌ 카카오 로그인 실패 응답:", body);
-                    alert("카카오 로그인 실패. 다시 시도하세요.");
-                }
-            } catch (error) {
-                console.error("❌ 카카오 로그인 요청 오류:", error);
-                alert("서버 오류가 발생했습니다. 다시 시도하세요.");
-            }
-        };
-
-        window.addEventListener("message", onMessage, { once: true });
+    const loginPopup = window.open(kakaoAuthURL, "kakaoLogin", "width=500,height=700");
+    if (!loginPopup) {
+        // 팝업 차단 시 폴백
+        window.location.href = kakaoAuthURL;
     }
 }
 

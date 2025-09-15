@@ -6,49 +6,55 @@
   <title>카카오 로그인 처리</title>
   <script>
     (function () {
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get("code");
+      const params = new URLSearchParams(location.search);
+      const code  = params.get("code");
+      const state = params.get("state");                // ✅ CSRF용 state
+      const error = params.get("error") || params.get("error_description");
 
-      if (!code) {
-        console.error("❌ 카카오 로그인 코드 없음");
-        alert("카카오 로그인에 실패했습니다.");
-        window.location.href = "/html/log.html";
+      const origin = location.origin;                   // "https://zeroadmin.kr"
+
+      // 팝업 플로우
+      if (window.opener && !window.opener.closed) {
+        const payload = { type: "kakao-auth", code, state, error };
+        window.opener.postMessage(payload, origin);     // ✅ type/ state 포함
+        window.close();
         return;
       }
 
-      if (window.opener && !window.opener.closed) {
-        console.log("✅ 팝업 → 부모창으로 code 전달");
-        window.opener.postMessage({ code }, "https://zeroadmin.kr");
-        window.close();
-      } else {
-        console.log("📱 모바일 → redirect 처리");
-        fetch("https://api.narrowroad-model.com/model_admin_login?func=kakao-login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code }),
-        })
-                .then(response => response.json())
-                .then(result => {
-                  if (result.accessToken) {
-                    localStorage.setItem("accessToken", result.accessToken);
-                    window.location.href = "/html/home.html";
-                  } else if (result.redirectUrl) {
-                    window.location.href = result.redirectUrl;
-                  } else {
-                    alert("카카오 로그인 실패. 다시 시도하세요.");
-                    window.location.href = "/html/log.html";
-                  }
-                })
-                .catch(error => {
-                  console.error("❌ 로그인 오류:", error);
-                  alert("서버 오류가 발생했습니다. 다시 시도하세요.");
-                  window.location.href = "/html/log.html";
-                });
+      // 모바일/리다이렉트 플로우
+      if (error || !code) {
+        alert("카카오 로그인에 실패했습니다.");
+        location.href = "/html/log.html";
+        return;
       }
+
+      // 서버 토큰 교환
+      fetch("https://api.narrowroad-model.com/model_admin_login?func=kakao-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, state }),          // ✅ state 함께 전달(선택)
+      })
+              .then(r => r.json())
+              .then(result => {
+                if (result.accessToken) {
+                  localStorage.setItem("accessToken", result.accessToken);
+                  location.href = "/html/home.html";
+                } else if (result.redirectUrl) {
+                  location.href = result.redirectUrl;
+                } else {
+                  alert("카카오 로그인 실패. 다시 시도하세요.");
+                  location.href = "/html/log.html";
+                }
+              })
+              .catch(err => {
+                console.error("❌ 로그인 오류:", err);
+                alert("서버 오류가 발생했습니다. 다시 시도하세요.");
+                location.href = "/html/log.html";
+              });
     })();
   </script>
 </head>
-<body style="background-color: black; color: white;">
+<body style="background-color:#000;color:#fff;">
 <h1>카카오 로그인 중...</h1>
 </body>
 </html>
