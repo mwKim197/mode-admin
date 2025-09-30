@@ -39,6 +39,8 @@ export default defineConfig({
         couponList: resolve(__dirname, "html/couponList.html"), // 추가: 쿠폰목록 페이지
         noticeList: resolve(__dirname, "html/noticeList.html"), // 추가: 공지사항목록 페이지
         noticeDetail: resolve(__dirname, "html/noticeDetail.html"), // 추가: 공지사항 페이지
+        menuMerge: resolve(__dirname, "html/menuMerge.html"), // 메뉴 병합
+        userRegister: resolve(__dirname, "html/user-register.html"), // 매장계정생성
         // 다른 html들도 여기에 추가 가능
       },
     },

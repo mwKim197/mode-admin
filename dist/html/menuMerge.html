@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <script type="module" crossorigin src="../assets/main-BTQuD9qN.js"></script>
+    <link rel="stylesheet" crossorigin href="../assets/main--FnuIZ4K.css">
+    <link rel="stylesheet" crossorigin href="../assets/menuMerge-CxN54c7W.css">
+    <link rel="stylesheet" crossorigin href="../assets/style-CchalFEw.css">
+  </head>
+  <body class="menu-merge-page">
+    <!-- 메인 -->
+    <div id="main-content">
+      <!--상품관리-->
+      <section class="mt8">
+        <div class="inner">
+          <div class="user-flex">
+            <div class="user">
+              <i class="fa-regular fa-circle-user"></i>
+              <p id="user-name">zero001 님</p>
+              <label class="label manager" id="user-grade"
+                ><span>총괄관리자</span></label
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 계정 선택 섹션 -->
+      <section class="pb20">
+        <div class="inner">
+          <h2 class="mb20">레시피 복사</h2>
+          <div class="inputWrap">
+            <div class="data_input">
+              <p>보내는 계정</p>
+              <div class="select">
+                <select
+                  id="sourceAccount"
+                  class="popup-select mb0"
+                  required
+                ></select>
+              </div>
+            </div>
+          </div>
+          <img class="account-arrow" src="../img/arrow.svg" alt="아래화살표" />
+          <div class="inputWrap">
+            <div class="data_input">
+              <p>받는 계정</p>
+              <div class="select">
+                <select
+                  id="targetAccount"
+                  class="popup-select mb0"
+                  required
+                ></select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- table -->
+      <section class="pb20">
+        <div class="inner">
+          <div class="table-wrapper tableArea">
+            <!-- 🔹 고정 헤더 테이블 -->
+            <table class="product-table">
+              <colgroup>
+                <col style="width: 40px" />
+                <col style="width: 23px" />
+                <col style="width: 40px" />
+                <col style="width: 105px" />
+                <col style="width: 50px" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>
+                    <input type="checkbox" id="selectAll" />
+                  </th>
+                  <th>순서</th>
+                  <th>이미지</th>
+                  <th>상품명</th>
+                  <th>가격</th>
+                </tr>
+              </thead>
+            </table>
+
+            <!-- 스크롤 바디 테이블 -->
+            <div class="scroll-body">
+              <table class="product-table">
+                <colgroup>
+                  <col style="width: 40px" />
+                  <col style="width: 23px" />
+                  <col style="width: 40px" />
+                  <col style="width: 105px" />
+                  <col style="width: 50px" />
+                </colgroup>
+                <tbody id="menu-table-body">
+                  <tr>
+                    <td
+                      colspan="5"
+                      class="h-14 text-center flex justify-center items-center"
+                    ></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="inner">
+        <div class="btnFlex mb-4">
+          <button class="btn blue" id="copyButton">복사하기</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
