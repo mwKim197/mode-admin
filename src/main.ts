@@ -412,7 +412,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       module.initNoticeDetail();
     });
   } else if (path === "/html/menuMerge.html") {
-      alert("?");
       initMenuMerge();
   } else if (path === "/html/user-register.html") {
     console.log("📌 사용자 등록 - user-register.ts 로드");
