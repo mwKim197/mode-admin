@@ -716,6 +716,7 @@ async function updatePopupContent(rowIndex: number) {
     let storeInfo = {
       storeName: "정보 없음",
       tel: "정보 없음",
+      address: "정보 없음",
       businessNo: "정보 없음",
     };
 
@@ -729,6 +730,7 @@ async function updatePopupContent(rowIndex: number) {
         storeInfo = {
           storeName: storeData.user.storeName || "정보 없음",
           tel: storeData.user.tel || "정보 없음",
+          address: storeData.user.address || "정보 없음",
           businessNo: storeData.user.businessNo || "정보 없음",
         };
       }
@@ -828,6 +830,10 @@ async function updatePopupContent(rowIndex: number) {
           <div>
             <h5>매장 연락처</h5>
             <p>${storeInfo.tel}</p>
+          </div>
+          <div class="store-address">
+            <h5>매장 주소</h5>
+            <p>${storeInfo.address}</p>
           </div>
           <div>
             <h5>사업자 등록번호</h5>
