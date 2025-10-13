@@ -902,3 +902,9 @@ noticeArea start
   display: block;
   margin: 10px auto;
 }
+
+.store-address p {
+    white-space: normal;   /* 줄바꿈 허용 */
+    word-wrap: break-word; /* 단어가 너무 길면 강제 줄바꿈 */
+    overflow-wrap: anywhere; /* 긴 단어나 URL도 강제 줄바꿈 */
+}

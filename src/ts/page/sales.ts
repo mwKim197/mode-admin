@@ -831,7 +831,7 @@ async function updatePopupContent(rowIndex: number) {
             <h5>매장 연락처</h5>
             <p>${storeInfo.tel}</p>
           </div>
-          <div>
+          <div class="store-address">
             <h5>매장 주소</h5>
             <p>${storeInfo.address}</p>
           </div>
