@@ -139,6 +139,7 @@ export async function initProductAdd() {
             )?.value;
 
             const shouldHide = selectedValue === "yes"; // 일반상품일 때 숨김
+            const barcodeScannerHide = user?.barcodeScanner; // 바코드 스캐너 옵션있을경우에만 활성화
 
             if (itemsContainer) {
                 itemsContainer.style.display = shouldHide ? "none" : "block";
@@ -152,7 +153,8 @@ export async function initProductAdd() {
 
             const barcodeBox = document.getElementById("barcode-box") as HTMLElement;
             if (barcodeBox) {
-                barcodeBox.style.display = shouldHide ? "block" : "none";
+                
+                barcodeBox.style.display = shouldHide && barcodeScannerHide ? "block" : "none";
             }
         }
 

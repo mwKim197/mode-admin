@@ -157,6 +157,12 @@ async function loadStoreInfo() {
       if (businessNo) {
         businessNo.value = data.user.businessNo || "";
       }
+        
+        // 매장 주소 설정
+        const addressInput = document.querySelector("#address-input") as HTMLInputElement;
+        if (addressInput) {
+            addressInput.value = data.user.address || "";
+        }
 
       // 한번에 결제 가능한 최대 잔 수 설정
       const limitCountInput = document.querySelector(
@@ -307,6 +313,7 @@ async function saveStoreInfo() {
       "#storeNm"
     ) as HTMLInputElement;
     const telInput = document.querySelector("#tel-input") as HTMLInputElement;
+    const addressInput = document.querySelector("#address-input") as HTMLInputElement;
     const businessNoInput = document.getElementById(
       "businessNo"
     ) as HTMLInputElement;
@@ -394,6 +401,11 @@ async function saveStoreInfo() {
     if (telInput && telInput.value !== originalUserData?.tel) {
       hasChanges = true;
     }
+      
+      // 매장 주소가 수정되었는지 확인
+      if (addressInput && addressInput.value !== originalUserData?.address) {
+          hasChanges = true;
+      }
 
     // 사업자등록번호가 수정되었는지 확인
     if (
@@ -493,6 +505,11 @@ async function saveStoreInfo() {
       if (telInput && telInput.value !== originalUserData?.tel) {
         updateData.tel = telInput.value;
       }
+        
+        // 매장 주소 추가 (변경된 경우만)
+        if (addressInput && addressInput.value !== originalUserData?.address) {
+            updateData.address = addressInput.value;
+        }
 
       // 사업자등록번호 추가 (변경된 경우만)
       if (

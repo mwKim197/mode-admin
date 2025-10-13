@@ -4,6 +4,8 @@ export interface ModelUser {
   tel?: string;
   businessNo?: string; // 추가
   earnMileage?: number;
+  barcodeScanner?: string;
+  address?: string;
   mileageNumber?: number;
   remoteAddress?: string;
   isPhone?: boolean;
