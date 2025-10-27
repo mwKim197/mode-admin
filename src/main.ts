@@ -1,23 +1,23 @@
 import "./css/common.css"; // 또는 상대 경로 맞게 수정
-import { checkUserAccess, getUserData } from "./ts/common/auth.ts";
+import {checkUserAccess, getUserData} from "./ts/common/auth.ts";
 import "./ts/page/login.ts";
-import { loadPartials } from "./ts/utils/layoutLoader.ts";
-import { ToastType } from "./ts/types/common.ts";
-import { getStoredUser } from "./ts/utils/userStorage.ts";
-import { sendMachineCommand } from "./ts/page/deviceManage.ts";
+import {loadPartials} from "./ts/utils/layoutLoader.ts";
+import {ToastType} from "./ts/types/common.ts";
+import {getStoredUser} from "./ts/utils/userStorage.ts";
+import {sendMachineCommand} from "./ts/page/deviceManage.ts";
 import Choices from "choices.js";
 import "choices.js/public/assets/styles/choices.min.css";
-import { initMenuMerge } from "./ts/page/menuMerge.ts";
+import {initMenuMerge} from "./ts/page/menuMerge.ts";
 
 // 글로벌 등록
 declare global {
-  interface Window {
-    showLoading: () => void;
-    hideLoading: () => void;
-    showToast: (msg: string, duration?: number, type?: ToastType) => void;
-    sendMachineCommand: typeof import("./ts/page/deviceManage").sendMachineCommand;
-    Choices: typeof Choices;
-  }
+    interface Window {
+        showLoading: () => void;
+        hideLoading: () => void;
+        showToast: (msg: string, duration?: number, type?: ToastType) => void;
+        sendMachineCommand: typeof import("./ts/page/deviceManage").sendMachineCommand;
+        Choices: typeof Choices;
+    }
 }
 // ------- 머신조작전역등록 --------//
 window.sendMachineCommand = sendMachineCommand;
@@ -29,14 +29,15 @@ window.Choices = Choices;
 // ------- 로딩 딤 --------//
 
 function showLoading() {
-  const loader = document.getElementById("global-loading");
-  if (loader) loader.style.display = "flex";
+    const loader = document.getElementById("global-loading");
+    if (loader) loader.style.display = "flex";
 }
 
 function hideLoading() {
-  const loader = document.getElementById("global-loading");
-  if (loader) loader.style.display = "none";
+    const loader = document.getElementById("global-loading");
+    if (loader) loader.style.display = "none";
 }
+
 window.showLoading = showLoading;
 window.hideLoading = hideLoading;
 // ------- 로딩 딤 --------//
@@ -44,17 +45,17 @@ window.hideLoading = hideLoading;
 // ------- 토스트 메세지 --------//
 
 export function showToast(
-  message: string,
-  duration = 3000,
-  type: ToastType = "success"
+    message: string,
+    duration = 3000,
+    type: ToastType = "success"
 ) {
-  const containerId = "toast-container";
-  let container = document.getElementById(containerId);
+    const containerId = "toast-container";
+    let container = document.getElementById(containerId);
 
-  if (!container) {
-    container = document.createElement("div");
-    container.id = containerId;
-    container.style.cssText = `
+    if (!container) {
+        container = document.createElement("div");
+        container.id = containerId;
+        container.style.cssText = `
           position: fixed;
           top: 1rem;
           right: 2rem; /* ✅ 오른쪽 여백은 고정 */
@@ -63,34 +64,34 @@ export function showToast(
           flex-direction: column;
           align-items: center; /* ✅ 오른쪽 정렬 */
         `;
-    document.body.appendChild(container);
-  }
+        document.body.appendChild(container);
+    }
 
-  const toast = document.createElement("div");
-  toast.textContent = message;
+    const toast = document.createElement("div");
+    toast.textContent = message;
 
-  // ✅ 스타일 분기
-  const styleMap = {
-    success: {
-      background: "#e6fbe6",
-      border: "2px solid #4CAF50",
-      color: "#2e7d32",
-    },
-    error: {
-      background: "#fde8e8",
-      border: "2px solid #f44336",
-      color: "#b71c1c",
-    },
-    warning: {
-      background: "#fff8e1",
-      border: "2px solid #ffb300",
-      color: "#795548",
-    },
-  };
+    // ✅ 스타일 분기
+    const styleMap = {
+        success: {
+            background: "#e6fbe6",
+            border: "2px solid #4CAF50",
+            color: "#2e7d32",
+        },
+        error: {
+            background: "#fde8e8",
+            border: "2px solid #f44336",
+            color: "#b71c1c",
+        },
+        warning: {
+            background: "#fff8e1",
+            border: "2px solid #ffb300",
+            color: "#795548",
+        },
+    };
 
-  const style = styleMap[type];
+    const style = styleMap[type];
 
-  toast.style.cssText = `
+    toast.style.cssText = `
     background: ${style.background};
     color: ${style.color};
     border: ${style.border};
@@ -107,18 +108,18 @@ export function showToast(
     transform: translateY(-10px);
   `;
 
-  container.appendChild(toast);
+    container.appendChild(toast);
 
-  requestAnimationFrame(() => {
-    toast.style.opacity = "1";
-    toast.style.transform = "translateY(0)";
-  });
+    requestAnimationFrame(() => {
+        toast.style.opacity = "1";
+        toast.style.transform = "translateY(0)";
+    });
 
-  setTimeout(() => {
-    toast.style.opacity = "0";
-    toast.style.transform = "translateY(-10px)";
-    setTimeout(() => container?.removeChild(toast), 300);
-  }, duration);
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(-10px)";
+        setTimeout(() => container?.removeChild(toast), 300);
+    }, duration);
 }
 
 window.showToast = showToast;
@@ -126,477 +127,484 @@ window.showToast = showToast;
 
 // 📌 main.ts (불필요한 코드 로딩 방지)
 document.addEventListener("DOMContentLoaded", async () => {
-  console.log("✅ main.ts 실행됨");
+    console.log("✅ main.ts 실행됨");
 
-  // 📌 현재 페이지 URL 확인
-  const path = window.location.pathname;
+    // 📌 현재 페이지 URL 확인
+    const path = window.location.pathname;
 
-  if (path != "/html/log.html" && path != "/html/dashboard.html") {
-    // ✅ 자동로그인 시도 (세션 토큰 없을 때만)
-    if (!localStorage.getItem("authToken")) {
-      console.log("🔄 자동로그인 시도");
-      await tryAutoLogin(); // ✅ 토큰 저장까지 기다림
+    if (path != "/html/log.html" && path != "/html/dashboard.html") {
+        // ✅ 자동로그인 시도 (세션 토큰 없을 때만)
+        if (!localStorage.getItem("authToken")) {
+            console.log("🔄 자동로그인 시도");
+            await tryAutoLogin(); // ✅ 토큰 저장까지 기다림
+        } else {
+            console.log("✅ 기존 세션 토큰 사용");
+        }
+
+        await checkUserAccess();
+        await loadPartials(); // ✅ head, layout, header 로딩도 제외
+        bindGlobalDeviceEvents();
+    }
+
+    const userInfo = await getUserData();
+
+    if (userInfo) {
+        const userNameEl = document.getElementById("user-name");
+        const userGradeEl = document.getElementById("user-grade");
+
+        if (userNameEl) {
+            userNameEl.textContent = `${userInfo.adminId} 님`;
+        }
+
+        if (userGradeEl) {
+            const gradeText =
+                {
+                    1: "총괄관리자",
+                    2: "운영관리자",
+                    3: "프랜차이즈",
+                    4: "일반회원",
+                }[userInfo.grade] || "일반회원";
+
+            userGradeEl.innerHTML = `<span>${gradeText}</span>`;
+            userGradeEl.classList.remove("manager", "franchise", "store"); // 필요 시
+            if (userInfo.grade === 1) userGradeEl.classList.add("manager");
+            if (userInfo.grade === 3) userGradeEl.classList.add("franchise");
+            if (userInfo.grade === 4) userGradeEl.classList.add("store");
+        }
+    }
+
+    // 일반 유저 정보
+    const user = getStoredUser();
+
+    // 일반 유저정보 있을경우에만 빠른조작화면 노출
+    if (user) {
+        const menuWrap = document.querySelector(".user-menuWrap") as HTMLElement;
+        if (menuWrap) {
+            menuWrap.style.display = "block"; // ✅ 보이게
+        }
     } else {
-      console.log("✅ 기존 세션 토큰 사용");
+        const menuWrap = document.querySelector(".user-menuWrap") as HTMLElement;
+        if (menuWrap) {
+            menuWrap.style.display = "none"; // ✅ 숨기기
+        }
     }
 
-    await checkUserAccess();
-    await loadPartials(); // ✅ head, layout, header 로딩도 제외
-    bindGlobalDeviceEvents();
-  }
+    // ----- Types -----
+    type Grade = number | string;
 
-  const userInfo = await getUserData();
+    interface UserInfo {
+        grade?: Grade;
 
-  if (userInfo) {
-    const userNameEl = document.getElementById("user-name");
-    const userGradeEl = document.getElementById("user-grade");
-
-    if (userNameEl) {
-      userNameEl.textContent = `${userInfo.adminId} 님`;
+        [key: string]: unknown;
     }
 
-    if (userGradeEl) {
-      const gradeText =
-        {
-          1: "총괄관리자",
-          2: "운영관리자",
-          3: "프랜차이즈",
-          4: "일반회원",
-        }[userInfo.grade] || "일반회원";
-
-      userGradeEl.innerHTML = `<span>${gradeText}</span>`;
-      userGradeEl.classList.remove("manager", "franchise", "store"); // 필요 시
-      if (userInfo.grade === 1) userGradeEl.classList.add("manager");
-      if (userInfo.grade === 3) userGradeEl.classList.add("franchise");
-      if (userInfo.grade === 4) userGradeEl.classList.add("store");
+    interface MenuItem {
+        href: string;
+        label: string;
+        target?: '_blank' | '_self' | '_parent' | '_top';
+        rel?: string;
     }
-  }
-
-  // 일반 유저 정보
-  const user = getStoredUser();
-
-  // 일반 유저정보 있을경우에만 빠른조작화면 노출
-  if (user) {
-    const menuWrap = document.querySelector(".user-menuWrap") as HTMLElement;
-    if (menuWrap) {
-      menuWrap.style.display = "block"; // ✅ 보이게
-    }
-  } else {
-    const menuWrap = document.querySelector(".user-menuWrap") as HTMLElement;
-    if (menuWrap) {
-      menuWrap.style.display = "none"; // ✅ 숨기기
-    }
-  }
-
-  // ----- Types -----
-  type Grade = number | string;
-
-  interface UserInfo {
-    grade?: Grade;
-    [key: string]: unknown;
-  }
-
-  interface MenuItem {
-    href: string;
-    label: string;
-    target?: '_blank' | '_self' | '_parent' | '_top';
-    rel?: string;
-  }
 
 // userInfo 예: { grade: 3, ... }, grade <= 2면 관리자
-  const isAdmin = (info?: UserInfo | null): boolean => {
-    if (!info || info.grade == null) return false;
-    const n = typeof info.grade === 'string' ? Number(info.grade) : info.grade;
-    return Number.isFinite(n as number) && (n as number) <= 2;
-  };
+    const isAdmin = (info?: UserInfo | null): boolean => {
+        if (!info || info.grade == null) return false;
+        const n = typeof info.grade === 'string' ? Number(info.grade) : info.grade;
+        return Number.isFinite(n as number) && (n as number) <= 2;
+    };
 
 // 1) 공통(일반) 메뉴
-  const generalMenus: MenuItem[] = [
-    { href: "/html/home.html", label: "Home" },
-    { href: "/html/noticeList.html", label: "공지사항" },
-    { href: "/html/product.html", label: "상품" },
-    { href: "/html/sales.html", label: "매출" },
-    { href: "/html/deviceManage.html", label: "기기관리" },
-    { href: "http://modelzero.shop/", label: "쇼핑몰", target: "_blank", rel: "noopener noreferrer" },
-    { href: "http://pf.kakao.com/_mIxiYG/chat", label: "A/S접수", target: "_blank", rel: "noopener noreferrer" },
-    { href: "/html/normalSet.html", label: "일반설정" },
-    /*{ href: "/html/couponList.html", label: "쿠폰" },*/
-    { href: "/html/log.html", label: "로그아웃" },
-  ];
+    const generalMenus: MenuItem[] = [
+        {href: "/html/home.html", label: "Home"},
+        {href: "/html/noticeList.html", label: "공지사항"},
+        {href: "/html/product.html", label: "상품"},
+        {href: "/html/sales.html", label: "매출"},
+        {href: "/html/deviceManage.html", label: "기기관리"},
+        {href: "http://modelzero.shop/", label: "쇼핑몰", target: "_blank", rel: "noopener noreferrer"},
+        {href: "http://pf.kakao.com/_mIxiYG/chat", label: "A/S접수", target: "_blank", rel: "noopener noreferrer"},
+        {href: "/html/normalSet.html", label: "일반설정"},
+        {href: "/html/log.html", label: "로그아웃"},
+    ];
 
 // 2) 관리자 전용 메뉴
-  const adminMenus: MenuItem[] = [
-    { href: "/html/home.html", label: "Home" },
-    { href: "/html/noticeList.html", label: "공지사항" },
-    { href: "/html/user-register.html", label: "매장계정생성" },
-    { href: "/html/menuMerge.html", label: "레시피복사" },
-    { href: "/html/notice.html?type=admin",   label: "관리자 공지사항" },
-    { href: "/html/notice.html?type=notice",  label: "홈페이지 공지사항" },
-    { href: "/html/notice.html?type=store",   label: "설치매장" },
-    { href: "/html/notice.html?type=news",    label: "언론보도" },
-    { href: "/html/notice.html?type=machine", label: "머신사용설명" },
-    { href: "/html/empowerment.html",         label: "권한 관리" },
-    { href: "/html/log.html", label: "로그아웃" },
-  ];
+    const adminMenus: MenuItem[] = [
+        {href: "/html/home.html", label: "Home"},
+        {href: "/html/noticeList.html", label: "공지사항"},
+        {href: "/html/user-register.html", label: "매장계정생성"},
+        {href: "/html/menuMerge.html", label: "레시피복사"},
+        {href: "/html/notice.html?type=admin", label: "관리자 공지사항"},
+        {href: "/html/notice.html?type=notice", label: "홈페이지 공지사항"},
+        {href: "/html/notice.html?type=store", label: "설치매장"},
+        {href: "/html/notice.html?type=news", label: "언론보도"},
+        {href: "/html/notice.html?type=machine", label: "머신사용설명"},
+        {href: "/html/empowerment.html", label: "권한 관리"},
+        {href: "/html/log.html", label: "로그아웃"},
+    ];
 
-  // ✅ 포인트 메뉴 정의
-  const pointMenu: MenuItem = { href: "/html/point.html", label: "포인트" };
+    // ✅ 포인트 메뉴 정의
+    const pointMenu: MenuItem = {href: "/html/point.html", label: "포인트"};
+
+    // ✅ 쿠폰 메뉴 정의
+    const couponMenu: MenuItem = {href: "/html/couponList.html", label: "쿠폰"};
 
 // 3) 메뉴 렌더 함수
-  function renderMenu(containerSelector: string, items: MenuItem[]): void {
-    const menuList = document.querySelector<HTMLUListElement>(containerSelector);
-    if (!menuList) return;
+    function renderMenu(containerSelector: string, items: MenuItem[]): void {
+        const menuList = document.querySelector<HTMLUListElement>(containerSelector);
+        if (!menuList) return;
 
-    menuList.replaceChildren(); // 기존 항목 비우기
+        menuList.replaceChildren(); // 기존 항목 비우기
 
-    items.forEach((item) => {
-      const li = document.createElement("li");
-      const a  = document.createElement("a");
-      const p  = document.createElement("p");
+        items.forEach((item) => {
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            const p = document.createElement("p");
 
-      a.href = item.href;
-      if (item.target) a.target = item.target;
-      if (item.rel)    a.rel    = item.rel;
+            a.href = item.href;
+            if (item.target) a.target = item.target;
+            if (item.rel) a.rel = item.rel;
 
-      p.textContent = item.label;
-      a.appendChild(p);
-      li.appendChild(a);
-      menuList.appendChild(li);
-    });
-  }
-
-  // 🔧 유틸: 특정 항목 존재 여부 + 원하는 위치에 삽입
-  function upsertMenuItem(
-      items: MenuItem[],
-      item: MenuItem,
-      opts: { insertAfterHref?: string; insertAfterLabel?: string } = {}
-  ): MenuItem[] {
-    const exists = items.some(
-        (it) => it.href === item.href || it.label === item.label
-    );
-    if (exists) return items;
-
-    let insertIndex = items.length;
-    if (opts.insertAfterHref) {
-      const i = items.findIndex((it) => it.href === opts.insertAfterHref);
-      if (i >= 0) insertIndex = i + 1;
-    } else if (opts.insertAfterLabel) {
-      const i = items.findIndex((it) => it.label === opts.insertAfterLabel);
-      if (i >= 0) insertIndex = i + 1;
+            p.textContent = item.label;
+            a.appendChild(p);
+            li.appendChild(a);
+            menuList.appendChild(li);
+        });
     }
 
-    const next = items.slice();
-    next.splice(insertIndex, 0, item);
-    return next;
-  }
+    // 🔧 유틸: 특정 항목 존재 여부 + 원하는 위치에 삽입
+    function upsertMenuItem(
+        items: MenuItem[],
+        item: MenuItem,
+        opts: { insertAfterHref?: string; insertAfterLabel?: string } = {}
+    ): MenuItem[] {
+        const exists = items.some(
+            (it) => it.href === item.href || it.label === item.label
+        );
+        if (exists) return items;
+
+        let insertIndex = items.length;
+        if (opts.insertAfterHref) {
+            const i = items.findIndex((it) => it.href === opts.insertAfterHref);
+            if (i >= 0) insertIndex = i + 1;
+        } else if (opts.insertAfterLabel) {
+            const i = items.findIndex((it) => it.label === opts.insertAfterLabel);
+            if (i >= 0) insertIndex = i + 1;
+        }
+
+        const next = items.slice();
+        next.splice(insertIndex, 0, item);
+        return next;
+    }
 
 // 4) 사용자 등급에 따라 구성
-  (function initSideMenu(): void {
-    let menus: MenuItem[] = isAdmin(userInfo)
-        ? adminMenus  // 관리자: 일반 + 관리자 메뉴
-        : generalMenus;
+    (function initSideMenu(): void {
+        let menus: MenuItem[] = isAdmin(userInfo)
+            ? adminMenus  // 관리자: 일반 + 관리자 메뉴
+            : generalMenus;
 
-    if (!user?.payType) {
-      menus = upsertMenuItem(menus, pointMenu, { insertAfterLabel: "매출" });
-    }
+        if (!user?.payType) {
+            menus = upsertMenuItem(menus, pointMenu, {insertAfterLabel: "매출"});
+        }
 
-    renderMenu(".sidemenu .menu", menus);
-    highlightActiveMenu(".sidemenu .menu"); // (선택) 현재 페이지 활성화 표시
-  })();
+        if (!user?.coupon) {
+            menus = upsertMenuItem(menus, couponMenu, {insertAfterLabel: "일반설정"});
+        }
+
+        renderMenu(".sidemenu .menu", menus);
+        highlightActiveMenu(".sidemenu .menu"); // (선택) 현재 페이지 활성화 표시
+    })();
 
 // (선택) 현재 경로와 링크가 같으면 active 클래스 추가
-  function highlightActiveMenu(containerSelector: string): void {
-    const container = document.querySelector<HTMLUListElement>(containerSelector);
-    if (!container) return;
+    function highlightActiveMenu(containerSelector: string): void {
+        const container = document.querySelector<HTMLUListElement>(containerSelector);
+        if (!container) return;
 
-    const here = location.pathname + location.search;
+        const here = location.pathname + location.search;
 
-    container.querySelectorAll<HTMLAnchorElement>("a").forEach((a) => {
-      try {
-        const url = new URL(a.href, location.origin);
-        const isSame =
-            a.target !== "_blank" &&
-            (url.pathname + url.search === here);
-        if (isSame) a.classList.add("active");
-      } catch {
-        // malformed href 등 무시
-      }
-    });
-  }
+        container.querySelectorAll<HTMLAnchorElement>("a").forEach((a) => {
+            try {
+                const url = new URL(a.href, location.origin);
+                const isSame =
+                    a.target !== "_blank" &&
+                    (url.pathname + url.search === here);
+                if (isSame) a.classList.add("active");
+            } catch {
+                // malformed href 등 무시
+            }
+        });
+    }
 
-  if (path === "/index.html" || path === "/") {
-    console.log("index 페이지");
-  } else if (path === "/html/log.html") {
-    console.log("📌 로그인 페이지 - login.ts 로드");
-    import("./ts/page/login.ts").then((module) => {
-      module.initLogin(); // login.ts의 함수 실행
-    });
-  } else if (path === "/html/home.html") {
-    console.log("📌 홈 페이지 - home.ts 로드");
-    import("./ts/page/home.ts").then((module) => {
-      module.initHome();
-    });
-  } else if (path === "/html/point.html") {
-    console.log("📌 포인트 - point.ts 로드");
-    import("./ts/page/point.ts").then((module) => {
-      module.initPoint();
-    });
-  } else if (path === "/html/product.html") {
-    console.log("📌 상품 - product.ts 로드");
-    import("./ts/page/product.ts").then((module) => {
-      module.initProduct();
-    });
-  } else if (path === "/html/product-detail.html") {
-    console.log("📌 상품상세 - productDetail.ts 로드");
-    import("./ts/page/productDetail.ts").then((module) => {
-      module.initProductDetail();
-    });
-  } else if (path === "/html/product-add.html") {
-    console.log("📌 상품등록 - productAdd.ts 로드");
-    import("./ts/page/productAdd.ts").then((module) => {
-      module.initProductAdd();
-    });
-  } else if (path === "/html/register.html") {
-    console.log("📌 회원가입 페이지 - register.ts 로드");
-    import("./ts/page/register.ts").then((module) => {
-      module.initRegister();
-    });
-  } else if (path === "/html/notice.html") {
-    console.log("📌 관리자 공지사항등록 - notice.ts 로드");
-    import("./ts/page/notice.ts").then((module) => {
-      module.initNotice();
-    });
-  } else if (path === "/html/franchise_dashboard.html") {
-    console.log("🏘️ 프랜차이즈 - franchise.ts 로드");
-    import("./ts/page/franchise.ts").then((module) => {
-      module.franchiseEdit();
-    });
-  } else if (path === "/html/store_dashboard.html") {
-    console.log("📌 데쉬보드 - store_dashboard.ts 로드");
-    import("./ts/page/store.ts").then((module) => {
-      module.storeEdit();
-    });
-  } else if (path === "/html/deviceManage.html") {
-    console.log("📌 머신관리 - deviceManage.ts 로드");
-    import("./ts/page/deviceManage.ts").then((module) => {
-      module.initDeviceManage();
-    });
-  } else if (path === "/html/sales.html") {
-    console.log("📌 매출 - sales.ts 로드");
-    import("./ts/page/sales.ts").then((module) => {
-      module.initSales();
-    });
-  } else if (path === "/html/normalSet.html") {
-    console.log("📌 일반설정 - normalSet.ts 로드");
-    import("./ts/page/normalSet.ts").then((module) => {
-      module.initNormalSet();
-    });
-  } else if (path === "/html/couponList.html") {
-    console.log("📌 쿠폰목록 - couponList.ts 로드");
-    import("./ts/page/couponList.ts").then((module) => {
-      module.initCouponList();
-    });
-  } else if (path === "/html/couponDetail.html") {
-    console.log("📌 쿠폰발행 - couponDetail.ts 로드");
-    import("./ts/page/couponDetail.ts").then((module) => {
-      module.initCouponDetail();
-    });
-  } else if (path === "/html/noticeList.html") {
-    console.log("📌 공지사항목록 - noticeList.ts 로드");
-    import("./ts/page/noticeList.ts").then((module) => {
-      module.initNoticeList();
-    });
-  } else if (path === "/html/noticeDetail.html") {
-    console.log("📌 공지사항상세 - noticeDetail.ts 로드");
-    import("./ts/page/noticeDetail.ts").then((module) => {
-      module.initNoticeDetail();
-    });
-  } else if (path === "/html/menuMerge.html") {
-      initMenuMerge();
-  } else if (path === "/html/user-register.html") {
-    console.log("📌 사용자 등록 - user-register.ts 로드");
-    import("./ts/page/user-register.ts").then((module) => {
-      module.initUserRegister();
-    });
-  } else {
-    console.log("📌 기본 페이지");
-  }
+    if (path === "/index.html" || path === "/") {
+        console.log("index 페이지");
+    } else if (path === "/html/log.html") {
+        console.log("📌 로그인 페이지 - login.ts 로드");
+        import("./ts/page/login.ts").then((module) => {
+            module.initLogin(); // login.ts의 함수 실행
+        });
+    } else if (path === "/html/home.html") {
+        console.log("📌 홈 페이지 - home.ts 로드");
+        import("./ts/page/home.ts").then((module) => {
+            module.initHome();
+        });
+    } else if (path === "/html/point.html") {
+        console.log("📌 포인트 - point.ts 로드");
+        import("./ts/page/point.ts").then((module) => {
+            module.initPoint();
+        });
+    } else if (path === "/html/product.html") {
+        console.log("📌 상품 - product.ts 로드");
+        import("./ts/page/product.ts").then((module) => {
+            module.initProduct();
+        });
+    } else if (path === "/html/product-detail.html") {
+        console.log("📌 상품상세 - productDetail.ts 로드");
+        import("./ts/page/productDetail.ts").then((module) => {
+            module.initProductDetail();
+        });
+    } else if (path === "/html/product-add.html") {
+        console.log("📌 상품등록 - productAdd.ts 로드");
+        import("./ts/page/productAdd.ts").then((module) => {
+            module.initProductAdd();
+        });
+    } else if (path === "/html/register.html") {
+        console.log("📌 회원가입 페이지 - register.ts 로드");
+        import("./ts/page/register.ts").then((module) => {
+            module.initRegister();
+        });
+    } else if (path === "/html/notice.html") {
+        console.log("📌 관리자 공지사항등록 - notice.ts 로드");
+        import("./ts/page/notice.ts").then((module) => {
+            module.initNotice();
+        });
+    } else if (path === "/html/franchise_dashboard.html") {
+        console.log("🏘️ 프랜차이즈 - franchise.ts 로드");
+        import("./ts/page/franchise.ts").then((module) => {
+            module.franchiseEdit();
+        });
+    } else if (path === "/html/store_dashboard.html") {
+        console.log("📌 데쉬보드 - store_dashboard.ts 로드");
+        import("./ts/page/store.ts").then((module) => {
+            module.storeEdit();
+        });
+    } else if (path === "/html/deviceManage.html") {
+        console.log("📌 머신관리 - deviceManage.ts 로드");
+        import("./ts/page/deviceManage.ts").then((module) => {
+            module.initDeviceManage();
+        });
+    } else if (path === "/html/sales.html") {
+        console.log("📌 매출 - sales.ts 로드");
+        import("./ts/page/sales.ts").then((module) => {
+            module.initSales();
+        });
+    } else if (path === "/html/normalSet.html") {
+        console.log("📌 일반설정 - normalSet.ts 로드");
+        import("./ts/page/normalSet.ts").then((module) => {
+            module.initNormalSet();
+        });
+    } else if (path === "/html/couponList.html") {
+        console.log("📌 쿠폰목록 - couponList.ts 로드");
+        import("./ts/page/couponList.ts").then((module) => {
+            module.initCouponList();
+        });
+    } else if (path === "/html/couponDetail.html") {
+        console.log("📌 쿠폰발행 - couponDetail.ts 로드");
+        import("./ts/page/couponDetail.ts").then((module) => {
+            module.initCouponDetail();
+        });
+    } else if (path === "/html/noticeList.html") {
+        console.log("📌 공지사항목록 - noticeList.ts 로드");
+        import("./ts/page/noticeList.ts").then((module) => {
+            module.initNoticeList();
+        });
+    } else if (path === "/html/noticeDetail.html") {
+        console.log("📌 공지사항상세 - noticeDetail.ts 로드");
+        import("./ts/page/noticeDetail.ts").then((module) => {
+            module.initNoticeDetail();
+        });
+    } else if (path === "/html/menuMerge.html") {
+        initMenuMerge();
+    } else if (path === "/html/user-register.html") {
+        console.log("📌 사용자 등록 - user-register.ts 로드");
+        import("./ts/page/user-register.ts").then((module) => {
+            module.initUserRegister();
+        });
+    } else {
+        console.log("📌 기본 페이지");
+    }
 
-  // === 톱니바퀴(메뉴) 팝업 바깥 클릭 시 닫기 기능 추가 ===
-  const userMenuWrap = document.querySelector(".user-menuWrap");
-  const userSetBox = document.querySelector(".user-setBox");
-  const menuBtn = userMenuWrap?.querySelector(".ani-1");
+    // === 톱니바퀴(메뉴) 팝업 바깥 클릭 시 닫기 기능 추가 ===
+    const userMenuWrap = document.querySelector(".user-menuWrap");
+    const userSetBox = document.querySelector(".user-setBox");
+    const menuBtn = userMenuWrap?.querySelector(".ani-1");
 
-  if (userMenuWrap && userSetBox && menuBtn) {
-    menuBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (userSetBox.classList.contains("hidden")) {
-        userSetBox.classList.remove("hidden");
-      }
-    });
+    if (userMenuWrap && userSetBox && menuBtn) {
+        menuBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (userSetBox.classList.contains("hidden")) {
+                userSetBox.classList.remove("hidden");
+            }
+        });
 
-    // 팝업 내부 클릭 시 이벤트 전파 막기
-    userSetBox.addEventListener("click", (e) => {
-      e.stopPropagation();
-    });
+        // 팝업 내부 클릭 시 이벤트 전파 막기
+        userSetBox.addEventListener("click", (e) => {
+            e.stopPropagation();
+        });
 
-    // 팝업 바깥 클릭 시 팝업 닫기
-    document.addEventListener(
-      "click",
-      (e) => {
-        if (!userSetBox.classList.contains("hidden")) {
-          if (
-            !userSetBox.contains(e.target as Node) &&
-            !(e.target as HTMLElement).closest(".ani-1")
-          ) {
-            userSetBox.classList.add("hidden");
-          }
-        }
-      },
-      false
-    );
-  }
+        // 팝업 바깥 클릭 시 팝업 닫기
+        document.addEventListener(
+            "click",
+            (e) => {
+                if (!userSetBox.classList.contains("hidden")) {
+                    if (
+                        !userSetBox.contains(e.target as Node) &&
+                        !(e.target as HTMLElement).closest(".ani-1")
+                    ) {
+                        userSetBox.classList.add("hidden");
+                    }
+                }
+            },
+            false
+        );
+    }
 });
 
 window.addEventListener("load", () => {
-  document.body.style.visibility = "visible";
+    document.body.style.visibility = "visible";
 });
 
 // 머신 조작 전역등록 api - deviceManage.ts 호출
 function bindGlobalDeviceEvents() {
-  const userInfo = getStoredUser();
-  if (!userInfo) {
-    console.warn("❌ 사용자 정보 없음");
-    return;
-  }
-  const userId = userInfo.userId;
+    const userInfo = getStoredUser();
+    if (!userInfo) {
+        console.warn("❌ 사용자 정보 없음");
+        return;
+    }
+    const userId = userInfo.userId;
 
-  // [data-func] 있는 모든 버튼 및 a 태그 처리
-  document
-    .querySelectorAll<HTMLAnchorElement | HTMLButtonElement>(
-      "a[data-func], button[data-func]"
-    )
-    .forEach((el) => {
-      el.addEventListener("click", (e) => {
-        e.preventDefault();
-        const func = el.dataset.func!;
-        const msg = el.dataset.msg || "명령이 전송되었습니다";
+    // [data-func] 있는 모든 버튼 및 a 태그 처리
+    document
+        .querySelectorAll<HTMLAnchorElement | HTMLButtonElement>(
+            "a[data-func], button[data-func]"
+        )
+        .forEach((el) => {
+            el.addEventListener("click", (e) => {
+                e.preventDefault();
+                const func = el.dataset.func!;
+                const msg = el.dataset.msg || "명령이 전송되었습니다";
 
-        // ✅ 확인창이 필요한 기능
-        if (
-          func === "wash" ||
-          func === "pl" ||
-          func === "pa" ||
-          func === "restart" ||
-          func === "shutdown"
-        ) {
-          let confirmMsg = "";
-          if (func === "wash") confirmMsg = "기기세척을 진행하시겠습니까?";
-          if (func === "pl") confirmMsg = "플라스틱컵을 배출하시겠습니까?";
-          if (func === "pa") confirmMsg = "종이컵을 배출하시겠습니까?";
-          if (func === "restart") confirmMsg = "프로그램을 재시작하시겠습니까?";
-          if (func === "shutdown") confirmMsg = "프로그램을 종료하시겠습니까?";
-          if (!confirm(confirmMsg)) return;
-        }
+                // ✅ 확인창이 필요한 기능
+                if (
+                    func === "wash" ||
+                    func === "pl" ||
+                    func === "pa" ||
+                    func === "restart" ||
+                    func === "shutdown"
+                ) {
+                    let confirmMsg = "";
+                    if (func === "wash") confirmMsg = "기기세척을 진행하시겠습니까?";
+                    if (func === "pl") confirmMsg = "플라스틱컵을 배출하시겠습니까?";
+                    if (func === "pa") confirmMsg = "종이컵을 배출하시겠습니까?";
+                    if (func === "restart") confirmMsg = "프로그램을 재시작하시겠습니까?";
+                    if (func === "shutdown") confirmMsg = "프로그램을 종료하시겠습니까?";
+                    if (!confirm(confirmMsg)) return;
+                }
 
-        // 커피 세척 및 전체 세척 구분
-        const washData =
-          el.id === "coffeeWash"
-            ? { data: [{ type: "coffee" }] }
-            : el.id === "wash"
-            ? {
-                data: [
-                  { type: "coffee" },
-                  { type: "garucha", value1: "1" },
-                  { type: "garucha", value1: "2" },
-                  { type: "garucha", value1: "3" },
-                  { type: "garucha", value1: "4" },
-                  { type: "garucha", value1: "5" },
-                  { type: "garucha", value1: "6" },
-                  { type: "syrup", value1: "1" },
-                  { type: "syrup", value1: "2" },
-                  { type: "syrup", value1: "3" },
-                  { type: "syrup", value1: "5" },
-                  { type: "syrup", value1: "6" },
-                ],
-              }
-            : undefined;
+                // 커피 세척 및 전체 세척 구분
+                const washData =
+                    el.id === "coffeeWash"
+                        ? {data: [{type: "coffee"}]}
+                        : el.id === "wash"
+                            ? {
+                                data: [
+                                    {type: "coffee"},
+                                    {type: "garucha", value1: "1"},
+                                    {type: "garucha", value1: "2"},
+                                    {type: "garucha", value1: "3"},
+                                    {type: "garucha", value1: "4"},
+                                    {type: "garucha", value1: "5"},
+                                    {type: "garucha", value1: "6"},
+                                    {type: "syrup", value1: "1"},
+                                    {type: "syrup", value1: "2"},
+                                    {type: "syrup", value1: "3"},
+                                    {type: "syrup", value1: "5"},
+                                    {type: "syrup", value1: "6"},
+                                ],
+                            }
+                            : undefined;
 
-        window.sendMachineCommand(
-          userId,
-          washData ? { func, washData } : { func },
-          msg
-        );
-      });
-    });
+                window.sendMachineCommand(
+                    userId,
+                    washData ? {func, washData} : {func},
+                    msg
+                );
+            });
+        });
 
-  // [data-type][data-value] 있는 모든 버튼 및 a 태그 처리 (부분세척)
-  document
-    .querySelectorAll<HTMLAnchorElement | HTMLButtonElement>(
-      "a[data-type][data-value], button[data-type][data-value]"
-    )
-    .forEach((el) => {
-      el.addEventListener("click", (e) => {
-        e.preventDefault();
+    // [data-type][data-value] 있는 모든 버튼 및 a 태그 처리 (부분세척)
+    document
+        .querySelectorAll<HTMLAnchorElement | HTMLButtonElement>(
+            "a[data-type][data-value], button[data-type][data-value]"
+        )
+        .forEach((el) => {
+            el.addEventListener("click", (e) => {
+                e.preventDefault();
 
-        const type = el.dataset.type as "garucha" | "syrup";
-        const value1 = el.dataset.value!;
-        let number = value1;
-        if (type === "syrup") {
-          if (parseFloat(value1) === 5) {
-            number = String(4);
-          } else if (parseFloat(value1) === 6) {
-            number = String(5);
-          }
-        }
+                const type = el.dataset.type as "garucha" | "syrup";
+                const value1 = el.dataset.value!;
+                let number = value1;
+                if (type === "syrup") {
+                    if (parseFloat(value1) === 5) {
+                        number = String(4);
+                    } else if (parseFloat(value1) === 6) {
+                        number = String(5);
+                    }
+                }
 
-        const msg = `${
-          type === "garucha" ? "가루차" : "시럽"
-        } ${number}번 세척`;
+                const msg = `${
+                    type === "garucha" ? "가루차" : "시럽"
+                } ${number}번 세척`;
 
-        const washData = { data: [{ type, value1 }] };
+                const washData = {data: [{type, value1}]};
 
-        window.sendMachineCommand(userId, { func: "wash", washData }, msg);
-      });
-    });
+                window.sendMachineCommand(userId, {func: "wash", washData}, msg);
+            });
+        });
 }
 
 // 자동로그인
 async function tryAutoLogin() {
-  const API_URL = "https://api.narrowroad-model.com"; // ✅ 전역 충돌 방지
-  const refreshToken = localStorage.getItem("refreshToken");
-  if (!refreshToken) {
-    console.log("🔒 자동로그인 스킵: refreshToken 없음");
-    return;
-  }
-
-  console.log("🔄 자동로그인 시도 중...");
-
-  try {
-    const res = await fetch(`${API_URL}/model_admin_login?func=refresh`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken }),
-    });
-
-    const data = await res.json();
-    console.log(data);
-    if (res.ok) {
-      localStorage.setItem("accessToken", data.accessToken);
-      console.log("✅ 자동로그인 성공");
-    } else {
-      console.warn("❌ 자동로그인 실패:", data.message || "Unknown error");
-      localStorage.removeItem("refreshToken");
-      redirectToLogin();
+    const API_URL = "https://api.narrowroad-model.com"; // ✅ 전역 충돌 방지
+    const refreshToken = localStorage.getItem("refreshToken");
+    if (!refreshToken) {
+        console.log("🔒 자동로그인 스킵: refreshToken 없음");
+        return;
     }
-  } catch (err) {
-    console.error("❌ 자동로그인 요청 오류:", err);
-    redirectToLogin();
-  }
+
+    console.log("🔄 자동로그인 시도 중...");
+
+    try {
+        const res = await fetch(`${API_URL}/model_admin_login?func=refresh`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({refreshToken}),
+        });
+
+        const data = await res.json();
+        console.log(data);
+        if (res.ok) {
+            localStorage.setItem("accessToken", data.accessToken);
+            console.log("✅ 자동로그인 성공");
+        } else {
+            console.warn("❌ 자동로그인 실패:", data.message || "Unknown error");
+            localStorage.removeItem("refreshToken");
+            redirectToLogin();
+        }
+    } catch (err) {
+        console.error("❌ 자동로그인 요청 오류:", err);
+        redirectToLogin();
+    }
 }
 
 // 로그인페이지 이동
 function redirectToLogin() {
-  console.log("➡️ 로그인 페이지로 이동");
-  window.location.href = "/html/log.html";
+    console.log("➡️ 로그인 페이지로 이동");
+    window.location.href = "/html/log.html";
 }

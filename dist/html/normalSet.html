@@ -1,716 +1,723 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
+<head>
+    <meta charset="UTF-8"/>
     <!-- ✅ 메인 진입 -->
-    <script type="module" crossorigin src="../assets/main-B1NCi6Rz.js"></script>
-    <link rel="stylesheet" crossorigin href="../assets/main--FnuIZ4K.css">
-    <link rel="stylesheet" crossorigin href="../assets/normalSet-BSMSdkgR.css">
-    <link rel="stylesheet" crossorigin href="../assets/style-BWJWr5B5.css">
-  </head>
-  <!--머신설정-->
-  <body>
-    <!-- 메인 -->
-    <div id="main-content">
-      <section class="mt80 pb20">
+  <script type="module" crossorigin src="../assets/main-s1C98eLx.js"></script>
+  <link rel="stylesheet" crossorigin href="../assets/main--FnuIZ4K.css">
+  <link rel="stylesheet" crossorigin href="../assets/normalSet-BSMSdkgR.css">
+  <link rel="stylesheet" crossorigin href="../assets/style-BWJWr5B5.css">
+</head>
+<!--머신설정-->
+<body>
+<!-- 메인 -->
+<div id="main-content">
+    <section class="mt80 pb20">
         <div class="inner">
-          <div class="title-flex mb20">
-            <h2>일반설정</h2>
-            <button class="btn-outline">변경사항 저장</button>
-          </div>
+            <div class="title-flex mb20">
+                <h2>일반설정</h2>
+                <button class="btn-outline">변경사항 저장</button>
+            </div>
 
-          <!-- 기본정보 -->
-          <hr class="borderSt-dot" />
-          <div class="inputWrap">
-            <h3>기본정보</h3>
-            <div class="data_input">
-              <p>매장명</p>
-              <input type="text" id="storeNm" name="storeNm" />
+            <!-- 기본정보 -->
+            <hr class="borderSt-dot"/>
+            <div class="inputWrap">
+                <h3>기본정보</h3>
+                <div class="data_input">
+                    <p>매장명</p>
+                    <input type="text" id="storeNm" name="storeNm"/>
+                </div>
+                <div class="data_input">
+                    <p>사업자 등록번호</p>
+                    <input type="text" id="businessNo" name="businessNo"/>
+                </div>
+                <div class="data_input">
+                    <p>매장 연락처</p>
+                    <input type="text" id="tel-input" name="player-id"/>
+                </div>
+                <div class="data_input">
+                    <p>비밀번호</p>
+                    <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            value="******"
+                    />
+                </div>
+                <div class="data_input">
+                    <p>원격 주소</p>
+                    <input type="text" id="remote-address" name="remote-address"/>
+                </div>
+                <div class="data_input">
+                    <p>매장 주소</p>
+                    <input type="text" id="address-input" name="player-id"/>
+                </div>
             </div>
-            <div class="data_input">
-              <p>사업자 등록번호</p>
-              <input type="text" id="businessNo" name="businessNo" />
-            </div>
-            <div class="data_input">
-              <p>매장 연락처</p>
-              <input type="text" id="tel-input" name="player-id" />
-            </div>
-            <div class="data_input">
-              <p>비밀번호</p>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value="******"
-              />
-            </div>
-            <div class="data_input">
-              <p>원격 주소</p>
-              <input type="text" id="remote-address" name="remote-address" />
-            </div>
-              <div class="data_input">
-                  <p>매장 주소</p>
-                  <input type="text" id="address-input" name="player-id" />
-              </div>
-          </div>
 
-          <!-- 재고관리 -->
-          <hr class="borderSt-dot" />
-          <div class="inputWrap St02">
-            <h3>일반설정</h3>
-            <div class="data_input">
-              <p>포인트 사용</p>
-              <label class="toggle-switch">
-                <input type="checkbox" id="point-check" />
-                <span class="slider"></span>
-              </label>
-            </div>
-            <div class="data_input">
-              <p>한번에 결제 가능한 최대 잔 수</p>
-              <span class="in-box">
+            <!-- 재고관리 -->
+            <hr class="borderSt-dot"/>
+            <div class="inputWrap St02">
+                <h3>일반설정</h3>
+                <div class="data_input">
+                    <p>포인트 사용</p>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="point-check"/>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="data_input">
+                    <p>쿠폰 사용</p>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="coupon-check"/>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="data_input">
+                    <p>한번에 결제 가능한 최대 잔 수</p>
+                    <span class="in-box">
                 <input type="text" id="limit-count"/>
                 <p>잔</p>
               </span>
-            </div>
-            <div class="data_input">
-              <p>전체세척 예약시간</p>
-              <span class="in-box">
-                <input type="text" id="wash-time-input" />
+                </div>
+                <div class="data_input">
+                    <p>전체세척 예약시간</p>
+                    <span class="in-box">
+                <input type="text" id="wash-time-input"/>
                 <p>시</p>
               </span>
-            </div>
-            <div class="data_input">
-              <p>vcat 사용</p>
-              <label class="toggle-switch">
-                <input type="checkbox" id="vcat-check" />
-                <span class="slider"></span>
-              </label>
-            </div>
-            <!-- 개인컵은 추후개발 예정 -->
-            <!-- <div class="data_input">
-              <p>개인 컵 사용</p>
-              <label class="toggle-switch">
-                <input type="checkbox" />
-                <span class="slider"></span>
-              </label>
-            </div>
-            <div class="data_input">
-              <p>개인 컵 사용 할인 금액</p>
-              <span class="in-box">
-                <input type="text" value="100" />
-                <p>원</p>
-              </span>
-            </div> -->
-          </div>
-
-          <!-- 카테고리설정 -->
-          <hr class="borderSt-dot" style="display: none" />
-          <div class="inputWrap St02" style="display: none" >
-            <h3>카테고리설정</h3>
-            <div id="category-container"></div>
-            <div class="category-actions">
-              <button type="button" class="btn-outline">+ 카테고리 추가</button>
-            </div>
-          </div>
-
-          <!-- 기본정보 -->
-          <hr class="borderSt-dot" />
-          <div class="screenSet">
-            <h3 class="mb10">화면설정</h3>
-            <!-- 로고 업로드 부분 수정 -->
-            <div class="set-box">
-              <div class="icon-header">
-                <p>매장 로고 설정</p>
-                <button>삭제</button>
-              </div>
-
-              <!-- 숨겨진 파일 입력 -->
-              <input
-                type="file"
-                id="logoUpload"
-                accept="image/png"
-                style="display: none"
-              />
-
-              <!-- 사용자에게 보여지는 버튼 -->
-              <button
-                class="btn-outline gr"
-                onclick="document.getElementById('logoUpload').click()"
-              >
-                파일선택
-              </button>
-
-              <!-- 파일 이름 표시 -->
-              <p
-                id="fileName"
-                style="margin-top: 10px; font-size: 14px; color: #555"
-              ></p>
-
-              <!-- 이미지 미리보기 -->
-              <img
-                id="logoPreview"
-                src=""
-                alt="로고 미리보기"
-                style="margin-top: 10px; max-width: 200px; display: none"
-              />
-
-              <p class="caption">
-                * 초기화면 우측 상단(사이즈 가로 600px/ 세로 140px 이내 확장자
-                png)
-              </p>
-            </div>
-
-            <!-- 아이콘 업로드 부분 수정 -->
-            <div class="set-box">
-              <div class="icon-header">
-                <p>매장 아이콘 설정</p>
-                <button>삭제</button>
-              </div>
-
-              <!-- 숨겨진 파일 입력 -->
-              <input
-                type="file"
-                id="iconUpload"
-                accept="image/png"
-                style="display: none"
-              />
-
-              <!-- 사용자에게 보여지는 버튼 -->
-              <button
-                class="btn-outline gr"
-                onclick="document.getElementById('iconUpload').click()"
-              >
-                파일선택
-              </button>
-
-              <!-- 파일 이름 표시 -->
-              <p
-                id="iconFileName"
-                style="margin-top: 10px; font-size: 14px; color: #555"
-              ></p>
-
-              <!-- 이미지 미리보기 -->
-              <img
-                id="iconPreview"
-                src=""
-                alt="아이콘 미리보기"
-                style="margin-top: 10px; max-width: 200px; display: none"
-              />
-
-              <p class="caption">
-                * 화면 우측 음료제조 순서위치<br />(사이즈 가로 1300px/ 세로
-                2000px 이내 확장자 png)
-              </p>
-            </div>
-          </div>
-
-          <!-- 재고설정 -->
-
-         <hr class="borderSt-dot">
-         <div class="productSet" style="display: none">
-          <h2 class="mb20">재고 설정</h2>
-
-          <!-- 컵 -->
-          <div class="proBox mb20">
-            <h3 class="mb20">1. 컵설정</h3>
-            <div class="flex js">
-              <p class="protext">플라스틱컵</p>
-              <div class="toggle-flex">
-                <p>품절</p>
-                <label class="toggle-switch">
-                  <input type="checkbox">
-                  <span class="slider"></span>
-                </label>
-              </div>
-            </div>
-            <div class="grid col2 mb20">
-              <div class="input">
-                <p>플라스틱컵 전체수량</p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>개</span>
                 </div>
-              </div>
-              <div class="input">
-                <p>현재 재고량</p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>개</span>
+                <div class="data_input">
+                    <p>vcat 사용</p>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="vcat-check"/>
+                        <span class="slider"></span>
+                    </label>
                 </div>
-              </div>
-            </div>
-            <div class="flex js">
-              <p class="protext">종이컵</p>
-              <div class="toggle-flex">
-                <p>품절</p>
-                <label class="toggle-switch">
-                  <input type="checkbox">
-                  <span class="slider"></span>
-                </label>
-              </div>
-            </div>
-            <div class="grid col2">
-              <div class="input">
-                <p>종이컵 전체수량</p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>개</span>
-                </div>
-              </div>
-              <div class="input">
-                <p>현재 재고량</p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>개</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 원두 -->
-          <div class="proBox mb20">
-            <h3 class="mb20">2. 원두 설정</h3>
-            <div class="grid col2">
-              <div class="in-box">
-                <p>원두 1 이름</p>
-                <input type="text" name="" placeholder="다크, 산미 등">
-              </div>
-              <div class="flex js">
-                <p>원두 1</p>
-                <div class="toggle-flex">
-                  <p>품절</p>
+                <!-- 개인컵은 추후개발 예정 -->
+                <!-- <div class="data_input">
+                  <p>개인 컵 사용</p>
                   <label class="toggle-switch">
-                    <input type="checkbox">
+                    <input type="checkbox" />
                     <span class="slider"></span>
                   </label>
                 </div>
-              </div>
-            </div>
-            <div class="grid col2 mb20">
-              <div class="input">
-                <p>원두1 현재 중량 </p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-              <div class="input">
-                <p>원두1 총 중량</p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
+                <div class="data_input">
+                  <p>개인 컵 사용 할인 금액</p>
+                  <span class="in-box">
+                    <input type="text" value="100" />
+                    <p>원</p>
+                  </span>
+                </div> -->
             </div>
 
-            <div class="grid col2">
-              <div class="in-box">
-                <p>원두 2 이름</p>
-                <input type="text" name="" placeholder="다크, 산미 등">
-              </div>
-              <div class="flex js">
-                <p>원두 2</p>
-                <div class="toggle-flex">
-                  <p>품절</p>
-                  <label class="toggle-switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                  </label>
+            <!-- 카테고리설정 -->
+            <hr class="borderSt-dot" style="display: none"/>
+            <div class="inputWrap St02" style="display: none">
+                <h3>카테고리설정</h3>
+                <div id="category-container"></div>
+                <div class="category-actions">
+                    <button type="button" class="btn-outline">+ 카테고리 추가</button>
                 </div>
-              </div>
-            </div>
-            <div class="grid col2 mb20">
-              <div class="input">
-                <p>원두2 현재 중량 </p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-              <div class="input">
-                <p>원두2 총 중량</p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 파우더 설정 -->
-          <div class="proBox mb20">
-            <h3 class="mb20">3. 파우더 설정</h3>
-            <div class="grid col2">
-              <div class="in-box">
-                <p>파우더 1 이름</p>
-                <input type="text" name="" placeholder="다크, 산미 등">
-              </div>
-              <div class="flex js">
-                <p>파우더 1</p>
-                <div class="toggle-flex">
-                  <p>품절</p>
-                  <label class="toggle-switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div class="grid col2 mb20">
-              <div class="input">
-                <p>파우더 1 현재 중량 </p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-              <div class="input">
-                <p>파우더 1 총 중량</p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
             </div>
 
-            <div class="grid col2">
-              <div class="in-box">
-                <p>파우더 2 이름</p>
-                <input type="text" name="" placeholder="다크, 산미 등">
-              </div>
-              <div class="flex js">
-                <p>파우더 2 </p>
-                <div class="toggle-flex">
-                  <p>품절</p>
-                  <label class="toggle-switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                  </label>
+            <!-- 기본정보 -->
+            <hr class="borderSt-dot"/>
+            <div class="screenSet">
+                <h3 class="mb10">화면설정</h3>
+                <!-- 로고 업로드 부분 수정 -->
+                <div class="set-box">
+                    <div class="icon-header">
+                        <p>매장 로고 설정</p>
+                        <button>삭제</button>
+                    </div>
+
+                    <!-- 숨겨진 파일 입력 -->
+                    <input
+                            type="file"
+                            id="logoUpload"
+                            accept="image/png"
+                            style="display: none"
+                    />
+
+                    <!-- 사용자에게 보여지는 버튼 -->
+                    <button
+                            class="btn-outline gr"
+                            onclick="document.getElementById('logoUpload').click()"
+                    >
+                        파일선택
+                    </button>
+
+                    <!-- 파일 이름 표시 -->
+                    <p
+                            id="fileName"
+                            style="margin-top: 10px; font-size: 14px; color: #555"
+                    ></p>
+
+                    <!-- 이미지 미리보기 -->
+                    <img
+                            id="logoPreview"
+                            src=""
+                            alt="로고 미리보기"
+                            style="margin-top: 10px; max-width: 200px; display: none"
+                    />
+
+                    <p class="caption">
+                        * 초기화면 우측 상단(사이즈 가로 600px/ 세로 140px 이내 확장자
+                        png)
+                    </p>
                 </div>
-              </div>
-            </div>
-            <div class="grid col2 mb20">
-              <div class="input">
-                <p>파우더 2 현재 중량 </p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
+
+                <!-- 아이콘 업로드 부분 수정 -->
+                <div class="set-box">
+                    <div class="icon-header">
+                        <p>매장 아이콘 설정</p>
+                        <button>삭제</button>
+                    </div>
+
+                    <!-- 숨겨진 파일 입력 -->
+                    <input
+                            type="file"
+                            id="iconUpload"
+                            accept="image/png"
+                            style="display: none"
+                    />
+
+                    <!-- 사용자에게 보여지는 버튼 -->
+                    <button
+                            class="btn-outline gr"
+                            onclick="document.getElementById('iconUpload').click()"
+                    >
+                        파일선택
+                    </button>
+
+                    <!-- 파일 이름 표시 -->
+                    <p
+                            id="iconFileName"
+                            style="margin-top: 10px; font-size: 14px; color: #555"
+                    ></p>
+
+                    <!-- 이미지 미리보기 -->
+                    <img
+                            id="iconPreview"
+                            src=""
+                            alt="아이콘 미리보기"
+                            style="margin-top: 10px; max-width: 200px; display: none"
+                    />
+
+                    <p class="caption">
+                        * 화면 우측 음료제조 순서위치<br/>(사이즈 가로 1300px/ 세로
+                        2000px 이내 확장자 png)
+                    </p>
                 </div>
-              </div>
-              <div class="input">
-                <p>파우더 2 총 중량</p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
             </div>
 
-            <div class="grid col2">
-              <div class="in-box">
-                <p>파우더 3 이름</p>
-                <input type="text" name="" placeholder="다크, 산미 등">
-              </div>
-              <div class="flex js">
-                <p>파우더 3</p>
-                <div class="toggle-flex">
-                  <p>품절</p>
-                  <label class="toggle-switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div class="grid col2 mb20">
-              <div class="input">
-                <p>파우더 3 현재 중량 </p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-              <div class="input">
-                <p>파우더 3 총 중량</p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-            </div>
+            <!-- 재고설정 -->
 
-            <div class="grid col2">
-              <div class="in-box">
-                <p>파우더 4 이름</p>
-                <input type="text" name="" placeholder="다크, 산미 등">
-              </div>
-              <div class="flex js">
-                <p>파우더 4</p>
-                <div class="toggle-flex">
-                  <p>품절</p>
-                  <label class="toggle-switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div class="grid col2 mb20">
-              <div class="input">
-                <p>파우더 4 현재 중량 </p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-              <div class="input">
-                <p>파우더 5 총 중량</p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-            </div>
+            <hr class="borderSt-dot">
+            <div class="productSet" style="display: none">
+                <h2 class="mb20">재고 설정</h2>
 
-            <div class="grid col2">
-              <div class="in-box">
-                <p>파우더 3 이름</p>
-                <input type="text" name="" placeholder="다크, 산미 등">
-              </div>
-              <div class="flex js">
-                <p>파우더 5</p>
-                <div class="toggle-flex">
-                  <p>품절</p>
-                  <label class="toggle-switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                  </label>
+                <!-- 컵 -->
+                <div class="proBox mb20">
+                    <h3 class="mb20">1. 컵설정</h3>
+                    <div class="flex js">
+                        <p class="protext">플라스틱컵</p>
+                        <div class="toggle-flex">
+                            <p>품절</p>
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="grid col2 mb20">
+                        <div class="input">
+                            <p>플라스틱컵 전체수량</p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>개</span>
+                            </div>
+                        </div>
+                        <div class="input">
+                            <p>현재 재고량</p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>개</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex js">
+                        <p class="protext">종이컵</p>
+                        <div class="toggle-flex">
+                            <p>품절</p>
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="grid col2">
+                        <div class="input">
+                            <p>종이컵 전체수량</p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>개</span>
+                            </div>
+                        </div>
+                        <div class="input">
+                            <p>현재 재고량</p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>개</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-            <div class="grid col2 mb20">
-              <div class="input">
-                <p>파우더 5 현재 중량 </p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-              <div class="input">
-                <p>파우더 5 총 중량</p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-            </div>
 
-            <div class="grid col2">
-              <div class="in-box">
-                <p>파우더 6 이름</p>
-                <input type="text" name="" placeholder="다크, 산미 등">
-              </div>
-              <div class="flex js">
-                <p>파우더 6</p>
-                <div class="toggle-flex">
-                  <p>품절</p>
-                  <label class="toggle-switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div class="grid col2 mb20">
-              <div class="input">
-                <p>파우더 6 현재 중량 </p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-              <div class="input">
-                <p>파우더 6 총 중량</p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-            </div>
-          </div>
+                <!-- 원두 -->
+                <div class="proBox mb20">
+                    <h3 class="mb20">2. 원두 설정</h3>
+                    <div class="grid col2">
+                        <div class="in-box">
+                            <p>원두 1 이름</p>
+                            <input type="text" name="" placeholder="다크, 산미 등">
+                        </div>
+                        <div class="flex js">
+                            <p>원두 1</p>
+                            <div class="toggle-flex">
+                                <p>품절</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid col2 mb20">
+                        <div class="input">
+                            <p>원두1 현재 중량 </p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                        <div class="input">
+                            <p>원두1 총 중량</p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                    </div>
 
-          <!-- 액상 -->
-          <div class="proBox mb20">
-            <h3 class="mb20">4. 액상 설정</h3>
-            <div class="grid col2">
-              <div class="in-box">
-                <p>액상 1 이름</p>
-                <input type="text" name="" placeholder="다크, 산미 등">
-              </div>
-              <div class="flex js">
-                <p>액상 1</p>
-                <div class="toggle-flex">
-                  <p>품절</p>
-                  <label class="toggle-switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                  </label>
+                    <div class="grid col2">
+                        <div class="in-box">
+                            <p>원두 2 이름</p>
+                            <input type="text" name="" placeholder="다크, 산미 등">
+                        </div>
+                        <div class="flex js">
+                            <p>원두 2</p>
+                            <div class="toggle-flex">
+                                <p>품절</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid col2 mb20">
+                        <div class="input">
+                            <p>원두2 현재 중량 </p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                        <div class="input">
+                            <p>원두2 총 중량</p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-            <div class="grid col2 mb20">
-              <div class="input">
-                <p>액상 1 현재 중량 </p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-              <div class="input">
-                <p>액상 1 총 중량</p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-            </div>
 
-            <div class="grid col2">
-              <div class="in-box">
-                <p>액상 2 이름</p>
-                <input type="text" name="" placeholder="다크, 산미 등">
-              </div>
-              <div class="flex js">
-                <p>액상 2</p>
-                <div class="toggle-flex">
-                  <p>품절</p>
-                  <label class="toggle-switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div class="grid col2 mb20">
-              <div class="input">
-                <p>액상 2 현재 중량 </p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-              <div class="input">
-                <p>액상 2 총 중량</p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-            </div>
+                <!-- 파우더 설정 -->
+                <div class="proBox mb20">
+                    <h3 class="mb20">3. 파우더 설정</h3>
+                    <div class="grid col2">
+                        <div class="in-box">
+                            <p>파우더 1 이름</p>
+                            <input type="text" name="" placeholder="다크, 산미 등">
+                        </div>
+                        <div class="flex js">
+                            <p>파우더 1</p>
+                            <div class="toggle-flex">
+                                <p>품절</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid col2 mb20">
+                        <div class="input">
+                            <p>파우더 1 현재 중량 </p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                        <div class="input">
+                            <p>파우더 1 총 중량</p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="grid col2">
-              <div class="in-box">
-                <p>액상 3 이름</p>
-                <input type="text" name="" placeholder="다크, 산미 등">
-              </div>
-              <div class="flex js">
-                <p>액상 3</p>
-                <div class="toggle-flex">
-                  <p>품절</p>
-                  <label class="toggle-switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div class="grid col2 mb20">
-              <div class="input">
-                <p>액상 3 현재 중량 </p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-              <div class="input">
-                <p>액상 3 총 중량</p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-            </div>
+                    <div class="grid col2">
+                        <div class="in-box">
+                            <p>파우더 2 이름</p>
+                            <input type="text" name="" placeholder="다크, 산미 등">
+                        </div>
+                        <div class="flex js">
+                            <p>파우더 2 </p>
+                            <div class="toggle-flex">
+                                <p>품절</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid col2 mb20">
+                        <div class="input">
+                            <p>파우더 2 현재 중량 </p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                        <div class="input">
+                            <p>파우더 2 총 중량</p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="grid col2">
-              <div class="in-box">
-                <p>액상 4 이름</p>
-                <input type="text" name="" placeholder="다크, 산미 등">
-              </div>
-              <div class="flex js">
-                <p>액상 4</p>
-                <div class="toggle-flex">
-                  <p>품절</p>
-                  <label class="toggle-switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div class="grid col2 mb20">
-              <div class="input">
-                <p>액상 4 현재 중량 </p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-              <div class="input">
-                <p>액상 4 총 중량</p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-            </div>
+                    <div class="grid col2">
+                        <div class="in-box">
+                            <p>파우더 3 이름</p>
+                            <input type="text" name="" placeholder="다크, 산미 등">
+                        </div>
+                        <div class="flex js">
+                            <p>파우더 3</p>
+                            <div class="toggle-flex">
+                                <p>품절</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid col2 mb20">
+                        <div class="input">
+                            <p>파우더 3 현재 중량 </p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                        <div class="input">
+                            <p>파우더 3 총 중량</p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="grid col2">
-              <div class="in-box">
-                <p>액상 5 이름</p>
-                <input type="text" name="" placeholder="다크, 산미 등">
-              </div>
-              <div class="flex js">
-                <p>액상 5</p>
-                <div class="toggle-flex">
-                  <p>품절</p>
-                  <label class="toggle-switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div class="grid col2 mb20">
-              <div class="input">
-                <p>액상 5 현재 중량 </p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-              <div class="input">
-                <p>액상 5 총 중량</p>
-                <div class="in-box">
-                  <input type="text" name="" placeholder="숫자만 입력가능">
-                  <span>g</span>
-                </div>
-              </div>
-            </div>
-          </div>
+                    <div class="grid col2">
+                        <div class="in-box">
+                            <p>파우더 4 이름</p>
+                            <input type="text" name="" placeholder="다크, 산미 등">
+                        </div>
+                        <div class="flex js">
+                            <p>파우더 4</p>
+                            <div class="toggle-flex">
+                                <p>품절</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid col2 mb20">
+                        <div class="input">
+                            <p>파우더 4 현재 중량 </p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                        <div class="input">
+                            <p>파우더 5 총 중량</p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                    </div>
 
-         </div>
+                    <div class="grid col2">
+                        <div class="in-box">
+                            <p>파우더 3 이름</p>
+                            <input type="text" name="" placeholder="다크, 산미 등">
+                        </div>
+                        <div class="flex js">
+                            <p>파우더 5</p>
+                            <div class="toggle-flex">
+                                <p>품절</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid col2 mb20">
+                        <div class="input">
+                            <p>파우더 5 현재 중량 </p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                        <div class="input">
+                            <p>파우더 5 총 중량</p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid col2">
+                        <div class="in-box">
+                            <p>파우더 6 이름</p>
+                            <input type="text" name="" placeholder="다크, 산미 등">
+                        </div>
+                        <div class="flex js">
+                            <p>파우더 6</p>
+                            <div class="toggle-flex">
+                                <p>품절</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid col2 mb20">
+                        <div class="input">
+                            <p>파우더 6 현재 중량 </p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                        <div class="input">
+                            <p>파우더 6 총 중량</p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 액상 -->
+                <div class="proBox mb20">
+                    <h3 class="mb20">4. 액상 설정</h3>
+                    <div class="grid col2">
+                        <div class="in-box">
+                            <p>액상 1 이름</p>
+                            <input type="text" name="" placeholder="다크, 산미 등">
+                        </div>
+                        <div class="flex js">
+                            <p>액상 1</p>
+                            <div class="toggle-flex">
+                                <p>품절</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid col2 mb20">
+                        <div class="input">
+                            <p>액상 1 현재 중량 </p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                        <div class="input">
+                            <p>액상 1 총 중량</p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid col2">
+                        <div class="in-box">
+                            <p>액상 2 이름</p>
+                            <input type="text" name="" placeholder="다크, 산미 등">
+                        </div>
+                        <div class="flex js">
+                            <p>액상 2</p>
+                            <div class="toggle-flex">
+                                <p>품절</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid col2 mb20">
+                        <div class="input">
+                            <p>액상 2 현재 중량 </p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                        <div class="input">
+                            <p>액상 2 총 중량</p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid col2">
+                        <div class="in-box">
+                            <p>액상 3 이름</p>
+                            <input type="text" name="" placeholder="다크, 산미 등">
+                        </div>
+                        <div class="flex js">
+                            <p>액상 3</p>
+                            <div class="toggle-flex">
+                                <p>품절</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid col2 mb20">
+                        <div class="input">
+                            <p>액상 3 현재 중량 </p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                        <div class="input">
+                            <p>액상 3 총 중량</p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid col2">
+                        <div class="in-box">
+                            <p>액상 4 이름</p>
+                            <input type="text" name="" placeholder="다크, 산미 등">
+                        </div>
+                        <div class="flex js">
+                            <p>액상 4</p>
+                            <div class="toggle-flex">
+                                <p>품절</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid col2 mb20">
+                        <div class="input">
+                            <p>액상 4 현재 중량 </p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                        <div class="input">
+                            <p>액상 4 총 중량</p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid col2">
+                        <div class="in-box">
+                            <p>액상 5 이름</p>
+                            <input type="text" name="" placeholder="다크, 산미 등">
+                        </div>
+                        <div class="flex js">
+                            <p>액상 5</p>
+                            <div class="toggle-flex">
+                                <p>품절</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid col2 mb20">
+                        <div class="input">
+                            <p>액상 5 현재 중량 </p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                        <div class="input">
+                            <p>액상 5 총 중량</p>
+                            <div class="in-box">
+                                <input type="text" name="" placeholder="숫자만 입력가능">
+                                <span>g</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
-      </section>
-    </div>
-  </body>
+    </section>
+</div>
+</body>
 </html>

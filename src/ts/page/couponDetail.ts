@@ -1,354 +1,354 @@
-import { apiGet, apiPost } from "../api/apiHelpers.ts";
-import { getStoredUser } from "../utils/userStorage.ts";
+import {apiGet, apiPost} from "../api/apiHelpers.ts";
+import {getStoredUser} from "../utils/userStorage.ts";
 
 export function initCouponDetail() {
-  console.log("쿠폰 발행 페이지 초기화");
+    console.log("쿠폰 발행 페이지 초기화");
 
-  // API에서 사용자 정보 가져와서 가맹점/지점에 넣기
-  loadUserData();
+    // API에서 사용자 정보 가져와서 가맹점/지점에 넣기
+    loadUserData();
 
-  // 날짜 입력 필드 초기화 및 이벤트 리스너 추가
-  initDateInputs();
+    // 날짜 입력 필드 초기화 및 이벤트 리스너 추가
+    initDateInputs();
 
-  // 목록으로 버튼 클릭 시 couponList 페이지로 이동
-  const backToListBtn = document.getElementById("back-to-list");
+    // 목록으로 버튼 클릭 시 couponList 페이지로 이동
+    const backToListBtn = document.getElementById("back-to-list");
 
-  if (backToListBtn) {
-    backToListBtn.addEventListener("click", function () {
-      window.location.href = "/html/couponList.html";
-    });
-  }
+    if (backToListBtn) {
+        backToListBtn.addEventListener("click", function () {
+            window.location.href = "/html/couponList.html";
+        });
+    }
 
-  // 폼 제출 이벤트
-  const couponForm = document.getElementById("coupon-form") as HTMLFormElement;
+    // 폼 제출 이벤트
+    const couponForm = document.getElementById("coupon-form") as HTMLFormElement;
 
-  if (couponForm) {
-    couponForm.addEventListener("submit", async function (e) {
-      e.preventDefault();
+    if (couponForm) {
+        couponForm.addEventListener("submit", async function (e) {
+            e.preventDefault();
 
-      // 필드 값 가져오기
-      const franchise = (
-        document.getElementById("franchise-input") as HTMLInputElement
-      )?.value.trim();
-      const store = (
-        document.getElementById("store-input") as HTMLInputElement
-      )?.value.trim();
-      const device = (
-        document.getElementById("device-input") as HTMLInputElement
-      )?.value.trim();
-      const startDate = (
-        document.getElementById("start-date") as HTMLInputElement
-      )?.value.trim();
-      const endDate = (
-        document.getElementById("end-date") as HTMLInputElement
-      )?.value.trim();
-      const issueCount = (
-        document.getElementById("issue-count") as HTMLInputElement
-      )?.value.trim();
-      const coupon = (
-        document.getElementById("sample") as HTMLSelectElement
-      )?.value.trim();
-      /*const memo = (
-        document.getElementById("myTextarea") as HTMLTextAreaElement
-      )?.value.trim();*/
+            // 필드 값 가져오기
+            const franchise = (
+                document.getElementById("franchise-input") as HTMLInputElement
+            )?.value.trim();
+            const store = (
+                document.getElementById("store-input") as HTMLInputElement
+            )?.value.trim();
+            const device = (
+                document.getElementById("device-input") as HTMLInputElement
+            )?.value.trim();
+            const startDate = (
+                document.getElementById("start-date") as HTMLInputElement
+            )?.value.trim();
+            const endDate = (
+                document.getElementById("end-date") as HTMLInputElement
+            )?.value.trim();
+            const issueCount = (
+                document.getElementById("issue-count") as HTMLInputElement
+            )?.value.trim();
+            const coupon = (
+                document.getElementById("sample") as HTMLSelectElement
+            )?.value.trim();
+            /*const memo = (
+              document.getElementById("myTextarea") as HTMLTextAreaElement
+            )?.value.trim();*/
 
-      // 유효성 검사
-      if (!franchise) {
-        window.showToast("가맹점을 입력해 주세요", 2000, "warning");
-        return;
-      }
-      if (!store) {
-        window.showToast("지점을 입력해 주세요", 2000, "warning");
-        return;
-      }
-      if (!device) {
-        window.showToast("기기번호를 입력해 주세요", 2000, "warning");
-        return;
-      }
-      if (!startDate) {
-        window.showToast("사용기한(시작일)을 입력해 주세요", 2000, "warning");
-        return;
-      }
-      if (!endDate) {
-        window.showToast("사용기한(종료일)을 입력해 주세요", 2000, "warning");
-        return;
-      }
-      if (!issueCount) {
-        window.showToast("발행매수를 입력해 주세요", 2000, "warning");
-        return;
-      }
-      if (!coupon) {
-        window.showToast("쿠폰을 선택해 주세요", 2000, "warning");
-        return;
-      }
-
-      // ✅ 발행매수 유효성 검사 추가
-      const issueCountNum = parseInt(issueCount);
-      if (isNaN(issueCountNum) || issueCountNum < 1 || issueCountNum > 99) {
-        window.showToast(
-          "발행매수는 1~99개 사이로 입력해주세요",
-          2000,
-          "warning"
-        );
-        return;
-      }
-
-      // ✅ 날짜 범위 유효성 검사 추가
-      if (!validateDateRange(startDate, endDate)) {
-        return;
-      }
-
-      // 선택된 쿠폰의 이름 가져오기
-      const selectElement = document.getElementById(
-        "sample"
-      ) as HTMLSelectElement;
-      const selectedOption =
-        selectElement?.options[selectElement.selectedIndex];
-      const selectedMenuName = selectedOption?.textContent || "";
-
-      // ✅ 확인창 표시
-      const confirmMessage = "쿠폰을 발행하시겠습니까?";
-
-      if (!confirm(confirmMessage)) {
-        return; // 사용자가 취소를 선택한 경우
-      }
-
-      try {
-        const user = getStoredUser();
-        if (!user) {
-          window.showToast("사용자 정보가 없습니다.", 2000, "error");
-          return;
-        }
-
-        let successCount = 0;
-        let errorCount = 0;
-
-        for (let i = 0; i < issueCountNum; i++) {
-          try {
-            const payload = {
-              userId: user.userId,
-              title: `${selectedMenuName} 무료`,
-              menuId: coupon,
-              count: 1,
-              startsAt: startDate,
-              expiresAt: endDate,
-            };
-
-            // 쿠폰 발급 API 호출
-            const response = await apiPost(
-              "/model_coupon?func=setCoupon",
-              payload
-            );
-
-            if (response.ok) {
-              successCount++;
-            } else {
-              errorCount++;
-              const errorData = await response.json();
-              console.error(
-                `쿠폰 발급 실패 (${i + 1}/${issueCountNum}):`,
-                errorData.message
-              );
+            // 유효성 검사
+            if (!franchise) {
+                window.showToast("가맹점을 입력해 주세요", 2000, "warning");
+                return;
             }
-          } catch (error) {
-            errorCount++;
-            console.error(
-              `쿠폰 발급 중 오류 발생 (${i + 1}/${issueCountNum}):`,
-              error
-            );
-          }
-        }
+            if (!store) {
+                window.showToast("지점을 입력해 주세요", 2000, "warning");
+                return;
+            }
+            if (!device) {
+                window.showToast("기기번호를 입력해 주세요", 2000, "warning");
+                return;
+            }
+            if (!startDate) {
+                window.showToast("사용기한(시작일)을 입력해 주세요", 2000, "warning");
+                return;
+            }
+            if (!endDate) {
+                window.showToast("사용기한(종료일)을 입력해 주세요", 2000, "warning");
+                return;
+            }
+            if (!issueCount) {
+                window.showToast("발행매수를 입력해 주세요", 2000, "warning");
+                return;
+            }
+            if (!coupon) {
+                window.showToast("쿠폰을 선택해 주세요", 2000, "warning");
+                return;
+            }
 
-        // 결과 메시지 표시
-        if (successCount === issueCountNum) {
-          window.showToast("쿠폰 발행이 완료되었습니다.", 3000, "success");
-        } else if (successCount > 0) {
-          window.showToast(
-            `${successCount}개 발급 성공, ${errorCount}개 발급 실패`,
-            3000,
-            "warning"
-          );
-        } else {
-          window.showToast("쿠폰 발급에 실패했습니다.", 3000, "error");
-          return;
-        }
+            // ✅ 발행매수 유효성 검사 추가
+            const issueCountNum = parseInt(issueCount);
+            if (isNaN(issueCountNum) || issueCountNum < 1 || issueCountNum > 99) {
+                window.showToast(
+                    "발행매수는 1~99개 사이로 입력해주세요",
+                    2000,
+                    "warning"
+                );
+                return;
+            }
 
-        // 성공 시 목록 페이지로 이동
-        setTimeout(() => {
-          window.location.href = "/html/couponList.html";
-        }, 1000);
-      } catch (error) {
-        window.showToast("쿠폰 발급 중 오류가 발생했습니다.", 3000, "error");
-      }
-    });
-  }
+            // ✅ 날짜 범위 유효성 검사 추가
+            if (!validateDateRange(startDate, endDate)) {
+                return;
+            }
+
+            // 선택된 쿠폰의 이름 가져오기
+            const selectElement = document.getElementById(
+                "sample"
+            ) as HTMLSelectElement;
+            const selectedOption =
+                selectElement?.options[selectElement.selectedIndex];
+            const selectedMenuName = selectedOption?.textContent || "";
+
+            // ✅ 확인창 표시
+            const confirmMessage = "쿠폰을 발행하시겠습니까?";
+
+            if (!confirm(confirmMessage)) {
+                return; // 사용자가 취소를 선택한 경우
+            }
+
+            try {
+                const user = getStoredUser();
+                if (!user) {
+                    window.showToast("사용자 정보가 없습니다.", 2000, "error");
+                    return;
+                }
+
+                let successCount = 0;
+                let errorCount = 0;
+
+                for (let i = 0; i < issueCountNum; i++) {
+                    try {
+                        const payload = {
+                            userId: user.userId,
+                            title: `${selectedMenuName} 무료`,
+                            menuId: coupon,
+                            count: 1,
+                            startsAt: startDate,
+                            expiresAt: endDate,
+                        };
+
+                        // 쿠폰 발급 API 호출
+                        const response = await apiPost(
+                            "/model_coupon?func=setCoupon",
+                            payload
+                        );
+
+                        if (response.ok) {
+                            successCount++;
+                        } else {
+                            errorCount++;
+                            const errorData = await response.json();
+                            console.error(
+                                `쿠폰 발급 실패 (${i + 1}/${issueCountNum}):`,
+                                errorData.message
+                            );
+                        }
+                    } catch (error) {
+                        errorCount++;
+                        console.error(
+                            `쿠폰 발급 중 오류 발생 (${i + 1}/${issueCountNum}):`,
+                            error
+                        );
+                    }
+                }
+
+                // 결과 메시지 표시
+                if (successCount === issueCountNum) {
+                    window.showToast("쿠폰 발행이 완료되었습니다.", 3000, "success");
+                } else if (successCount > 0) {
+                    window.showToast(
+                        `${successCount}개 발급 성공, ${errorCount}개 발급 실패`,
+                        3000,
+                        "warning"
+                    );
+                } else {
+                    window.showToast("쿠폰 발급에 실패했습니다.", 3000, "error");
+                    return;
+                }
+
+                // 성공 시 목록 페이지로 이동
+                setTimeout(() => {
+                    window.location.href = "/html/couponList.html";
+                }, 1000);
+            } catch (error) {
+                window.showToast("쿠폰 발급 중 오류가 발생했습니다.", 3000, "error");
+            }
+        });
+    }
 }
 
 function validateDateRange(startDate: string, endDate: string): boolean {
-  if (!startDate || !endDate) {
-    window.showToast("시작일과 종료일을 모두 선택해주세요.", 3000, "warning");
-    return false;
-  }
+    if (!startDate || !endDate) {
+        window.showToast("시작일과 종료일을 모두 선택해주세요.", 3000, "warning");
+        return false;
+    }
 
-  // ✅ 날짜만 비교하도록 수정 (시간 제거)
-  const today = new Date();
-  const todayStr = today.toISOString().split("T")[0]; // YYYY-MM-DD 형식
+    // ✅ 날짜만 비교하도록 수정 (시간 제거)
+    const today = new Date();
+    const todayStr = today.toISOString().split("T")[0]; // YYYY-MM-DD 형식
 
-  const startDateObj = new Date(startDate + "T00:00:00");
+    const startDateObj = new Date(startDate + "T00:00:00");
 
-  // ✅ 시작날짜가 오늘보다 이전인지 확인 (날짜만 비교)
-  if (startDate < todayStr) {
-    window.showToast("시작날짜는 오늘 이후로 설정해주세요.", 3000, "warning");
-    return false;
-  }
+    // ✅ 시작날짜가 오늘보다 이전인지 확인 (날짜만 비교)
+    if (startDate < todayStr) {
+        window.showToast("시작날짜는 오늘 이후로 설정해주세요.", 3000, "warning");
+        return false;
+    }
 
-  // ✅ 시작날짜가 종료날짜보다 늦은지 확인
-  if (startDate > endDate) {
-    window.showToast("시작일은 종료일보다 클 수 없습니다.", 3000, "warning");
-    return false;
-  }
+    // ✅ 시작날짜가 종료날짜보다 늦은지 확인
+    if (startDate > endDate) {
+        window.showToast("시작일은 종료일보다 클 수 없습니다.", 3000, "warning");
+        return false;
+    }
 
-  // ✅ 종료날짜가 시작날짜 + 1년을 초과하는지 확인 (정확히 365일)
-  const maxEndDate = new Date(startDateObj);
-  maxEndDate.setDate(maxEndDate.getDate() + 365); // 정확히 365일 후
-  const maxEndDateStr = maxEndDate.toISOString().split("T")[0];
+    // ✅ 종료날짜가 시작날짜 + 1년을 초과하는지 확인 (정확히 365일)
+    const maxEndDate = new Date(startDateObj);
+    maxEndDate.setDate(maxEndDate.getDate() + 365); // 정확히 365일 후
+    const maxEndDateStr = maxEndDate.toISOString().split("T")[0];
 
-  if (endDate > maxEndDateStr) {
-    window.showToast(
-      "종료날짜는 시작날짜로부터 1년 이내로 설정해주세요.",
-      3000,
-      "warning"
-    );
-    return false;
-  }
+    if (endDate > maxEndDateStr) {
+        window.showToast(
+            "종료날짜는 시작날짜로부터 1년 이내로 설정해주세요.",
+            3000,
+            "warning"
+        );
+        return false;
+    }
 
-  return true;
+    return true;
 }
 
 async function loadUserData() {
-  try {
-    const user = getStoredUser();
-    if (!user) return;
+    try {
+        const user = getStoredUser();
+        if (!user) return;
 
-    const response = await apiGet(
-      `/model_user_setting?func=get-user&userId=${user.userId}`
-    );
-    const data = await response.json();
+        const response = await apiGet(
+            `/model_user_setting?func=get-user&userId=${user.userId}`
+        );
+        const data = await response.json();
 
-    const storeName = data.user.storeName;
+        const storeName = data.user.storeName;
 
-    // 가맹점과 지점에 storeName 값 설정
-    const franchiseInput = document.getElementById(
-      "franchise-input"
-    ) as HTMLInputElement;
-    const storeInput = document.getElementById(
-      "store-input"
-    ) as HTMLInputElement;
-    const deviceInput = document.getElementById(
-      "device-input"
-    ) as HTMLInputElement;
+        // 가맹점과 지점에 storeName 값 설정
+        const franchiseInput = document.getElementById(
+            "franchise-input"
+        ) as HTMLInputElement;
+        const storeInput = document.getElementById(
+            "store-input"
+        ) as HTMLInputElement;
+        const deviceInput = document.getElementById(
+            "device-input"
+        ) as HTMLInputElement;
 
-    if (franchiseInput) franchiseInput.value = storeName;
-    if (storeInput) storeInput.value = storeName;
-    if (deviceInput) deviceInput.value = user.userId;
+        if (franchiseInput) franchiseInput.value = storeName;
+        if (storeInput) storeInput.value = storeName;
+        if (deviceInput) deviceInput.value = user.userId;
 
-    await sampleSelect(user.userId);
-  } catch (error) {
-    console.error("사용자 데이터 로드 실패:", error);
-  }
+        await sampleSelect(user.userId);
+    } catch (error) {
+        console.error("사용자 데이터 로드 실패:", error);
+    }
 }
 
 async function sampleSelect(userId: string) {
-  try {
-    const response = await apiGet(
-      `/model_admin_menu?userId=${userId}&func=get-all-menu`
-    );
-    const data = await response.json();
+    try {
+        const response = await apiGet(
+            `/model_admin_menu?userId=${userId}&func=get-all-menu`
+        );
+        const data = await response.json();
 
-    const selectElement = document.getElementById(
-      "sample"
-    ) as HTMLSelectElement;
+        const selectElement = document.getElementById(
+            "sample"
+        ) as HTMLSelectElement;
 
-    if (selectElement && data.items) {
-      selectElement.innerHTML = '<option value="">쿠폰을 선택해주세요</option>';
+        if (selectElement && data.items) {
+            selectElement.innerHTML = '<option value="">쿠폰을 선택해주세요</option>';
 
-      data.items.forEach((item: any) => {
-        if (!item.menuId || !item.name) return;
-        const option = document.createElement("option");
-        option.value = item.menuId;
-        option.textContent = item.name;
-        selectElement.appendChild(option);
-      });
+            data.items.forEach((item: any) => {
+                if (!item.menuId || !item.name) return;
+                const option = document.createElement("option");
+                option.value = item.menuId;
+                option.textContent = item.name;
+                selectElement.appendChild(option);
+            });
 
-      new window.Choices(selectElement, {
-        shouldSort: false,
-        searchEnabled: true,
-        position: "auto",
-        classNames: {
-          containerOuter: "custom-select",
-          containerInner: "custom-select-inner",
-          input: "custom-select-input",
-          itemChoice: "custom-select-item",
-          listDropdown: "custom-select-dropdown",
-          placeholder: "custom-select-placeholder",
-        },
-      });
+            new window.Choices(selectElement, {
+                shouldSort: false,
+                searchEnabled: true,
+                position: "auto",
+                classNames: {
+                    containerOuter: "custom-select",
+                    containerInner: "custom-select-inner",
+                    input: "custom-select-input",
+                    itemChoice: "custom-select-item",
+                    listDropdown: "custom-select-dropdown",
+                    placeholder: "custom-select-placeholder",
+                },
+            });
+        }
+    } catch (error) {
+        console.error("메뉴 데이터 로드 실패:", error);
     }
-  } catch (error) {
-    console.error("메뉴 데이터 로드 실패:", error);
-  }
 }
 
 function initDateInputs() {
-  const startDateInput = document.getElementById(
-    "start-date"
-  ) as HTMLInputElement;
-  const endDateInput = document.getElementById("end-date") as HTMLInputElement;
+    const startDateInput = document.getElementById(
+        "start-date"
+    ) as HTMLInputElement;
+    const endDateInput = document.getElementById("end-date") as HTMLInputElement;
 
-  if (!startDateInput || !endDateInput) {
-    console.error("날짜 입력 필드를 찾을 수 없습니다.");
-    return;
-  }
-
-  const today = new Date().toISOString().split("T")[0];
-
-  startDateInput.min = today;
-  startDateInput.value = today;
-
-  endDateInput.min = today;
-
-  startDateInput.addEventListener("change", function () {
-    const startDate = this.value;
-    if (startDate) {
-      const startDateObj = new Date(startDate);
-      const maxEndDate = new Date(startDateObj);
-      maxEndDate.setDate(maxEndDate.getDate() + 365);
-
-      const maxEndDateStr = maxEndDate.toISOString().split("T")[0];
-
-      endDateInput.max = maxEndDateStr;
-
-      if (endDateInput.value && endDateInput.value > maxEndDateStr) {
-        endDateInput.value = maxEndDateStr;
-      }
-
-      endDateInput.min = startDate;
+    if (!startDateInput || !endDateInput) {
+        console.error("날짜 입력 필드를 찾을 수 없습니다.");
+        return;
     }
-  });
 
-  endDateInput.addEventListener("change", function () {
-    const endDate = this.value;
-    if (endDate) {
-      const endDateObj = new Date(endDate);
-      const minStartDate = new Date(endDateObj);
-      minStartDate.setDate(minStartDate.getDate() - 365);
+    const today = new Date().toISOString().split("T")[0];
 
-      const minStartDateStr = minStartDate.toISOString().split("T")[0];
+    startDateInput.min = today;
+    startDateInput.value = today;
 
-      const todayDate = new Date(today).getTime();
-      const minStartDateNum = new Date(minStartDateStr).getTime();
-      const maxDate = Math.max(todayDate, minStartDateNum);
-      startDateInput.min = new Date(maxDate).toISOString().split("T")[0];
-    }
-  });
+    endDateInput.min = today;
+
+    startDateInput.addEventListener("change", function () {
+        const startDate = this.value;
+        if (startDate) {
+            const startDateObj = new Date(startDate);
+            const maxEndDate = new Date(startDateObj);
+            maxEndDate.setDate(maxEndDate.getDate() + 365);
+
+            const maxEndDateStr = maxEndDate.toISOString().split("T")[0];
+
+            endDateInput.max = maxEndDateStr;
+
+            if (endDateInput.value && endDateInput.value > maxEndDateStr) {
+                endDateInput.value = maxEndDateStr;
+            }
+
+            endDateInput.min = startDate;
+        }
+    });
+
+    endDateInput.addEventListener("change", function () {
+        const endDate = this.value;
+        if (endDate) {
+            const endDateObj = new Date(endDate);
+            const minStartDate = new Date(endDateObj);
+            minStartDate.setDate(minStartDate.getDate() - 365);
+
+            const minStartDateStr = minStartDate.toISOString().split("T")[0];
+
+            const todayDate = new Date(today).getTime();
+            const minStartDateNum = new Date(minStartDateStr).getTime();
+            const maxDate = Math.max(todayDate, minStartDateNum);
+            startDateInput.min = new Date(maxDate).toISOString().split("T")[0];
+        }
+    });
 }
