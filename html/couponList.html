@@ -1,118 +1,117 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="/src/css/reset.css" />
-    <link rel="stylesheet" href="/src/css/common.css" />
-    <link rel="stylesheet" href="/src/css/style.css" />
-    <link rel="stylesheet" href="/src/css/couponList.css" />
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="/src/css/reset.css"/>
+    <link rel="stylesheet" href="/src/css/common.css"/>
+    <link rel="stylesheet" href="/src/css/style.css"/>
+    <link rel="stylesheet" href="/src/css/couponList.css"/>
     <script type="module" src="/src/main.ts"></script>
-  </head>
+</head>
 
-  <body id="coupon-page">
-    <div id="main-content">
-      <!-- 사용자 정보 섹션 -->
-      <section class="mt8">
+<body id="coupon-page">
+<div id="main-content">
+    <!-- 사용자 정보 섹션 -->
+    <section class="mt8">
         <div class="inner">
-          <div class="user-flex">
-            <div class="user">
-              <i class="fa-regular fa-circle-user"></i>
-              <p id="user-name">-</p>
-              <label class="label manager" id="user-grade"
-                ><span>-</span></label
-              >
+            <div class="user-flex">
+                <div class="user">
+                    <i class="fa-regular fa-circle-user"></i>
+                    <p id="user-name">-</p>
+                    <label class="label manager" id="user-grade"
+                    ><span>-</span></label
+                    >
+                </div>
             </div>
-          </div>
         </div>
-      </section>
+    </section>
 
-      <!-- 쿠폰 목록 메인 페이지 -->
-      <section class="pb20">
+    <!-- 쿠폰 목록 메인 페이지 -->
+    <section class="pb20">
         <div class="inner">
-          <div class="title-flex" style="margin-bottom: 10px">
-            <h2 style="margin-bottom: 0">쿠폰목록</h2>
+            <div class="title-flex" style="margin-bottom: 10px">
+                <h2 style="margin-bottom: 0">쿠폰목록</h2>
 
-            <!-- 발권하기 버튼 -->
-            <div class="btnFlex" style="margin-top: 0">
-              <button
-                type="button"
-                class="btn blue coupon-list-btn"
-                id="open-coupon-detail"
-              >
-                발급하기
-              </button>
-              <!-- ✅ 이미지 저장 버튼 -->
-              <button
-                type="button"
-                class="btn blue coupon-list-btn"
-                id="save-selected-coupons"
-              >
-                <img src="/img/image_icon.svg" alt="" />이미지 저장
-              </button>
+                <!-- 발권하기 버튼 -->
+                <div class="btnFlex" style="margin-top: 0">
+                    <button
+                            type="button"
+                            class="btn blue coupon-list-btn"
+                            id="open-coupon-detail"
+                    >
+                        발급하기
+                    </button>
+                    <!-- ✅ 이미지 저장 버튼 -->
+                    <button
+                            type="button"
+                            class="btn blue coupon-list-btn"
+                            id="save-selected-coupons"
+                    >
+                        <img src="/img/image_icon.svg" alt=""/>이미지 저장
+                    </button>
+                </div>
             </div>
-          </div>
 
-          <!-- 검색창 추가 -->
-          <div class="search-container" style="margin-bottom: 20px">
-            <div class="search-box">
-              <input
-                id="searchCoupon"
-                type="text"
-                placeholder="쿠폰명 또는 쿠폰코드로 검색해주세요."
-              />
-              <button id="searchButton" class="btn-i search">
-                <img src="/img/search.svg" alt="" />
-              </button>
-              <button id="searchReset" class="btn-i reset">
-                <img src="/img/refresh_icon.svg" alt="" />
-              </button>
+            <!-- 검색창 추가 -->
+            <div class="search-container" style="margin-bottom: 20px">
+                <div class="search-box">
+                    <input
+                            id="searchCoupon"
+                            type="text"
+                            placeholder="쿠폰명 또는 쿠폰코드로 검색해주세요."
+                    />
+                    <button id="searchButton" class="btn-i search">
+                        <img src="/img/search.svg" alt=""/>
+                    </button>
+                    <button id="searchReset" class="btn-i reset">
+                        <img src="/img/refresh_icon.svg" alt=""/>
+                    </button>
+                </div>
             </div>
-          </div>
 
-          <!-- 쿠폰 목록 테이블 추가 -->
-          <div class="tableArea">
-            <table>
-              <thead>
-                <tr>
-                  <th><input type="checkbox" /></th>
-                  <th>순서</th>
-                  <th>이름</th>
-                  <th>사용기한</th>
-                  <th>코드</th>
-                  <th>사용여부</th>
-                </tr>
-              </thead>
-              <tbody id="coupon-table-body">
-                <tr>
-                  <td colspan="6" style="padding: 2rem 0 0">
-                    표시할 쿠폰이 없습니다.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+            <!-- 쿠폰 목록 테이블 추가 -->
+            <div class="tableArea">
+                <table>
+                    <thead>
+                    <tr>
+                        <th><input type="checkbox"/></th>
+                        <th>순서</th>
+                        <th>이름</th>
+                        <th>사용기한</th>
+                        <th>코드</th>
+                        <th>사용여부</th>
+                    </tr>
+                    </thead>
+                    <tbody id="coupon-table-body">
+                    <tr>
+                        <td colspan="6" style="padding: 2rem 0 0">
+                            표시할 쿠폰이 없습니다.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-      </section>
+    </section>
 
-      <!-- 쿠폰 팝업 수정 -->
-      <div id="coupon-popup" class="popup-overlay" style="display: none">
+    <!-- 쿠폰 팝업 수정 -->
+    <div id="coupon-popup" class="popup-overlay" style="display: none">
         <div class="popup">
-          <div class="popup-header">
-            <h2>쿠폰</h2>
-            <button class="close-btn">&times;</button>
-          </div>
-          <div class="popup-body">
-            <div class="coupon-container">
-              <img id="coupon-image" src="/img/coupon.svg" alt="쿠폰" />
-
-              <div class="coupon-overlay">
-                <!-- 바코드 캔버스 추가 -->
-                <canvas id="coupon-barcode"></canvas>
-              </div>
+            <div class="popup-header">
+                <h2>쿠폰</h2>
+                <button class="close-btn">&times;</button>
             </div>
-          </div>
+            <div class="popup-body">
+                <div class="coupon-container">
+                    <img id="coupon-image" src="/img/coupon.svg" alt="쿠폰" width="340" height="405"/>
+                    <div class="coupon-overlay">
+                        <!-- 바코드 캔버스 추가 -->
+                        <canvas id="coupon-barcode"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </body>
+</div>
+</body>
 </html>
