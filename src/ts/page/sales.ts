@@ -710,8 +710,6 @@ async function updatePopupContent(rowIndex: number) {
             return;
         }
 
-        console.log(item);
-
         // 매장 정보 가져오기
         const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
         const userId = userInfo.userId;
@@ -743,6 +741,7 @@ async function updatePopupContent(rowIndex: number) {
         let popupContent = "";
 
         if (currentSalesType === "transaction") {
+            console.log("item: ", item);
             const menuItems = item.menuSummary
                 .map((menu: any) => `${menu.name} / ${menu.count || 1}개`)
                 .join("<br>");
@@ -752,122 +751,248 @@ async function updatePopupContent(rowIndex: number) {
             const timeStr = date[1].substring(0, 5);
             const formattedDate = `${dateStr} ${timeStr}`;
 
-            const usedPoints = item.point === 0 ? "0P" : `${item.point}P`;
-
-            let actualPaymentType = "card";
-            let paymentMethodText = "카드";
-            let pointContact = "정보 없음";
-            let earnedPoints = "정보없음";
-
-            if (item.point > 0) {
-                actualPaymentType = "point";
-                paymentMethodText = "포인트";
-            }
-
-            if (item.pointData) {
-                pointContact = item.pointData.tel || "정보 없음";
-                earnedPoints = `${item.pointData.points || 0}P`;
-            }
-
-            let paymentMethodInfo = "";
-            let pointInfo = "";
-
-            if (actualPaymentType === "card") {
-                const cardInfo = item.payInfo || {};
-                const issuerName = cardInfo.issuerName || "정보 없음";
-                const cardBin = cardInfo.cardBin || "정보 없음";
-
-                paymentMethodInfo = `
-      <div>
-        <h5>결제 카드</h5>
-        <p>${issuerName}</p>
-      </div>
-      <div>
-        <h5>카드 번호</h5>
-        <p>${cardBin}</p>
-      </div>
-    `;
-            } else if (actualPaymentType === "point") {
-                pointInfo = `
-      <div>
-        <h5>포인트 연락처</h5>
-        <p>${pointContact}</p>
-      </div>
-      <div>
-        <h5>사용 포인트</h5>
-        <p>${usedPoints}</p>
-      </div>
-      <div>
-        <h5>적립 포인트</h5>
-        <p>${earnedPoints}</p>
-      </div>
-    `;
-            }
-
-            // ✅ 쿠폰 내역 추출
+            //----------쿠폰 내역 추출
             const couponInfos = item.totalPayInfo
                 ?.filter((pay: any) => pay.method === "쿠폰")
                 .flatMap((pay: any) => pay.coupons || [])
-                .map((c: any) => `${c.name} (${c.couponCode})`)
+                .map((c: any) => `${c.name} (${c.couponCode}) - ${c.price}`)
                 .join("<br>") || "사용한 쿠폰 없음";
 
-            // ✅ 쿠폰 내역 HTML
+            //----------쿠폰 내역 HTML
             const couponInfoHTML = `
-    <div>
-      <h5>사용 쿠폰</h5>
-      <p>${couponInfos}</p>
-    </div>
-  `;
+                    <div>
+                      <h5>사용 쿠폰</h5>
+                      <p>${couponInfos}</p>
+                    </div>
+            `;
 
-            // ✅ 최종 팝업 내용
-            popupContent = `
-    <li>
-      <div>
-        <h5>주문상품</h5>
-        <p>${menuItems}</p>
-      </div>
-    </li>
-    <li>
-      <div>
-        <h5>매장명</h5>
-        <p>${storeInfo.storeName}</p>
-      </div>
-      <div>
-        <h5>매장 연락처</h5>
-        <p>${storeInfo.tel}</p>
-      </div>
-      <div class="store-address">
-        <h5>매장 주소</h5>
-        <p>${storeInfo.address}</p>
-      </div>
-      <div>
-        <h5>사업자 등록번호</h5>
-        <p>${storeInfo.businessNo}</p>
-      </div>
-    </li>
-    <li>
-      <div>
-        <h5>결제 금액</h5>
-        <p>${item.totalPrice.toLocaleString()}원</p>
-      </div>
-      <div>
-        <h5>결제 일자</h5>
-        <p>${formattedDate}</p>
-      </div>
-      <div>
-        <h5>승인번호</h5>
-        <p>${item.orderId || "정보 없음"}</p>
-      </div>
-      <div>
-        <h5>결제 수단</h5>
-        <p>${paymentMethodText}</p>
-      </div>
-      ${couponInfoHTML}   <!-- ✅ 추가된 부분 -->
-      ${paymentMethodInfo}
-      ${pointInfo}
-    </li>
-  `;
+            //----------카드 내역 추출
+            const cardInfos = item.totalPayInfo
+                ?.filter((pay: any) => pay.method === "카드")
+                .flatMap((pay: any) => pay || {});
 
+            let issuerName = '미사용';
+            let cardBin = '미사용';
+
+            if (cardInfos.length > 0) {
+                issuerName = cardInfos
+                    .map((c: any) => `${c.method} (${c.issuerName})`)
+
+                cardBin = cardInfos
+                    .map((c: any) => `${c.cardBin}`)
+            }
+
+            //----------바코드 내역 추출
+            const barcodeInfos = item.totalPayInfo
+                ?.filter((pay: any) => pay.method === "바코드QR")
+                .flatMap((pay: any) => pay || {});
+
+            if (barcodeInfos.length > 0) {
+                issuerName = barcodeInfos
+                    .map((c: any) => `${c.method} (${c.payName})`)
+
+                cardBin = barcodeInfos
+                    .map((c: any) => `${c.cardBin}`)
+            }
+
+            //----------포인트 사용 내역 추출
+            const pointInfos = item.totalPayInfo
+                ?.filter((pay: any) => pay.method === "마일리지")
+                .flatMap((pay: any) => pay || {});
+
+            let pointContact = '미등록 고객';
+            let usedPoints = '미사용';
+
+            if (pointInfos.length > 0) {
+                pointContact = pointInfos
+                    .map((c: any) => `${c.tel}`)
+
+                usedPoints = pointInfos
+                    .map((c: any) => `${c.usedAmount}`)
+            }
+
+            const paymentMethodInfo = `
+                    <div>
+                        <h5>결제 수단</h5>
+                        <p>${issuerName}</p>
+                    </div>
+                    <div>
+                        <h5>카드 번호</h5>
+                        <p>${cardBin}</p>
+                    </div>
+                    <div>
+                        <h5>포인트 연락처</h5>
+                        <p>${pointContact}</p>
+                    </div>
+                    <div>
+                        <h5>사용 포인트</h5>
+                        <p>${usedPoints}</p>
+                    </div>
+                `;
+
+            if (item.totalPayInfo) {
+
+                // ✅ 최종 팝업 내용
+                popupContent = `
+                    <li>
+                      <div>
+                        <h5>주문상품</h5>
+                        <p>${menuItems}</p>
+                      </div>
+                    </li>
+                    <li>
+                      <div>
+                        <h5>매장명</h5>
+                        <p>${storeInfo.storeName}</p>
+                      </div>
+                      <div>
+                        <h5>매장 연락처</h5>
+                        <p>${storeInfo.tel}</p>
+                      </div>
+                      <div class="store-address">
+                        <h5>매장 주소</h5>
+                        <p>${storeInfo.address}</p>
+                      </div>
+                      <div>
+                        <h5>사업자 등록번호</h5>
+                        <p>${storeInfo.businessNo}</p>
+                      </div>
+                    </li>
+                    <li>
+                      <div>
+                        <h5>결제 금액</h5>
+                        <p>${item.totalPrice.toLocaleString()}원</p>
+                      </div>
+                      <div>
+                        <h5>결제 일자</h5>
+                        <p>${formattedDate}</p>
+                      </div>
+                      <div>
+                        <h5>승인번호</h5>
+                        <p>${item.orderId || "정보 없음"}</p>
+                      </div>
+                      ${paymentMethodInfo}
+                      ${couponInfoHTML}   <!-- ✅ 추가된 부분 -->
+                    </li>
+                `;
+            } else {
+
+                const usedPoints = item.point === 0 ? "0P" : `${item.point}P`;
+
+                let actualPaymentType = "card";
+                let paymentMethodText = "카드";
+                let pointContact = "정보 없음";
+                let earnedPoints = "정보없음";
+
+                if (item.point > 0) {
+                    actualPaymentType = "point";
+                    paymentMethodText = "포인트";
+                }
+
+                if (item.pointData) {
+                    pointContact = item.pointData.tel || "정보 없음";
+                    earnedPoints = `${item.pointData.points || 0}P`;
+                }
+
+                let paymentMethodInfo = "";
+                let pointInfo = "";
+
+                if (actualPaymentType === "card") {
+                    const cardInfo = item.payInfo || {};
+                    const issuerName = cardInfo.issuerName || "정보 없음";
+                    const cardBin = cardInfo.cardBin || "정보 없음";
+
+                    paymentMethodInfo = `
+                        <div>
+                            <h5>결제 카드</h5>
+                            <p>${issuerName}</p>
+                        </div>
+                        <div>
+                            <h5>카드 번호</h5>
+                            <p>${cardBin}</p>
+                        </div>
+                    `;
+                } else if (actualPaymentType === "point") {
+                    pointInfo = `
+                        <div>
+                            <h5>포인트 연락처</h5>
+                            <p>${pointContact}</p>
+                        </div>
+                        <div>
+                            <h5>사용 포인트</h5>
+                            <p>${usedPoints}</p>
+                        </div>
+                        <div>
+                            <h5>적립 포인트</h5>
+                            <p>${earnedPoints}</p>
+                        </div>
+                    `;
+                }
+
+                // ✅ 쿠폰 내역 추출
+                const couponInfos = item.totalPayInfo
+                    ?.filter((pay: any) => pay.method === "쿠폰")
+                    .flatMap((pay: any) => pay.coupons || [])
+                    .map((c: any) => `${c.name} (${c.couponCode})`)
+                    .join("<br>") || "사용한 쿠폰 없음";
+
+                // ✅ 쿠폰 내역 HTML
+                const couponInfoHTML = `
+                    <div>
+                      <h5>사용 쿠폰</h5>
+                      <p>${couponInfos}</p>
+                    </div>
+                `;
+
+                // ✅ 최종 팝업 내용
+                popupContent = `
+                    <li>
+                      <div>
+                        <h5>주문상품</h5>
+                        <p>${menuItems}</p>
+                      </div>
+                    </li>
+                    <li>
+                      <div>
+                        <h5>매장명</h5>
+                        <p>${storeInfo.storeName}</p>
+                      </div>
+                      <div>
+                        <h5>매장 연락처</h5>
+                        <p>${storeInfo.tel}</p>
+                      </div>
+                      <div class="store-address">
+                        <h5>매장 주소</h5>
+                        <p>${storeInfo.address}</p>
+                      </div>
+                      <div>
+                        <h5>사업자 등록번호</h5>
+                        <p>${storeInfo.businessNo}</p>
+                      </div>
+                    </li>
+                    <li>
+                      <div>
+                        <h5>결제 금액</h5>
+                        <p>${item.totalPrice.toLocaleString()}원</p>
+                      </div>
+                      <div>
+                        <h5>결제 일자</h5>
+                        <p>${formattedDate}</p>
+                      </div>
+                      <div>
+                        <h5>승인번호</h5>
+                        <p>${item.orderId || "정보 없음"}</p>
+                      </div>
+                      <div>
+                        <h5>결제 수단</h5>
+                        <p>${paymentMethodText}</p>
+                      </div>
+                      ${couponInfoHTML}   <!-- ✅ 추가된 부분 -->
+                      ${paymentMethodInfo}
+                      ${pointInfo}
+                    </li>
+                `;
+            }
         } else {
             // 상품별 데이터 팝업 (기존과 동일)
             const lastOrderDate = new Date(item.lastOrderTimestamp);
