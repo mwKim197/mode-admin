@@ -705,6 +705,8 @@ async function updatePopupContent(rowIndex: number) {
             item = items[actualIndex];
         }
 
+
+        console.log("item", item);
         if (!item) {
             console.error("해당 인덱스의 데이터를 찾을 수 없습니다:", actualIndex);
             return;
@@ -741,7 +743,6 @@ async function updatePopupContent(rowIndex: number) {
         let popupContent = "";
 
         if (currentSalesType === "transaction") {
-            console.log("item: ", item);
             const menuItems = item.menuSummary
                 .map((menu: any) => `${menu.name} / ${menu.count || 1}개`)
                 .join("<br>");
@@ -751,67 +752,69 @@ async function updatePopupContent(rowIndex: number) {
             const timeStr = date[1].substring(0, 5);
             const formattedDate = `${dateStr} ${timeStr}`;
 
-            //----------쿠폰 내역 추출
-            const couponInfos = item.totalPayInfo
-                ?.filter((pay: any) => pay.method === "쿠폰")
-                .flatMap((pay: any) => pay.coupons || [])
-                .map((c: any) => `${c.name} (${c.couponCode}) - ${c.price}`)
-                .join("<br>") || "사용한 쿠폰 없음";
 
-            //----------쿠폰 내역 HTML
-            const couponInfoHTML = `
+            if (item.totalPayInfo) {
+                //----------쿠폰 내역 추출
+                const couponInfos = item.totalPayInfo
+                    ?.filter((pay: any) => pay.method === "쿠폰")
+                    .flatMap((pay: any) => pay.coupons || [])
+                    .map((c: any) => `${c.name} (${c.couponCode}) - ${c.price}`)
+                    .join("<br>") || "사용한 쿠폰 없음";
+
+                //----------쿠폰 내역 HTML
+                const couponInfoHTML = `
                     <div>
                       <h5>사용 쿠폰</h5>
                       <p>${couponInfos}</p>
                     </div>
             `;
 
-            //----------카드 내역 추출
-            const cardInfos = item.totalPayInfo
-                ?.filter((pay: any) => pay.method === "카드")
-                .flatMap((pay: any) => pay || {});
+                //----------카드 내역 추출
+                const cardInfos = item.totalPayInfo
+                    ?.filter((pay: any) => pay.method === "카드")
+                    .flatMap((pay: any) => pay || {});
 
-            let issuerName = '미사용';
-            let cardBin = '미사용';
+                let issuerName = '미사용';
+                let cardBin = '미사용';
 
-            if (cardInfos.length > 0) {
-                issuerName = cardInfos
-                    .map((c: any) => `${c.method} (${c.issuerName})`)
+                if (cardInfos.length > 0) {
+                    issuerName = cardInfos
+                        .map((c: any) => `${c.method} (${c.issuerName})`)
 
-                cardBin = cardInfos
-                    .map((c: any) => `${c.cardBin}`)
-            }
+                    cardBin = cardInfos
+                        .map((c: any) => `${c.cardBin}`)
+                }
 
-            //----------바코드 내역 추출
-            const barcodeInfos = item.totalPayInfo
-                ?.filter((pay: any) => pay.method === "바코드QR")
-                .flatMap((pay: any) => pay || {});
+                //----------바코드 내역 추출
+                const barcodeInfos = item.totalPayInfo
+                    ?.filter((pay: any) => pay.method === "바코드QR")
+                    .flatMap((pay: any) => pay || {});
 
-            if (barcodeInfos.length > 0) {
-                issuerName = barcodeInfos
-                    .map((c: any) => `${c.method} (${c.payName})`)
+                if (barcodeInfos.length > 0) {
+                    issuerName = barcodeInfos
+                        .map((c: any) => `${c.method} (${c.payName})`)
 
-                cardBin = barcodeInfos
-                    .map((c: any) => `${c.cardBin}`)
-            }
+                    cardBin = barcodeInfos
+                        .map((c: any) => `${c.cardBin}`)
+                }
 
-            //----------포인트 사용 내역 추출
-            const pointInfos = item.totalPayInfo
-                ?.filter((pay: any) => pay.method === "마일리지")
-                .flatMap((pay: any) => pay || {});
+                //----------포인트 사용 내역 추출
+                const pointInfos = item.totalPayInfo
+                    ?.filter((pay: any) => pay.method === "마일리지")
+                    .flatMap((pay: any) => pay || {});
 
-            let pointContact = '미등록 고객';
-            let usedPoints = '미사용';
+                let pointContact = '미등록 고객';
+                let usedPoints = '미사용';
 
-            if (pointInfos.length > 0) {
-                pointContact = pointInfos
-                    .map((c: any) => `${c.tel}`)
+                if (pointInfos.length > 0) {
+                    pointContact = pointInfos
+                        .map((c: any) => `${c.tel}`)
 
-                usedPoints = pointInfos
-                    .map((c: any) => `${c.usedAmount}`)
-            }
+                    usedPoints = pointInfos
+                        .map((c: any) => `${c.usedAmount}`)
+                }
 
-            const paymentMethodInfo = `
+                const paymentMethodInfo = `
                     <div>
                         <h5>결제 수단</h5>
                         <p>${issuerName}</p>
@@ -829,8 +832,6 @@ async function updatePopupContent(rowIndex: number) {
                         <p>${usedPoints}</p>
                     </div>
                 `;
-
-            if (item.totalPayInfo) {
 
                 // ✅ 최종 팝업 내용
                 popupContent = `
