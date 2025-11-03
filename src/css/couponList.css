@@ -98,7 +98,7 @@
 
 #coupon-image {
     width: 100%;
-    aspect-ratio: 5 / 6; /* ✅ 비율 고정 */
+    aspect-ratio: 5 / 6.5; /* ✅ 비율 고정 */
     object-fit: contain;
     display: block;
 }

@@ -758,7 +758,7 @@ async function updatePopupContent(rowIndex: number) {
                 const couponInfos = item.totalPayInfo
                     ?.filter((pay: any) => pay.method === "쿠폰")
                     .flatMap((pay: any) => pay.coupons || [])
-                    .map((c: any) => `${c.name} (${c.couponCode}) - ${c.price}`)
+                    .map((c: any) => `${c.name} (${c.couponCode}) - ${c.price.toLocaleString()}`)
                     .join("<br>") || "사용한 쿠폰 없음";
 
                 //----------쿠폰 내역 HTML
@@ -808,10 +808,10 @@ async function updatePopupContent(rowIndex: number) {
 
                 if (pointInfos.length > 0) {
                     pointContact = pointInfos
-                        .map((c: any) => `${c.tel}`)
+                        .map((c: any) => `${c.mileageNo}`)
 
                     usedPoints = pointInfos
-                        .map((c: any) => `${c.usedAmount}`)
+                        .map((c: any) => `${c.usedAmount.toLocaleString()}`)
                 }
 
                 const paymentMethodInfo = `
@@ -824,7 +824,7 @@ async function updatePopupContent(rowIndex: number) {
                         <p>${cardBin}</p>
                     </div>
                     <div>
-                        <h5>포인트 연락처</h5>
+                        <h5>고객번호</h5>
                         <p>${pointContact}</p>
                     </div>
                     <div>
@@ -921,11 +921,11 @@ async function updatePopupContent(rowIndex: number) {
                         </div>
                         <div>
                             <h5>사용 포인트</h5>
-                            <p>${usedPoints}</p>
+                            <p>${usedPoints.toLocaleString()}</p>
                         </div>
                         <div>
                             <h5>적립 포인트</h5>
-                            <p>${earnedPoints}</p>
+                            <p>${earnedPoints.toLocaleString()}</p>
                         </div>
                     `;
                 }
