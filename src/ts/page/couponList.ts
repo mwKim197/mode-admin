@@ -442,6 +442,8 @@ function renderCouponTable(coupons: any[], isSearchResult: boolean = false) {
         return;
     }
 
+    console.log("coupons :", coupons);
+
     coupons.forEach((coupon, index) => {
         const row = document.createElement("tr");
         row.classList.add("coupon-row");
@@ -549,7 +551,7 @@ function updateCouponOverlay(couponData: any) {
         const day = String(date.getDate()).padStart(2, "0");
         const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
         const weekday = weekdays[date.getDay()];
-        return `${year}년 ${month}월 ${day}일(${weekday})`;
+        return `${year}-${month}-${day}(${weekday})`;
     };
 
     const title = couponData.title.replace(" 무료", "");
@@ -791,7 +793,7 @@ async function updateCouponOverlayForCapture(couponData: any): Promise<void> {
         const day = String(date.getDate()).padStart(2, "0");
         const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
         const weekday = weekdays[date.getDay()];
-        return `${year}년 ${month}월 ${day}일(${weekday})`;
+        return `${year}-${month}-${day}(${weekday})`;
     };
 
     const title = couponData.title.replace(" 무료", "");
