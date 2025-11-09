@@ -1,134 +1,134 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="/src/css/reset.css" />
-    <link rel="stylesheet" href="/src/css/common.css" />
-    <link rel="stylesheet" href="/src/css/style.css" />
-    <link rel="stylesheet" href="/src/css/couponDetail.css" />
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="/src/css/reset.css"/>
+    <link rel="stylesheet" href="/src/css/common.css"/>
+    <link rel="stylesheet" href="/src/css/style.css"/>
+    <link rel="stylesheet" href="/src/css/couponDetail.css"/>
     <script type="module" src="/src/main.ts"></script>
-  </head>
+</head>
 
-  <body id="coupon-detail-page">
-    <div id="main-content">
-      <!-- 사용자 정보 섹션 -->
-      <section class="mt8">
+<body id="coupon-detail-page">
+<div id="main-content">
+    <!-- 사용자 정보 섹션 -->
+    <section class="mt8">
         <div class="inner">
-          <div class="user-flex">
-            <div class="user">
-              <i class="fa-regular fa-circle-user"></i>
-              <p id="user-name">-</p>
-              <label class="label manager" id="user-grade"
-                ><span>-</span></label
-              >
+            <div class="user-flex">
+                <div class="user">
+                    <i class="fa-regular fa-circle-user"></i>
+                    <p id="user-name">-</p>
+                    <label class="label manager" id="user-grade"
+                    ><span>-</span></label
+                    >
+                </div>
             </div>
-          </div>
         </div>
-      </section>
+    </section>
 
-      <!-- 쿠폰 발행 페이지 -->
-      <section class="pb20">
+    <!-- 쿠폰 발행 페이지 -->
+    <section class="pb20">
         <div class="inner">
-          <div class="title-flex" style="margin-bottom: 10px">
-            <h2 style="margin-bottom: 0">쿠폰 발행</h2>
-            <div class="btnFlex" style="margin-top: 0">
-              <button
-                type="button"
-                class="btn gr"
-                id="back-to-list"
-                style="width: auto; padding: 1rem 2rem"
-              >
-                목록으로
-              </button>
+            <div class="title-flex" style="margin-bottom: 10px">
+                <h2 style="margin-bottom: 0">쿠폰 발행</h2>
+                <div class="btnFlex" style="margin-top: 0">
+                    <button
+                            type="button"
+                            class="btn gr"
+                            id="back-to-list"
+                            style="width: auto; padding: 1rem 2rem"
+                    >
+                        목록으로
+                    </button>
+                </div>
             </div>
-          </div>
 
-          <!-- 쿠폰 발행 폼 -->
-          <div class="boxStyle gr">
-            <form id="coupon-form">
-              <!-- 가맹점 입력 -->
-              <div class="inputWrap">
-                <div class="data_input">
-                  <p>가맹점</p>
-                  <input type="text" id="franchise-input" readonly />
-                </div>
-              </div>
+            <!-- 쿠폰 발행 폼 -->
+            <div class="boxStyle gr">
+                <form id="coupon-form">
+                    <!-- 가맹점 입력 -->
+                    <div class="inputWrap">
+                        <div class="data_input">
+                            <p>가맹점</p>
+                            <input type="text" id="franchise-input" readonly/>
+                        </div>
+                    </div>
 
-              <!-- 지점 입력 -->
-              <div class="inputWrap">
-                <div class="data_input">
-                  <p>지점</p>
-                  <input type="text" id="store-input" readonly />
-                </div>
-              </div>
+                    <!-- 지점 입력 -->
+                    <div class="inputWrap">
+                        <div class="data_input">
+                            <p>지점</p>
+                            <input type="text" id="store-input" readonly/>
+                        </div>
+                    </div>
 
-              <!-- 기기번호 입력 -->
-              <div class="inputWrap">
-                <div class="data_input">
-                  <p>기기번호</p>
-                  <input type="text" id="device-input" readonly />
-                </div>
-              </div>
+                    <!-- 기기번호 입력 -->
+                    <div class="inputWrap">
+                        <div class="data_input">
+                            <p>기기번호</p>
+                            <input type="text" id="device-input" readonly/>
+                        </div>
+                    </div>
 
-              <!-- 사용기한 -->
-              <div class="inputWrap">
-                <div class="data_input">
-                  <p>사용기한</p>
-                  <div>
-                    <input type="date" id="start-date" />
-                    <span>~</span>
-                    <input type="date" id="end-date" />
-                  </div>
-                </div>
-              </div>
+                    <!-- 사용기한 -->
+                    <div class="inputWrap">
+                        <div class="data_input">
+                            <p>사용기한</p>
+                            <div>
+                                <input type="date" id="start-date"/>
+                                <span>~</span>
+                                <input type="date" id="end-date"/>
+                            </div>
+                        </div>
+                    </div>
 
-              <!-- 발행매수 -->
-              <div class="inputWrap">
-                <div class="data_input">
-                  <p>발행매수</p>
-                  <div>
-                    <input type="text" id="issue-count" />
-                    <span>매</span>
-                  </div>
-                </div>
-              </div>
+                    <!-- 발행매수 -->
+                    <div class="inputWrap">
+                        <div class="data_input">
+                            <p>발행매수</p>
+                            <div>
+                                <input type="text" id="issue-count"/>
+                                <span>매</span>
+                            </div>
+                        </div>
+                    </div>
 
-              <!-- 쿠폰선택 -->
-              <div class="inputWrap">
-                <div class="data_input">
-                  <p>쿠폰선택</p>
-                  <div class="select">
-                    <select
-                      id="sample"
-                      class="popup-select mb0"
-                      required
-                    ></select>
-                  </div>
-                </div>
-              </div>
+                    <!-- 쿠폰선택 -->
+                    <div class="inputWrap">
+                        <div class="data_input">
+                            <p>메뉴선택</p>
+                            <div class="select">
+                                <select
+                                        id="sample"
+                                        class="popup-select mb0"
+                                        required
+                                ></select>
+                            </div>
+                        </div>
+                    </div>
 
-              <!-- 메모 -->
-              <div class="inputWrap">
-                <div class="text_input">
-                  <p>메모</p>
-                  <textarea
-                    id="myTextarea"
-                    maxlength="200"
-                    rows="4"
-                    cols="50"
-                    placeholder="내용을 입력해주세요"
-                  ></textarea>
-                </div>
-              </div>
+                    <!-- 메모 -->
+                    <div class="inputWrap">
+                        <div class="text_input">
+                            <p>메모</p>
+                            <textarea
+                                    id="myTextarea"
+                                    maxlength="200"
+                                    rows="4"
+                                    cols="50"
+                                    placeholder="내용을 입력해주세요"
+                            ></textarea>
+                        </div>
+                    </div>
 
-              <!-- 버튼 -->
-              <div class="btnFlex">
-                <button type="submit" class="btn blue">쿠폰 발급</button>
-              </div>
-            </form>
-          </div>
+                    <!-- 버튼 -->
+                    <div class="btnFlex">
+                        <button type="submit" class="btn blue">쿠폰 발급</button>
+                    </div>
+                </form>
+            </div>
         </div>
-      </section>
-    </div>
-  </body>
+    </section>
+</div>
+</body>
 </html>

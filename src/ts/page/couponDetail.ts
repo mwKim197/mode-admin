@@ -78,7 +78,7 @@ export function initCouponDetail() {
                 return;
             }
             if (!coupon) {
-                window.showToast("쿠폰을 선택해 주세요", 2000, "warning");
+                window.showToast("메뉴를 선택해 주세요", 2000, "warning");
                 return;
             }
 
@@ -270,7 +270,7 @@ async function sampleSelect(userId: string) {
         ) as HTMLSelectElement;
 
         if (selectElement && data.items) {
-            selectElement.innerHTML = '<option value="">쿠폰을 선택해주세요</option>';
+            selectElement.innerHTML = '<option value="">메뉴를 선택해주세요</option>';
 
             data.items.forEach((item: any) => {
                 if (!item.menuId || !item.name) return;
