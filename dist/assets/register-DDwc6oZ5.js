@@ -1,4 +1,4 @@
-import{h as f}from"./main-MtkqVlrK.js";function h(){console.log("✅ register.ts 로드됨");const r=document.getElementById("register-form");if(!r){console.error("❌ 회원가입 폼을 찾을 수 없음");return}r.addEventListener("submit",async n=>{n.preventDefault();const e=document.getElementById("adminId").value.trim(),t=document.getElementById("password").value.trim(),s=document.getElementById("number").value.trim(),a=document.getElementById("confirmPassword").value.trim(),c=document.getElementById("privacyAgree").checked,m=document.getElementById("kakaoAgree").checked,u=`
+import{h as f}from"./main-D_2zzUxL.js";function h(){console.log("✅ register.ts 로드됨");const r=document.getElementById("register-form");if(!r){console.error("❌ 회원가입 폼을 찾을 수 없음");return}r.addEventListener("submit",async n=>{n.preventDefault();const e=document.getElementById("adminId").value.trim(),t=document.getElementById("password").value.trim(),s=document.getElementById("number").value.trim(),a=document.getElementById("confirmPassword").value.trim(),c=document.getElementById("privacyAgree").checked,m=document.getElementById("kakaoAgree").checked,u=`
         - 수집 항목: 성명, 전화번호, 아이디, 비밀번호, 결제정보 등
         - 이용 목적: 회원관리, 서비스 제공, 카카오 알림톡 발송 등
         - 보유 기간: 이용 종료 후 5년 보관 (관련 법령에 따름)
@@ -19,5 +19,5 @@ import{h as f}from"./main-MtkqVlrK.js";function h(){console.log("✅ register.ts
       - 수신 항목: 서비스 안내, 마케팅 및 이벤트 정보<br/>
       - 수신 방법: 카카오 알림톡, 카카오 채널 메시지 등<br/>
       - 보유 기간: 동의 철회 시까지<br/>
-      - 동의는 선택 사항이며, 미동의해도 서비스 이용에 제한은 없습니다.
+      - 동의는 선택 사항이며, 미동의해도 <br/>서비스 이용에 제한은 없습니다.
       `}};function l(n){const e=document.getElementById("modal-content"),t=document.getElementById("modal-backdrop");document.getElementById("modal-title").innerText=d[n].title,document.getElementById("modal-body").innerHTML=d[n].body,e==null||e.classList.remove("hidden"),t==null||t.classList.remove("hidden")}function i(){var n,e;(n=document.getElementById("modal-content"))==null||n.classList.add("hidden"),(e=document.getElementById("modal-backdrop"))==null||e.classList.add("hidden")}window.openModal=l,window.closeModal=i}export{h as initRegister};

@@ -1,74 +1,187 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>회원가입</title>
-    <script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind CDN -->
-  <script type="module" crossorigin src="../assets/main-MtkqVlrK.js"></script>
+    <meta charset="UTF-8"/> <!-- 관리자 CSS -->
+    <style>
+        .logWrap form label {
+            display: block;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+        /* 팝업 전체 wrapper */
+        .popup-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1001; /* overlay보다 위 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 팝업 박스 (기존 관리자 popup 스타일 확장) */
+        .popup {
+            background: #333;
+            width: 90%;
+            max-width: 420px;
+            border-radius: 10px;
+            padding: 2rem;
+            color: var(--white);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* 팝업 타이틀 */
+        #modal-title {
+            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 1.6rem;
+            font-family: var(--f-St);
+        }
+
+        /* 팝업 본문 */
+        .popup-body {
+            font-size: 1.4rem;
+            color: #ccc;
+            line-height: 1.6;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 2rem;
+        }
+
+        /* 닫기 버튼 */
+        .btn-close {
+            background: var(--point-color);
+            border: none;
+            padding: 1rem 1.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            color: white;
+            font-size: 1.4rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-close:hover {
+            opacity: 0.85;
+        }
+
+        /* 팝업 배경 오버레이 */
+        #modal-backdrop {
+            z-index: 1000; /* 팝업보다 아래 */
+        }
+
+        /* Fade-in 애니메이션 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+    </style>
+  <script type="module" crossorigin src="../assets/main-D_2zzUxL.js"></script>
   <link rel="stylesheet" crossorigin href="../assets/main--FnuIZ4K.css">
+  <link rel="stylesheet" crossorigin href="../assets/style-BWJWr5B5.css">
 </head>
-<body class="flex items-center justify-center h-screen bg-gray-100">
-<div class="bg-white p-6 rounded-lg shadow-md w-80">
-    <h1 class="text-2xl font-bold text-center mb-4">회원가입</h1>
-    <form id="register-form" class="space-y-3">
-        <div>
-            <label for="adminId" class="block text-sm font-medium text-gray-700">아이디</label>
-            <input type="text" id="adminId" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-        </div>
 
-        <div>
-            <label for="password" class="block text-sm font-medium text-gray-700">비밀번호</label>
-            <input type="password" id="password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-        </div>
+<body>
 
-        <div>
-            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">비밀번호 확인</label>
-            <input type="password" id="confirmPassword" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-        </div>
+<div id="main-content">
 
-        <div>
-            <label for="number" class="block text-sm font-medium text-gray-700">전화번호</label>
-            <input type="tel" id="number" required pattern="^01[0-9]{1}-?[0-9]{3,4}-?[0-9]{4}$" title="010-1234-5678 형식으로 입력해주세요"
-                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-        </div>
+    <!-- 회원가입 화면 -->
+    <section class="logWrap mt50">
 
-        <!-- 동의 체크박스 -->
-        <div class="space-y-2 mb-4">
-            <div class="flex items-start">
-                <input type="checkbox" id="privacyAgree" required class="mt-1 mr-2">
-                <label for="privacyAgree" class="text-sm text-gray-700">
-                    <button type="button" onclick="openModal('privacy')" class="text-blue-600 underline">개인정보 수집 및 이용</button>에 동의합니다. (필수)
+        <form id="register-form">
+
+            <h2>회원가입</h2>
+
+            <!-- 아이디 -->
+            <label for="adminId">아이디</label>
+            <input type="text" id="adminId" required placeholder="아이디를 입력하세요"/>
+
+            <!-- 비밀번호 -->
+            <label for="password">비밀번호</label>
+            <div class="password-container">
+                <input type="password" id="password" required placeholder="비밀번호 입력"/>
+                <span class="eyes" onclick="togglePw('password')">👁</span>
+            </div>
+
+            <!-- 비밀번호 확인 -->
+            <label for="confirmPassword">비밀번호 확인</label>
+            <div class="password-container">
+                <input type="password" id="confirmPassword" required placeholder="비밀번호 확인"/>
+                <span class="eyes" onclick="togglePw('confirmPassword')">👁</span>
+            </div>
+
+            <!-- 전화번호 -->
+            <label for="number">전화번호</label>
+            <input type="text" id="number" required
+                   pattern="^01[0-9]{1}-?[0-9]{3,4}-?[0-9]{4}$"
+                   title="010-1234-5678 형식으로 입력해주세요"
+                   placeholder="010-0000-0000"/>
+
+            <!-- 동의 체크 -->
+            <div class="privacy" style="margin: 1rem 0;">
+                <input type="checkbox" id="privacyAgree" required>
+                <label for="privacyAgree">
+                    <button type="button" onclick="openModal('privacy')" class="text-blue-600 underline">
+                        개인정보 수집 및 이용
+                    </button>
+                    에 동의합니다. (필수)
                 </label>
             </div>
 
-            <div class="flex items-start">
-                <input type="checkbox" id="kakaoAgree" class="mt-1 mr-2">
-                <label for="kakaoAgree" class="text-sm text-gray-700">
-                    <button type="button" onclick="openModal('kakao')" class="text-blue-600 underline">카카오톡 수신</button>에 동의합니다. (선택)
+            <div class="privacy">
+                <input type="checkbox" id="kakaoAgree">
+                <label for="kakaoAgree">
+                    <button type="button" onclick="openModal('kakao')" class="text-blue-600 underline">
+                        카카오 알림톡 수신
+                    </button>
+                    동의 (선택)
                 </label>
             </div>
-        </div>
 
-        <button type="submit" class="w-full py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500">계정 생성</button>
-    </form>
+            <!-- 제출 버튼 -->
+            <button type="submit" class="btn save-img" style="margin-top:20px; width:100%; justify-content:center;">
+                계정 생성
+            </button>
 
-    <p id="message" class="mt-3 text-center text-sm"></p> <!-- 결과 메시지 -->
+            <p id="message" class="text-center mt-2"></p>
+        </form>
+    </section>
 </div>
 
 <!-- 모달 배경 -->
-<div id="modal-backdrop" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+<div id="modal-backdrop" class="popup-overlay hidden"></div>
 
 <!-- 모달 내용 -->
-<div id="modal-content" class="hidden fixed inset-0 flex items-center justify-center z-50">
-    <div class="bg-white w-full max-w-lg p-6 rounded-lg shadow-lg overflow-y-auto max-h-[90vh]">
-        <h2 id="modal-title" class="text-xl font-bold mb-4"></h2>
-        <div id="modal-body" class="text-sm text-gray-700 leading-relaxed space-y-2"></div>
+<div id="modal-content" class="popup-container hidden">
+    <div class="popup">
+        <h2 id="modal-title"></h2>
 
-        <div class="mt-6 text-right">
-            <button onclick="closeModal()" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">닫기</button>
+        <div id="modal-body" class="popup-body"></div>
+
+        <div class="popup-footer">
+            <button onclick="closeModal()" class="btn-close">닫기</button>
         </div>
     </div>
 </div>
+
+
+<script>
+    function togglePw(id) {
+        const input = document.getElementById(id);
+        input.type = input.type === "password" ? "text" : "password";
+    }
+</script>
+
 </body>
 </html>

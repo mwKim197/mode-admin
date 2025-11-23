@@ -58,18 +58,19 @@ export function initRegister() {
         try {
             // ✅ 회원가입 API 호출
             const response = await fetchWithAuth("/model_admin_user?func=register-admin", {
-                  method: "POST",
-                  body: JSON.stringify({
-                      adminId,
-                      password,
-                      number,
-                      privacyAgree,
-                      privacyContent,
-                      kakaoAgree,
-                      kakaoContent,
-                      agreedAt: new Date().toISOString()}),
-                  mode: "cors",
-              });
+                method: "POST",
+                body: JSON.stringify({
+                    adminId,
+                    password,
+                    number,
+                    privacyAgree,
+                    privacyContent,
+                    kakaoAgree,
+                    kakaoContent,
+                    agreedAt: new Date().toISOString()
+                }),
+                mode: "cors",
+            });
 
             const result = await response.json();
 
@@ -103,7 +104,7 @@ export function initRegister() {
       - 수신 항목: 서비스 안내, 마케팅 및 이벤트 정보<br/>
       - 수신 방법: 카카오 알림톡, 카카오 채널 메시지 등<br/>
       - 보유 기간: 동의 철회 시까지<br/>
-      - 동의는 선택 사항이며, 미동의해도 서비스 이용에 제한은 없습니다.
+      - 동의는 선택 사항이며, 미동의해도 <br/>서비스 이용에 제한은 없습니다.
       `
         }
     };
