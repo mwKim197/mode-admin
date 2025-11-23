@@ -9,15 +9,14 @@
             margin-bottom: 0.5rem;
         }
 
-        /* 팝업 전체 wrapper */
         .popup-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 1001; /* overlay보다 위 */
-            display: flex;
+            z-index: 1001;
+            display: none;
             justify-content: center;
             align-items: center;
         }
@@ -86,8 +85,24 @@
             }
         }
 
+        .popup-overlay {
+            display: none;
+        }
+
+        .popup-overlay.active {
+            display: flex;
+        }
+
+        .popup-container {
+            display: none;
+        }
+
+        .popup-container.active {
+            display: flex;
+        }
+
     </style>
-  <script type="module" crossorigin src="../assets/main-D_2zzUxL.js"></script>
+  <script type="module" crossorigin src="../assets/main-DeHJLsrf.js"></script>
   <link rel="stylesheet" crossorigin href="../assets/main--FnuIZ4K.css">
   <link rel="stylesheet" crossorigin href="../assets/style-BWJWr5B5.css">
 </head>
@@ -160,10 +175,10 @@
 </div>
 
 <!-- 모달 배경 -->
-<div id="modal-backdrop" class="popup-overlay hidden"></div>
+<div id="modal-backdrop" class="popup-overlay"></div>
 
 <!-- 모달 내용 -->
-<div id="modal-content" class="popup-container hidden">
+<div id="modal-content" class="popup-container">
     <div class="popup">
         <h2 id="modal-title"></h2>
 

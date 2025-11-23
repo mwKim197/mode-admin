@@ -109,22 +109,17 @@ export function initRegister() {
         }
     };
 
-    // 모달 오픈 함수
     function openModal(type: "privacy" | "kakao") {
-        const modal = document.getElementById("modal-content");
-        const backdrop = document.getElementById("modal-backdrop");
+        document.getElementById("modal-backdrop")?.classList.add("active");
+        document.getElementById("modal-content")?.classList.add("active");
 
         document.getElementById("modal-title")!.innerText = terms[type].title;
         document.getElementById("modal-body")!.innerHTML = terms[type].body;
-
-        modal?.classList.remove("hidden");
-        backdrop?.classList.remove("hidden");
     }
 
-// 모달 닫기 함수
     function closeModal() {
-        document.getElementById("modal-content")?.classList.add("hidden");
-        document.getElementById("modal-backdrop")?.classList.add("hidden");
+        document.getElementById("modal-backdrop")?.classList.remove("active");
+        document.getElementById("modal-content")?.classList.remove("active");
     }
 
 // 💡 전역 등록 (HTML에서 호출 가능하게)
