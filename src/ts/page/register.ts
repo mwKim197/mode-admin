@@ -110,17 +110,18 @@ export function initRegister() {
     };
 
     function openModal(type: "privacy" | "kakao") {
-        document.getElementById("modal-backdrop")?.classList.add("active");
-        document.getElementById("modal-content")?.classList.add("active");
+        document.getElementById("modal-backdrop")?.classList.remove("hidden");
+        document.getElementById("modal-content")?.classList.remove("hidden");
 
-        document.getElementById("modal-title")!.innerText = terms[type].title;
-        document.getElementById("modal-body")!.innerHTML = terms[type].body;
+        (document.getElementById("modal-title") as HTMLElement).innerText = terms[type].title;
+        (document.getElementById("modal-body") as HTMLElement).innerHTML = terms[type].body;
     }
 
     function closeModal() {
-        document.getElementById("modal-backdrop")?.classList.remove("active");
-        document.getElementById("modal-content")?.classList.remove("active");
+        document.getElementById("modal-backdrop")?.classList.add("hidden");
+        document.getElementById("modal-content")?.classList.add("hidden");
     }
+
 
 // 💡 전역 등록 (HTML에서 호출 가능하게)
     (window as any).openModal = openModal;
