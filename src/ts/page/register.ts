@@ -109,17 +109,27 @@ export function initRegister() {
         }
     };
 
-    function openModal(type: "privacy" | "kakao") {
-        document.getElementById("modal-backdrop")?.classList.remove("hidden");
-        document.getElementById("modal-content")?.classList.remove("hidden");
+    type ModalType = "privacy" | "kakao";
 
-        (document.getElementById("modal-title") as HTMLElement).innerText = terms[type].title;
-        (document.getElementById("modal-body") as HTMLElement).innerHTML = terms[type].body;
+    function openModal(type: ModalType) {
+        const backdrop = document.getElementById("modal-backdrop") as HTMLElement;
+        const content = document.getElementById("modal-content") as HTMLElement;
+        const titleEl = document.getElementById("modal-title") as HTMLElement;
+        const bodyEl = document.getElementById("modal-body") as HTMLElement;
+
+        backdrop.style.display = "flex";  // overlay는 flex
+        content.style.display = "flex";   // container도 flex
+
+        titleEl.innerText = terms[type].title;
+        bodyEl.innerHTML = terms[type].body;
     }
 
     function closeModal() {
-        document.getElementById("modal-backdrop")?.classList.add("hidden");
-        document.getElementById("modal-content")?.classList.add("hidden");
+        const backdrop = document.getElementById("modal-backdrop") as HTMLElement;
+        const content = document.getElementById("modal-content") as HTMLElement;
+
+        backdrop.style.display = "none";
+        content.style.display = "none";
     }
 
 
