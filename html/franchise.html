@@ -1,232 +1,195 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
-  <meta charset="UTF-8" />
-  <link rel="stylesheet" href="/src/css/reset.css">
-  <link rel="stylesheet" href="/src/css/common.css">
-  <link rel="stylesheet" href="/src/css/style.css">
-  <script type="module" src="/src/main.ts"></script> <!-- ✅ 메인 진입 -->
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="/src/css/reset.css"/>
+    <link rel="stylesheet" href="/src/css/common.css"/>
+    <link rel="stylesheet" href="/src/css/style.css"/> <!-- 관리자 CSS -->
+
+    <style>
+        /* ================================
+   프랜차이즈 페이지 전체 레이아웃
+================================ */
+        .pageWrap {
+            max-width: 420px;
+            margin: 120px auto 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 페이지 타이틀 */
+        .pageWrap h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        /* ================================
+           프랜차이즈 리스트
+        ================================ */
+        #franchiseList {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        /* 프랜차이즈 아이템 전체 */
+        .franchise-item {
+            background: #2b2b2b;
+            padding: 15px;
+            border-radius: 8px;
+            color: #fff;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* 왼쪽 텍스트 영역 — 길면 줄바꿈 */
+        .franchise-item > div:first-child {
+            flex: 1;
+            min-width: 0; /* 🔥 flex 줄바꿈 key */
+            word-break: break-all;
+        }
+
+        /* 오른쪽 버튼 영역 — 길이 고정 */
+        .franchise-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0; /* 🔥 버튼 줄어들지 않음 */
+            white-space: nowrap;
+        }
+
+        /* 버튼 스타일 */
+        .btn-edit, .btn-delete {
+            padding: 6px 10px;
+            font-size: 0.9rem;
+            border-radius: 6px;
+            width: auto;
+        }
+
+        /* 파란 수정 버튼 */
+        .btn-edit {
+            background-color: #2080ff;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background-color: #1a6ed8;
+        }
+
+        /* 회색 삭제 버튼 */
+        .btn-delete {
+            background-color: #555;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #444;
+        }
+
+        /* ================================
+           모달 스타일 (기존 회원가입 UI 동일)
+        ================================ */
+        .modal-bg {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .modal-bg.active {
+            display: flex;
+        }
+
+        .modal-box {
+            width: 90%;
+            max-width: 420px;
+            background: #333;
+            padding: 20px;
+            border-radius: 10px;
+            color: #fff;
+            animation: fadeIn 0.25s ease-out;
+
+            /* 🔥 여기 추가: 내부 요소 세로 배치 */
+            display: flex;
+            flex-direction: column;
+            gap: 12px; /* 입력칸 간격 */
+        }
+
+        .modal-box input {
+            width: 100%;
+            padding: 12px;
+            background: #444;
+            border-radius: 6px;
+            color: #fff;
+            border: none;
+        }
+
+        /* 모달 애니메이션 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+    </style>
+
+    <script type="module" src="/src/main.ts"></script>
 </head>
-<!--프랜차이즈 홈-->
+
 <body>
-  <!-- 메인 -->
-  <div id="main-content">
 
-    <!-- 커피봇 -->
-    <section class="mt8">
-      <div class="inner">
-        <div class="user-flex">
-          <div class="user">
-            <i class="fa-regular fa-circle-user"></i>
-            <p id="user-name">zero001 님</p>
-            <label class="label manager" id="user-grade"><span>총괄관리자</span></label>
-          </div>
-        </div>
-      </div>
-    </section>
+<div id="main-content">
+    <section class="pageWrap" style="margin-top: 120px;">
 
-    <!-- table -->
-    <section class="pb20">
-      <div class="inner">
-        <h2 class="mb20">프랜차이즈 1</h2>
-        <div class="tableArea St02">
-          <table>
-            <thead>
-              <tr>
-                <th>순서</th>
-                <th>계정이름</th>
-                <th>설치일자</th>
-                <th>머신번호</th>
-                <th>권한설정</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="">
-                <td>1</td>
-                <td>커피봇일산</td>
-                <td>23-06-01</td>
-                <td>
-                  <div class="select-box">
-                    <select onchange="handleSelectChange()" class="contest-filter1">
-                      <option value="zero101">zero101</option>
-                      <option value="zero102">zero102</option>                      
-                      <option value="zero103">zero103</option>
-                    </select>
-                    <i class="fa-solid fa-caret-down"></i>
-                  </div>
-                </td>
-                <td>
-                  <div class="select-box user01">
-                    <select onchange="handleSelectChange()" class="contest-filter1 ">
-                      <option value="일반회원" >일반회원</option>
-                      <option value="총괄관리자">총괄관리자</option>                      
-                      <option value="프랜차이즈">프랜차이즈</option>
-                    </select>
-                    <i class="fa-solid fa-caret-down"></i>
-                  </div>
-                </td>
-              </tr>
-              <tr class="">
-                <td>2</td>
-                <td>커피봇일산</td>
-                <td>23-06-01</td>
-                <td>
-                  <div class="select-box">
-                    <select onchange="handleSelectChange()" class="contest-filter1">
-                      <option value="zero102">zero102</option> 
-                      <option value="zero101">zero101</option>                     
-                      <option value="zero103">zero103</option>
-                    </select>
-                    <i class="fa-solid fa-caret-down"></i>
-                  </div>
-                </td>
-                <td>
-                  <div class="select-box user02">
-                    <select onchange="handleSelectChange()" class="contest-filter1 ">
-                      <option value="총괄관리자">총괄관리자</option>  
-                      <option value="일반회원" >일반회원</option>                    
-                      <option value="프랜차이즈">프랜차이즈</option>
-                    </select>
-                    <i class="fa-solid fa-caret-down"></i>
-                  </div>
-                </td>
-              </tr>
-              <tr class="">
-                <td>3</td>
-                <td>커피봇일산</td>
-                <td>23-06-01</td>
-                <td>
-                  <div class="select-box">
-                    <select onchange="handleSelectChange()" class="contest-filter1">
-                      <option value="zero103">zero103</option>
-                      <option value="zero101">zero101</option>
-                      <option value="zero102">zero102</option>                      
-                    </select>
-                    <i class="fa-solid fa-caret-down"></i>
-                  </div>
-                </td>
-                <td>
-                  <div class="select-box user03">
-                    <select onchange="handleSelectChange()" class="contest-filter1 ">                    
-                      <option value="프랜차이즈">프랜차이즈</option>
-                      <option value="일반회원" >일반회원</option>
-                      <option value="총괄관리자">총괄관리자</option>  
-                    </select>
-                    <i class="fa-solid fa-caret-down"></i>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>            
-        </div>
-        <div class="btnFlex">
-          <button class="btn blue">추가</button>
-          <button class="btn red">삭제</button>
-        </div>
-      </div>
+        <h2>프랜차이즈 관리</h2>
+
+        <!-- 신규 생성 버튼 -->
+        <button id="openCreateBtn"
+                class="btn save-img"
+                style="width:100%; justify-content:center; margin-bottom:20px;">
+            + 신규 프랜차이즈 등록
+        </button>
+
+        <!-- 리스트 영역 -->
+        <div id="franchiseList"></div>
+
     </section>
-    <!-- table -->
-    <section class="pb20">
-      <div class="inner">
-        <h2 class="mb20">프랜차이즈 2</h2>
-        <div class="tableArea St02">
-          <table>
-            <thead>
-              <tr>
-                <th>순서</th>
-                <th>계정이름</th>
-                <th>설치일자</th>
-                <th>머신번호</th>
-                <th>권한설정</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>커피봇일산</td>
-                <td>23-06-01</td>
-                <td>
-                  <div class="select-box">
-                    <select onchange="handleSelectChange()" class="contest-filter1">
-                      <option value="zero101">zero101</option>
-                      <option value="zero102">zero102</option>                      
-                      <option value="zero103">zero103</option>
-                    </select>
-                    <i class="fa-solid fa-caret-down"></i>
-                  </div>
-                </td>
-                <td>
-                  <div class="select-box user01">
-                    <select onchange="handleSelectChange()" class="contest-filter1 ">
-                      <option value="일반회원" >일반회원</option>
-                      <option value="총괄관리자">총괄관리자</option>                      
-                      <option value="프랜차이즈">프랜차이즈</option>
-                    </select>
-                    <i class="fa-solid fa-caret-down"></i>
-                  </div>
-                </td>
-              </tr>
-              <tr class="">
-                <td>2</td>
-                <td>커피봇일산</td>
-                <td>23-06-01</td>
-                <td>
-                  <div class="select-box">
-                    <select onchange="handleSelectChange()" class="contest-filter1">
-                      <option value="zero102">zero102</option> 
-                      <option value="zero101">zero101</option>                     
-                      <option value="zero103">zero103</option>
-                    </select>
-                    <i class="fa-solid fa-caret-down"></i>
-                  </div>
-                </td>
-                <td>
-                  <div class="select-box user02">
-                    <select onchange="handleSelectChange()" class="contest-filter1 ">
-                      <option value="총괄관리자">총괄관리자</option>  
-                      <option value="일반회원" >일반회원</option>                    
-                      <option value="프랜차이즈">프랜차이즈</option>
-                    </select>
-                    <i class="fa-solid fa-caret-down"></i>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>커피봇일산</td>
-                <td>23-06-01</td>
-                <td>
-                  <div class="select-box">
-                    <select onchange="handleSelectChange()" class="contest-filter1">
-                      <option value="zero103">zero103</option>
-                      <option value="zero101">zero101</option>
-                      <option value="zero102">zero102</option>                      
-                    </select>
-                    <i class="fa-solid fa-caret-down"></i>
-                  </div>
-                </td>
-                <td>
-                  <div class="select-box user03">
-                    <select onchange="handleSelectChange()" class="contest-filter1 ">                    
-                      <option value="프랜차이즈">프랜차이즈</option>
-                      <option value="일반회원" >일반회원</option>
-                      <option value="총괄관리자">총괄관리자</option>  
-                    </select>
-                    <i class="fa-solid fa-caret-down"></i>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>            
+</div>
+
+<!-- 모달 -->
+<div id="franchiseModal" class="modal-bg">
+    <div class="modal-box">
+
+        <h3 id="modalTitle" style="text-align:center; font-size:1.6rem; margin-bottom:10px;"></h3>
+
+        <input type="text" id="modalFranchiseId" placeholder="프랜차이즈 ID 입력"/>
+        <input type="text" id="modalFranchiseName" placeholder="프랜차이즈 이름 입력"/>
+
+        <div style="margin-top: 20px; text-align:center;">
+            <button id="cancelBtn" class="btn save-img" style="width:45%; display:inline-block;">취소</button>
+            <button id="saveBtn" class="btn blue" style="width:45%; display:inline-block; margin-left:10px;">저장
+            </button>
         </div>
-        <div class="btnFlex">
-          <button class="btn blue">추가</button>
-          <button class="btn red">삭제</button>
-        </div>
-      </div>
-    </section>
-  </div>
+
+    </div>
+</div>
 
 </body>
 </html>

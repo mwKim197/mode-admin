@@ -97,7 +97,7 @@
         }
 
     </style>
-  <script type="module" crossorigin src="../assets/main-DVqWtZWP.js"></script>
+  <script type="module" crossorigin src="../assets/main-W9r1QosY.js"></script>
   <link rel="stylesheet" crossorigin href="../assets/main--FnuIZ4K.css">
   <link rel="stylesheet" crossorigin href="../assets/style-BWJWr5B5.css">
 </head>
@@ -105,68 +105,70 @@
 <body>
 
 <div id="main-content">
-
     <!-- 회원가입 화면 -->
-    <section class="logWrap mt50">
+    <div>
+        <section class="logWrap" style="margin-top: 150px;">
 
-        <form id="register-form">
+            <form id="register-form">
 
-            <h2>회원가입</h2>
+                <h2>회원가입</h2>
 
-            <!-- 아이디 -->
-            <label for="adminId">아이디</label>
-            <input type="text" id="adminId" required placeholder="아이디를 입력하세요"/>
+                <!-- 아이디 -->
+                <label for="adminId">아이디</label>
+                <input type="text" id="adminId" required placeholder="아이디를 입력하세요"/>
 
-            <!-- 비밀번호 -->
-            <label for="password">비밀번호</label>
-            <div class="password-container">
-                <input type="password" id="password" required placeholder="비밀번호 입력"/>
-                <span class="eyes" onclick="togglePw('password')">👁</span>
-            </div>
+                <!-- 비밀번호 -->
+                <label for="password">비밀번호</label>
+                <div class="password-container">
+                    <input type="password" id="password" required placeholder="비밀번호 입력"/>
+                    <span class="eyes" onclick="togglePw('password')">👁</span>
+                </div>
 
-            <!-- 비밀번호 확인 -->
-            <label for="confirmPassword">비밀번호 확인</label>
-            <div class="password-container">
-                <input type="password" id="confirmPassword" required placeholder="비밀번호 확인"/>
-                <span class="eyes" onclick="togglePw('confirmPassword')">👁</span>
-            </div>
+                <!-- 비밀번호 확인 -->
+                <label for="confirmPassword">비밀번호 확인</label>
+                <div class="password-container">
+                    <input type="password" id="confirmPassword" required placeholder="비밀번호 확인"/>
+                    <span class="eyes" onclick="togglePw('confirmPassword')">👁</span>
+                </div>
 
-            <!-- 전화번호 -->
-            <label for="number">전화번호</label>
-            <input type="text" id="number" required
-                   pattern="^01[0-9]{1}-?[0-9]{3,4}-?[0-9]{4}$"
-                   title="010-1234-5678 형식으로 입력해주세요"
-                   placeholder="010-0000-0000"/>
+                <!-- 전화번호 -->
+                <label for="number">전화번호</label>
+                <input type="text" id="number" required
+                       pattern="^01[0-9]{1}-?[0-9]{3,4}-?[0-9]{4}$"
+                       title="010-1234-5678 형식으로 입력해주세요"
+                       placeholder="010-0000-0000"/>
 
-            <!-- 동의 체크 -->
-            <div class="privacy" style="margin: 1rem 0;">
-                <input type="checkbox" id="privacyAgree" required>
-                <label for="privacyAgree">
-                    <button type="button" onclick="openModal('privacy')" class="text-blue-600 underline">
-                        개인정보 수집 및 이용
-                    </button>
-                    에 동의합니다. (필수)
-                </label>
-            </div>
+                <!-- 동의 체크 -->
+                <div class="privacy" style="margin: 1rem 0;">
+                    <input type="checkbox" id="privacyAgree" required>
+                    <label for="privacyAgree">
+                        <button type="button" onclick="openModal('privacy')" class="text-blue-600 underline">
+                            개인정보 수집 및 이용
+                        </button>
+                        에 동의합니다. (필수)
+                    </label>
+                </div>
 
-            <div class="privacy">
-                <input type="checkbox" id="kakaoAgree">
-                <label for="kakaoAgree">
-                    <button type="button" onclick="openModal('kakao')" class="text-blue-600 underline">
-                        카카오 알림톡 수신
-                    </button>
-                    동의 (선택)
-                </label>
-            </div>
+                <div class="privacy">
+                    <input type="checkbox" id="kakaoAgree">
+                    <label for="kakaoAgree">
+                        <button type="button" onclick="openModal('kakao')" class="text-blue-600 underline">
+                            카카오 알림톡 수신
+                        </button>
+                        동의 (선택)
+                    </label>
+                </div>
 
-            <!-- 제출 버튼 -->
-            <button type="submit" class="btn save-img" style="margin-top:20px; width:100%; justify-content:center;">
-                계정 생성
-            </button>
+                <!-- 제출 버튼 -->
+                <button type="submit" class="btn save-img" style="margin-top:20px; width:100%; justify-content:center;">
+                    계정 생성
+                </button>
 
-            <p id="message" class="text-center mt-2"></p>
-        </form>
-    </section>
+                <p id="message" class="text-center mt-2"></p>
+            </form>
+        </section>
+    </div>
+
 </div>
 
 <!-- 모달 배경 -->

@@ -175,16 +175,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 일반 유저 정보
     const user = getStoredUser();
-
+    const menuWrap = document.querySelector(".user-menuWrap") as HTMLElement;
     // 일반 유저정보 있을경우에만 빠른조작화면 노출
-    if (user) {
-        const menuWrap = document.querySelector(".user-menuWrap") as HTMLElement;
-        if (menuWrap) {
+    if (menuWrap) {
+
+        if (user) {
             menuWrap.style.display = "block"; // ✅ 보이게
-        }
-    } else {
-        const menuWrap = document.querySelector(".user-menuWrap") as HTMLElement;
-        if (menuWrap) {
+        } else {
             menuWrap.style.display = "none"; // ✅ 숨기기
         }
     }
@@ -236,7 +233,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         {href: "/html/notice.html?type=store", label: "설치매장"},
         {href: "/html/notice.html?type=news", label: "언론보도"},
         {href: "/html/notice.html?type=machine", label: "머신사용설명"},
-        {href: "/html/empowerment.html", label: "권한 관리"},
+        {href: "/html/empowerment.html", label: "매장 권한설정"},
+        {href: "/html/adminEmpowerment.html", label: "관리자 권한설정"},
+        {href: "/html/register.html", label: "관리자 계정생성"},
+        {href: "/html/franchise.html", label: "프랜차이즈 관리"},
         {href: "/html/log.html", label: "로그아웃"},
     ];
 
@@ -300,11 +300,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             ? adminMenus  // 관리자: 일반 + 관리자 메뉴
             : generalMenus;
 
-        if (!user?.payType) {
+        if (user?.payType === false) {
             menus = upsertMenuItem(menus, pointMenu, {insertAfterLabel: "매출"});
         }
 
-        if (!user?.coupon) {
+        if (user?.coupon === false) {
             menus = upsertMenuItem(menus, couponMenu, {insertAfterLabel: "일반설정"});
         }
 
@@ -374,7 +374,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         import("./ts/page/notice.ts").then((module) => {
             module.initNotice();
         });
-    } else if (path === "/html/franchise_dashboard.html") {
+    } else if (path === "/html/franchise.html") {
         console.log("🏘️ 프랜차이즈 - franchise.ts 로드");
         import("./ts/page/franchise.ts").then((module) => {
             module.franchiseEdit();
@@ -418,6 +418,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.log("📌 공지사항상세 - noticeDetail.ts 로드");
         import("./ts/page/noticeDetail.ts").then((module) => {
             module.initNoticeDetail();
+        });
+    } else if (path === "/html/adminEmpowerment.html") {
+        console.log("📌 관리자 권한설정 - adminEmpowerment.ts 로드");
+        import("./ts/page/adminEmpowerment.ts").then((module) => {
+            module.adminEmpowermentDetail();
+        });
+    } else if (path === "/html/empowerment.html") {
+        console.log("📌 권한설정 - empowerment.ts 로드");
+        import("./ts/page/empowerment.ts").then((module) => {
+            module.empowermentStore();
         });
     } else if (path === "/html/menuMerge.html") {
         initMenuMerge();
@@ -469,6 +479,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 window.addEventListener("load", () => {
     document.body.style.visibility = "visible";
 });
+
+function test11() {
+    const userInfo = getStoredUser();
+    const adminInfo = getUserData();
+    console.log(userInfo);
+    adminInfo.then(
+        (res) => {
+            console.log(res);
+        }
+    ).catch(console.error);
+}
+
+test11();
 
 // 머신 조작 전역등록 api - deviceManage.ts 호출
 function bindGlobalDeviceEvents() {

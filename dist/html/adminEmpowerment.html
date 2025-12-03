@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        .franchise-select[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style> <!-- ✅ 메인 진입 -->
+  <script type="module" crossorigin src="../assets/main-W9r1QosY.js"></script>
+  <link rel="stylesheet" crossorigin href="../assets/main--FnuIZ4K.css">
+  <link rel="stylesheet" crossorigin href="../assets/style-BWJWr5B5.css">
+</head>
+
+<!--권한관리-->
+<body>
+
+<!-- 메인 -->
+<div id="main-content">
+
+    <!-- 커피봇 -->
+    <section class="mt8">
+        <div class="inner">
+            <div class="user-flex">
+                <div class="user">
+                    <i class="fa-regular fa-circle-user"></i>
+                    <p id="user-name">zero001 님</p>
+                    <label class="label manager" id="user-grade"><span>총괄관리자</span></label>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- table -->
+    <section class="pb20">
+        <div class="inner">
+            <div class="title-flex mb20">
+                <h2>권한설정</h2>
+                <button class="btn-outline">변경사항 저장</button>
+            </div>
+
+            <div class="tableArea St02">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>계정</th>
+                        <th>권한</th>
+                        <th>프랜차이즈 지정</th>
+                    </tr>
+                    </thead>
+                    <tbody id="admin-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+</body>
+
+</html>
