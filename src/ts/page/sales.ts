@@ -785,6 +785,11 @@ async function updatePopupContent(rowIndex: number) {
                         .map((c: any) => `${c.cardBin}`)
                 }
 
+                const payDateTime = String(item.payInfo.approvalDateTime).split("T");
+                const payDateStr = payDateTime[0];
+                const payTimeStr = payDateTime[1].substring(0, 5);
+                const payFormattedDate = `${payDateStr} ${payTimeStr}`;
+
                 //----------바코드 내역 추출
                 const barcodeInfos = item.totalPayInfo
                     ?.filter((pay: any) => pay.method === "바코드QR")
@@ -818,6 +823,10 @@ async function updatePopupContent(rowIndex: number) {
                     <div>
                         <h5>결제 수단</h5>
                         <p>${issuerName}</p>
+                    </div>
+                    <div>
+                        <h5>실제결제 시간</h5>
+                        <p>${payFormattedDate}</p>
                     </div>
                     <div>
                         <h5>카드 번호</h5>
