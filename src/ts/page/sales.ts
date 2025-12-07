@@ -786,9 +786,14 @@ async function updatePopupContent(rowIndex: number) {
                 }
 
                 const payDateTime = String(item.payInfo.approvalDateTime).split("T");
-                const payDateStr = payDateTime[0];
-                const payTimeStr = payDateTime[1].substring(0, 5);
-                const payFormattedDate = `${payDateStr} ${payTimeStr}`;
+                let payFormattedDate = "-";
+
+                if (item.payInfo.approvalDateTime) {
+                    const payDateStr = payDateTime[0];
+                    const payTimeStr = payDateTime[1].substring(0, 5);
+                    payFormattedDate = `${payDateStr} ${payTimeStr}`;
+
+                }
 
                 //----------바코드 내역 추출
                 const barcodeInfos = item.totalPayInfo
@@ -805,20 +810,16 @@ async function updatePopupContent(rowIndex: number) {
 
                 //----------포인트 사용 내역 추출
                 const pointInfos = item.totalPayInfo
-                    ?.filter((pay: any) => pay.method === "마일리지")
-                    .flatMap((pay: any) => pay || {});
+                    ?.filter((pay: any) => pay.method === "마일리지" && pay.usedAmount > 0) || [];
 
                 let pointContact = '미등록 고객';
                 let usedPoints = '미사용';
 
                 if (pointInfos.length > 0) {
-                    pointContact = pointInfos
-                        .map((c: any) => `${c.mileageNo}`)
-
-                    usedPoints = pointInfos
-                        .map((c: any) => `${c.usedAmount.toLocaleString()}`)
+                    pointContact = pointInfos.map((c: any) => `${c.mileageNo ?? '-'}`).join(', ');
+                    usedPoints = pointInfos.map((c: any) => `${c.usedAmount.toLocaleString()}`).join(', ');
                 }
-
+                
                 const paymentMethodInfo = `
                     <div>
                         <h5>결제 수단</h5>
