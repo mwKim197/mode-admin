@@ -26,13 +26,11 @@ export default defineConfig({
                 notice: resolve(__dirname, "html/01.notice.html"), // ✅ 공지 페이지
                 noticeEdit: resolve(__dirname, "html/01.notice-edit.html"), // ✅ 공지 등록
                 adminNotice: resolve(__dirname, "html/notice.html"), // ✅ 관리자 공지 등록
-                empowerment: resolve(__dirname, "html/adminEmpowerment.html"), // 추가: 권한관리
                 register: resolve(__dirname, "html/register.html"), // 추가: 회원가입 페이지
                 point: resolve(__dirname, "html/point.html"), // 추가: 포인트(마일리지) 페이지
                 product: resolve(__dirname, "html/product.html"), // 추가: 상품 목록 페이지
                 productDetail: resolve(__dirname, "html/product-detail.html"), // 추가: 상품 상세 페이지
                 productAdd: resolve(__dirname, "html/product-add.html"), // 추가: 상품 등록 페이지
-                franchise: resolve(__dirname, "html/franchise_dashboard.html"), // 추가: 프렌차이즈 메인 페이지
                 store: resolve(__dirname, "html/store_dashboard.html"), // 추가: 회원 메인 페이지
                 sales: resolve(__dirname, "html/sales.html"), // 추가: 매출 페이지
                 normalSet: resolve(__dirname, "html/normalSet.html"), // 추가: 회원 기본정보
@@ -43,8 +41,13 @@ export default defineConfig({
                 noticeDetail: resolve(__dirname, "html/noticeDetail.html"), // 추가: 공지사항 페이지
                 menuMerge: resolve(__dirname, "html/menuMerge.html"), // 메뉴 병합
                 userRegister: resolve(__dirname, "html/user-register.html"), // 매장계정생성
+                franchise: resolve(__dirname, "html/franchise.html"), // 추가: 프렌차이즈 생성 수정 페이지
+                adminEmpowerment: resolve(__dirname, "html/adminEmpowerment.html"), // 추가: 어드민권한설정 페이지
+                empowerment: resolve(__dirname, "html/empowerment.html"), // 추가: 일반권한설정 페이지
                 // 다른 html들도 여기에 추가 가능
             },
         },
     },
 });
+
+

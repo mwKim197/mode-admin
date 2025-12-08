@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8"/>
+
+    <style>
+        /* 검색바 */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-bar input,
+        .filter-bar select {
+            height: 40px;
+            padding: 0 12px;
+            border-radius: 6px;
+            background: #2b2b2b;
+            color: #fff;
+            border: 1px solid #444;
+        }
+
+        .filter-bar button {
+            min-width: 100px;
+        }
+
+        /* 매장 테이블 스타일 */
+        .store-table td, .store-table th {
+            padding: 14px;
+            white-space: nowrap;
+        }
+
+        /* 페이징 영역 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 12px;
+        }
+
+        /* 페이지네이션 버튼 개별 스타일링 */
+        .pagination button {
+            background: transparent; /* 🔥 기본 투명 */
+            border: 1px solid #777; /* 🔥 옅은 회색 테두리 */
+            color: #ddd; /* 🔥 회색 텍스트 */
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: auto; /* 🔥 공용 .btn 스타일 무시 */
+        }
+
+        /* 호버 시 반전 효과 */
+        .pagination button:hover {
+            background: #2080ff; /* 🔵 파란 배경 */
+            border-color: #2080ff;
+            color: white;
+        }
+
+        /* 오른쪽 버튼 영역 — 길이 고정 */
+        .franchise-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0; /* 🔥 버튼 줄어들지 않음 */
+            white-space: nowrap;
+        }
+
+        /* 관리 버튼 영역 */
+        .franchise-actions {
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
+            width: 100px; /* 🔥 버튼 영역 고정 세로 폭 */
+        }
+
+        /* 테이블 안에서만 .btn width 초기화 */
+        .tableArea .btn {
+            width: auto !important; /* 🔥 강제 width 해제 */
+            padding: 6px 10px;
+            font-size: 0.9rem;
+            border-radius: 6px;
+        }
+
+        /* 버튼 스타일 */
+        .btn-edit,
+        .btn-delete {
+            padding: 4px 8px; /* 🔥 더 작게 */
+            font-size: 0.75rem; /* 🔥 텍스트 크기 축소 */
+            border-radius: 4px;
+            white-space: nowrap;
+            min-width: 45px; /* 🔥 버튼 최소 크기 보장 */
+        }
+
+        /* 파란 수정 버튼 */
+        .btn-edit {
+            background-color: #2080ff;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background-color: #1a6ed8;
+        }
+
+        /* 회색 삭제 버튼 */
+        .btn-delete {
+            background-color: #555;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #444;
+        }
+
+
+    </style>
+  <script type="module" crossorigin src="../assets/main-BOnR6R5Y.js"></script>
+  <link rel="stylesheet" crossorigin href="../assets/main--FnuIZ4K.css">
+  <link rel="stylesheet" crossorigin href="../assets/style-BWJWr5B5.css">
+</head>
+
+<body>
+<div id="main-content">
+
+    <section class="mt8">
+        <div class="inner">
+            <div class="user-flex">
+                <div class="user">
+                    <i class="fa-regular fa-circle-user"></i>
+                    <p id="user-name">zero001 님</p>
+                    <label class="label manager" id="user-grade"><span>총괄관리자</span></label>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="pb20">
+        <div class="inner">
+
+            <!-- 페이지 제목 -->
+            <div class="title-flex mb20">
+                <h2>일반 매장 계정 관리</h2>
+            </div>
+
+            <!-- 🔍 검색/필터 영역 -->
+            <div class="filter-bar">
+                <input type="text" id="searchKeyword" placeholder="계정 검색">
+
+                <select id="filterFranchise">
+                    <option value="">전체 프랜차이즈</option>
+                </select>
+
+                <select id="filterGrade">
+                    <option value="">전체 권한</option>
+                    <option value="4">일반 매장</option>
+                    <option value="3">프랜차이즈</option>
+                </select>
+
+                <button class="btn-outline" id="filterBtn">검색</button>
+            </div>
+
+            <!-- 🏪 매장 리스트 테이블 -->
+            <div class="tableArea St02">
+                <table class="store-table">
+                    <thead>
+                    <tr>
+                        <th>계정</th>
+                        <th>프랜차이즈</th>
+                        <th>권한</th>
+                        <th>관리</th>
+                    </tr>
+                    </thead>
+                    <tbody id="store-table-body"></tbody>
+                </table>
+            </div>
+
+            <!-- 🔄 페이징 -->
+            <div class="pagination">
+                <button data-page="prev" class="btn-outline">◀ 이전</button>
+                <span id="page-info">1 / 1</span>
+                <button data-page="next" class="btn-outline">다음 ▶</button>
+            </div>
+
+        </div>
+    </section>
+
+</div>
+</body>
+</html>
