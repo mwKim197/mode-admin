@@ -1,8 +1,8 @@
-
 export type AdminUserInfo = {
     adminId: string;
     name: string;
     grade: number;
+    franchiseId?: string;
     kakaoId?: string;
     createdAt?: string;
     userId?: string;      // 단일 연결 사용자

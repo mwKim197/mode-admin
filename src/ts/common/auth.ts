@@ -78,6 +78,7 @@ export async function getUserData(): Promise<AdminUserInfo | null> {
         adminId: data.adminId,
         name: data.name,
         grade: data.grade,
+        franchiseId: data.franchiseId,
     };
 }
 

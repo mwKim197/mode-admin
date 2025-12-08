@@ -8,6 +8,7 @@ import {sendMachineCommand} from "./ts/page/deviceManage.ts";
 import Choices from "choices.js";
 import "choices.js/public/assets/styles/choices.min.css";
 import {initMenuMerge} from "./ts/page/menuMerge.ts";
+import {apiGet} from "./ts/api/apiHelpers.ts";
 
 // 글로벌 등록
 declare global {
@@ -173,6 +174,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    let shoppingMallOption = true;
+
+    if (userInfo && userInfo.grade === 4) {
+        const franchiseId = userInfo.franchiseId;
+
+        if (franchiseId) {
+            const res = await apiGet(`/model_admin_franchise?func=get-franchise&franchiseId=${franchiseId}`);
+            const data = await res.json();
+
+            const franchise = data.franchise;
+            shoppingMallOption = franchise.options?.shoppingMall ?? true; // 기본값 true
+
+        }
+    }
+
+
     // 일반 유저 정보
     const user = getStoredUser();
     const menuWrap = document.querySelector(".user-menuWrap") as HTMLElement;
@@ -216,7 +233,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         {href: "/html/product.html", label: "상품"},
         {href: "/html/sales.html", label: "매출"},
         {href: "/html/deviceManage.html", label: "기기관리"},
-        {href: "http://modelzero.shop/", label: "쇼핑몰", target: "_blank", rel: "noopener noreferrer"},
         {href: "http://pf.kakao.com/_mIxiYG/chat", label: "A/S접수", target: "_blank", rel: "noopener noreferrer"},
         {href: "/html/normalSet.html", label: "일반설정"},
         {href: "/html/log.html", label: "로그아웃"},
@@ -306,6 +322,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (user?.coupon === false) {
             menus = upsertMenuItem(menus, couponMenu, {insertAfterLabel: "일반설정"});
+        }
+
+        if (shoppingMallOption) {
+
+            menus = upsertMenuItem(menus, {
+                href: "http://modelzero.shop/",
+                label: "쇼핑몰",
+                target: "_blank",
+                rel: "noopener noreferrer"
+            }, {insertAfterLabel: "매출"});
+
         }
 
         renderMenu(".sidemenu .menu", menus);
@@ -480,18 +507,6 @@ window.addEventListener("load", () => {
     document.body.style.visibility = "visible";
 });
 
-function test11() {
-    const userInfo = getStoredUser();
-    const adminInfo = getUserData();
-    console.log(userInfo);
-    adminInfo.then(
-        (res) => {
-            console.log(res);
-        }
-    ).catch(console.error);
-}
-
-test11();
 
 // 머신 조작 전역등록 api - deviceManage.ts 호출
 function bindGlobalDeviceEvents() {
@@ -611,7 +626,7 @@ async function tryAutoLogin() {
         });
 
         const data = await res.json();
-        console.log(data);
+
         if (res.ok) {
             localStorage.setItem("accessToken", data.accessToken);
             console.log("✅ 자동로그인 성공");

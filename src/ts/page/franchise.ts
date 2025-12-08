@@ -5,6 +5,9 @@ export function franchiseEdit() {
         franchiseId: string;
         name: string;
         createdAt?: string;
+        options?: {
+            shoppingMall: boolean;
+        };
     }
 
     const API_BASE = "/model_admin_franchise";
@@ -15,6 +18,7 @@ export function franchiseEdit() {
     const modalTitle = document.getElementById("modalTitle") as HTMLElement;
     const modalFranchiseId = document.getElementById("modalFranchiseId") as HTMLInputElement;
     const modalFranchiseName = document.getElementById("modalFranchiseName") as HTMLInputElement;
+    const modalShoppingMall = document.getElementById("modalShoppingMall") as HTMLInputElement;
 
     const openCreateBtn = document.getElementById("openCreateBtn") as HTMLButtonElement;
     const saveBtn = document.getElementById("saveBtn") as HTMLButtonElement;
@@ -40,6 +44,9 @@ export function franchiseEdit() {
                 <div>
                     <strong>${f.franchiseId}</strong><br/>
                     ${f.name}
+                </div>
+                <div>
+                  <span class="option-tag">쇼핑몰: ${f.options?.shoppingMall ? "ON" : "OFF"}</span>
                 </div>
                 <div class="franchise-actions">
                     <button class="btn btn-edit" data-edit="${f.franchiseId}">수정</button>
@@ -105,6 +112,7 @@ export function franchiseEdit() {
         const data = await res.json();
 
         modalFranchiseName.value = data.franchise.name;
+        modalShoppingMall.checked = data.franchise.options?.shoppingMall ?? false;
 
         franchiseModal.classList.add("active");
     }
@@ -122,9 +130,21 @@ export function franchiseEdit() {
         }
 
         if (isEdit) {
-            await apiPut(`${API_BASE}?func=update-franchise`, {franchiseId, name});
+            await apiPut(`${API_BASE}?func=update-franchise`, {
+                franchiseId,
+                name,
+                options: {
+                    shoppingMall: modalShoppingMall.checked
+                }
+            });
         } else {
-            await apiPost(`${API_BASE}?func=create-franchise`, {franchiseId, name});
+            await apiPost(`${API_BASE}?func=create-franchise`, {
+                franchiseId,
+                name,
+                options: {
+                    shoppingMall: modalShoppingMall.checked
+                }
+            });
         }
 
         closeModal();
