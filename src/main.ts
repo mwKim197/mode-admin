@@ -227,7 +227,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
 // 1) 공통(일반) 메뉴
-    const generalMenus: MenuItem[] = [
+    let generalMenus: MenuItem[] = [
         {href: "/html/home.html", label: "Home"},
         {href: "/html/noticeList.html", label: "공지사항"},
         {href: "/html/product.html", label: "상품"},
@@ -237,6 +237,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         {href: "/html/normalSet.html", label: "일반설정"},
         {href: "/html/log.html", label: "로그아웃"},
     ];
+
+    if (shoppingMallOption) {
+
+        generalMenus = upsertMenuItem(generalMenus, {
+            href: "http://modelzero.shop/",
+            label: "쇼핑몰",
+            target: "_blank",
+            rel: "noopener noreferrer"
+        }, {insertAfterLabel: "매출"});
+    }
 
 // 2) 관리자 전용 메뉴
     const adminMenus: MenuItem[] = [
@@ -322,17 +332,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (user?.coupon === false) {
             menus = upsertMenuItem(menus, couponMenu, {insertAfterLabel: "일반설정"});
-        }
-
-        if (shoppingMallOption) {
-
-            menus = upsertMenuItem(menus, {
-                href: "http://modelzero.shop/",
-                label: "쇼핑몰",
-                target: "_blank",
-                rel: "noopener noreferrer"
-            }, {insertAfterLabel: "매출"});
-
         }
 
         renderMenu(".sidemenu .menu", menus);
