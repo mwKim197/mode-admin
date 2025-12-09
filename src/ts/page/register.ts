@@ -75,9 +75,9 @@ export function initRegister() {
             const result = await response.json();
 
             if (response.ok) {
-                console.log("✅ 회원가입 성공 → 로그인 페이지로 이동");
-                alert("✅ 회원가입 성공! 로그인 페이지로 이동합니다.");
-                window.location.href = "/html/log.html";
+                console.log("✅ 계정생성 성공 → 메인 페이지로 이동");
+                alert("✅ 계정생성 성공! 메인 페이지로 이동합니다.");
+                window.location.href = "/html/home.html";
             } else {
                 alert(result.message || "회원가입 실패. 다시 시도하세요.");
             }
