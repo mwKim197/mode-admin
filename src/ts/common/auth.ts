@@ -1,5 +1,5 @@
 import {fetchWithAuth} from "../api/api.ts";
-import {DecodedToken, AdminUserInfo} from "../types/adminUser.ts";
+import {AdminUserInfo, DecodedToken} from "../types/adminUser.ts";
 import {jwtDecode} from "jwt-decode";
 
 /**
@@ -41,16 +41,28 @@ export async function checkUserAccess() {
 
     // ✅ 권한별 접근 허용 페이지 정의
     const pageAccess: Record<string, number[]> = {
-        "/html/01.notice.html": [1, 2],
-        "/html/01.notice-edit.html": [1, 2],
         "/html/notice.html": [1, 2],
+        "/html/notice-edit.html": [1, 2],
+        "/html/noticeList.html": [1, 2],
+        "/html/user-register.html": [1, 2],
+        "/html/menuMerge.html": [1, 2],
+        "/html/notice.html?type=admin": [1, 2],
+        "/html/notice.html?type=notice": [1, 2],
+        "/html/notice.html?type=store": [1, 2],
+        "/html/notice.html?type=news": [1, 2],
+        "/html/notice.html?type=machine": [1, 2],
+        "/html/empowerment.html": [1, 2],
+        "/html/adminEmpowerment.html": [1, 2],
+        "/html/register.html": [1, 2],
+        "/html/franchise.html": [1, 2],
     };
 
     const gradeHome: Record<number, string> = {
-        1: "/html/dashboard.html",
-        2: "/html/dashboard.html",
-        3: "/html/franchise_dashboard.html",
-        4: "/html/store_dashboard.html",
+        1: "/html/home.html",
+        2: "/html/home.html",
+        3: "/html/home.html",
+        4: "/html/home.html",
+        //[TODO] 권한별 home화면 만들어넣기
     };
 
     const pathname = window.location.pathname;

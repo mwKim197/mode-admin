@@ -93,21 +93,21 @@ export function showToast(
     const style = styleMap[type];
 
     toast.style.cssText = `
-    background: ${style.background};
-    color: ${style.color};
-    border: ${style.border};
-    padding: 0.8rem 1.2rem;
-    margin-top: 0.5rem;
-    border-radius: 0.5rem;
-    font-size: 1.2rem;
-    max-width: 320px;                /* ✅ 최대 너비 제한 */
-    white-space: normal;             /* ✅ 줄바꿈 허용 */
-    word-break: break-word;          /* ✅ 단어 길어도 줄바꿈 */
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    transition: all 0.3s ease;
-    opacity: 0;
-    transform: translateY(-10px);
-  `;
+        background: ${style.background};
+        color: ${style.color};
+        border: ${style.border};
+        padding: 0.8rem 1.2rem;
+        margin-top: 0.5rem;
+        border-radius: 0.5rem;
+        font-size: 1.2rem;
+        max-width: 320px;                /* ✅ 최대 너비 제한 */
+        white-space: normal;             /* ✅ 줄바꿈 허용 */
+        word-break: break-word;          /* ✅ 단어 길어도 줄바꿈 */
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+        opacity: 0;
+        transform: translateY(-10px);
+    `;
 
     container.appendChild(toast);
 
@@ -272,7 +272,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // ✅ 쿠폰 메뉴 정의
     const couponMenu: MenuItem = {href: "/html/couponList.html", label: "쿠폰"};
 
-// 3) 메뉴 렌더 함수
+    // 3) 메뉴 렌더 함수
     function renderMenu(containerSelector: string, items: MenuItem[]): void {
         const menuList = document.querySelector<HTMLUListElement>(containerSelector);
         if (!menuList) return;
@@ -320,7 +320,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return next;
     }
 
-// 4) 사용자 등급에 따라 구성
+    // 4) 사용자 등급에 따라 구성
     (function initSideMenu(): void {
         let menus: MenuItem[] = isAdmin(userInfo)
             ? adminMenus  // 관리자: 일반 + 관리자 메뉴
@@ -338,7 +338,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         highlightActiveMenu(".sidemenu .menu"); // (선택) 현재 페이지 활성화 표시
     })();
 
-// (선택) 현재 경로와 링크가 같으면 active 클래스 추가
+    // (선택) 현재 경로와 링크가 같으면 active 클래스 추가
     function highlightActiveMenu(containerSelector: string): void {
         const container = document.querySelector<HTMLUListElement>(containerSelector);
         if (!container) return;
