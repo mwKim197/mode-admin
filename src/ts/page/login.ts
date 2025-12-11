@@ -28,7 +28,7 @@ export function initLogin() {
         const adminId = (document.getElementById("adminId") as HTMLInputElement).value.trim();
         const password = (document.getElementById("password") as HTMLInputElement).value.trim();
         const autoLoginChecked = (document.getElementById("agree") as HTMLInputElement).checked;
-        
+
         if (!adminId || !password) {
             alert("아이디와 비밀번호를 입력해주세요.");
             return;
@@ -39,8 +39,8 @@ export function initLogin() {
         try {
             const response = await fetch(`${API_URL}/model_admin_login?func=login`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ adminId, password }),
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({adminId, password}),
             });
 
             const result = await response.json();
@@ -97,12 +97,12 @@ function handleKakaoLogin() {
 
         const expectedState = sessionStorage.getItem("kakao_state");
         if (!expectedState || data.state !== expectedState) {
-            console.warn("Invalid state", { got: data.state, expected: expectedState });
+            console.warn("Invalid state", {got: data.state, expected: expectedState});
             alert("로그인 보안 검증에 실패했습니다. 다시 시도해주세요.");
             return;
         }
 
-        const { code, error } = data;
+        const {code, error} = data;
         if (error || !code) {
             console.error("❌ Kakao OAuth error or code missing:", error);
             alert("카카오 로그인 실패. 다시 시도하세요.");
@@ -112,8 +112,8 @@ function handleKakaoLogin() {
         try {
             const resp = await fetch(`${API_URL}/model_admin_login?func=kakao-login`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ code, state: expectedState }), // 서버로 state도 전달(선택)
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({code, state: expectedState}), // 서버로 state도 전달(선택)
             });
             const body = await resp.json();
 
@@ -138,7 +138,7 @@ function handleKakaoLogin() {
     }
 
     // 4) PC: 팝업 플로우 (리스너 먼저 등록)
-    window.addEventListener("message", onMessage, { once: true });
+    window.addEventListener("message", onMessage, {once: true});
 
     const loginPopup = window.open(kakaoAuthURL, "kakaoLogin", "width=500,height=700");
     if (!loginPopup) {
@@ -154,7 +154,7 @@ async function handlePostLogin(data: any, autoLoginChecked: boolean = false) {
         localStorage.setItem("accessToken", data.accessToken);
         if (autoLoginChecked) {
             console.log("✅ 로그인 성공 → 자동로그인 활성화");
-            localStorage.setItem("refreshToken", data.refreshToken);    
+            localStorage.setItem("refreshToken", data.refreshToken);
         } else {
             console.log("✅ 로그인 성공 → 자동로그인 삭제");
             localStorage.removeItem("refreshToken");
@@ -191,7 +191,7 @@ async function handlePostLogin(data: any, autoLoginChecked: boolean = false) {
             });
 
             if (res.ok) {
-                const { user } = await res.json();
+                const {user} = await res.json();
                 setStoredUser(user);
                 console.log("✅ 사용자 정보 저장 완료");
             } else {

@@ -1,4 +1,4 @@
-import {apiGet, apiPut} from "../api/apiHelpers";
+import {apiGet, apiPost, apiPut} from "../api/apiHelpers";
 
 interface StoreUser {
     adminId: string;
@@ -152,37 +152,51 @@ function renderStoreTable(list: StoreUser[]) {
                         class="btn btn-edit store-update-btn"
                         data-admin="${store.adminId}"
                     >변경</button>
+                    
+                    <button 
+                        class="btn btn-primary store-open-btn"
+                        data-admin="${store.adminId}"
+                    >매장관리</button>
                 </td>
+                
             </tr>
         `;
     });
 }
 
 /* =======================================
-   4) 변경 버튼 클릭 이벤트
+   4) 변경/매장관리 버튼 클릭 이벤트
 ======================================= */
 function attachRowEvents() {
     document.addEventListener("click", async (e) => {
         const btn = e.target as HTMLElement;
-        if (!btn.classList.contains("store-update-btn")) return;
 
-        const adminId = btn.dataset.admin!;
-        const select = document.querySelector(
-            `.store-franchise-select[data-admin="${adminId}"]`
-        ) as HTMLSelectElement;
+        // 🔹 1) 기존 변경 버튼
+        if (btn.classList.contains("store-update-btn")) {
+            const adminId = btn.dataset.admin!;
+            const select = document.querySelector(
+                `.store-franchise-select[data-admin="${adminId}"]`
+            ) as HTMLSelectElement;
 
-        const franchiseId = select.value || null;
+            const franchiseId = select.value || null;
 
-        if (!confirm("정말 이 계정 정보를 변경하시겠습니까?")) return;
+            if (!confirm("정말 이 계정 정보를 변경하시겠습니까?")) return;
 
-        await apiPut("/model_admin_user?func=update-admin", {
-            adminId,
-            franchiseId,
-        });
+            await apiPut("/model_admin_user?func=update-admin", {
+                adminId,
+                franchiseId,
+            });
 
-        alert("변경 완료되었습니다.");
-        // 필요하면 다시 로드
-        loadStoreList();
+            alert("변경 완료되었습니다.");
+            loadStoreList();
+            return;
+        }
+
+        // 🔹 2) 매장관리 열기 (대리 로그인)
+        if (btn.classList.contains("store-open-btn")) {
+            const adminId = btn.dataset.admin!;
+            openStoreDashboard(adminId);
+        }
     });
 }
 
@@ -231,5 +245,30 @@ function gradeName(grade: number) {
             return "일반매장";
         default:
             return "미지정";
+    }
+}
+
+/* =======================================
+   8) 관리>매장 로그인
+======================================= */
+async function openStoreDashboard(storeAdminId: string) {
+    const res = await apiPost("/model_admin_login?func=impersonate-store", {
+        storeUserId: storeAdminId
+    });
+
+    const data = await res.json();
+
+    if (!data.accessToken) {
+        alert("매장 계정 로그인 생성 실패");
+        return;
+    }
+
+    const token = encodeURIComponent(data.accessToken);
+
+    // 매장 페이지 오픈 + 토큰 파라미터 전달
+    const newWin = window.open(`/html/home.html?impersonate_token=${token}`, "_blank");
+
+    if (!newWin) {
+        alert("팝업이 차단되었습니다. 팝업 허용 후 다시 시도해주세요.");
     }
 }

@@ -1,3 +1,5 @@
+import {getToken} from "../common/auth.ts";
+
 const API_URL = "https://api.narrowroad-model.com";
 
 /**
@@ -16,11 +18,11 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {},
         return {
             ok: false,
             status: 200,
-            json: async () => ({ message: "로그인 페이지에서는 인증 요청을 하지 않습니다." }),
+            json: async () => ({message: "로그인 페이지에서는 인증 요청을 하지 않습니다."}),
         };
     }
 
-    const accessToken = localStorage.getItem("accessToken");
+    const accessToken = getToken();
 
     if (!accessToken) {
         console.log("❌ 토큰이 없습니다. 로그인 페이지로 이동합니다.");
@@ -28,7 +30,7 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {},
         return {
             ok: false,
             status: 401,
-            json: async () => ({ message: "인증 토큰이 없습니다." }),
+            json: async () => ({message: "인증 토큰이 없습니다."}),
         };
     }
 
@@ -67,7 +69,7 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {},
         return {
             ok: false,
             status: 500,
-            json: async () => ({ message: "❌ API 요청 오류" }),
+            json: async () => ({message: "❌ API 요청 오류"}),
         };
     } finally {
         // 글로벌

@@ -1,12 +1,14 @@
 import {fetchWithAuth} from "../api/api.ts";
 import {AdminUserInfo, DecodedToken} from "../types/adminUser.ts";
 import {jwtDecode} from "jwt-decode";
+import {setStoredUser} from "../utils/userStorage.ts";
+import {apiGet} from "../api/apiHelpers.ts";
 
 /**
  * ✅ 토큰 사용자 권한 확인
  */
 export function getUserFromToken(): DecodedToken | null {
-    const accessToken = localStorage.getItem("accessToken");
+    const accessToken = getToken();
     if (!accessToken) return null;
 
     try {
@@ -94,10 +96,39 @@ export async function getUserData(): Promise<AdminUserInfo | null> {
     };
 }
 
+export async function getUserInfo(userId: string | undefined) {
+
+    if (userId) {
+        const res = await apiGet(`/model_user_setting?func=get-user&userId=${userId}`);
+
+        if (res.ok) {
+            const {user} = await res.json();
+            setStoredUser(user);
+            console.log("✅ 사용자 정보 저장 완료");
+        } else {
+            if ("text" in res) {
+                const errorBody = await res.text();
+                console.error("❌ 사용자 정보 조회 실패:", res.status, errorBody);
+            }
+
+            alert("사용자 정보를 불러오지 못했습니다.");
+            return;
+        }
+    }
+}
+
 /**
  * ✅ 로그아웃
  */
 export function logout() {
     localStorage.removeItem("accessToken");
     window.location.href = "/log.html";
+}
+
+/**
+ * ✅ 로그인 세션확인
+ */
+export function getToken() {
+    return sessionStorage.getItem("accessToken")
+        || localStorage.getItem("accessToken");
 }

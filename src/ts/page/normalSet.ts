@@ -1,5 +1,7 @@
 import {ModelUser} from "../types/user";
-import {apiGet, apiPut, apiPost} from "../api/apiHelpers";
+import {apiGet, apiPost, apiPut} from "../api/apiHelpers";
+import {getToken, getUserInfo} from "../common/auth";
+import {getStoredUser} from "../utils/userStorage.ts";
 
 // 파일 업로드 관련 전역 변수
 let logoFile: File | null = null;
@@ -109,7 +111,12 @@ function initSaveButtonHandler() {
     if (saveButton) {
         saveButton.addEventListener("click", (e) => {
             e.preventDefault();
-            saveStoreInfo();
+            saveStoreInfo().then(() => {
+                const storedUserData = getStoredUser();
+                getUserInfo(storedUserData?.userId).then(() => {
+                    location.reload();
+                });
+            });
         });
     }
 }
@@ -308,7 +315,7 @@ function loadCategoryData(categories: any[]) {
 async function saveStoreInfo() {
     try {
         const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
-        const accessToken = localStorage.getItem("accessToken");
+        const accessToken = getToken();
 
         if (!accessToken) {
             return;

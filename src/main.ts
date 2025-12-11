@@ -126,6 +126,23 @@ export function showToast(
 window.showToast = showToast;
 // ------- 토스트 메세지 --------//
 
+// ===============================
+// 🔥 Impersonation Token 처리
+// ===============================
+(function applyImpersonationToken() {
+    const url = new URL(window.location.href);
+    const token = url.searchParams.get("impersonate_token");
+
+    if (token) {
+        // 매장 계정 세션은 sessionStorage에 저장해야 함
+        sessionStorage.setItem("accessToken", token);
+        sessionStorage.setItem("impersonationMode", "true");
+
+        url.searchParams.delete("impersonate_token");
+        window.location.replace(url.toString());
+    }
+})();
+
 // 📌 main.ts (불필요한 코드 로딩 방지)
 document.addEventListener("DOMContentLoaded", async () => {
     console.log("✅ main.ts 실행됨");
@@ -326,6 +343,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             ? adminMenus  // 관리자: 일반 + 관리자 메뉴
             : generalMenus;
 
+        console.log(`point !!!: ${user?.payType}`);
         if (user?.payType === false) {
             menus = upsertMenuItem(menus, pointMenu, {insertAfterLabel: "매출"});
         }
@@ -645,3 +663,4 @@ function redirectToLogin() {
     console.log("➡️ 로그인 페이지로 이동");
     window.location.href = "/html/log.html";
 }
+
