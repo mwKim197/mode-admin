@@ -1,5 +1,5 @@
 import "./css/common.css"; // 또는 상대 경로 맞게 수정
-import {checkUserAccess, getUserData} from "./ts/common/auth.ts";
+import {checkUserAccess, getUserData, getUserInfo} from "./ts/common/auth.ts";
 import "./ts/page/login.ts";
 import {loadPartials} from "./ts/utils/layoutLoader.ts";
 import {ToastType} from "./ts/types/common.ts";
@@ -140,6 +140,7 @@ window.showToast = showToast;
 
         url.searchParams.delete("impersonate_token");
         window.location.replace(url.toString());
+
     }
 })();
 
@@ -147,25 +148,30 @@ window.showToast = showToast;
 document.addEventListener("DOMContentLoaded", async () => {
     console.log("✅ main.ts 실행됨");
 
-    // 📌 현재 페이지 URL 확인
     const path = window.location.pathname;
+    const impersonationMode = sessionStorage.getItem("impersonationMode") === "true";
 
-    if (path != "/html/log.html" && path != "/html/dashboard.html") {
-        // ✅ 자동로그인 시도 (세션 토큰 없을 때만)
+    // 1) 로그인 처리
+    if (!impersonationMode && path !== "/html/log.html" && path !== "/html/dashboard.html") {
         if (!localStorage.getItem("authToken")) {
-            console.log("🔄 자동로그인 시도");
-            await tryAutoLogin(); // ✅ 토큰 저장까지 기다림
-        } else {
-            console.log("✅ 기존 세션 토큰 사용");
+            await tryAutoLogin();
         }
+    }
 
+    // 2) 공통 처리 (단 한 번만 실행!)
+    if (path !== "/html/log.html" && path !== "/html/dashboard.html") {
         await checkUserAccess();
-        await loadPartials(); // ✅ head, layout, header 로딩도 제외
+        await loadPartials();
         bindGlobalDeviceEvents();
     }
 
+    // 3) 유저정보 불러오기
     const userInfo = await getUserData();
 
+    if (userInfo?.userId) {
+        await getUserInfo(userInfo.userId);
+    }
+    
     if (userInfo) {
         const userNameEl = document.getElementById("user-name");
         const userGradeEl = document.getElementById("user-grade");
@@ -206,7 +212,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-
     // 일반 유저 정보
     const user = getStoredUser();
     const menuWrap = document.querySelector(".user-menuWrap") as HTMLElement;
@@ -242,6 +247,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         const n = typeof info.grade === 'string' ? Number(info.grade) : info.grade;
         return Number.isFinite(n as number) && (n as number) <= 2;
     };
+
+    console.log();
 
 // 1) 공통(일반) 메뉴
     let generalMenus: MenuItem[] = [
@@ -310,6 +317,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             li.appendChild(a);
             menuList.appendChild(li);
         });
+
     }
 
     // 🔧 유틸: 특정 항목 존재 여부 + 원하는 위치에 삽입
@@ -343,7 +351,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             ? adminMenus  // 관리자: 일반 + 관리자 메뉴
             : generalMenus;
 
-        console.log(`point !!!: ${user?.payType}`);
         if (user?.payType === false) {
             menus = upsertMenuItem(menus, pointMenu, {insertAfterLabel: "매출"});
         }
