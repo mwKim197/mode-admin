@@ -167,11 +167,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 3) 유저정보 불러오기
     const userInfo = await getUserData();
-
+    
     if (userInfo?.userId) {
         await getUserInfo(userInfo.userId);
     }
-    
+
     if (userInfo) {
         const userNameEl = document.getElementById("user-name");
         const userGradeEl = document.getElementById("user-grade");
@@ -283,7 +283,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         {href: "/html/notice.html?type=store", label: "설치매장"},
         {href: "/html/notice.html?type=news", label: "언론보도"},
         {href: "/html/notice.html?type=machine", label: "머신사용설명"},
-        {href: "/html/empowerment.html", label: "매장 권한설정"},
+        {href: "/html/empowerment.html", label: "일반 매장관리"},
         {href: "/html/adminEmpowerment.html", label: "관리자 권한설정"},
         {href: "/html/register.html", label: "관리자 계정생성"},
         {href: "/html/franchise.html", label: "프랜차이즈 관리"},

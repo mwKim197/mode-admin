@@ -88,11 +88,13 @@ export async function getUserData(): Promise<AdminUserInfo | null> {
     }
 
     const data = await res.json();
+
     return {
         adminId: data.adminId,
         name: data.name,
         grade: data.grade,
         franchiseId: data.franchiseId,
+        userId: data.userId,
     };
 }
 
@@ -103,6 +105,8 @@ export async function getUserInfo(userId: string | undefined) {
 
         if (res.ok) {
             const {user} = await res.json();
+
+            console.log("user: ", user);
             setStoredUser(user);
             console.log("✅ 사용자 정보 저장 완료");
         } else {

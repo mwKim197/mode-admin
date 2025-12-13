@@ -195,6 +195,7 @@ function attachRowEvents() {
         // 🔹 2) 매장관리 열기 (대리 로그인)
         if (btn.classList.contains("store-open-btn")) {
             const adminId = btn.dataset.admin!;
+            console.log(adminId);
             openStoreDashboard(adminId);
         }
     });

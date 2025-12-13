@@ -23,7 +23,7 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {},
     }
 
     const accessToken = getToken();
-
+    
     if (!accessToken) {
         console.log("❌ 토큰이 없습니다. 로그인 페이지로 이동합니다.");
         window.location.href = "/html/log.html";
