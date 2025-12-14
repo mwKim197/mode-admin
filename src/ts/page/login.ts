@@ -201,8 +201,13 @@ async function handlePostLogin(data: any, autoLoginChecked: boolean = false) {
                 return;
             }
         }
-        // ✅ 홈으로 이동
-        window.location.href = "/html/home.html";
+        // ✅ 권한별 홈으로 이동
+        if (userInfo?.grade === 3) {
+            window.location.href = "/html/franchise_home.html";
+        } else {
+            window.location.href = "/html/home.html";
+        }
+
     } catch (error) {
         console.error("❌ postLogin 처리 오류:", error);
         alert("로그인 후 처리 중 오류가 발생했습니다.");

@@ -9,8 +9,7 @@ interface AdminUser {
 
 
 export async function adminEmpowermentDetail() {
-    console.log("📌 adminEmpowermentDetail 초기화");
-
+    
     // 관리자 리스트
     const adminRes = await apiGet("/model_admin_user?func=get-admins");
     const adminJson = await adminRes.json();

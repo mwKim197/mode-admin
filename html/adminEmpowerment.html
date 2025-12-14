@@ -3,16 +3,16 @@
 
 <head>
     <meta charset="UTF-8"/>
-    <link rel="stylesheet" href="/src/css/reset.css">
-    <link rel="stylesheet" href="/src/css/common.css">
-    <link rel="stylesheet" href="/src/css/style.css">
+    <link href="/src/css/reset.css" rel="stylesheet">
+    <link href="/src/css/common.css" rel="stylesheet">
+    <link href="/src/css/style.css" rel="stylesheet">
     <style>
         .franchise-select[disabled] {
             opacity: 0.5;
             cursor: not-allowed;
         }
     </style>
-    <script type="module" src="/src/main.ts"></script> <!-- ✅ 메인 진입 -->
+    <script src="/src/main.ts" type="module"></script> <!-- ✅ 메인 진입 -->
 </head>
 
 <!--권한관리-->
@@ -37,10 +37,6 @@
     <!-- table -->
     <section class="pb20">
         <div class="inner">
-            <div class="title-flex mb20">
-                <h2>권한설정</h2>
-                <button class="btn-outline">변경사항 저장</button>
-            </div>
 
             <div class="tableArea St02">
                 <table>

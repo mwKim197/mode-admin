@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8"/>
+    <meta charset="UTF-8"/>
+    <link href="/src/css/reset.css" rel="stylesheet"/>
+    <link href="/src/css/common.css" rel="stylesheet"/>
+    <link href="/src/css/style.css" rel="stylesheet"/>
+    <script src="/src/main.ts" type="module"></script>
+    <!-- ✅ 메인 진입 -->
 
     <style>
         /* 검색바 */
@@ -116,46 +121,37 @@
 
 
     </style>
-  <script type="module" crossorigin src="../assets/main-B9X5czot.js"></script>
-  <link rel="stylesheet" crossorigin href="../assets/main-gsZTbLZ0.css">
-  <link rel="stylesheet" crossorigin href="../assets/style-BWJWr5B5.css">
 </head>
 
 <body>
+<!-- 메인 -->
 <div id="main-content">
-
+    <!-- 커피봇 -->
     <section class="mt8">
         <div class="inner">
             <div class="user-flex">
                 <div class="user">
                     <i class="fa-regular fa-circle-user"></i>
-                    <p id="user-name">zero001 님</p>
-                    <label class="label manager" id="user-grade"><span>총괄관리자</span></label>
+                    <p id="user-name">-</p>
+                    <label class="label manager" id="user-grade"
+                    ><span>-</span></label
+                    >
                 </div>
             </div>
         </div>
     </section>
+
     <section class="pb20">
         <div class="inner">
 
             <!-- 페이지 제목 -->
             <div class="title-flex mb20">
-                <h2>일반 매장 계정 관리</h2>
+                <h2>프랜차이즈 계정 관리</h2>
             </div>
 
             <!-- 🔍 검색/필터 영역 -->
             <div class="filter-bar">
-                <input type="text" id="searchKeyword" placeholder="계정 검색">
-
-                <select id="filterFranchise">
-                    <option value="">전체 프랜차이즈</option>
-                </select>
-
-                <select id="filterGrade">
-                    <option value="">전체 권한</option>
-                    <option value="4">일반 매장</option>
-                    <option value="3">프랜차이즈</option>
-                </select>
+                <input id="searchKeyword" placeholder="계정 검색" type="text">
 
                 <button class="btn-outline" id="filterBtn">검색</button>
             </div>
@@ -166,8 +162,9 @@
                     <thead>
                     <tr>
                         <th>계정</th>
-                        <th>프랜차이즈</th>
-                        <th>권한</th>
+                        <th>일매출</th>
+                        <th>월매출</th>
+                        <th>오픈일</th>
                         <th>관리</th>
                     </tr>
                     </thead>
@@ -177,14 +174,17 @@
 
             <!-- 🔄 페이징 -->
             <div class="pagination">
-                <button data-page="prev" class="btn-outline">◀ 이전</button>
+                <button class="btn-outline" data-page="prev">◀ 이전</button>
                 <span id="page-info">1 / 1</span>
-                <button data-page="next" class="btn-outline">다음 ▶</button>
+                <button class="btn-outline" data-page="next">다음 ▶</button>
             </div>
 
         </div>
     </section>
-
 </div>
 </body>
+
+<script>
+
+</script>
 </html>

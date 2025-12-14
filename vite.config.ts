@@ -1,5 +1,5 @@
 import {defineConfig} from "vite";
-import {resolve, dirname} from "path"; // ✅ 여기서 dirname도 import 해줘야 함
+import {dirname, resolve} from "path"; // ✅ 여기서 dirname도 import 해줘야 함
 import {fileURLToPath} from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -42,6 +42,7 @@ export default defineConfig({
                 menuMerge: resolve(__dirname, "html/menuMerge.html"), // 메뉴 병합
                 userRegister: resolve(__dirname, "html/user-register.html"), // 매장계정생성
                 franchise: resolve(__dirname, "html/franchise.html"), // 추가: 프렌차이즈 생성 수정 페이지
+                franchiseHome: resolve(__dirname, "html/franchise_home.html"), // 추가: 프렌차이즈 관리자 페이지
                 adminEmpowerment: resolve(__dirname, "html/adminEmpowerment.html"), // 추가: 어드민권한설정 페이지
                 empowerment: resolve(__dirname, "html/empowerment.html"), // 추가: 일반권한설정 페이지
                 // 다른 html들도 여기에 추가 가능

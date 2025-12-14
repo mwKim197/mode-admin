@@ -45,9 +45,9 @@ export async function checkUserAccess() {
     const pageAccess: Record<string, number[]> = {
         "/html/notice.html": [1, 2],
         "/html/notice-edit.html": [1, 2],
-        "/html/noticeList.html": [1, 2],
+        "/html/noticeList.html": [1, 2, 3, 4],
         "/html/user-register.html": [1, 2],
-        "/html/menuMerge.html": [1, 2],
+        "/html/menuMerge.html": [1, 2, 3],
         "/html/notice.html?type=admin": [1, 2],
         "/html/notice.html?type=notice": [1, 2],
         "/html/notice.html?type=store": [1, 2],
@@ -62,7 +62,7 @@ export async function checkUserAccess() {
     const gradeHome: Record<number, string> = {
         1: "/html/home.html",
         2: "/html/home.html",
-        3: "/html/home.html",
+        3: "/html/franchise_home.html",
         4: "/html/home.html",
         //[TODO] 권한별 home화면 만들어넣기
     };

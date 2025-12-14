@@ -167,9 +167,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 3) 유저정보 불러오기
     const userInfo = await getUserData();
-    
+
     if (userInfo?.userId) {
         await getUserInfo(userInfo.userId);
+    }
+
+    // logo home 경로 변경
+    if (userInfo?.grade === 3) {
+        const logoLink = document.querySelector("header a[href='/html/home.html']");
+        if (logoLink) {
+            logoLink.setAttribute("href", "/html/franchise_home.html");
+        }
     }
 
     if (userInfo) {
@@ -225,30 +233,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    // ----- Types -----
-    type Grade = number | string;
-
-    interface UserInfo {
-        grade?: Grade;
-
-        [key: string]: unknown;
-    }
-
     interface MenuItem {
         href: string;
         label: string;
         target?: '_blank' | '_self' | '_parent' | '_top';
         rel?: string;
     }
-
-// userInfo 예: { grade: 3, ... }, grade <= 2면 관리자
-    const isAdmin = (info?: UserInfo | null): boolean => {
-        if (!info || info.grade == null) return false;
-        const n = typeof info.grade === 'string' ? Number(info.grade) : info.grade;
-        return Number.isFinite(n as number) && (n as number) <= 2;
-    };
-
-    console.log();
 
 // 1) 공통(일반) 메뉴
     let generalMenus: MenuItem[] = [
@@ -287,6 +277,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         {href: "/html/adminEmpowerment.html", label: "관리자 권한설정"},
         {href: "/html/register.html", label: "관리자 계정생성"},
         {href: "/html/franchise.html", label: "프랜차이즈 관리"},
+        {href: "/html/log.html", label: "로그아웃"},
+    ];
+
+    // 3) 프랜차이즈관리자 메뉴
+    const franchiseMenus: MenuItem[] = [
+        {href: "/html/franchise_home.html", label: "Home"},
+        {href: "/html/noticeList.html", label: "공지사항"},
+        {href: "/html/menuMerge.html", label: "레시피복사"},
         {href: "/html/log.html", label: "로그아웃"},
     ];
 
@@ -347,10 +345,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 4) 사용자 등급에 따라 구성
     (function initSideMenu(): void {
-        let menus: MenuItem[] = isAdmin(userInfo)
-            ? adminMenus  // 관리자: 일반 + 관리자 메뉴
-            : generalMenus;
+        let menus: MenuItem[];
 
+        const grade = Number(userInfo?.grade);
+
+        if (grade <= 2) {
+            // 1~2 : 관리자 메뉴
+            menus = adminMenus;
+        } else if (grade === 3) {
+            // 3 : 프랜차이즈 메뉴
+            menus = franchiseMenus;
+        } else {
+            // 4 : 일반 매장
+            menus = generalMenus;
+        }
+
+        // 옵션 메뉴 추가 (포인트/쿠폰)
         if (user?.payType === false) {
             menus = upsertMenuItem(menus, pointMenu, {insertAfterLabel: "매출"});
         }
@@ -359,8 +369,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             menus = upsertMenuItem(menus, couponMenu, {insertAfterLabel: "일반설정"});
         }
 
+        // 렌더링
         renderMenu(".sidemenu .menu", menus);
-        highlightActiveMenu(".sidemenu .menu"); // (선택) 현재 페이지 활성화 표시
+        highlightActiveMenu(".sidemenu .menu");
     })();
 
     // (선택) 현재 경로와 링크가 같으면 active 클래스 추가
@@ -486,6 +497,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.log("📌 사용자 등록 - user-register.ts 로드");
         import("./ts/page/user-register.ts").then((module) => {
             module.initUserRegister();
+        });
+    } else if (path === "/html/franchise_home.html") {
+        console.log("📌 프렌차이즈 관리자 - franchise_home.ts 로드");
+        import("./ts/page/franchise_home.ts").then((module) => {
+            module.initFranchiseHome();
         });
     } else {
         console.log("📌 기본 페이지");
