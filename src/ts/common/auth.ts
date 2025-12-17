@@ -62,7 +62,7 @@ export async function checkUserAccess() {
     const gradeHome: Record<number, string> = {
         1: "/html/home.html",
         2: "/html/home.html",
-        3: "/html/franchise_home.html",
+        3: "/html/franchiseHome.html",
         4: "/html/home.html",
         //[TODO] 권한별 home화면 만들어넣기
     };

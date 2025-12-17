@@ -176,7 +176,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (userInfo?.grade === 3) {
         const logoLink = document.querySelector("header a[href='/html/home.html']");
         if (logoLink) {
-            logoLink.setAttribute("href", "/html/franchise_home.html");
+            logoLink.setAttribute("href", "/html/franchiseHome.html");
+        }
+    }
+
+    // logo home 경로 변경
+    if (userInfo?.grade === 1 || userInfo?.grade === 2) {
+        const logoLink = document.querySelector("header a[href='/html/home.html']");
+        if (logoLink) {
+            logoLink.setAttribute("href", "/html/adminHome.html");
         }
     }
 
@@ -264,7 +272,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // 2) 관리자 전용 메뉴
     const adminMenus: MenuItem[] = [
-        {href: "/html/home.html", label: "Home"},
+        {href: "/html/adminHome.html", label: "Home"},
         {href: "/html/noticeList.html", label: "공지사항"},
         {href: "/html/user-register.html", label: "매장계정생성"},
         {href: "/html/menuMerge.html", label: "레시피복사"},
@@ -282,7 +290,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 3) 프랜차이즈관리자 메뉴
     const franchiseMenus: MenuItem[] = [
-        {href: "/html/franchise_home.html", label: "Home"},
+        {href: "/html/franchiseHome.html", label: "Home"},
         {href: "/html/noticeList.html", label: "공지사항"},
         {href: "/html/menuMerge.html", label: "레시피복사"},
         {href: "/html/log.html", label: "로그아웃"},
@@ -498,10 +506,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         import("./ts/page/user-register.ts").then((module) => {
             module.initUserRegister();
         });
-    } else if (path === "/html/franchise_home.html") {
-        console.log("📌 프렌차이즈 관리자 - franchise_home.ts 로드");
-        import("./ts/page/franchise_home.ts").then((module) => {
+    } else if (path === "/html/franchiseHome.html") {
+        console.log("📌 프렌차이즈 관리자 - franchiseHome.ts 로드");
+        import("./ts/page/franchiseHome.ts").then((module) => {
             module.initFranchiseHome();
+        });
+    } else if (path === "/html/adminHome.html") {
+        console.log("📌 관리자 HOME - adminHome.ts 로드");
+        import("./ts/page/adminHome.ts").then((module) => {
+            module.initAdminHome();
         });
     } else {
         console.log("📌 기본 페이지");

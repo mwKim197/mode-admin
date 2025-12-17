@@ -5,6 +5,7 @@ interface StoreUser {
     grade: number;
     franchiseId?: string | null;
     franchiseName?: string | null;
+    createdAt?: string | null;
 }
 
 interface Franchise {
@@ -56,7 +57,6 @@ async function loadFranchiseList() {
 async function loadStoreList() {
     const keyword = (document.getElementById("searchKeyword") as HTMLInputElement).value.trim();
     const franchiseFilter = (document.getElementById("filterFranchise") as HTMLSelectElement).value;
-    const gradeFilter = (document.getElementById("filterGrade") as HTMLSelectElement).value;
 
     // 🔥 매장 계정 전체 로드
     const res = await apiGet("/model_admin_user?func=get-admins");
@@ -84,14 +84,18 @@ async function loadStoreList() {
         const matchFranchise =
             !franchiseFilter || u.franchiseId === franchiseFilter;
 
-        const matchGrade =
-            !gradeFilter || u.grade === Number(gradeFilter);
 
-        return matchKeyword && matchFranchise && matchGrade;
+        return matchKeyword && matchFranchise;
     });
 
     // 🔥 일반매장(4) + 프랜차이즈매장(3)만
-    list = list.filter((u) => u.grade === 4 || u.grade === 3);
+    list = list.filter((u) => u.grade === 4);
+
+    list.sort((a, b) => {
+        const da = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const db = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return db - da; // 최신순
+    });
 
     // 🔄 페이징
     const totalPages = Math.ceil(Math.max(list.length, 1) / pageSize);

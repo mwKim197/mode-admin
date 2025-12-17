@@ -203,7 +203,9 @@ async function handlePostLogin(data: any, autoLoginChecked: boolean = false) {
         }
         // ✅ 권한별 홈으로 이동
         if (userInfo?.grade === 3) {
-            window.location.href = "/html/franchise_home.html";
+            window.location.href = "/html/franchiseHome.html";
+        } else if (userInfo?.grade === 1 || userInfo?.grade === 2) {
+            window.location.href = "/html/adminHome.html";
         } else {
             window.location.href = "/html/home.html";
         }

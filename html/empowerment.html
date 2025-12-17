@@ -2,10 +2,10 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8"/>
-    <link rel="stylesheet" href="/src/css/reset.css">
-    <link rel="stylesheet" href="/src/css/common.css">
-    <link rel="stylesheet" href="/src/css/style.css">
-    <script type="module" src="/src/main.ts"></script>
+    <link href="/src/css/reset.css" rel="stylesheet">
+    <link href="/src/css/common.css" rel="stylesheet">
+    <link href="/src/css/style.css" rel="stylesheet">
+    <script src="/src/main.ts" type="module"></script>
 
     <style>
         /* 검색바 */
@@ -146,16 +146,10 @@
 
             <!-- 🔍 검색/필터 영역 -->
             <div class="filter-bar">
-                <input type="text" id="searchKeyword" placeholder="계정 검색">
+                <input id="searchKeyword" placeholder="계정 검색" type="text">
 
                 <select id="filterFranchise">
                     <option value="">전체 프랜차이즈</option>
-                </select>
-
-                <select id="filterGrade">
-                    <option value="">전체 권한</option>
-                    <option value="4">일반 매장</option>
-                    <option value="3">프랜차이즈</option>
                 </select>
 
                 <button class="btn-outline" id="filterBtn">검색</button>
@@ -178,9 +172,9 @@
 
             <!-- 🔄 페이징 -->
             <div class="pagination">
-                <button data-page="prev" class="btn-outline">◀ 이전</button>
+                <button class="btn-outline" data-page="prev">◀ 이전</button>
                 <span id="page-info">1 / 1</span>
-                <button data-page="next" class="btn-outline">다음 ▶</button>
+                <button class="btn-outline" data-page="next">다음 ▶</button>
             </div>
 
         </div>

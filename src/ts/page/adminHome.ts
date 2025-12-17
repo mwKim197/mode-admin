@@ -1,16 +1,12 @@
 import {apiGet, apiPost} from "../api/apiHelpers";
-import {getUserData} from "../common/auth.ts";
 
 let currentPage = 1;
-let franchiseId: string | undefined = "";
 const pageSize = 20;
 
 
 // 초기 로드 함수
-export async function initFranchiseHome() {
-    const adminInfo = await getUserData();
-    franchiseId = adminInfo?.franchiseId;
-    await loadStoreList(franchiseId);       // 매장 목록 로드
+export async function initAdminHome() {
+    await loadStoreList();       // 매장 목록 로드
 
     attachFilterEvents();
     attachPaginationEvents();
@@ -21,18 +17,27 @@ export async function initFranchiseHome() {
 /* =======================================
    2) 프랜차이즈 매장 리스트 로드 + 필터 + 페이징
 ======================================= */
-async function loadStoreList(franchiseId: string = "") {
+async function loadStoreList() {
     const keyword = (document.getElementById("searchKeyword") as HTMLInputElement).value.trim();
 
-    const res = await apiGet(`/model_admin_franchise?func=list-stores-summary&franchiseId=${franchiseId}`);
+    const res = await apiGet("/model_admin_user?func=get-admins");
     const json = await res.json();
 
     // 📌 Lambda 응답 구조 반영
-    let list: any[] = json.stores ?? [];
+    let list: any[] = json.admins ?? [];
     // 🔍 검색 기능
     if (keyword) {
         list = list.filter((u) => u.adminId.includes(keyword));
     }
+
+    // 🔥 일반매장(4)
+    list = list.filter((u) => u.grade === 4);
+
+    list.sort((a, b) => {
+        const da = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const db = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return db - da; // 최신순
+    });
 
     // 페이징 처리
     const totalPages = Math.ceil(Math.max(list.length, 1) / pageSize);
@@ -53,17 +58,15 @@ function renderStoreTable(list: any[]) {
     const tbody = document.getElementById("store-table-body")!;
     tbody.innerHTML = "";
 
-    list.forEach((store) => {
+    list.forEach((admin) => {
         tbody.innerHTML += `
             <tr>
-                <td>${store.adminId}</td>          
-                <td>${store.todaySales?.toLocaleString() ?? 0}</td>
-                <td>${store.monthSales?.toLocaleString() ?? 0}</td>
-                <td>${new Date(store.createdAt).toLocaleDateString()}</td>
+                <td>${admin.adminId}</td>          
+                <td>${new Date(admin.createdAt).toLocaleDateString()}</td>
                 <td>
                     <button 
                         class="btn blue store-open-btn"
-                        data-admin="${store.adminId}"
+                        data-admin="${admin.adminId}"
                     >원격</button>
                 </td>
             </tr>
@@ -94,12 +97,12 @@ function attachPaginationEvents() {
     document.querySelector("[data-page='prev']")!.addEventListener("click", () => {
         if (currentPage > 1) {
             currentPage--;
-            loadStoreList(franchiseId);
+            loadStoreList();
         }
     });
     document.querySelector("[data-page='next']")!.addEventListener("click", () => {
         currentPage++;
-        loadStoreList(franchiseId);
+        loadStoreList();
     });
 }
 
@@ -113,7 +116,7 @@ function updatePageInfo(current: number, total: number) {
 function attachFilterEvents() {
     document.getElementById("filterBtn")!.addEventListener("click", () => {
         currentPage = 1;
-        loadStoreList(franchiseId);
+        loadStoreList();
     });
 }
 
