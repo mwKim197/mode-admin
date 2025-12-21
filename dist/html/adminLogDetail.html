@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>로그 상세 보기</title>
+
+    <style>
+        .detail-row div {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .detail-box {
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            color: #ddd;
+        }
+
+        .detail-title {
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 8px;
+        }
+
+        .detail-row .key {
+            width: 150px;
+            color: #aaa;
+        }
+
+        .diff-box {
+            display: flex;
+            flex-direction: column; /* 🔥 좌우 → 위아래로 변경 */
+            gap: 20px;
+        }
+
+        .diff-section {
+            flex: 1;
+            background: #111;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .changed {
+            color: #ff5b5b;
+            font-weight: bold;
+        }
+
+        .back-box {
+            position: fixed;
+            right: -1%;
+            bottom: -196%;
+            transform: translate(-50%, -50%);
+            z-index: 10000;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .back-button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .back-button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+
+  <script type="module" crossorigin src="../assets/main-IlWPti-r.js"></script>
+  <link rel="stylesheet" crossorigin href="../assets/main-gsZTbLZ0.css">
+  <link rel="stylesheet" crossorigin href="../assets/style-BWJWr5B5.css">
+</head>
+
+<body>
+<div class="main-content">
+    <section class="mt8">
+        <div class="inner">
+            <div class="user-flex">
+                <div class="user">
+                    <i class="fa-regular fa-circle-user"></i>
+                    <p id="user-name">-</p>
+                    <label class="label manager" id="user-grade"
+                    ><span>-</span></label
+                    >
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="pb20">
+
+
+        <h2 class="mb20">로그 상세 보기</h2>
+
+        <!-- 기본 정보 -->
+        <div class="detail-box" id="basicInfo"></div>
+
+        <!-- 데이터 비교 -->
+        <div class="detail-box">
+            <div class="detail-title">변경 내용 비교</div>
+            <div class="diff-box">
+
+                <div class="diff-section" id="beforeBox">
+                    <div class="detail-title">기존 데이터</div>
+                    <div id="beforeData"></div>
+                </div>
+
+                <div class="diff-section" id="afterBox">
+                    <div class="detail-title">수정 후 데이터</div>
+                    <div id="afterData"></div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>

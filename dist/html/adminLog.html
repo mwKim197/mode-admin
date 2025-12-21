@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        /* 🔥 검색 영역 버튼은 기본 .btn 규칙을 덮어씌움 */
+        .filter-bar .btn {
+            width: auto !important;
+            padding: 0.8rem 1.4rem;
+            font-size: 1.2rem;
+            border-radius: 0.8rem;
+        }
+
+        .filter-bar .btn.btn-wide {
+            width: 100% !important;
+        }
+
+        .filter-bar select {
+            height: 40px;
+            padding: 0 12px;
+            border-radius: 6px;
+            background: #2b2b2b;
+            color: #fff;
+            border: 1px solid #444;
+        }
+
+        .filter-bar input {
+            width: 80%;
+            height: 40px;
+            padding: 0 12px;
+            background: #2b2b2b;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #fff;
+        }
+
+        /* 🔥 각 줄의 간격 */
+        .filter-bar > div {
+            margin-bottom: 10px; /* 원하는 만큼 조절 */
+        }
+
+        .filter-bar > div:last-child {
+            margin-bottom: 0; /* 마지막 줄은 제거 */
+        }
+
+
+        /* 로그 리스트 */
+        .log-row {
+            display: flex;
+            gap: 20px;
+            padding: 12px 0;
+            border-bottom: 1px solid #444;
+            cursor: pointer;
+        }
+
+        .log-row:hover {
+            background: #1f1f1f;
+        }
+
+        .log-type {
+            min-width: 70px;
+            color: #4da3ff;
+            font-weight: bold;
+        }
+
+        .log-target {
+            min-width: 125px;
+            color: #fff;
+        }
+
+        .log-date {
+            color: #ccc;
+        }
+
+        /* 페이징 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 12px;
+        }
+
+        .pagination button {
+            background: transparent;
+            border: 1px solid #777;
+            color: #ddd;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pagination button:hover {
+            background: #2080ff;
+            color: #fff;
+            border-color: #2080ff;
+        }
+    </style>
+  <script type="module" crossorigin src="../assets/main-IlWPti-r.js"></script>
+  <link rel="stylesheet" crossorigin href="../assets/main-gsZTbLZ0.css">
+  <link rel="stylesheet" crossorigin href="../assets/style-BWJWr5B5.css">
+</head>
+
+<body>
+<div id="main-content">
+    <!-- 커피봇 -->
+    <section class="mt8">
+        <div class="inner">
+            <div class="user-flex">
+                <div class="user">
+                    <i class="fa-regular fa-circle-user"></i>
+                    <p id="user-name">-</p>
+                    <label class="label manager" id="user-grade"
+                    ><span>-</span></label
+                    >
+                </div>
+            </div>
+        </div>
+    </section>
+
+        <div class="inner">
+            <div class="title-flex mb20">
+                <h2>관리자 로그 조회</h2>
+            </div>
+
+            <!-- 🔍 검색 영역 -->
+            <div class="filter-bar">
+                <div>
+                    <label style="color:#ccc; margin-left:10px;">시작일</label>
+                    <input id="startDate" type="date">
+                    <label style="color:#ccc;">종료일</label>
+                    <input id="endDate" type="date">
+                </div>
+                <div>
+                    <input id="userIdInput" placeholder="조회할 계정 입력">
+                    <!-- 🔥 limit 개수 선택 -->
+                    <select id="limitSelect">
+                        <option value="50">50개</option>
+                        <option value="100">100개</option>
+                        <option value="500">500개</option>
+                    </select>
+                </div>
+                <div>
+                    <button class="blue btn btn-wide" id="userSearchBtn">조회</button>
+                </div>
+                <div>
+                    <input id="filterKeyword" placeholder="필터 검색">
+                    <button class="blue btn" id="filterBtn">검색</button>
+                </div>
+            </div>
+
+            <!-- 📋 로그 리스트 -->
+            <div id="logList"></div>
+
+            <!-- 🔄 페이징 -->
+            <div class="pagination">
+                <button class="btn-outline" data-page="prev">◀ 이전</button>
+                <span id="page-info">1 / 1</span>
+                <button class="btn-outline" data-page="next">다음 ▶</button>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>

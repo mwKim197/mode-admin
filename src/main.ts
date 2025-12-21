@@ -281,6 +281,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         {href: "/html/notice.html?type=store", label: "설치매장"},
         {href: "/html/notice.html?type=news", label: "언론보도"},
         {href: "/html/notice.html?type=machine", label: "머신사용설명"},
+        {href: "/html/adminLog.html", label: "로그조회"},
         {href: "/html/empowerment.html", label: "일반 매장관리"},
         {href: "/html/adminEmpowerment.html", label: "관리자 권한설정"},
         {href: "/html/register.html", label: "관리자 계정생성"},
@@ -515,6 +516,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.log("📌 관리자 HOME - adminHome.ts 로드");
         import("./ts/page/adminHome.ts").then((module) => {
             module.initAdminHome();
+        });
+    } else if (path === "/html/adminLog.html") {
+        console.log("📌 관리자 LOG - adminLog.ts 로드");
+        import("./ts/page/adminLog.ts").then((module) => {
+            module.initAdmionLog();
+        });
+    } else if (path === "/html/adminLogDetail.html") {
+        console.log("📌 관리자 LOG DEATAIL - adminLogDetail.ts 로드");
+        import("./ts/page/adminLogDetail.ts").then((module) => {
+            module.initAdmionDetailLog();
         });
     } else {
         console.log("📌 기본 페이지");

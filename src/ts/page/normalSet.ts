@@ -632,12 +632,11 @@ async function saveStoreInfo() {
         // 비밀번호 업데이트 (별도 API)
         if (hasPasswordChange) {
             const passwordData = {
-                userId: currentUserId,
-                newPassword: passwordInput.value,
-                adminId: currentUserId,
+                adminId: currentUserId,             // 변경할 관리자
+                newPassword: passwordInput.value,   // 새 비번
             };
 
-            await apiPut(`/model_user_setting?func=update-password`, passwordData);
+            await apiPut(`/model_admin_user?func=update-password`, passwordData);
         }
 
         window.showToast("변경사항이 저장되었습니다.", 3000, "success");
