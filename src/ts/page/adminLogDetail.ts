@@ -37,39 +37,37 @@ function renderBasicInfo(log: any) {
 /** 기존데이터 - 수정데이터 비교 + description 표시 */
 function renderDescriptionDiff(log: any) {
     const wrapper = document.getElementById("descriptionText");
-    if (!wrapper) return; // ❗ null 대응
+    if (!wrapper) return;
 
+    // 🔥 description은 무조건 원본문자열을 그대로 표시
+    // JSON이어도 문자열 그대로 화면에 표시됨
     wrapper.innerText = log.description || "설명 없음";
 
-
+    // Diff 비교용 데이터가 없으면 종료
     if (!log.description) {
-        wrapper.innerText = "설명 없음";
         hideDiffBoxes();
         return;
     }
 
     let desc = log.description;
 
-    // 📌 1) JSON인지 검사
-    const isJson = isJsonString(desc);
-
-    // 📌 2) JSON이 아닐 경우 → 문자열 그대로 표시
-    if (!isJson) {
-        wrapper.innerText = desc; // ← 여기서 설명문 출력됨
+    // 🔍 1) JSON 구조인지 검사
+    if (!isJsonString(desc)) {
         hideDiffBoxes();
         return;
     }
 
-    // 📌 3) JSON일 경우 → 파싱 후 diff 비교
-    desc = JSON.parse(desc);
-    wrapper.innerText = desc.description ?? "변경 내역 상세";
+    // 🔍 2) JSON 파싱
+    const diffData = JSON.parse(desc);
 
-    const before = desc["기존데이터"] || {};
-    const after = desc["수정데이터"] || {};
+    const before = diffData["기존데이터"] || {};
+    const after = diffData["수정데이터"] || {};
 
+    // 🔍 정렬된 클린 데이터 생성
     const sortedBefore = sortObjectKeys(before);
     const sortedAfter = sortObjectKeys(after);
 
+    // 🔍 diff 렌더링
     renderKeyValue("beforeData", sortedBefore, sortedAfter);
     renderKeyValue("afterData", sortedAfter, sortedBefore);
 }
@@ -90,17 +88,25 @@ function hideDiffBoxes() {
     document.getElementById("afterData")!.innerHTML = "변경 기록 없음";
 }
 
-function sortObjectKeys(obj: any) {
-    if (typeof obj !== "object" || obj === null || Array.isArray(obj)) {
-        return obj;
+function sortObjectKeys(obj: any): any {
+    if (Array.isArray(obj)) {
+        // 배열인 경우 각 요소를 재귀적으로 정렬
+        return obj.map(item => sortObjectKeys(item));
     }
-    return Object.keys(obj)
-        .sort()
-        .reduce((acc, key) => {
-            acc[key] = sortObjectKeys(obj[key]); // 내부 객체도 재귀적으로 정렬
-            return acc;
-        }, {} as any);
+
+    if (typeof obj === "object" && obj !== null) {
+        // 객체인 경우 key를 정렬
+        return Object.keys(obj)
+            .sort()
+            .reduce((acc, key) => {
+                acc[key] = sortObjectKeys(obj[key]);
+                return acc;
+            }, {} as any);
+    }
+
+    return obj; // 기본 타입은 그대로 반환
 }
+
 
 /** JSON Key-Value 표기 + 변경 강조 */
 function renderKeyValue(elementId: string, data: any, compareData: any) {
