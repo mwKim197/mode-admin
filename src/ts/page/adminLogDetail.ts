@@ -17,7 +17,7 @@ function renderBasicInfo(log: any) {
     if (backBox) {
         backBox.style.display = 'flex';
     }
-    
+
     const box = document.getElementById("basicInfo");
     if (!box) return;
 
@@ -34,12 +34,35 @@ function renderBasicInfo(log: any) {
     `;
 }
 
-/** 기존데이터 - 수정데이터 비교 */
+/** 기존데이터 - 수정데이터 비교 + description 표시 */
 function renderDescriptionDiff(log: any) {
-    if (!log.description) return;
+    const wrapper = document.getElementById("descriptionText");
+    if (!wrapper) return; // ❗ null 대응
+
+    wrapper.innerText = log.description || "설명 없음";
+
+
+    if (!log.description) {
+        wrapper.innerText = "설명 없음";
+        hideDiffBoxes();
+        return;
+    }
 
     let desc = log.description;
-    if (typeof desc === "string") desc = JSON.parse(desc);
+
+    // 📌 1) JSON인지 검사
+    const isJson = isJsonString(desc);
+
+    // 📌 2) JSON이 아닐 경우 → 문자열 그대로 표시
+    if (!isJson) {
+        wrapper.innerText = desc; // ← 여기서 설명문 출력됨
+        hideDiffBoxes();
+        return;
+    }
+
+    // 📌 3) JSON일 경우 → 파싱 후 diff 비교
+    desc = JSON.parse(desc);
+    wrapper.innerText = desc.description ?? "변경 내역 상세";
 
     const before = desc["기존데이터"] || {};
     const after = desc["수정데이터"] || {};
@@ -49,6 +72,22 @@ function renderDescriptionDiff(log: any) {
 
     renderKeyValue("beforeData", sortedBefore, sortedAfter);
     renderKeyValue("afterData", sortedAfter, sortedBefore);
+}
+
+
+function isJsonString(str: string) {
+    if (typeof str !== "string") return false;
+    try {
+        const parsed = JSON.parse(str);
+        return typeof parsed === "object" && parsed !== null;
+    } catch (e) {
+        return false;
+    }
+}
+
+function hideDiffBoxes() {
+    document.getElementById("beforeData")!.innerHTML = "변경 기록 없음";
+    document.getElementById("afterData")!.innerHTML = "변경 기록 없음";
 }
 
 function sortObjectKeys(obj: any) {

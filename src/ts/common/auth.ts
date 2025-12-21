@@ -57,6 +57,8 @@ export async function checkUserAccess() {
         "/html/adminEmpowerment.html": [1, 2],
         "/html/register.html": [1, 2],
         "/html/franchise.html": [1, 2],
+        "/html/adminLog.html": [1, 2],
+        "/html/adminLogDetail.html": [1, 2],
     };
 
     const gradeHome: Record<number, string> = {
@@ -105,8 +107,7 @@ export async function getUserInfo(userId: string | undefined) {
 
         if (res.ok) {
             const {user} = await res.json();
-
-            console.log("user: ", user);
+            
             setStoredUser(user);
             console.log("✅ 사용자 정보 저장 완료");
         } else {

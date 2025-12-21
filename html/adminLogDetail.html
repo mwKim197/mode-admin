@@ -41,7 +41,7 @@
 
         .diff-box {
             display: flex;
-            flex-direction: column; /* 🔥 좌우 → 위아래로 변경 */
+            flex-direction: column;
             gap: 20px;
         }
 
@@ -55,6 +55,18 @@
         .changed {
             color: #ff5b5b;
             font-weight: bold;
+        }
+
+        /* 🔥 description 영역 스타일 */
+        #descriptionText {
+            background: #111;
+            padding: 15px;
+            border-radius: 10px;
+            color: #eee;
+            font-size: 1.4rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
         }
 
         .back-box {
@@ -99,20 +111,26 @@
                 <div class="user">
                     <i class="fa-regular fa-circle-user"></i>
                     <p id="user-name">-</p>
-                    <label class="label manager" id="user-grade"
-                    ><span>-</span></label
-                    >
+                    <label class="label manager" id="user-grade">
+                        <span>-</span>
+                    </label>
                 </div>
             </div>
         </div>
     </section>
-    <section class="pb20">
 
+    <section class="pb20">
 
         <h2 class="mb20">로그 상세 보기</h2>
 
         <!-- 기본 정보 -->
         <div class="detail-box" id="basicInfo"></div>
+
+        <!-- 🔥 description 추가된 영역 -->
+        <div class="detail-box">
+            <div class="detail-title">설명</div>
+            <div id="descriptionText">-</div>
+        </div>
 
         <!-- 데이터 비교 -->
         <div class="detail-box">

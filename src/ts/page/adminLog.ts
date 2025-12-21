@@ -183,6 +183,7 @@ function saveLogListState() {
 /** ⭐ 상세 보기 페이지 이동 */
 function openDetail(log: any) {
     saveLogListState();
+    console.log(log);
     localStorage.setItem("selectedLog", JSON.stringify(log));
     window.location.href = "/html/adminLogDetail.html";
 }

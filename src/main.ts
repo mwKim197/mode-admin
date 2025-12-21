@@ -286,6 +286,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         {href: "/html/adminEmpowerment.html", label: "관리자 권한설정"},
         {href: "/html/register.html", label: "관리자 계정생성"},
         {href: "/html/franchise.html", label: "프랜차이즈 관리"},
+        {href: "/html/normalSet.html", label: "일반설정"},
         {href: "/html/log.html", label: "로그아웃"},
     ];
 

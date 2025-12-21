@@ -1,6 +1,6 @@
 import {ModelUser} from "../types/user";
 import {apiGet, apiPost, apiPut} from "../api/apiHelpers";
-import {getToken, getUserInfo} from "../common/auth";
+import {getToken, getUserData, getUserInfo} from "../common/auth";
 import {getStoredUser} from "../utils/userStorage.ts";
 
 // 파일 업로드 관련 전역 변수
@@ -631,9 +631,12 @@ async function saveStoreInfo() {
 
         // 비밀번호 업데이트 (별도 API)
         if (hasPasswordChange) {
+
+            const adminInfo = await getUserData(); // ✔ Promise 풀기
+
             const passwordData = {
-                adminId: currentUserId,             // 변경할 관리자
-                newPassword: passwordInput.value,   // 새 비번
+                adminId: adminInfo?.adminId,
+                newPassword: passwordInput.value,
             };
 
             await apiPut(`/model_admin_user?func=update-password`, passwordData);
