@@ -770,29 +770,33 @@ async function updatePopupContent(rowIndex: number) {
             `;
 
                 //----------카드 내역 추출
+                // ---------- 카드 내역 추출
                 const cardInfos = item.totalPayInfo
-                    ?.filter((pay: any) => pay.method === "카드")
-                    .flatMap((pay: any) => pay || {});
+                    ?.filter((pay: any) => pay.method === "카드") || [];
 
-                let issuerName = '미사용';
-                let cardBin = '미사용';
-
-                if (cardInfos.length > 0) {
-                    issuerName = cardInfos
-                        .map((c: any) => `${c.method} (${c.issuerName})`)
-
-                    cardBin = cardInfos
-                        .map((c: any) => `${c.cardBin}`)
-                }
-
-                const payDateTime = String(item.payInfo.approvalDateTime).split("T");
+                let issuerName = "미사용";
+                let cardBin = "미사용";
                 let payFormattedDate = "-";
 
-                if (item.payInfo.approvalDateTime) {
-                    const payDateStr = payDateTime[0];
-                    const payTimeStr = payDateTime[1].substring(0, 5);
-                    payFormattedDate = `${payDateStr} ${payTimeStr}`;
+// 카드 결제가 1개 이상일 때 처리
+                if (cardInfos.length > 0) {
+                    // 카드명
+                    issuerName = cardInfos
+                        .map((c: any) => `${c.method} (${c.issuerName})`)
+                        .join(", ");
 
+                    // BIN
+                    cardBin = cardInfos
+                        .map((c: any) => c.cardBin)
+                        .join(", ");
+
+                    // 카드 결제의 승인일자
+                    const approval = cardInfos[0]?.approvalDateTime; // 보통 1건
+                    if (approval) {
+                        const [date, timeWithTZ] = approval.split("T");
+                        const time = timeWithTZ.split("+")[0].substring(0, 5); // HH:mm
+                        payFormattedDate = `${date} ${time}`;
+                    }
                 }
 
                 //----------바코드 내역 추출
@@ -819,7 +823,7 @@ async function updatePopupContent(rowIndex: number) {
                     pointContact = pointInfos.map((c: any) => `${c.mileageNo ?? '-'}`).join(', ');
                     usedPoints = pointInfos.map((c: any) => `${c.usedAmount.toLocaleString()}`).join(', ');
                 }
-                
+
                 const paymentMethodInfo = `
                     <div>
                         <h5>결제 수단</h5>
