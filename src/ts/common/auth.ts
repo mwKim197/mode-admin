@@ -107,7 +107,7 @@ export async function getUserInfo(userId: string | undefined) {
 
         if (res.ok) {
             const {user} = await res.json();
-            
+
             setStoredUser(user);
             console.log("✅ 사용자 정보 저장 완료");
         } else {
@@ -136,4 +136,37 @@ export function logout() {
 export function getToken() {
     return sessionStorage.getItem("accessToken")
         || localStorage.getItem("accessToken");
+}
+
+const API_URL = "https://api.narrowroad-model.com";
+
+/**
+ * ✅ 앱 시작 / 토큰 만료 시 자동 로그인 복구
+ */
+export async function bootstrapAuth(): Promise<boolean> {
+    // 1️⃣ accessToken 있으면 그대로 통과
+    const accessToken = getToken();
+    if (accessToken) return true;
+
+    // 2️⃣ refreshToken 없으면 로그인 불가
+    const refreshToken = localStorage.getItem("refreshToken");
+    if (!refreshToken) return false;
+
+    // 3️⃣ refresh 요청
+    const res = await fetch(`${API_URL}/model_admin_login?func=refresh`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({refreshToken}),
+    });
+
+    if (!res.ok) {
+        localStorage.removeItem("refreshToken");
+        return false;
+    }
+
+    const data = await res.json();
+
+    // 4️⃣ 새 accessToken 저장
+    localStorage.setItem("accessToken", data.accessToken);
+    return true;
 }

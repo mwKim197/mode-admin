@@ -215,3 +215,29 @@ async function handlePostLogin(data: any, autoLoginChecked: boolean = false) {
         alert("로그인 후 처리 중 오류가 발생했습니다.");
     }
 }
+
+// 리프레시 토큰을이용한 자동로그인
+export async function bootstrapAuth() {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) return true;
+
+    const refreshToken = localStorage.getItem("refreshToken");
+    if (!refreshToken) return false;
+
+    const res = await fetch(`${API_URL}/model_admin_login?func=refresh`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({refreshToken}),
+    });
+
+    if (!res.ok) {
+        localStorage.removeItem("refreshToken");
+        return false;
+    }
+
+    const data = await res.json();
+    localStorage.setItem("accessToken", data.accessToken);
+    return true;
+}
+
+
