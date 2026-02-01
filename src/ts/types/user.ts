@@ -19,6 +19,7 @@ export interface ModelUser {
     url?: string;
     payType?: boolean;
     vcat?: boolean;
+    inventoryCheckEnabled?: boolean;
     category?: Array<{
         name: string;
         no: string;

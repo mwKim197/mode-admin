@@ -121,6 +121,109 @@ function initSaveButtonHandler() {
     }
 }
 
+// 인벤토리 이름 적용 함수
+function applyInventoryNamesToUI(data: any) {
+    const config = data.config || {};
+
+    for (const type in config) {
+        for (const slot in config[type]) {
+            const name = config[type][slot]?.name;
+            if (!name) continue;
+
+            const input = document.querySelector(
+                `input[data-type="${type}"][data-slot="${slot}"]`
+            ) as HTMLInputElement;
+
+            if (input) {
+                input.value = name;
+            }
+        }
+    }
+}
+
+// 인벤토리 UI 적용
+/*function applyCoffeeInventoryToUI(data: any) {
+    const coffeeInv = data.inventory.coffee;
+    const coffeeSpec = data.spec.consumption.coffee;
+
+    Object.keys(coffeeInv).forEach((key) => {
+        const inv = coffeeInv[key];
+        const spec = coffeeSpec[key];
+
+        setInputValue(key, "current", inv.current);
+        setInputValue(key, "max", inv.max);
+        setInputValue(key, "perSecond", spec?.perSecond ?? "");
+    });
+}
+
+function setInputValue(coffeeNo: string, field: string, value: any) {
+    const input = document.querySelector(
+        `input[data-coffee="${coffeeNo}"][data-field="${field}"]`
+    ) as HTMLInputElement;
+
+    if (input) input.value = String(value);
+}*/
+
+function applyInventoryByType(
+    data: any,
+    type: "coffee" | "syrup" | "garucha"
+) {
+    const invByType = data.inventory?.[type];
+    const specByType = data.spec?.consumption?.[type];
+
+    if (!invByType) return;
+
+    Object.keys(invByType).forEach((slot) => {
+        const inv = invByType[slot];
+        const spec = specByType?.[slot];
+
+        setInputValueByType(type, slot, "current", inv.current);
+        setInputValueByType(type, slot, "max", inv.max);
+
+        if (spec?.perSecond !== undefined) {
+            setInputValueByType(type, slot, "perSecond", spec.perSecond);
+        }
+    });
+}
+
+function setInputValueByType(
+    type: string,
+    slot: string,
+    field: string,
+    value: any
+) {
+    const input = document.querySelector(
+        `input[data-type="${type}"][data-slot="${slot}"][data-field="${field}"]`
+    ) as HTMLInputElement;
+
+    if (input) {
+        input.value = String(value);
+    }
+}
+
+// 인벤토리 정보조회
+async function loadInventoryRuntime(userId: string) {
+    try {
+        const res = await apiGet(
+            `/model_inventory_calculate?func=get-runtime&userId=${userId}`
+        );
+        const runtime = await res.json();
+
+        if (runtime?.ok && runtime.inventory && runtime.spec) {
+            // runtime 데이터 받은 직후
+            applyInventoryNamesToUI(runtime);
+
+            applyInventoryByType(runtime, "coffee");
+            applyInventoryByType(runtime, "garucha");
+            applyInventoryByType(runtime, "syrup");
+        } else {
+            console.warn("⚠️ inventory runtime 없음");
+        }
+    } catch (e) {
+        console.warn("⚠️ inventory 조회 실패", e);
+    }
+}
+
 // 전역 변수로 원래 데이터 저장
 let originalUserData: ModelUser | null = null;
 
@@ -142,6 +245,18 @@ async function loadStoreInfo() {
         if (data && data.user) {
             // 원래 데이터 저장 (나중에 비교용)
             originalUserData = data.user as ModelUser;
+
+            const allowInventoryUsers = ["model0000", "zero16"];
+
+            if (!allowInventoryUsers.includes(originalUserData.userId)) {
+                const inventory = document.querySelector("#inventory") as HTMLInputElement;
+                inventory.style.display = "none";
+
+            }
+
+            if (originalUserData.inventoryCheckEnabled !== false) {
+                await loadInventoryRuntime(originalUserData.userId);
+            }
 
             // 매장명 설정
             const storeNameInput = document.getElementById(
@@ -217,6 +332,13 @@ async function loadStoreInfo() {
             ) as HTMLInputElement;
             if (vcatCheckbox) {
                 vcatCheckbox.checked = data.user.vcat; // vcat의 반대값
+            }
+
+            const inventoryCheckbox = document.getElementById(
+                "inventory-check"
+            ) as HTMLInputElement;
+            if (inventoryCheckbox) {
+                inventoryCheckbox.checked = data.user.inventoryCheckEnabled; // inventory 반대값
             }
 
             // 카테고리 데이터
@@ -354,12 +476,16 @@ async function saveStoreInfo() {
         const vcatCheckbox = document.getElementById(
             "vcat-check"
         ) as HTMLInputElement;
+        const inventoryCheckbox = document.getElementById(
+            "inventory-check"
+        ) as HTMLInputElement;
 
         // 수정된 필드만 추가
         let hasChanges = false;
         let hasPasswordChange = false;
         let hasFileChanges = false;
         let hasCategoryChanges = false;
+        let hasInventoryChange = false;
 
         // 카테고리 데이터 수집 및 변경사항 체크
         const categoryInputs = document.querySelectorAll(
@@ -457,6 +583,11 @@ async function saveStoreInfo() {
 
         if (vcatCheckbox && vcatCheckbox.checked !== originalUserData?.vcat) {
             hasChanges = true;
+        }
+
+        if (inventoryCheckbox && inventoryCheckbox.checked !== originalUserData?.inventoryCheckEnabled) {
+            hasChanges = true;
+            hasInventoryChange = true;
         }
 
         // 비밀번호가 수정되었는지 확인
@@ -579,6 +710,14 @@ async function saveStoreInfo() {
                 updateData.vcat = vcatCheckbox.checked;
             }
 
+            // inventory 사용 추가 (변경된 경우만)
+            if (
+                inventoryCheckbox &&
+                inventoryCheckbox.checked !== originalUserData?.vcat
+            ) {
+                updateData.inventoryCheckEnabled = inventoryCheckbox.checked;
+            }
+
             // 한번에 결제 가능한 최대 잔 수 추가 (변경된 경우만)
             if (
                 limitCountInput &&
@@ -640,6 +779,17 @@ async function saveStoreInfo() {
             };
 
             await apiPut(`/model_admin_user?func=update-password`, passwordData);
+        }
+
+        // 인벤토리 사용여부 업데이트
+        if (hasInventoryChange) {
+
+            if (inventoryCheckbox.checked) {
+                await apiPost(
+                    `/model_inventory_calculate?func=init-runtime`,
+                    {userId: originalUserData?.userId}
+                );
+            }
         }
 
         window.showToast("변경사항이 저장되었습니다.", 3000, "success");
