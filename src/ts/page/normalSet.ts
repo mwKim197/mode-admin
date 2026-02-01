@@ -142,28 +142,6 @@ function applyInventoryNamesToUI(data: any) {
 }
 
 // 인벤토리 UI 적용
-/*function applyCoffeeInventoryToUI(data: any) {
-    const coffeeInv = data.inventory.coffee;
-    const coffeeSpec = data.spec.consumption.coffee;
-
-    Object.keys(coffeeInv).forEach((key) => {
-        const inv = coffeeInv[key];
-        const spec = coffeeSpec[key];
-
-        setInputValue(key, "current", inv.current);
-        setInputValue(key, "max", inv.max);
-        setInputValue(key, "perSecond", spec?.perSecond ?? "");
-    });
-}
-
-function setInputValue(coffeeNo: string, field: string, value: any) {
-    const input = document.querySelector(
-        `input[data-coffee="${coffeeNo}"][data-field="${field}"]`
-    ) as HTMLInputElement;
-
-    if (input) input.value = String(value);
-}*/
-
 function applyInventoryByType(
     data: any,
     type: "coffee" | "syrup" | "garucha"
@@ -201,6 +179,37 @@ function setInputValueByType(
     }
 }
 
+
+// 인벤토리 CUP UI적용
+type CupType = "paper" | "plastic";
+
+function applyCupInventoryToUI(data: any) {
+    const cupInv = data.inventory?.cup;
+    if (!cupInv) return;
+
+    (Object.keys(cupInv) as CupType[]).forEach((cupType) => {
+        const inv = cupInv[cupType];
+        setCupInputValue(cupType, "current", inv.current);
+        setCupInputValue(cupType, "max", inv.max);
+    });
+}
+
+
+function setCupInputValue(
+    cupType: "paper" | "plastic",
+    field: "current" | "max",
+    value: any
+) {
+    const input = document.querySelector(
+        `input[data-type="${cupType}"][data-field="${field}"]`
+    ) as HTMLInputElement;
+
+    if (input) {
+        input.value = String(value);
+    }
+}
+
+
 // 인벤토리 정보조회
 async function loadInventoryRuntime(userId: string) {
     try {
@@ -216,6 +225,8 @@ async function loadInventoryRuntime(userId: string) {
             applyInventoryByType(runtime, "coffee");
             applyInventoryByType(runtime, "garucha");
             applyInventoryByType(runtime, "syrup");
+
+            applyCupInventoryToUI(runtime);
         } else {
             console.warn("⚠️ inventory runtime 없음");
         }
