@@ -209,6 +209,32 @@ function setCupInputValue(
     }
 }
 
+type SoldOutMap = Record<string, boolean>;
+
+// 인벤토리 SoldOut UI적용
+function applySoldOutToUI(data: any) {
+    const soldOut: SoldOutMap = data.flags?.soldOut || {};
+
+    const checkboxes = document.querySelectorAll<HTMLInputElement>(
+        'input[data-field="soldOut"]'
+    );
+
+    checkboxes.forEach((checkbox) => {
+        const type = checkbox.dataset.type;
+        const slot = checkbox.dataset.slot;
+
+        if (!type) return;
+
+        // key 규칙 통일
+        // coffee_1, syrup_6, garucha_3
+        // cup_paper, cup_plastic
+        const key = slot
+            ? `${type}_${slot}`
+            : `cup_${type}`;
+
+        checkbox.checked = !!soldOut[key];
+    });
+}
 
 // 인벤토리 정보조회
 async function loadInventoryRuntime(userId: string) {
@@ -225,6 +251,8 @@ async function loadInventoryRuntime(userId: string) {
             applyInventoryByType(runtime, "coffee");
             applyInventoryByType(runtime, "garucha");
             applyInventoryByType(runtime, "syrup");
+
+            applySoldOutToUI(runtime);
 
             applyCupInventoryToUI(runtime);
         } else {
@@ -444,6 +472,112 @@ function loadCategoryData(categories: any[]) {
     }
 }
 
+////////////재고 수정 시작
+// 재고 수정 - invetory
+function collectInventoryFromUI() {
+    const inventory: any = {};
+
+    document
+        .querySelectorAll<HTMLInputElement>(
+            '#inventory input[data-field="current"], #inventory input[data-field="max"]'
+        )
+        .forEach((input) => {
+            const type = input.dataset.type!;
+            const slot = input.dataset.slot;
+            const field = input.dataset.field!;
+            const value = Number(input.value || 0);
+
+            // ✅ CUP
+            if (type === "paper" || type === "plastic") {
+                inventory.cup = inventory.cup || {};
+                inventory.cup[type] = inventory.cup[type] || {};
+                inventory.cup[type][field] = value;
+                return;
+            }
+
+            // ✅ 나머지 재료
+            inventory[type] = inventory[type] || {};
+            inventory[type][slot!] = inventory[type][slot!] || {};
+            inventory[type][slot!][field] = value;
+        });
+
+    return inventory;
+}
+
+
+// 재고 수정 - soldOut
+function collectSoldOutFromUI() {
+    const soldOut: Record<string, boolean> = {};
+
+    document
+        .querySelectorAll<HTMLInputElement>(
+            '#inventory input[type="checkbox"][data-field="soldOut"]'
+        )
+        .forEach((checkbox) => {
+            const type = checkbox.dataset.type!;
+            const slot = checkbox.dataset.slot; // cup은 없음
+
+            const key = slot
+                ? `${type}_${slot}`   // coffee / syrup / garucha
+                : `cup_${type}`;     // cup (paper / plastic)
+
+            if (checkbox.checked) {
+                soldOut[key] = true;
+            } else {
+                soldOut[key] = false;
+            }
+        });
+
+    return soldOut;
+}
+
+
+// 재고 수정 - spec
+function collectSpecFromUI() {
+    const spec: any = {consumption: {}};
+
+    document
+        .querySelectorAll<HTMLInputElement>(
+            '#inventory input[data-field="perSecond"]'
+        )
+        .forEach((input) => {
+            const type = input.dataset.type!;
+            const slot = input.dataset.slot!;
+            const value = Number(input.value);
+
+            if (Number.isNaN(value)) return;
+
+            if (!spec.consumption[type]) spec.consumption[type] = {};
+            spec.consumption[type][slot] = {perSecond: value};
+        });
+
+    return spec;
+}
+
+// 재고 수정 - config
+function collectConfigFromUI() {
+    const config: any = {};
+
+    document
+        .querySelectorAll<HTMLInputElement>(
+            '#inventory input[data-field="name"]'
+        )
+        .forEach((input) => {
+            const type = input.dataset.type!;
+            const slot = input.dataset.slot!;
+            const name = input.value.trim();
+
+            if (!name) return;
+
+            if (!config[type]) config[type] = {};
+            config[type][slot] = {name};
+        });
+
+    return config;
+}
+
+//////////////재고 수정 끝/////////
+
 // 매장 정보 저장 함수 (수정됨)
 async function saveStoreInfo() {
     try {
@@ -635,17 +769,6 @@ async function saveStoreInfo() {
             hasFileChanges = true;
         }
 
-        // 수정할 내용이 없으면 저장하지 않음
-        if (
-            !hasChanges &&
-            !hasPasswordChange &&
-            !hasFileChanges &&
-            !hasCategoryChanges
-        ) {
-            window.showToast("변경사항이 없습니다.", 3000, "warning");
-            return;
-        }
-
         // 일반 정보 업데이트 (비밀번호 제외)
         if (hasChanges || hasFileChanges || hasCategoryChanges) {
             // 삭제 대기 중인 카테고리들 처리
@@ -803,6 +926,9 @@ async function saveStoreInfo() {
             }
         }
 
+        // 제고업데이트
+        await updateInventory(userInfo.userId);
+
         window.showToast("변경사항이 저장되었습니다.", 3000, "success");
 
         // 저장 성공 시 삭제 대기 목록 초기화
@@ -848,6 +974,27 @@ async function saveStoreInfo() {
     } catch (error) {
         window.showToast("저장 중 오류가 발생했습니다.", 3000, "error");
     }
+}
+
+// 제고정보 업데이트
+async function updateInventory(userId: string) {
+    const inventory = collectInventoryFromUI();
+    const spec = collectSpecFromUI();
+    const config = collectConfigFromUI();
+    const soldOut = collectSoldOutFromUI();
+
+    const payload = {
+        userId,
+        inventory,
+        spec,
+        config,
+        soldOut
+    };
+
+    await apiPut(
+        "/model_inventory_calculate?func=update-config",
+        payload
+    );
 }
 
 // 삭제 대기 중인 카테고리들 처리 함수
