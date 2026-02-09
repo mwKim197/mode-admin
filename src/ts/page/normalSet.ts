@@ -451,26 +451,37 @@ function loadCategoryData(categories: any[]) {
     );
 
     if (visibleCategories.length > 0) {
-        visibleCategories.forEach((category) => {
-            const itemVal = String(category.item ?? "");
+        visibleCategories.forEach((category, idx) => {
+            const itemVal = String(category.item ?? ""); // 기존 item (ex: "coffee")
+            const noVal = String(category.no ?? String(idx + 1)); // 기존 no
 
             const categoryItem = document.createElement("div");
             categoryItem.className = "data_input category-item";
+
+            // ⚠️ XSS 방지: innerHTML에 바로 value 넣는 것보다 input.value로 세팅하는게 안전
             categoryItem.innerHTML = `
-        <p>카테고리${itemVal}</p>
+        <p>카테고리${noVal}</p>
         <div class="category-input-group">
-          <input type="text" value="${category.name || ""}" />
+          <input type="text" />
           <button type="button" class="btn-i delete-category">-</button>
         </div>
       `;
-            const del = categoryItem.querySelector(
-                ".delete-category"
-            ) as HTMLButtonElement;
+
+            const input = categoryItem.querySelector("input") as HTMLInputElement;
+            input.value = category.name || "";
+
+            // ✅ 핵심: 수정 전 item/no를 dataset으로 저장
+            input.dataset.originalItem = itemVal; // "coffee" 같은 기존 item
+            input.dataset.originalNo = noVal;
+
+            const del = categoryItem.querySelector(".delete-category") as HTMLButtonElement;
             if (del) del.addEventListener("click", () => deleteCategory(del));
+
             container.appendChild(categoryItem);
         });
     }
 }
+
 
 ////////////재고 수정 시작
 // 재고 수정 - invetory
@@ -632,52 +643,60 @@ async function saveStoreInfo() {
         let hasCategoryChanges = false;
         let hasInventoryChange = false;
 
-        // 카테고리 데이터 수집 및 변경사항 체크
         const categoryInputs = document.querySelectorAll(
             "#category-container .category-input-group input"
         );
 
         const visibleCategories = Array.from(categoryInputs)
             .map((input, idx) => {
-                const value = (input as HTMLInputElement).value.trim();
-                if (!value) return null;
+                const el = input as HTMLInputElement;
+                const name = el.value.trim();
+                if (!name) return null;
 
-                const originalCategory = originalUserData?.category?.find(
-                    (cat) => cat.name === value
-                );
+                const no = String(idx + 1); // 수정 후 위치 기반 no
+                const item = no;            // 변경 후 item은 숫자
 
-                const no = (idx + 1).toString();
-                const item = originalCategory?.item || no;
-
-                return {name: value, no, item};
+                const originalItem = el.dataset.originalItem || ""; // "coffee" 같은 기존 item
+                return {name, no, item, originalItem};
             })
-            .filter((c) => c !== null) as Array<{
-            name: string;
-            no: string;
-            item: string;
-        }>;
+            .filter(Boolean) as Array<{ name: string; no: string; item: string; originalItem: string }>;
 
         const categories = [
             {name: "전체메뉴", no: "0", item: "all"},
-            ...visibleCategories,
+            ...visibleCategories.map(({name, no, item}) => ({name, no, item})),
         ];
 
-        // 카테고리 변경사항 체크
+        // beforeItem -> afterItem 매핑
+        const itemMap: Record<string, string> = {all: "all"};
+        for (const c of visibleCategories) {
+            if (!c.originalItem) continue;   // 신규 추가 카테고리는 기존 메뉴가 없으니 스킵
+            itemMap[c.originalItem] = c.item; // "coffee" -> "1"
+        }
+
+        // ✅ 삭제된 카테고리 메뉴는 all로 이동 (정책)
+        for (const d of pendingDeleteCategories) {
+            const oldItem = String(d?.item ?? "");
+            if (!oldItem) continue;
+            itemMap[oldItem] = "all";
+        }
+
+        // ✅ 변경 감지(정확하게)
         const originalCategories = originalUserData?.category || [];
         const hasPendingDeletes = pendingDeleteCategories.length > 0;
 
-        if (categories.length !== originalCategories.length || hasPendingDeletes) {
-            hasCategoryChanges = true;
-        } else {
-            for (let i = 0; i < categories.length; i++) {
-                const current = categories[i];
-                const original = originalCategories[i];
-                if (!original || current?.name !== original.name) {
-                    hasCategoryChanges = true;
-                    break;
-                }
-            }
+        function normalizeCats(arr: any[]) {
+            return (arr || [])
+                .map((c: any) => ({
+                    no: String(c.no ?? ""),
+                    name: String(c.name ?? ""),
+                    item: String(c.item ?? ""),
+                }))
+                .sort((a, b) => Number(a.no) - Number(b.no));
         }
+
+        hasCategoryChanges =
+            hasPendingDeletes ||
+            JSON.stringify(normalizeCats(categories)) !== JSON.stringify(normalizeCats(originalCategories));
 
         // 매장명이 수정되었는지 확인
         if (
@@ -864,6 +883,10 @@ async function saveStoreInfo() {
             // 카테고리 데이터 추가 (변경된 경우만)
             if (hasCategoryChanges && categories.length > 0) {
                 updateData.category = categories;
+
+                // ✅ 메뉴 카테고리 마이그레이션용 매핑도 같이 전송
+                // (all 포함, 삭제된 카테고리 pendingDelete 처리까지 반영된 itemMap)
+                updateData.categoryItemMap = itemMap;
             }
 
             // 파일 업로드 데이터 추가
