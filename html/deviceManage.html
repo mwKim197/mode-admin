@@ -88,279 +88,294 @@
                 <div class="inventory-Wrap" id="inventory"> <!--[TODO] 2차 프랜차이즈랑 같이적용-->
                     <div class="grid col3 ai-c mb20">
                         <h2>재고관리</h2>
-                        <button class="btn-outline">전체채우기</button>
-                        <button class="btn-outline">변경사항 저장</button>
+                        <button class="btn-outline" id="refill-all">전체채우기</button>
+                        <button class="btn-outline" id="refill-submit">변경사항 저장</button>
                     </div>
 
                     <div class="grid col2">
                         <div class="progress-container">
                             <div class="flex type">
                                 <div class="protext">플라스틱컵</div>
-                                <div class="toggle-flex">
+                                <!--<div class="toggle-flex">
                                     <p>품절</p>
                                     <label class="toggle-switch">
                                         <input type="checkbox">
                                         <span class="slider"></span>
                                     </label>
-                                </div>
+                                </div>-->
                             </div>
                             <div class="flex">
                                 <div class="progress-bar">
                                     <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
                                 </div>
-                                <button class="refresh-btn"><img alt="" src="/img/refresh.svg"></button>
+                                <button class="refresh-btn" data-slot="plastic" data-type="cup">
+                                    <img alt="" src="/img/refresh.svg">
+                                </button>
                             </div>
                         </div>
                         <div class="progress-container">
                             <div class="flex type">
                                 <div class="protext">종이컵</div>
-                                <div class="toggle-flex">
+                                <!--<div class="toggle-flex">
                                     <p>품절</p>
                                     <label class="toggle-switch">
                                         <input type="checkbox">
                                         <span class="slider"></span>
                                     </label>
-                                </div>
+                                </div>-->
                             </div>
                             <div class="flex">
                                 <div class="progress-bar">
                                     <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
                                 </div>
-                                <button class="refresh-btn"><img alt=""
-                                                                 src="/img/refresh.svg"></button>
+                                <button class="refresh-btn" data-slot="paper" data-type="cup">
+                                    <img alt="" src="/img/refresh.svg">
+                                </button>
                             </div>
                         </div>
 
                         <div class="progress-container">
                             <div class="flex type">
                                 <div class="protext">원두</div>
-                                <div class="toggle-flex">
+                                <!--<div class="toggle-flex">
                                     <p>품절</p>
                                     <label class="toggle-switch">
                                         <input type="checkbox">
                                         <span class="slider"></span>
                                     </label>
-                                </div>
+                                </div>-->
                             </div>
                             <div class="flex">
                                 <div class="progress-bar">
                                     <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
                                 </div>
-                                <button class="refresh-btn"><img alt=""
-                                                                 src="/img/refresh.svg"></button>
+                                <button class="refresh-btn" data-slot="1" data-type="coffee">
+                                    <img alt="" src="/img/refresh.svg">
+                                </button>
                             </div>
                         </div>
                         <div class="progress-container">
                             <div class="flex type">
                                 <div class="protext">원두2</div>
-                                <div class="toggle-flex">
-                                    <p>품절</p>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox">
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
+                                <!-- <div class="toggle-flex">
+                                     <p>품절</p>
+                                     <label class="toggle-switch">
+                                         <input type="checkbox">
+                                         <span class="slider"></span>
+                                     </label>
+                                 </div>-->
                             </div>
                             <div class="flex">
                                 <div class="progress-bar">
                                     <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
                                 </div>
-                                <button class="refresh-btn"><img alt=""
-                                                                 src="/img/refresh.svg"></button>
+                                <button class="refresh-btn" data-slot="2" data-type="coffee">
+                                    <img alt="" src="/img/refresh.svg">
+                                </button>
                             </div>
                         </div>
 
                         <div class="progress-container">
                             <div class="flex type">
                                 <div class="protext">가루차1</div>
-                                <div class="toggle-flex">
+                                <!--<div class="toggle-flex">
                                     <p>품절</p>
                                     <label class="toggle-switch">
                                         <input type="checkbox">
                                         <span class="slider"></span>
                                     </label>
-                                </div>
+                                </div>-->
                             </div>
                             <div class="flex">
                                 <div class="progress-bar">
                                     <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
                                 </div>
-                                <button class="refresh-btn"><img alt=""
-                                                                 src="/img/refresh.svg"></button>
+                                <button class="refresh-btn" data-slot="1" data-type="garucha">
+                                    <img alt="" src="/img/refresh.svg">
+                                </button>
                             </div>
                         </div>
                         <div class="progress-container">
                             <div class="flex type">
                                 <div class="protext">가루차2</div>
-                                <div class="toggle-flex">
-                                    <p>품절</p>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox">
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
+                                <!-- <div class="toggle-flex">
+                                     <p>품절</p>
+                                     <label class="toggle-switch">
+                                         <input type="checkbox">
+                                         <span class="slider"></span>
+                                     </label>
+                                 </div>-->
                             </div>
                             <div class="flex">
                                 <div class="progress-bar">
                                     <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
                                 </div>
-                                <button class="refresh-btn"><img alt=""
-                                                                 src="/img/refresh.svg"></button>
+                                <button class="refresh-btn" data-slot="2" data-type="garucha">
+                                    <img alt="" src="/img/refresh.svg">
+                                </button>
                             </div>
                         </div>
 
                         <div class="progress-container">
                             <div class="flex type">
                                 <div class="protext">가루차3</div>
-                                <div class="toggle-flex">
-                                    <p>품절</p>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox">
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
+                                <!-- <div class="toggle-flex">
+                                     <p>품절</p>
+                                     <label class="toggle-switch">
+                                         <input type="checkbox">
+                                         <span class="slider"></span>
+                                     </label>
+                                 </div>-->
                             </div>
                             <div class="flex">
                                 <div class="progress-bar">
                                     <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
                                 </div>
-                                <button class="refresh-btn"><img alt=""
-                                                                 src="/img/refresh.svg"></button>
+                                <button class="refresh-btn" data-slot="3" data-type="garucha">
+                                    <img alt="" src="/img/refresh.svg">
+                                </button>
                             </div>
                         </div>
                         <div class="progress-container">
                             <div class="flex type">
                                 <div class="protext">가루차4</div>
-                                <div class="toggle-flex">
-                                    <p>품절</p>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox">
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
+                                <!-- <div class="toggle-flex">
+                                     <p>품절</p>
+                                     <label class="toggle-switch">
+                                         <input type="checkbox">
+                                         <span class="slider"></span>
+                                     </label>
+                                 </div>-->
                             </div>
                             <div class="flex">
                                 <div class="progress-bar">
                                     <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
                                 </div>
-                                <button class="refresh-btn"><img alt=""
-                                                                 src="/img/refresh.svg"></button>
+                                <button class="refresh-btn" data-slot="4" data-type="garucha">
+                                    <img alt="" src="/img/refresh.svg">
+                                </button>
                             </div>
                         </div>
 
                         <div class="progress-container">
                             <div class="flex type">
                                 <div class="protext">가루차5</div>
-                                <div class="toggle-flex">
-                                    <p>품절</p>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox">
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
+                                <!-- <div class="toggle-flex">
+                                     <p>품절</p>
+                                     <label class="toggle-switch">
+                                         <input type="checkbox">
+                                         <span class="slider"></span>
+                                     </label>
+                                 </div>-->
                             </div>
                             <div class="flex">
                                 <div class="progress-bar">
                                     <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
                                 </div>
-                                <button class="refresh-btn"><img alt=""
-                                                                 src="/img/refresh.svg"></button>
+                                <button class="refresh-btn" data-slot="5" data-type="garucha">
+                                    <img alt="" src="/img/refresh.svg">
+                                </button>
                             </div>
                         </div>
                         <div class="progress-container">
                             <div class="flex type">
                                 <div class="protext">가루차6</div>
-                                <div class="toggle-flex">
-                                    <p>품절</p>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox">
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
+                                <!--  <div class="toggle-flex">
+                                      <p>품절</p>
+                                      <label class="toggle-switch">
+                                          <input type="checkbox">
+                                          <span class="slider"></span>
+                                      </label>
+                                  </div>-->
                             </div>
                             <div class="flex">
                                 <div class="progress-bar">
                                     <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
                                 </div>
-                                <button class="refresh-btn"><img alt=""
-                                                                 src="/img/refresh.svg"></button>
+                                <button class="refresh-btn" data-slot="6" data-type="garucha">
+                                    <img alt="" src="/img/refresh.svg">
+                                </button>
                             </div>
                         </div>
 
                         <div class="progress-container">
                             <div class="flex type">
                                 <div class="protext">액상1</div>
-                                <div class="toggle-flex">
-                                    <p>품절</p>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox">
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
+                                <!--  <div class="toggle-flex">
+                                      <p>품절</p>
+                                      <label class="toggle-switch">
+                                          <input type="checkbox">
+                                          <span class="slider"></span>
+                                      </label>
+                                  </div>-->
                             </div>
                             <div class="flex">
                                 <div class="progress-bar">
                                     <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
                                 </div>
-                                <button class="refresh-btn"><img alt=""
-                                                                 src="/img/refresh.svg"></button>
+                                <button class="refresh-btn" data-slot="1" data-type="syrup">
+                                    <img alt="" src="/img/refresh.svg">
+                                </button>
                             </div>
                         </div>
                         <div class="progress-container">
                             <div class="flex type">
                                 <div class="protext">액상2</div>
-                                <div class="toggle-flex">
-                                    <p>품절</p>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox">
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
+                                <!--     <div class="toggle-flex">
+                                         <p>품절</p>
+                                         <label class="toggle-switch">
+                                             <input type="checkbox">
+                                             <span class="slider"></span>
+                                         </label>
+                                     </div>-->
                             </div>
                             <div class="flex">
                                 <div class="progress-bar">
                                     <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
                                 </div>
-                                <button class="refresh-btn"><img alt=""
-                                                                 src="/img/refresh.svg"></button>
+                                <button class="refresh-btn" data-slot="2" data-type="syrup">
+                                    <img alt="" src="/img/refresh.svg">
+                                </button>
                             </div>
                         </div>
                         <div class="progress-container">
                             <div class="flex type">
                                 <div class="protext">액상3</div>
-                                <div class="toggle-flex">
-                                    <p>품절</p>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox">
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
+                                <!--  <div class="toggle-flex">
+                                      <p>품절</p>
+                                      <label class="toggle-switch">
+                                          <input type="checkbox">
+                                          <span class="slider"></span>
+                                      </label>
+                                  </div>-->
                             </div>
                             <div class="flex">
                                 <div class="progress-bar">
                                     <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
                                 </div>
-                                <button class="refresh-btn"><img alt=""
-                                                                 src="/img/refresh.svg"></button>
+                                <button class="refresh-btn" data-slot="3" data-type="syrup">
+                                    <img alt="" src="/img/refresh.svg">
+                                </button>
                             </div>
                         </div>
                         <div class="progress-container">
                             <div class="flex type">
                                 <div class="protext">액상4</div>
-                                <div class="toggle-flex">
-                                    <p>품절</p>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox">
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
+                                <!-- <div class="toggle-flex">
+                                     <p>품절</p>
+                                     <label class="toggle-switch">
+                                         <input type="checkbox">
+                                         <span class="slider"></span>
+                                     </label>
+                                 </div>-->
                             </div>
                             <div class="flex">
                                 <div class="progress-bar">
                                     <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
                                 </div>
-                                <button class="refresh-btn"><img alt=""
-                                                                 src="/img/refresh.svg"></button>
+                                <button class="refresh-btn" data-slot="5" data-type="syrup">
+                                    <img alt="" src="/img/refresh.svg">
+                                </button>
                             </div>
                         </div>
 
@@ -368,20 +383,21 @@
                         <div class="progress-container">
                             <div class="flex type">
                                 <div class="protext">액상5</div>
-                                <div class="toggle-flex">
-                                    <p>품절</p>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox">
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
+                                <!-- <div class="toggle-flex">
+                                     <p>품절</p>
+                                     <label class="toggle-switch">
+                                         <input type="checkbox">
+                                         <span class="slider"></span>
+                                     </label>
+                                 </div>-->
                             </div>
                             <div class="flex">
                                 <div class="progress-bar">
                                     <div class="progress-fill fill3" style="transition: width 1s; width: 50%;">50%</div>
                                 </div>
-                                <button class="refresh-btn"><img alt=""
-                                                                 src="/img/refresh.svg"></button>
+                                <button class="refresh-btn" data-slot="6" data-type="syrup">
+                                    <img alt="" src="/img/refresh.svg">
+                                </button>
                             </div>
                         </div>
                     </div>

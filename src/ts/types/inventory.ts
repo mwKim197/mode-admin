@@ -24,3 +24,13 @@ export interface InventoryResponse {
     };
     updatedAt?: string;
 }
+
+export interface RefillItem {
+    type: string;
+    slot: string;
+}
+
+export interface RefillRequest {
+    userId: string;
+    items: RefillItem[];
+}

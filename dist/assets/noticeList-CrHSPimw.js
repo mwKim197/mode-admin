@@ -1,4 +1,4 @@
-import{a as i}from"./main-DRXaj6vt.js";function g(){console.log("공지사항 목록 페이지 초기화"),d()}async function d(){try{const t=await i("/model_admin_notice?func=get-notice-list&contentType=admin");if(t.ok){const e=await t.json();s(e)}else window.showToast("공지사항을 불러오는데 실패했습니다.",3e3,"error")}catch(t){console.error("공지사항 목록 로드 실패:",t),window.showToast("공지사항을 불러오는데 실패했습니다.",3e3,"error")}}function s(t){const e=document.getElementById("notice-table-body");if(!e)return;if(!t||t.length===0){e.innerHTML=`
+import{a as i}from"./main-BhPhcrsp.js";function g(){console.log("공지사항 목록 페이지 초기화"),d()}async function d(){try{const t=await i("/model_admin_notice?func=get-notice-list&contentType=admin");if(t.ok){const e=await t.json();s(e)}else window.showToast("공지사항을 불러오는데 실패했습니다.",3e3,"error")}catch(t){console.error("공지사항 목록 로드 실패:",t),window.showToast("공지사항을 불러오는데 실패했습니다.",3e3,"error")}}function s(t){const e=document.getElementById("notice-table-body");if(!e)return;if(!t||t.length===0){e.innerHTML=`
       <tr>
         <td colspan="4" class="text-center">등록된 공지사항이 없습니다.</td>
       </tr>

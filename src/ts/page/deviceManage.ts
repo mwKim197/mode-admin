@@ -2,62 +2,79 @@ import {apiGet} from "../api/apiHelpers.ts";
 import {showToast} from "../../main.ts";
 import {fetchWithoutLoading} from "../api/api.ts";
 import {ModelUser} from "../types/user.ts";
-import {InventoryData, InventoryResponse} from "../types/inventory.ts";
+import {InventoryData, InventoryResponse, RefillItem} from "../types/inventory.ts";
+
+/* ===============================
+   전역 상태
+================================= */
+
+let originalUserData: ModelUser | null = null;
+let selectedItems: RefillItem[] = [];
+
+/* ===============================
+   초기화
+================================= */
 
 export function initDeviceManage() {
     const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
     const userId = userInfo.userId;
+
     console.log("📌 initDeviceManage 호출됨");
+    bindRefreshButtons();
+    bindRefillButtons();
+
     loadStoreInfo();
-    loadInventoryRuntime(userId); // 인벤토리 데이터 lambda 조회
+    if (userId) {
+
+        loadInventoryRuntime(userId);
+    }
 }
 
-// 전역 변수로 원래 데이터 저장
-let originalUserData: ModelUser | null = null;
+/* ===============================
+   매장 정보 로드
+================================= */
 
-// 매장 정보 로드 함수
 async function loadStoreInfo() {
     try {
         const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
         const userId = userInfo.userId;
-
-        if (!userId) {
-            return;
-        }
+        if (!userId) return;
 
         const response = await apiGet(
             `/model_user_setting?func=get-user&userId=${userId}`
         );
+
         const data = await response.json();
 
-        if (data && data.user) {
-            // 원래 데이터 저장 (나중에 비교용)
+        if (data?.user) {
             originalUserData = data.user as ModelUser;
 
             const allowInventoryUsers = ["model0000", "zero16"];
 
             if (!allowInventoryUsers.includes(originalUserData.userId)) {
-                const inventory = document.querySelector("#inventory") as HTMLInputElement;
-                inventory.style.display = "none";
-
+                const inventory = document.querySelector("#inventory") as HTMLElement;
+                if (inventory) inventory.style.display = "none";
             }
         }
     } catch (error) {
-        window.showToast("매장 정보 로드에 실패했습니다.", 3000, "error");
+        showToast("매장 정보 로드 실패", 3000, "error");
     }
 }
 
-// 인벤토리 정보조회
+/* ===============================
+   인벤토리 조회
+================================= */
+
 async function loadInventoryRuntime(userId: string) {
     try {
         const res = await apiGet(
             `/model_inventory_calculate?func=get-runtime&userId=${userId}`
         );
+
         const runtime = await res.json();
 
-        if (runtime?.ok && runtime.inventory && runtime.spec) {
+        if (runtime?.ok && runtime.inventory) {
             inventoryChanged(runtime);
-            console.log(runtime);
         } else {
             console.warn("⚠️ inventory runtime 없음");
         }
@@ -66,82 +83,10 @@ async function loadInventoryRuntime(userId: string) {
     }
 }
 
-/*function inventoryChanged() {
-    // inventoryProgress.ts
+/* ===============================
+   퍼센트 계산
+================================= */
 
-// ===== 타입 유틸 =====
-    type ProgressFill = HTMLDivElement;
-    type RefreshButton = HTMLButtonElement;
-
-// ===== DOM 조회 =====
-    const fills = Array.from(
-        document.querySelectorAll<ProgressFill>(".progress-fill")
-    );
-
-    const buttons = Array.from(
-        document.querySelectorAll<RefreshButton>(".refresh-btn")
-    );
-
-// progress 개수만큼 초기값 50%
-    const values: number[] = Array.from(
-        {length: fills.length},
-        () => 50
-    );
-
-// ===== 프로그래스 애니메이션 =====
-    function animateProgress(
-        index: number,
-        value: number,
-        changeColor: boolean = false
-    ): void {
-        const fill = fills[index];
-        if (!fill) return;
-
-        // 초기화
-        fill.style.transition = "none";
-        fill.style.width = "0%";
-        fill.textContent = "0%";
-        fill.style.backgroundColor = "";
-
-        // 강제 리렌더링
-        void fill.offsetWidth;
-
-        // 애니메이션 시작
-        fill.style.transition = "width 1s ease";
-        fill.style.width = `${value}%`;
-
-        setTimeout(() => {
-            fill.textContent = `${value}%`;
-
-            if (changeColor) {
-                fill.style.backgroundColor = "#2B7FE8";
-            }
-        }, 1000);
-    }
-
-// ===== 다시 채우기 =====
-    function replayAnimation(index: number): void {
-        animateProgress(index, 100, true);
-    }
-
-// ===== 초기 바인딩 =====
-    window.addEventListener("DOMContentLoaded", () => {
-        // 초기 렌더링 (50%)
-        values.forEach((value, index) => {
-            animateProgress(index, value);
-        });
-
-        // 버튼 이벤트 연결
-        buttons.forEach((button, index) => {
-            button.addEventListener("click", () => {
-                replayAnimation(index);
-            });
-        });
-    });
-
-}*/
-
-// 잔량 계산기 단위 %
 function calcPercent(current: number, max: number): number {
     if (!max || max <= 0) return 0;
     const percent = Math.round((current / max) * 100);
@@ -153,7 +98,6 @@ interface InventoryRenderItem {
     key: string;
 }
 
-// 화면 순번 중요
 const INVENTORY_RENDER_ORDER: InventoryRenderItem[] = [
     {type: "cup", key: "plastic"},
     {type: "cup", key: "paper"},
@@ -173,106 +117,222 @@ const INVENTORY_RENDER_ORDER: InventoryRenderItem[] = [
     {type: "syrup", key: "3"},
     {type: "syrup", key: "5"},
     {type: "syrup", key: "6"},
-
-
 ];
 
 function buildInventoryPercents(inventory: InventoryData): number[] {
     return INVENTORY_RENDER_ORDER.map(({type, key}) => {
         const item = inventory?.[type]?.[key];
         if (!item) return 0;
-
         return calcPercent(item.current, item.max);
     });
 }
 
-//inventoryChanged 전체
+/* ===============================
+   인벤토리 렌더링
+================================= */
 function inventoryChanged(data: InventoryResponse): void {
+    
     const fills = Array.from(
         document.querySelectorAll<HTMLDivElement>(".progress-fill")
     );
 
-    const buttons = Array.from(
-        document.querySelectorAll<HTMLButtonElement>(".refresh-btn")
-    );
-
     if (!data?.inventory) return;
 
-    // ✅ inventory 기반 퍼센트 계산
-    const values: number[] = buildInventoryPercents(data.inventory);
+    const values = buildInventoryPercents(data.inventory);
 
-    function animateProgress(
-        index: number,
-        value: number,
-        changeColor: boolean = false
-    ): void {
+    function animateProgress(index: number, value: number) {
         const fill = fills[index];
         if (!fill) return;
 
-        // 초기화
         fill.style.transition = "none";
         fill.style.width = "0%";
         fill.textContent = "0%";
         fill.style.backgroundColor = "";
 
-        // 강제 리렌더
         void fill.offsetWidth;
 
-        // 애니메이션 시작
         fill.style.transition = "width 1s ease";
         fill.style.width = `${value}%`;
 
         setTimeout(() => {
             fill.textContent = `${value}%`;
-            if (changeColor) {
-                fill.style.backgroundColor = "#2B7FE8";
-            }
         }, 1000);
     }
 
-    function replayAnimation(index: number): void {
-        animateProgress(index, 100, true);
-    }
-
-    // 최초 렌더
     values.forEach((value, index) => {
         animateProgress(index, value);
     });
 
-    // 버튼 이벤트
-    buttons.forEach((button, index) => {
-        button.addEventListener("click", () => {
-            replayAnimation(index);
-        });
+}
+
+/* ===============================
+   리프레시 버튼
+================================= */
+function bindRefreshButtons() {
+
+    const inventoryWrap = document.querySelector(".inventory-Wrap");
+
+    if (!inventoryWrap) {
+        console.log("inventoryWrap 없음");
+        return;
+    }
+
+    inventoryWrap.addEventListener("click", (e) => {
+
+        const target = e.target as HTMLElement;
+        const button = target.closest(".refresh-btn") as HTMLButtonElement | null;
+
+        if (!button) return;
+
+        const type = button.dataset.type;
+        const slot = button.dataset.slot;
+
+        if (!type || !slot) return;
+
+        const container = button.closest(".progress-container");
+        const fill = container?.querySelector(".progress-fill") as HTMLDivElement | null;
+
+        const exists = selectedItems.find(
+            item => item.type === type && item.slot === slot
+        );
+
+        if (!exists) {
+            selectedItems.push({type, slot});
+            button.classList.add("selected");
+
+            // 🔥 즉시 100% 채우기
+            if (fill) {
+                fill.style.transition = "width 0.5s ease";
+                fill.style.width = "100%";
+                fill.textContent = "100%";
+            }
+        } else {
+            selectedItems = selectedItems.filter(
+                item => !(item.type === type && item.slot === slot)
+            );
+            button.classList.remove("selected");
+        }
+
     });
 }
 
 
-// 기기관리 공통
+/* ===============================
+   버튼 바인딩
+================================= */
+function bindRefillButtons() {
+
+    const refillBtn = document.getElementById("refill-submit");
+    const refillAllBtn = document.getElementById("refill-all");
+
+    refillBtn?.addEventListener("click", async () => {
+
+        if (selectedItems.length === 0) {
+            showToast("충전할 항목을 선택하세요.", 3000, "error");
+            return;
+        }
+
+        const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+        const userId = userInfo.userId;
+
+        await sendRefillInventory(userId, selectedItems);
+
+        selectedItems = [];
+        document.querySelectorAll(".refresh-btn.selected")
+            .forEach(btn => btn.classList.remove("selected"));
+    });
+
+    refillAllBtn?.addEventListener("click", async () => {
+
+        const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+        const userId = userInfo.userId;
+
+        const items = INVENTORY_RENDER_ORDER.map(({type, key}) => ({
+            type,
+            slot: key
+        }));
+
+        await sendRefillInventory(userId, items);
+    });
+}
+
+
+/* ===============================
+   머신 공통 명령
+================================= */
 export async function sendMachineCommand(
     userId: string,
     command: { func: string; [key: string]: any },
     successMessage: string
 ) {
-    const res = await apiGet(`/model_machine_registry?func=get-machine-status&userId=${userId}`);
+    const res = await apiGet(
+        `/model_machine_registry?func=get-machine-status&userId=${userId}`
+    );
+
     const {availableUrl, isOnline} = await res.json();
 
     if (isOnline && availableUrl) {
+
         showToast("✅ " + successMessage);
+
         fetchWithoutLoading("/model_machine_controll", {
             method: "POST",
             body: JSON.stringify({
                 ...command,
                 userId,
             }),
-        }).then((res) => {
-            if (!res.ok) {
-                console.warn("❌ 머신 명령 실패", res.status);
-            }
         }).catch((err) => {
             console.error("❌ 머신 통신 오류", err);
         });
+
     } else {
         showToast("❌ 머신이 오프라인입니다.", 4000, "error");
+    }
+}
+
+/* ===============================
+   재고 충전
+================================= */
+
+export async function sendRefillInventory(
+    userId: string,
+    items: RefillItem[]
+) {
+    try {
+
+        const statusRes = await apiGet(
+            `/model_machine_registry?func=get-machine-status&userId=${userId}`
+        );
+
+        const {availableUrl, isOnline} = await statusRes.json();
+
+        if (!isOnline || !availableUrl) {
+            showToast("❌ 머신이 오프라인입니다.", 4000, "error");
+            return;
+        }
+
+        const res = await fetchWithoutLoading(
+            "/model_inventory_calculate?func=refill-inventory",
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    userId,
+                    items,
+                }),
+            }
+        );
+
+        if (!res.ok) {
+            showToast("❌ 재고 충전 실패", 4000, "error");
+            return;
+        }
+
+        showToast("✅ 재고 충전 완료");
+
+        await loadInventoryRuntime(userId);
+
+    } catch (err) {
+        console.error("❌ 재고 충전 오류", err);
+        showToast("❌ 서버 통신 오류", 4000, "error");
     }
 }
