@@ -131,7 +131,7 @@ function buildInventoryPercents(inventory: InventoryData): number[] {
    인벤토리 렌더링
 ================================= */
 function inventoryChanged(data: InventoryResponse): void {
-    
+
     const fills = Array.from(
         document.querySelectorAll<HTMLDivElement>(".progress-fill")
     );
@@ -139,11 +139,10 @@ function inventoryChanged(data: InventoryResponse): void {
     if (!data?.inventory) return;
 
     const values = buildInventoryPercents(data.inventory);
-
+                                                       
     function animateProgress(index: number, value: number) {
         const fill = fills[index];
         if (!fill) return;
-
         fill.style.transition = "none";
         fill.style.width = "0%";
         fill.textContent = "0%";
