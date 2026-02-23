@@ -22,6 +22,66 @@ export function initNormalSet() {
     initSaveButtonHandler();
     initFileUploadHandlers();
     initCategoryHandlers();
+    initInventoryValidation(); // 재고 입력값 검증 초기화
+}
+
+// 재고 입력값 검증: current <= max, 숫자만 입력 허용
+function initInventoryValidation() {
+    // 숫자만 입력되도록 필터링
+    function filterNumericInput(input: HTMLInputElement) {
+        input.addEventListener("input", () => {
+            const cleaned = input.value.replace(/[^0-9]/g, "");
+            if (cleaned !== input.value) {
+                input.value = cleaned;
+            }
+        });
+    }
+
+    // current input 변경 시 max와 비교하여 제한
+    function bindCurrentMaxPair(current: HTMLInputElement, max: HTMLInputElement) {
+        const checkAndFix = () => {
+            const cur = Number(current.value || 0);
+            const mx = Number(max.value || 0);
+            if (!Number.isFinite(cur) || !Number.isFinite(mx)) return;
+            if (mx > 0 && cur > mx) {
+                current.value = String(mx);
+                window.showToast("현재 재고는 최대값을 초과할 수 없습니다. 최대값으로 조정했습니다.", 3000, "warning");
+            }
+        };
+
+        current.addEventListener("input", () => {
+            filterNumericInput(current);
+            checkAndFix();
+        });
+
+        // max가 바뀔 때도 current를 검증
+        max.addEventListener("input", () => {
+            filterNumericInput(max);
+            checkAndFix();
+        });
+    }
+
+    // 모든 재고 current/max 쌍 바인딩
+    document.querySelectorAll<HTMLInputElement>('#inventory input[data-field="current"]').forEach((currentEl) => {
+        const type = currentEl.dataset.type;
+        const slot = currentEl.dataset.slot;
+        let selector = `#inventory input[data-field="max"][data-type="${type}"]`;
+        if (slot) selector += `[data-slot="${slot}"]`;
+        const maxEl = document.querySelector<HTMLInputElement>(selector);
+        if (maxEl) {
+            bindCurrentMaxPair(currentEl, maxEl);
+        } else {
+            // 컵 같은 경우 slot이 없으므로 타입만으로 매칭
+            const cupSelector = `#inventory input[data-field="max"][data-type="${type}"]`;
+            const cupMax = document.querySelector<HTMLInputElement>(cupSelector);
+            if (cupMax) bindCurrentMaxPair(currentEl, cupMax);
+        }
+    });
+
+    // 또한 max 필드에 숫자만 입력되도록 필터 적용
+    document.querySelectorAll<HTMLInputElement>('#inventory input[data-field="max"]').forEach((maxEl) => {
+        filterNumericInput(maxEl);
+    });
 }
 
 function initCategoryHandlers() {
