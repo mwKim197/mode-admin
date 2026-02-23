@@ -1,0 +1,1347 @@
+import {ModelUser} from "../types/user";
+import {apiGet, apiPost, apiPut} from "../api/apiHelpers";
+import {getToken, getUserData, getUserInfo} from "../common/auth";
+import {getStoredUser} from "../utils/userStorage.ts";
+
+// 파일 업로드 관련 전역 변수
+let logoFile: File | null = null;
+let iconFile: File | null = null;
+let logoBase64: string = "";
+let iconBase64: string = "";
+let logoDeleted: boolean = false;
+let iconDeleted: boolean = false;
+
+let pendingDeleteCategories: Array<{
+    name: string;
+    item: string;
+    element: Element;
+}> = [];
+
+export function initNormalSet() {
+    loadStoreInfo();
+    initSaveButtonHandler();
+    initFileUploadHandlers();
+    initCategoryHandlers();
+}
+
+function initCategoryHandlers() {
+    // 삭제 버튼 이벤트 리스너 추가
+    const deleteButtons = document.querySelectorAll(".delete-category");
+    deleteButtons.forEach((button) => {
+        button.addEventListener("click", () =>
+            deleteCategory(button as HTMLButtonElement)
+        );
+    });
+
+    // 추가 버튼 이벤트 리스너 추가
+    const addButton = document.querySelector(".category-actions .btn-outline");
+    if (addButton) {
+        addButton.addEventListener("click", addCategory);
+    }
+}
+
+// 카테고리 추가 함수
+function addCategory() {
+    const container = document.getElementById("category-container");
+    if (!container) return;
+
+    const currentCount = container.querySelectorAll(".category-item").length;
+    if (currentCount >= 9) {
+        window.showToast(
+            "카테고리는 최대 9개까지 추가할 수 있습니다.",
+            3000,
+            "warning"
+        );
+        return;
+    }
+
+    const newCategory = document.createElement("div");
+    newCategory.className = "data_input category-item";
+    newCategory.innerHTML = `
+    <p>카테고리${currentCount + 1}</p>
+    <div class="category-input-group">
+      <input type="text"/>
+      <button type="button" class="btn-i delete-category">-</button>
+    </div>
+  `;
+
+    const deleteButton = newCategory.querySelector(".delete-category");
+    if (deleteButton) {
+        deleteButton.addEventListener("click", () =>
+            deleteCategory(deleteButton as HTMLButtonElement)
+        );
+    }
+
+    container.appendChild(newCategory);
+}
+
+// 카테고리 삭제 함수
+function deleteCategory(button: HTMLButtonElement) {
+    const container = document.getElementById("category-container");
+    if (!container) return;
+
+    const categoryItem = button.closest(".category-item");
+    if (!categoryItem) return;
+
+    // 삭제하려는 카테고리 정보 수집
+    const categoryInput = categoryItem.querySelector("input") as HTMLInputElement;
+    const categoryValue = categoryInput.value.trim();
+
+    const originalCategory = originalUserData?.category?.find(
+        (c) => c.name === categoryValue
+    );
+    const itemValue =
+        originalCategory?.item || categoryValue.toLowerCase().replace(/\s+/g, "_");
+
+    pendingDeleteCategories.push({
+        name: categoryValue,
+        item: itemValue,
+        element: categoryItem as Element,
+    });
+
+    categoryItem.remove();
+}
+
+// 저장 버튼 이벤트 핸들러
+function initSaveButtonHandler() {
+    const saveButton = document.querySelector(
+        ".btn-outline"
+    ) as HTMLButtonElement;
+
+    if (saveButton) {
+        saveButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            saveStoreInfo().then(() => {
+                const storedUserData = getStoredUser();
+                getUserInfo(storedUserData?.userId).then(() => {
+                    location.reload();
+                });
+            });
+        });
+    }
+}
+
+// 인벤토리 이름 적용 함수
+function applyInventoryNamesToUI(data: any) {
+    const config = data.config || {};
+
+    for (const type in config) {
+        for (const slot in config[type]) {
+            const name = config[type][slot]?.name;
+            if (!name) continue;
+
+            const input = document.querySelector(
+                `input[data-type="${type}"][data-slot="${slot}"]`
+            ) as HTMLInputElement;
+
+            if (input) {
+                input.value = name;
+            }
+        }
+    }
+}
+
+// 인벤토리 UI 적용
+function applyInventoryByType(
+    data: any,
+    type: "coffee" | "syrup" | "garucha"
+) {
+    const invByType = data.inventory?.[type];
+    const specByType = data.spec?.consumption?.[type];
+
+    if (!invByType) return;
+
+    Object.keys(invByType).forEach((slot) => {
+        const inv = invByType[slot];
+        const spec = specByType?.[slot];
+
+        setInputValueByType(type, slot, "current", inv.current);
+        setInputValueByType(type, slot, "max", inv.max);
+
+        if (spec?.perSecond !== undefined) {
+            setInputValueByType(type, slot, "perSecond", spec.perSecond);
+        }
+    });
+}
+
+function setInputValueByType(
+    type: string,
+    slot: string,
+    field: string,
+    value: any
+) {
+    const input = document.querySelector(
+        `input[data-type="${type}"][data-slot="${slot}"][data-field="${field}"]`
+    ) as HTMLInputElement;
+
+    if (input) {
+        input.value = String(value);
+    }
+}
+
+
+// 인벤토리 CUP UI적용
+type CupType = "paper" | "plastic";
+
+function applyCupInventoryToUI(data: any) {
+    const cupInv = data.inventory?.cup;
+    if (!cupInv) return;
+
+    (Object.keys(cupInv) as CupType[]).forEach((cupType) => {
+        const inv = cupInv[cupType];
+        setCupInputValue(cupType, "current", inv.current);
+        setCupInputValue(cupType, "max", inv.max);
+    });
+}
+
+
+function setCupInputValue(
+    cupType: "paper" | "plastic",
+    field: "current" | "max",
+    value: any
+) {
+    const input = document.querySelector(
+        `input[data-type="${cupType}"][data-field="${field}"]`
+    ) as HTMLInputElement;
+
+    if (input) {
+        input.value = String(value);
+    }
+}
+
+type SoldOutMap = Record<string, boolean>;
+
+// 인벤토리 SoldOut UI적용
+function applySoldOutToUI(data: any) {
+    const soldOut: SoldOutMap = data.flags?.soldOut || {};
+
+    const checkboxes = document.querySelectorAll<HTMLInputElement>(
+        'input[data-field="soldOut"]'
+    );
+
+    checkboxes.forEach((checkbox) => {
+        const type = checkbox.dataset.type;
+        const slot = checkbox.dataset.slot;
+
+        if (!type) return;
+
+        // key 규칙 통일
+        // coffee_1, syrup_6, garucha_3
+        // cup_paper, cup_plastic
+        const key = slot
+            ? `${type}_${slot}`
+            : `cup_${type}`;
+
+        checkbox.checked = !!soldOut[key];
+    });
+}
+
+// 인벤토리 정보조회
+async function loadInventoryRuntime(userId: string) {
+    try {
+        const res = await apiGet(
+            `/model_inventory_calculate?func=get-runtime&userId=${userId}`
+        );
+        const runtime = await res.json();
+
+        if (runtime?.ok && runtime.inventory && runtime.spec) {
+            // runtime 데이터 받은 직후
+            applyInventoryNamesToUI(runtime);
+
+            applyInventoryByType(runtime, "coffee");
+            applyInventoryByType(runtime, "garucha");
+            applyInventoryByType(runtime, "syrup");
+
+            applySoldOutToUI(runtime);
+
+            applyCupInventoryToUI(runtime);
+        } else {
+            console.warn("⚠️ inventory runtime 없음");
+        }
+    } catch (e) {
+        console.warn("⚠️ inventory 조회 실패", e);
+    }
+}
+
+// 전역 변수로 원래 데이터 저장
+let originalUserData: ModelUser | null = null;
+
+// 매장 정보 로드 함수
+async function loadStoreInfo() {
+    try {
+        const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+        const userId = userInfo.userId;
+
+        if (!userId) {
+            return;
+        }
+
+        const response = await apiGet(
+            `/model_user_setting?func=get-user&userId=${userId}`
+        );
+        const data = await response.json();
+
+        if (data && data.user) {
+            // 원래 데이터 저장 (나중에 비교용)
+            originalUserData = data.user as ModelUser;
+
+            const allowInventoryUsers = ["model0000", "zero16"];
+
+            if (!allowInventoryUsers.includes(originalUserData.userId)) {
+                const inventory = document.querySelector("#inventory") as HTMLInputElement;
+                inventory.style.display = "none";
+
+            }
+
+            if (originalUserData.inventoryCheckEnabled !== false) {
+                await loadInventoryRuntime(originalUserData.userId);
+            }
+
+            // 매장명 설정
+            const storeNameInput = document.getElementById(
+                "storeNm"
+            ) as HTMLInputElement;
+            if (storeNameInput) {
+                storeNameInput.value = data.user.storeName || "";
+            }
+
+            // 매장 연락처 설정
+            const telInput = document.querySelector("#tel-input") as HTMLInputElement;
+            if (telInput) {
+                telInput.value = data.user.tel || "";
+            }
+
+            // 매장 연락처 설정
+            const businessNo = document.getElementById(
+                "businessNo"
+            ) as HTMLInputElement;
+            if (businessNo) {
+                businessNo.value = data.user.businessNo || "";
+            }
+
+            // 매장 주소 설정
+            const addressInput = document.querySelector("#address-input") as HTMLInputElement;
+            if (addressInput) {
+                addressInput.value = data.user.address || "";
+            }
+
+            // 한번에 결제 가능한 최대 잔 수 설정
+            const limitCountInput = document.querySelector(
+                '.in-box input[type="text"]'
+            ) as HTMLInputElement;
+            if (limitCountInput) {
+                limitCountInput.value = data.user.limitCount || "";
+            }
+
+            // 전체 세척 예약 시간 설정
+            const washTimeInput = document.querySelector(
+                "#wash-time-input"
+            ) as HTMLInputElement;
+            if (washTimeInput) {
+                washTimeInput.value = data.user.washTime || "";
+            }
+
+            // 원격 주소 설정
+            const remoteAddressInput = document.querySelector(
+                "#remote-address"
+            ) as HTMLInputElement;
+            if (remoteAddressInput) {
+                remoteAddressInput.value = data.user.remoteAddress || "";
+            }
+
+            // 포인트 사용 체크박스 설정
+            const pointCheckbox = document.getElementById(
+                "point-check"
+            ) as HTMLInputElement;
+            if (pointCheckbox) {
+                pointCheckbox.checked = !data.user.payType; // payType의 반대값
+            }
+
+            // 쿠폰 사용 체크박스 설정
+            const couponCheckbox = document.getElementById(
+                "coupon-check"
+            ) as HTMLInputElement;
+            if (couponCheckbox) {
+                couponCheckbox.checked = !data.user.coupon; // coupon의 반대값
+            }
+
+
+            const vcatCheckbox = document.getElementById(
+                "vcat-check"
+            ) as HTMLInputElement;
+            if (vcatCheckbox) {
+                vcatCheckbox.checked = data.user.vcat; // vcat의 반대값
+            }
+
+            const inventoryCheckbox = document.getElementById(
+                "inventory-check"
+            ) as HTMLInputElement;
+            if (inventoryCheckbox) {
+                inventoryCheckbox.checked = data.user.inventoryCheckEnabled; // inventory 반대값
+            }
+
+            // 카테고리 데이터
+            loadCategoryData(data.user.category || []);
+
+            // 로고 이미지 표시
+            if (data.user.logoUrl) {
+                const logoPreview = document.getElementById(
+                    "logoPreview"
+                ) as HTMLImageElement;
+                if (logoPreview) {
+                    logoPreview.src = data.user.logoUrl;
+                    logoPreview.style.display = "block";
+
+                    // 이미지 로드 실패 시 처리 (S3 권한 문제 등)
+                    logoPreview.onerror = () => {
+                        logoPreview.style.display = "none";
+                    };
+                }
+            } else if (data.user.logoBase64) {
+                // Base64 데이터가 있는 경우 (기존 코드 유지)
+                const logoPreview = document.getElementById(
+                    "logoPreview"
+                ) as HTMLImageElement;
+                if (logoPreview) {
+                    logoPreview.src = data.user.logoBase64;
+                    logoPreview.style.display = "block";
+                }
+            }
+
+            // 아이콘 이미지 표시
+            if (data.user.iconUrl) {
+                const iconPreview = document.getElementById(
+                    "iconPreview"
+                ) as HTMLImageElement;
+                if (iconPreview) {
+                    iconPreview.src = data.user.iconUrl;
+                    iconPreview.style.display = "block";
+
+                    // 이미지 로드 실패 시 처리 (S3 권한 문제 등)
+                    iconPreview.onerror = () => {
+                        iconPreview.style.display = "none";
+                    };
+                }
+            } else if (data.user.iconBase64) {
+                // Base64 데이터가 있는 경우 (기존 코드 유지)
+                const iconPreview = document.getElementById(
+                    "iconPreview"
+                ) as HTMLImageElement;
+                if (iconPreview) {
+                    iconPreview.src = data.user.iconBase64;
+                    iconPreview.style.display = "block";
+                }
+            }
+        }
+    } catch (error) {
+        window.showToast("매장 정보 로드에 실패했습니다.", 3000, "error");
+    }
+}
+
+// 카테고리 데이터
+function loadCategoryData(categories: any[]) {
+    const container = document.getElementById("category-container");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    // 전체메뉴 제외하고 렌더링
+    const visibleCategories = (categories || []).filter(
+        (c: any) => c && c.no !== "0" && c.item !== "all" && c.item !== "0"
+    );
+
+    if (visibleCategories.length > 0) {
+        visibleCategories.forEach((category, idx) => {
+            const itemVal = String(category.item ?? ""); // 기존 item (ex: "coffee")
+            const noVal = String(category.no ?? String(idx + 1)); // 기존 no
+
+            const categoryItem = document.createElement("div");
+            categoryItem.className = "data_input category-item";
+
+            // ⚠️ XSS 방지: innerHTML에 바로 value 넣는 것보다 input.value로 세팅하는게 안전
+            categoryItem.innerHTML = `
+        <p>카테고리${noVal}</p>
+        <div class="category-input-group">
+          <input type="text" />
+          <button type="button" class="btn-i delete-category">-</button>
+        </div>
+      `;
+
+            const input = categoryItem.querySelector("input") as HTMLInputElement;
+            input.value = category.name || "";
+
+            // ✅ 핵심: 수정 전 item/no를 dataset으로 저장
+            input.dataset.originalItem = itemVal; // "coffee" 같은 기존 item
+            input.dataset.originalNo = noVal;
+
+            const del = categoryItem.querySelector(".delete-category") as HTMLButtonElement;
+            if (del) del.addEventListener("click", () => deleteCategory(del));
+
+            container.appendChild(categoryItem);
+        });
+    }
+}
+
+
+////////////재고 수정 시작
+// 재고 수정 - invetory
+function collectInventoryFromUI() {
+    const inventory: any = {};
+
+    document
+        .querySelectorAll<HTMLInputElement>(
+            '#inventory input[data-field="current"], #inventory input[data-field="max"]'
+        )
+        .forEach((input) => {
+            const type = input.dataset.type!;
+            const slot = input.dataset.slot;
+            const field = input.dataset.field!;
+            const value = Number(input.value || 0);
+
+            // ✅ CUP
+            if (type === "paper" || type === "plastic") {
+                inventory.cup = inventory.cup || {};
+                inventory.cup[type] = inventory.cup[type] || {};
+                inventory.cup[type][field] = value;
+                return;
+            }
+
+            // ✅ 나머지 재료
+            inventory[type] = inventory[type] || {};
+            inventory[type][slot!] = inventory[type][slot!] || {};
+            inventory[type][slot!][field] = value;
+        });
+
+    return inventory;
+}
+
+
+// 재고 수정 - soldOut
+function collectSoldOutFromUI() {
+    const soldOut: Record<string, boolean> = {};
+
+    document
+        .querySelectorAll<HTMLInputElement>(
+            '#inventory input[type="checkbox"][data-field="soldOut"]'
+        )
+        .forEach((checkbox) => {
+            const type = checkbox.dataset.type!;
+            const slot = checkbox.dataset.slot; // cup은 없음
+
+            const key = slot
+                ? `${type}_${slot}`   // coffee / syrup / garucha
+                : `cup_${type}`;     // cup (paper / plastic)
+
+            if (checkbox.checked) {
+                soldOut[key] = true;
+            } else {
+                soldOut[key] = false;
+            }
+        });
+
+    return soldOut;
+}
+
+
+// 재고 수정 - spec
+function collectSpecFromUI() {
+    const spec: any = {consumption: {}};
+
+    document
+        .querySelectorAll<HTMLInputElement>(
+            '#inventory input[data-field="perSecond"]'
+        )
+        .forEach((input) => {
+            const type = input.dataset.type!;
+            const slot = input.dataset.slot!;
+            const value = Number(input.value);
+
+            if (Number.isNaN(value)) return;
+
+            if (!spec.consumption[type]) spec.consumption[type] = {};
+            spec.consumption[type][slot] = {perSecond: value};
+        });
+
+    return spec;
+}
+
+// 재고 수정 - config
+function collectConfigFromUI() {
+    const config: any = {};
+
+    document
+        .querySelectorAll<HTMLInputElement>(
+            '#inventory input[data-field="name"]'
+        )
+        .forEach((input) => {
+            const type = input.dataset.type!;
+            const slot = input.dataset.slot!;
+            const name = input.value.trim();
+
+            if (!name) return;
+
+            if (!config[type]) config[type] = {};
+            config[type][slot] = {name};
+        });
+
+    return config;
+}
+
+//////////////재고 수정 끝/////////
+
+// 매장 정보 저장 함수 (수정됨)
+async function saveStoreInfo() {
+    try {
+        const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+        const accessToken = getToken();
+
+        if (!accessToken) {
+            return;
+        }
+
+        // 현재 사용자 ID
+        const currentUserId = userInfo.userId || "zero001";
+
+        // 폼 데이터 수집
+        const storeNameInput = document.querySelector(
+            "#storeNm"
+        ) as HTMLInputElement;
+        const telInput = document.querySelector("#tel-input") as HTMLInputElement;
+        const addressInput = document.querySelector("#address-input") as HTMLInputElement;
+        const businessNoInput = document.getElementById(
+            "businessNo"
+        ) as HTMLInputElement;
+        const remoteAddressInput = document.querySelector(
+            "#remote-address"
+        ) as HTMLInputElement;
+        const passwordInput = document.querySelector(
+            'input[type="password"]'
+        ) as HTMLInputElement;
+        const limitCountInput = document.getElementById(
+            "limit-count"
+        ) as HTMLInputElement;
+        const washTimeInput = document.getElementById(
+            "wash-time-input"
+        ) as HTMLInputElement;
+        const pointCheckbox = document.getElementById(
+            "point-check"
+        ) as HTMLInputElement;
+        const couponCheckbox = document.getElementById(
+            "coupon-check"
+        ) as HTMLInputElement;
+        const vcatCheckbox = document.getElementById(
+            "vcat-check"
+        ) as HTMLInputElement;
+        const inventoryCheckbox = document.getElementById(
+            "inventory-check"
+        ) as HTMLInputElement;
+
+        // 수정된 필드만 추가
+        let hasChanges = false;
+        let hasPasswordChange = false;
+        let hasFileChanges = false;
+        let hasCategoryChanges = false;
+        let hasInventoryChange = false;
+
+        const categoryInputs = document.querySelectorAll(
+            "#category-container .category-input-group input"
+        );
+
+        const visibleCategories = Array.from(categoryInputs)
+            .map((input, idx) => {
+                const el = input as HTMLInputElement;
+                const name = el.value.trim();
+                if (!name) return null;
+
+                const no = String(idx + 1); // 수정 후 위치 기반 no
+                const item = no;            // 변경 후 item은 숫자
+
+                const originalItem = el.dataset.originalItem || ""; // "coffee" 같은 기존 item
+                return {name, no, item, originalItem};
+            })
+            .filter(Boolean) as Array<{ name: string; no: string; item: string; originalItem: string }>;
+
+        const categories = [
+            {name: "전체메뉴", no: "0", item: "all"},
+            ...visibleCategories.map(({name, no, item}) => ({name, no, item})),
+        ];
+
+        // beforeItem -> afterItem 매핑
+        const itemMap: Record<string, string> = {all: "all"};
+        for (const c of visibleCategories) {
+            if (!c.originalItem) continue;   // 신규 추가 카테고리는 기존 메뉴가 없으니 스킵
+            itemMap[c.originalItem] = c.item; // "coffee" -> "1"
+        }
+
+        // ✅ 삭제된 카테고리 메뉴는 all로 이동 (정책)
+        for (const d of pendingDeleteCategories) {
+            const oldItem = String(d?.item ?? "");
+            if (!oldItem) continue;
+            itemMap[oldItem] = "all";
+        }
+
+        // ✅ 변경 감지(정확하게)
+        const originalCategories = originalUserData?.category || [];
+        const hasPendingDeletes = pendingDeleteCategories.length > 0;
+
+        function normalizeCats(arr: any[]) {
+            return (arr || [])
+                .map((c: any) => ({
+                    no: String(c.no ?? ""),
+                    name: String(c.name ?? ""),
+                    item: String(c.item ?? ""),
+                }))
+                .sort((a, b) => Number(a.no) - Number(b.no));
+        }
+
+        hasCategoryChanges =
+            hasPendingDeletes ||
+            JSON.stringify(normalizeCats(categories)) !== JSON.stringify(normalizeCats(originalCategories));
+
+        // 매장명이 수정되었는지 확인
+        if (
+            storeNameInput &&
+            storeNameInput.value !== originalUserData?.storeName
+        ) {
+            hasChanges = true;
+        }
+
+        // 매장 연락처가 수정되었는지 확인
+        if (telInput && telInput.value !== originalUserData?.tel) {
+            hasChanges = true;
+        }
+
+        // 매장 주소가 수정되었는지 확인
+        if (addressInput && addressInput.value !== originalUserData?.address) {
+            hasChanges = true;
+        }
+
+        // 사업자등록번호가 수정되었는지 확인
+        if (
+            businessNoInput &&
+            businessNoInput.value !== originalUserData?.businessNo
+        ) {
+            hasChanges = true;
+        }
+
+        // 원격 주소가 수정되었는지 확인
+        if (
+            remoteAddressInput &&
+            remoteAddressInput.value !== originalUserData?.remoteAddress
+        ) {
+            hasChanges = true;
+        }
+
+        // 전체 세척 예약 시간이 수정되었는지 확인
+        if (washTimeInput && washTimeInput.value !== originalUserData?.washTime) {
+            hasChanges = true;
+        }
+
+        if (pointCheckbox && pointCheckbox.checked !== !originalUserData?.payType) {
+            hasChanges = true;
+        }
+
+        if (couponCheckbox && couponCheckbox.checked !== !originalUserData?.coupon) {
+            hasChanges = true;
+        }
+
+        if (vcatCheckbox && vcatCheckbox.checked !== originalUserData?.vcat) {
+            hasChanges = true;
+        }
+
+        if (inventoryCheckbox && inventoryCheckbox.checked !== originalUserData?.inventoryCheckEnabled) {
+            hasChanges = true;
+            hasInventoryChange = true;
+        }
+
+        // 비밀번호가 수정되었는지 확인
+        if (
+            passwordInput &&
+            passwordInput.value !== "" &&
+            passwordInput.value !== "******"
+        ) {
+            if (passwordInput.value.length < 6) {
+                window.showToast(
+                    "비밀번호는 6자리 이상이어야 합니다.",
+                    3000,
+                    "warning"
+                );
+                return;
+            }
+            hasPasswordChange = true;
+        }
+
+        // 한번에 결제 가능한 최대 잔 수가 수정되었는지 확인
+        const currentLimitCount = limitCountInput?.value || "";
+        const originalLimitCount = originalUserData?.limitCount?.toString() || "";
+
+        if (
+            limitCountInput &&
+            currentLimitCount !== "" &&
+            currentLimitCount !== originalLimitCount
+        ) {
+            hasChanges = true;
+        }
+
+        // 파일 변경사항 체크
+        if (logoFile || iconFile || logoDeleted || iconDeleted) {
+            hasFileChanges = true;
+        }
+
+        // 일반 정보 업데이트 (비밀번호 제외)
+        if (hasChanges || hasFileChanges || hasCategoryChanges) {
+            // 삭제 대기 중인 카테고리들 처리
+            if (hasPendingDeletes) {
+                await processPendingCategoryDeletes(currentUserId);
+            }
+
+            const updateData: any = {
+                userId: currentUserId,
+                adminId: currentUserId,
+            };
+
+            // 매장명 추가 (변경된 경우만)
+            if (
+                storeNameInput &&
+                storeNameInput.value !== originalUserData?.storeName
+            ) {
+                updateData.storeName = storeNameInput.value;
+            }
+
+            // 매장 연락처 추가 (변경된 경우만)
+            if (telInput && telInput.value !== originalUserData?.tel) {
+                updateData.tel = telInput.value;
+            }
+
+            // 매장 주소 추가 (변경된 경우만)
+            if (addressInput && addressInput.value !== originalUserData?.address) {
+                updateData.address = addressInput.value;
+            }
+
+            // 사업자등록번호 추가 (변경된 경우만)
+            if (
+                businessNoInput &&
+                businessNoInput.value !== originalUserData?.businessNo
+            ) {
+                updateData.businessNo = businessNoInput.value;
+            }
+
+            // 원격 주소 추가 (변경된 경우만)
+            if (
+                remoteAddressInput &&
+                remoteAddressInput.value !== originalUserData?.remoteAddress
+            ) {
+                updateData.remoteAddress = remoteAddressInput.value;
+            }
+
+            // 전체 세척 예약 시간 추가 (변경된 경우만)
+            if (washTimeInput && washTimeInput.value !== originalUserData?.washTime) {
+                updateData.washTime = washTimeInput.value;
+            }
+
+            // 포인트 사용 추가 (변경된 경우만)
+            if (
+                pointCheckbox &&
+                pointCheckbox.checked !== !originalUserData?.payType
+            ) {
+                updateData.payType = !pointCheckbox.checked;
+            }
+
+            // 쿠폰 사용 추가 (변경된 경우만)
+            if (
+                couponCheckbox &&
+                couponCheckbox.checked !== !originalUserData?.coupon
+            ) {
+                updateData.coupon = !couponCheckbox.checked;
+            }
+
+            // vcat 사용 추가 (변경된 경우만)
+            if (
+                vcatCheckbox &&
+                vcatCheckbox.checked !== originalUserData?.vcat
+            ) {
+                updateData.vcat = vcatCheckbox.checked;
+            }
+
+            // inventory 사용 추가 (변경된 경우만)
+            if (
+                inventoryCheckbox &&
+                inventoryCheckbox.checked !== originalUserData?.vcat
+            ) {
+                updateData.inventoryCheckEnabled = inventoryCheckbox.checked;
+            }
+
+            // 한번에 결제 가능한 최대 잔 수 추가 (변경된 경우만)
+            if (
+                limitCountInput &&
+                currentLimitCount !== "" &&
+                currentLimitCount !== originalLimitCount
+            ) {
+                updateData.limitCount = parseInt(currentLimitCount);
+            }
+
+            // 카테고리 데이터 추가 (변경된 경우만)
+            if (hasCategoryChanges && categories.length > 0) {
+                updateData.category = categories;
+
+                // ✅ 메뉴 카테고리 마이그레이션용 매핑도 같이 전송
+                // (all 포함, 삭제된 카테고리 pendingDelete 처리까지 반영된 itemMap)
+                updateData.categoryItemMap = itemMap;
+            }
+
+            // 파일 업로드 데이터 추가
+            if (logoFile) {
+                updateData.logoFileName = logoFile.name;
+                updateData.logoBase64 = logoBase64;
+            } else if (logoDeleted) {
+                updateData.logoFileName = "";
+                updateData.logoBase64 = "";
+                updateData.logoUrl = "";
+            }
+
+            if (iconFile) {
+                updateData.iconFileName = iconFile.name;
+                updateData.iconBase64 = iconBase64;
+            } else if (iconDeleted) {
+                updateData.iconFileName = "";
+                updateData.iconBase64 = "";
+                updateData.iconUrl = "";
+            }
+
+            const response = await apiPut(
+                `/model_user_setting?func=update-user`,
+                updateData
+            );
+            const result = await response.json();
+
+            // update-user 성공 후 머신 컨트롤 API 호출
+            if (result.success || result.status === "success" || response.ok) {
+                const machineControlData = {
+                    userId: currentUserId,
+                    func: "update-user",
+                };
+
+                await apiPost(`/model_machine_controll`, machineControlData);
+            }
+        }
+
+        // 비밀번호 업데이트 (별도 API)
+        if (hasPasswordChange) {
+
+            const adminInfo = await getUserData(); // ✔ Promise 풀기
+
+            const passwordData = {
+                adminId: adminInfo?.adminId,
+                newPassword: passwordInput.value,
+            };
+
+            await apiPut(`/model_admin_user?func=update-password`, passwordData);
+        }
+
+        // 인벤토리 사용여부 업데이트
+        if (hasInventoryChange) {
+
+            if (inventoryCheckbox.checked) {
+                await apiPost(
+                    `/model_inventory_calculate?func=init-runtime`,
+                    {userId: originalUserData?.userId}
+                );
+            }
+        }
+
+        // 제고업데이트
+        await updateInventory(userInfo.userId);
+
+        window.showToast("변경사항이 저장되었습니다.", 3000, "success");
+
+        // 저장 성공 시 삭제 대기 목록 초기화
+        pendingDeleteCategories = [];
+
+        // 저장 성공 시 비밀번호 필드를 ******로 초기화
+        if (passwordInput) {
+            passwordInput.value = "******";
+        }
+
+        // 저장 성공 시 파일 변수 초기화
+        if (logoFile) {
+            logoFile = null;
+            logoBase64 = "";
+        }
+        if (iconFile) {
+            iconFile = null;
+            iconBase64 = "";
+        }
+
+        logoDeleted = false;
+        iconDeleted = false;
+
+        if (originalUserData) {
+            if (logoDeleted) {
+                originalUserData.logoUrl = "";
+                originalUserData.logoBase64 = "";
+            }
+            if (iconDeleted) {
+                originalUserData.iconUrl = "";
+                originalUserData.iconBase64 = "";
+            }
+            if (hasCategoryChanges) {
+                // item 속성을 추가하여 타입 맞춤
+                originalUserData.category = categories.map((cat, index) => ({
+                    ...cat,
+                    item:
+                        originalUserData?.category?.[index]?.item ||
+                        cat.name.toLowerCase().replace(/\s+/g, "_"),
+                }));
+            }
+        }
+    } catch (error) {
+        window.showToast("저장 중 오류가 발생했습니다.", 3000, "error");
+    }
+}
+
+// 제고정보 업데이트
+async function updateInventory(userId: string) {
+    const inventory = collectInventoryFromUI();
+    const spec = collectSpecFromUI();
+    const config = collectConfigFromUI();
+    const soldOut = collectSoldOutFromUI();
+
+    const payload = {
+        userId,
+        inventory,
+        spec,
+        config,
+        soldOut
+    };
+
+    await apiPut(
+        "/model_inventory_calculate?func=update-config",
+        payload
+    );
+}
+
+// 삭제 대기 중인 카테고리들 처리 함수
+async function processPendingCategoryDeletes(userId: string) {
+    for (const pendingCategory of pendingDeleteCategories) {
+        try {
+            console.log(`카테고리 ${pendingCategory.name} 처리 시작`);
+
+            // 전송할 데이터 확인
+            console.log(`전송할 데이터:`, {
+                userId: userId,
+                category: pendingCategory.item,
+                categoryName: pendingCategory.name,
+            });
+
+            //카테고리 사용 여부 확인
+            const checkResponse = await apiGet(
+                `/model_user_setting?func=check-category-usage&userId=${userId}&category=${pendingCategory.item}`
+            );
+
+            console.log(`응답:`, checkResponse.status, checkResponse.ok);
+
+            if (!checkResponse.ok) {
+                throw new Error(
+                    `카테고리 사용 여부 확인 실패: ${checkResponse.status}`
+                );
+            }
+
+            const checkResult = await checkResponse.json();
+            console.log(`결과:`, checkResult);
+
+            if (checkResult.hasAny) {
+                console.log(`카테고리 ${pendingCategory.name} 사용 중`);
+
+                //전체메뉴로 이동
+                const moveResponse = await fetch(
+                    `https://api.narrowroad-model.com/model_user_setting?func=move-category-to-all`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            userId: userId,
+                            category: pendingCategory.item,
+                        }),
+                    }
+                );
+
+                console.log(`응답:`, moveResponse.status, moveResponse.ok);
+
+                if (!moveResponse.ok) {
+                    throw new Error(`카테고리 이동 실패: ${moveResponse.status}`);
+                }
+
+                const moveResult = await moveResponse.json();
+                console.log(`결과:`, moveResult);
+
+                if (!moveResult.success) {
+                    throw new Error("카테고리 이동에 실패했습니다.");
+                }
+            } else {
+                console.log(
+                    `카테고리 ${pendingCategory.name} 사용되지 않음 - 바로 삭제`
+                );
+            }
+
+            console.log(`카테고리 ${pendingCategory.name} 처리 완료`);
+        } catch (error) {
+            console.error(`카테고리 ${pendingCategory.name} 처리 중 오류:`, error);
+
+            // 오류 발생 시 화면 복원
+            const container = document.getElementById("category-container");
+            if (container) {
+                container.appendChild(pendingCategory.element);
+
+                // 번호 재정렬
+                const categories = container.querySelectorAll(".category-item");
+                categories.forEach((item, index) => {
+                    const label = item.querySelector("p");
+                    if (label) label.textContent = `카테고리 ${index + 1}`;
+                });
+            }
+
+            window.showToast(
+                `카테고리 ${pendingCategory.name} 삭제 중 오류가 발생했습니다.`,
+                3000,
+                "error"
+            );
+        }
+    }
+}
+
+// 파일 업로드 핸들러 초기화
+function initFileUploadHandlers() {
+    // 로고 파일 업로드
+    const logoUpload = document.getElementById("logoUpload") as HTMLInputElement;
+    if (logoUpload) {
+        logoUpload.addEventListener("change", handleLogoUpload);
+    }
+
+    // 아이콘 파일 업로드
+    const iconUpload = document.getElementById("iconUpload") as HTMLInputElement;
+    if (iconUpload) {
+        iconUpload.addEventListener("change", handleIconUpload);
+    }
+
+    // 로고 삭제 버튼
+    const logoDeleteBtn = document.querySelector(
+        ".icon-header button"
+    ) as HTMLButtonElement;
+    if (logoDeleteBtn) {
+        logoDeleteBtn.addEventListener("click", handleLogoDelete);
+    }
+    // 아이콘 삭제 버튼
+    const iconDeleteBtns = document.querySelectorAll(".icon-header button");
+    const iconDeleteBtn = iconDeleteBtns[1] as HTMLButtonElement;
+    if (iconDeleteBtn) {
+        iconDeleteBtn.addEventListener("click", handleIconDelete);
+    }
+}
+
+// 이미지 크기 체크 함수
+function checkImageSize(
+    file: File,
+    maxWidth: number,
+    maxHeight: number
+): Promise<boolean> {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            resolve(img.width <= maxWidth && img.height <= maxHeight);
+        };
+        img.src = URL.createObjectURL(file);
+    });
+}
+
+// 파일을 Base64로 변환하는 함수
+function fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const result = reader.result as string;
+            // data:image/png;base64, 부분 제거하고 순수 Base64만 반환
+            const base64Only = result.split(",")[1];
+            resolve(base64Only);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+// 미리보기용 Base64 변환 함수
+function fileToBase64WithHeader(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+// 로고 파일 업로드 처리
+async function handleLogoUpload(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    // 파일 크기 체크
+    if (file.size > 2 * 1024 * 1024) {
+        window.showToast("파일 크기는 2MB 이하여야 합니다.", 3000, "warning");
+        return;
+    }
+
+    // 이미지 크기 체크
+    const isValidSize = await checkImageSize(file, 600, 140);
+    if (!isValidSize) {
+        window.showToast("로고 이미지는 600x140 이하여야 합니다.", 3000, "warning");
+        return;
+    }
+
+    // Base64 변환
+    logoFile = file;
+    logoBase64 = await fileToBase64(file);
+    // 새 파일 업로드 시 삭제 플래그 해제
+    logoDeleted = false;
+
+    // 파일명 표시
+    const fileNameElement = document.getElementById("fileName");
+    if (fileNameElement) {
+        fileNameElement.textContent = file.name;
+    }
+
+    // 미리보기 표시
+    const previewElement = document.getElementById(
+        "logoPreview"
+    ) as HTMLImageElement;
+    if (previewElement) {
+        const previewBase64 = await fileToBase64WithHeader(file);
+        previewElement.src = previewBase64;
+        previewElement.style.display = "block";
+    }
+}
+
+// 아이콘 파일 업로드 처리
+async function handleIconUpload(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    // 파일 크기 체크
+    if (file.size > 2 * 1024 * 1024) {
+        window.showToast("파일 크기는 2MB 이하여야 합니다.", 3000, "warning");
+        return;
+    }
+
+    // 이미지 크기 체크
+    const isValidSize = await checkImageSize(file, 1300, 2000);
+    if (!isValidSize) {
+        window.showToast(
+            "아이콘 이미지는 1300x2000 이하여야 합니다.",
+            3000,
+            "warning"
+        );
+        return;
+    }
+
+    // Base64 변환
+    iconFile = file;
+    iconBase64 = await fileToBase64(file);
+    // 새 파일 업로드 시 삭제 플래그 해제
+    iconDeleted = false;
+
+    // 파일명 표시
+    const iconFileNameElement = document.getElementById("iconFileName");
+    if (iconFileNameElement) {
+        iconFileNameElement.textContent = file.name;
+    }
+
+    // 미리보기 표시
+    const previewElement = document.getElementById(
+        "iconPreview"
+    ) as HTMLImageElement;
+    if (previewElement) {
+        const previewBase64 = await fileToBase64WithHeader(file);
+        previewElement.src = previewBase64;
+        previewElement.style.display = "block";
+    }
+}
+
+// 로고 파일 삭제 처리
+function handleLogoDelete() {
+    // 기존 이미지가 없으면 삭제하지 않음
+    if (!originalUserData?.logoUrl && !originalUserData?.logoBase64) {
+        return;
+    }
+
+    // 파일 변수 초기화
+    logoFile = null;
+    logoBase64 = "";
+
+    logoDeleted = true;
+
+    // 파일 입력 초기화
+    const logoUpload = document.getElementById("logoUpload") as HTMLInputElement;
+    if (logoUpload) {
+        logoUpload.value = "";
+    }
+
+    // 파일명 표시 숨기기
+    const fileNameElement = document.getElementById("fileName");
+    if (fileNameElement) {
+        fileNameElement.textContent = "";
+    }
+
+    // 미리보기 숨기기
+    const previewElement = document.getElementById(
+        "logoPreview"
+    ) as HTMLImageElement;
+    if (previewElement) {
+        previewElement.src = "";
+        previewElement.style.display = "none";
+    }
+
+    if (originalUserData) {
+        originalUserData.logoUrl = "";
+        originalUserData.logoBase64 = "";
+    }
+}
+
+// 아이콘 파일 삭제 처리
+function handleIconDelete() {
+    // 기존 이미지가 없으면 삭제하지 않음
+    if (!originalUserData?.iconUrl && !originalUserData?.iconBase64) {
+        return;
+    }
+
+    // 파일 변수 초기화
+    iconFile = null;
+    iconBase64 = "";
+
+    iconDeleted = true;
+
+    // 파일 입력 초기화
+    const iconUpload = document.getElementById("iconUpload") as HTMLInputElement;
+    if (iconUpload) {
+        iconUpload.value = "";
+    }
+
+    // 파일명 표시 숨기기
+    const iconFileNameElement = document.getElementById("iconFileName");
+    if (iconFileNameElement) {
+        iconFileNameElement.textContent = "";
+    }
+
+    // 미리보기 숨기기
+    const previewElement = document.getElementById(
+        "iconPreview"
+    ) as HTMLImageElement;
+    if (previewElement) {
+        previewElement.src = "";
+        previewElement.style.display = "none";
+    }
+
+    if (originalUserData) {
+        originalUserData.iconUrl = "";
+        originalUserData.iconBase64 = "";
+    }
+}
