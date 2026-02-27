@@ -74,18 +74,18 @@ function initInventoryValidation() {
             if (!Number.isFinite(cur) || !Number.isFinite(mx)) return;
             if (mx > 0 && cur > mx) {
                 current.value = String(mx);
-                window.showToast("현재 재고는 최대값을 초과할 수 없습니다. 최대값으로 조정했습니다.", 3000, "warning");
+                window.showToast("현재중량은 최대값을 초과할 수 없습니다. 최대값으로 조정했습니다.", 3000, "warning");
             }
         };
 
         current.addEventListener("input", () => {
-            filterNumericInput(current);
+            filterIntegerInput(current);
             checkAndFix();
         });
 
         // max가 바뀔 때도 current를 검증
         max.addEventListener("input", () => {
-            filterNumericInput(max);
+            filterIntegerInput(max);
             checkAndFix();
         });
     }
@@ -117,13 +117,13 @@ function initInventoryValidation() {
     // max 필드에 숫자만 입력되도록 필터 적용 및 상한(3000) 적용
     document.querySelectorAll<HTMLInputElement>('#inventory input[data-field="max"]').forEach((maxEl) => {
         filterIntegerInput(maxEl);
-        enforceMaxAllowed(maxEl, 3000, "최대 재고(max)");
+        enforceMaxAllowed(maxEl, 3000, "최대값");
     });
 
     // perSecond 필드에 숫자만 입력되도록 필터 적용 및 상한(50) 적용
     document.querySelectorAll<HTMLInputElement>('#inventory input[data-field="perSecond"]').forEach((psEl) => {
         filterDecimalInput(psEl);
-        enforceMaxAllowed(psEl, 50, "perSecond");
+        enforceMaxAllowed(psEl, 50, "초당 사용량");
     });
 
     // name 필드는 최대 100자 제한 (입력 중 자동 잘라내기 및 경고)
