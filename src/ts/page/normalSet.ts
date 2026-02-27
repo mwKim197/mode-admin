@@ -25,14 +25,43 @@ export function initNormalSet() {
     initInventoryValidation(); // 재고 입력값 검증 초기화
 }
 
-// 재고 입력값 검증: current <= max, 숫자만 입력 허용
+// 재고 입력값 검증: current <= max, 숫자만 입력 허용, max/perSecond 상한 적용
 function initInventoryValidation() {
-    // 숫자만 입력되도록 필터링
-    function filterNumericInput(input: HTMLInputElement) {
+    // 정수만 입력되도록 필터링 (max, current)
+    function filterIntegerInput(input: HTMLInputElement) {
         input.addEventListener("input", () => {
             const cleaned = input.value.replace(/[^0-9]/g, "");
             if (cleaned !== input.value) {
                 input.value = cleaned;
+            }
+        });
+    }
+
+    // 소수 가능 숫자 입력 필터링 (perSecond) — 소수점 한 개만 허용
+    function filterDecimalInput(input: HTMLInputElement) {
+        input.addEventListener("input", () => {
+            // 허용 문자: 숫자와 점(.) 단 하나
+            let v = input.value.replace(/[^0-9.]/g, "");
+            // 두 개 이상의 점이 있으면 첫 번째만 남김
+            const parts = v.split(".");
+            if (parts.length > 2) {
+                v = parts.shift() + "." + parts.join("");
+            }
+            if (v !== input.value) {
+                input.value = v;
+            }
+        });
+    }
+
+    // 특정 필드에 대해 최대값을 강제하는 헬퍼 (입력값이 허용치를 넘으면 클램프하고 경고)
+    // NOTE: 이 함수는 입력 필터링을 직접 수행하지 않으므로 호출 전 적절한 필터를 바인딩해야 합니다.
+    function enforceMaxAllowed(input: HTMLInputElement, maxAllowed: number, label: string) {
+        input.addEventListener("input", () => {
+            const val = Number(input.value || 0);
+            if (!Number.isFinite(val)) return;
+            if (val > maxAllowed) {
+                input.value = String(maxAllowed);
+                window.showToast(`${label}의 최대값은 ${maxAllowed} 입니다. 최대값으로 조정했습니다.`, 3000, "warning");
             }
         });
     }
@@ -69,18 +98,44 @@ function initInventoryValidation() {
         if (slot) selector += `[data-slot="${slot}"]`;
         const maxEl = document.querySelector<HTMLInputElement>(selector);
         if (maxEl) {
+            // current/max는 정수만 허용
+            filterIntegerInput(currentEl);
+            filterIntegerInput(maxEl);
             bindCurrentMaxPair(currentEl, maxEl);
         } else {
             // 컵 같은 경우 slot이 없으므로 타입만으로 매칭
             const cupSelector = `#inventory input[data-field="max"][data-type="${type}"]`;
             const cupMax = document.querySelector<HTMLInputElement>(cupSelector);
-            if (cupMax) bindCurrentMaxPair(currentEl, cupMax);
+            if (cupMax) {
+                filterIntegerInput(currentEl);
+                filterIntegerInput(cupMax);
+                bindCurrentMaxPair(currentEl, cupMax);
+            }
         }
     });
 
-    // 또한 max 필드에 숫자만 입력되도록 필터 적용
+    // max 필드에 숫자만 입력되도록 필터 적용 및 상한(3000) 적용
     document.querySelectorAll<HTMLInputElement>('#inventory input[data-field="max"]').forEach((maxEl) => {
-        filterNumericInput(maxEl);
+        filterIntegerInput(maxEl);
+        enforceMaxAllowed(maxEl, 3000, "최대 재고(max)");
+    });
+
+    // perSecond 필드에 숫자만 입력되도록 필터 적용 및 상한(50) 적용
+    document.querySelectorAll<HTMLInputElement>('#inventory input[data-field="perSecond"]').forEach((psEl) => {
+        filterDecimalInput(psEl);
+        enforceMaxAllowed(psEl, 50, "perSecond");
+    });
+
+    // name 필드는 최대 100자 제한 (입력 중 자동 잘라내기 및 경고)
+    document.querySelectorAll<HTMLInputElement>('#inventory input[data-field="name"]').forEach((nameEl) => {
+        // set maxlength attribute for HTML-level enforcement
+        nameEl.maxLength = 100;
+        nameEl.addEventListener('input', () => {
+            if (nameEl.value.length > 100) {
+                nameEl.value = nameEl.value.slice(0, 100);
+                window.showToast('이름은 100자 미만으로 입력해 주세요. 초과분을 잘라냈습니다.', 3000, 'warning');
+            }
+        });
     });
 }
 
