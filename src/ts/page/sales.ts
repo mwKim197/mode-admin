@@ -847,6 +847,15 @@ async function updatePopupContent(rowIndex: number) {
                     </div>
                 `;
 
+                // 승인번호 결정 (카드 결제 정보 우선, 없으면 orderId 사용)
+                let approvalDisplay = item.orderId || "정보 없음";
+                if (item.totalPayInfo) {
+                    const _cardInfos = (item.totalPayInfo || []).filter((pay: any) => pay.method === "카드");
+                    if (_cardInfos.length > 0 && (_cardInfos[0].approvalNo || _cardInfos[0].approvalNo === 0)) {
+                        approvalDisplay = _cardInfos[0].approvalNo;
+                    }
+                }
+
                 // ✅ 최종 팝업 내용
                 popupContent = `
                     <li>
@@ -884,7 +893,7 @@ async function updatePopupContent(rowIndex: number) {
                       </div>
                       <div>
                         <h5>승인번호</h5>
-                        <p>${(cardInfos && cardInfos[0] && (cardInfos[0].approvalNo || cardInfos[0].approvalNo === 0) ) ? (cardInfos[0].approvalNo) : (item.orderId || "정보 없음")}</p>
+                        <p>${approvalDisplay}</p>
                       </div>
                       ${paymentMethodInfo}
                       ${couponInfoHTML}   <!-- ✅ 추가된 부분 -->
@@ -959,6 +968,15 @@ async function updatePopupContent(rowIndex: number) {
                     </div>
                 `;
 
+                // 승인번호 결정 (카드 결제 정보 우선, 없으면 orderId 사용)
+                let approvalDisplay = item.orderId || "정보 없음";
+                if (item.totalPayInfo) {
+                    const _cardInfos = (item.totalPayInfo || []).filter((pay: any) => pay.method === "카드");
+                    if (_cardInfos.length > 0 && (_cardInfos[0].approvalNo || _cardInfos[0].approvalNo === 0)) {
+                        approvalDisplay = _cardInfos[0].approvalNo;
+                    }
+                }
+
                 // ✅ 최종 팝업 내용
                 popupContent = `
                     <li>
@@ -996,7 +1014,7 @@ async function updatePopupContent(rowIndex: number) {
                       </div>
                       <div>
                         <h5>승인번호</h5>
-                        <p>${(cardInfos && cardInfos[0] && (cardInfos[0].approvalNo || cardInfos[0].approvalNo === 0) ) ? (cardInfos[0].approvalNo) : (item.orderId || "정보 없음")}</p>
+                        <p>${approvalDisplay}</p>
                       </div>
                       <div>
                         <h5>결제 수단</h5>
