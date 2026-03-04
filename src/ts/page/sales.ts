@@ -884,7 +884,7 @@ async function updatePopupContent(rowIndex: number) {
                       </div>
                       <div>
                         <h5>승인번호</h5>
-                        <p>${item.orderId || "정보 없음"}</p>
+                        <p>${(cardInfos && cardInfos[0] && (cardInfos[0].approvalNo || cardInfos[0].approvalNo === 0) ) ? (cardInfos[0].approvalNo) : (item.orderId || "정보 없음")}</p>
                       </div>
                       ${paymentMethodInfo}
                       ${couponInfoHTML}   <!-- ✅ 추가된 부분 -->
@@ -996,7 +996,7 @@ async function updatePopupContent(rowIndex: number) {
                       </div>
                       <div>
                         <h5>승인번호</h5>
-                        <p>${item.orderId || "정보 없음"}</p>
+                        <p>${(cardInfos && cardInfos[0] && (cardInfos[0].approvalNo || cardInfos[0].approvalNo === 0) ) ? (cardInfos[0].approvalNo) : (item.orderId || "정보 없음")}</p>
                       </div>
                       <div>
                         <h5>결제 수단</h5>
