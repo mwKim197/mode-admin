@@ -138,7 +138,7 @@ export async function initPoint() {
     // ✅ 실시간 검색 기능 추가
     searchInput.addEventListener("input", function () {
         const keyword = searchInput.value.trim();
-        
+
         // 기존 타이머가 있으면 취소 (디바운스 효과)
         if (searchTimeout) {
             clearTimeout(searchTimeout);
@@ -348,7 +348,7 @@ async function getPointList() {
         return;
     }
     const userId = user.userId;
-    const res = await apiGet(`/model_admin_mileage?userId=${userId}&func=mileage&limit=1000`);
+    const res = await apiGet(`/model_admin_mileage?userId=${userId}&func=mileage&limit=2000`);
 
     if (!res.ok) {
         console.error("❌ 데이터 가져오기 실패");
