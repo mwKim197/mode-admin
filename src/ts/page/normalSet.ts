@@ -441,10 +441,10 @@ async function loadStoreInfo() {
             }
 
             // 알림톡 수신번호 설정
-            const kakaoInput = document.getElementById("kakao-alert-number") as HTMLInputElement;
+            const kakaoInput = document.getElementById("kakao-number") as HTMLInputElement;
             if (kakaoInput) {
-                // 서버 필드명은 kakaoAlertNumber 로 가정
-                kakaoInput.value = data.user.kakaoAlertNumber || "";
+                // 서버 필드명은 'kakao-number' 로 사용 (하이픈 포함 필드는 대괄호 표기 사용)
+                kakaoInput.value = (data.user as any)["kakao-number"] || "";
             }
 
             // 한번에 결제 가능한 최대 잔 수 설정
@@ -730,7 +730,7 @@ async function saveStoreInfo() {
         ) as HTMLInputElement;
         const telInput = document.querySelector("#tel-input") as HTMLInputElement;
         const addressInput = document.querySelector("#address-input") as HTMLInputElement;
-        const kakaoInput = document.getElementById("kakao-alert-number") as HTMLInputElement;
+        const kakaoInput = document.getElementById("kakao-number") as HTMLInputElement;
         const businessNoInput = document.getElementById(
             "businessNo"
         ) as HTMLInputElement;
@@ -840,7 +840,7 @@ async function saveStoreInfo() {
         }
 
         // 알림톡 수신번호가 수정되었는지 확인
-        if (kakaoInput && kakaoInput.value !== (originalUserData as any)?.kakaoAlertNumber) {
+        if (kakaoInput && ((originalUserData as any) ? (originalUserData as any)["kakao-number"] : undefined) !== kakaoInput.value) {
             hasChanges = true;
         }
 
@@ -963,8 +963,9 @@ async function saveStoreInfo() {
             }
 
             // 알림톡 수신번호 추가 (변경된 경우만)
-            if (kakaoInput && kakaoInput.value !== (originalUserData as any)?.kakaoAlertNumber) {
-                updateData.kakaoAlertNumber = kakaoInput.value;
+            if (kakaoInput && ((originalUserData as any) ? (originalUserData as any)["kakao-number"] : undefined) !== kakaoInput.value) {
+                // 서버 필드명은 'kakao-number' 로 전송
+                updateData["kakao-number"] = kakaoInput.value;
             }
 
             // 전체 세척 예약 시간 추가 (변경된 경우만)
