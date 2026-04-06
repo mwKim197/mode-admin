@@ -1,4 +1,3 @@
-// OpenClaw: test commit - add single-line comment for push test
 import {ModelUser} from "../types/user";
 import {apiGet, apiPost, apiPut} from "../api/apiHelpers";
 import {getToken, getUserData, getUserInfo} from "../common/auth";
@@ -990,4 +989,474 @@ async function saveStoreInfo() {
             // 한번에 결제 가능한 최대 잔 수 추가 (변경된 경우만)
             if (
                 limitCountInput &&
-(This file is large; truncated here to keep message concise)
+                currentLimitCount !== "" &&
+                currentLimitCount !== originalLimitCount
+            ) {
+                updateData.limitCount = parseInt(currentLimitCount);
+            }
+
+            // 카테고리 데이터 추가 (변경된 경우만)
+            if (hasCategoryChanges && categories.length > 0) {
+                updateData.category = categories;
+
+                // ✅ 메뉴 카테고리 마이그레이션용 매핑도 같이 전송
+                // (all 포함, 삭제된 카테고리 pendingDelete 처리까지 반영된 itemMap)
+                updateData.categoryItemMap = itemMap;
+            }
+
+            // 파일 업로드 데이터 추가
+            if (logoFile) {
+                updateData.logoFileName = logoFile.name;
+                updateData.logoBase64 = logoBase64;
+            } else if (logoDeleted) {
+                updateData.logoFileName = "";
+                updateData.logoBase64 = "";
+                updateData.logoUrl = "";
+            }
+
+            if (iconFile) {
+                updateData.iconFileName = iconFile.name;
+                updateData.iconBase64 = iconBase64;
+            } else if (iconDeleted) {
+                updateData.iconFileName = "";
+                updateData.iconBase64 = "";
+                updateData.iconUrl = "";
+            }
+
+            const response = await apiPut(
+                `/model_user_setting?func=update-user`,
+                updateData
+            );
+            const result = await response.json();
+
+            // update-user 성공 후 머신 컨트롤 API 호출
+            if (result.success || result.status === "success" || response.ok) {
+                const machineControlData = {
+                    userId: currentUserId,
+                    func: "update-user",
+                };
+
+                await apiPost(`/model_machine_controll`, machineControlData);
+            }
+        }
+
+        // 비밀번호 업데이트 (별도 API)
+        if (hasPasswordChange) {
+
+            const adminInfo = await getUserData(); // ✔ Promise 풀기
+
+            const passwordData = {
+                adminId: adminInfo?.adminId,
+                newPassword: passwordInput.value,
+            };
+
+            await apiPut(`/model_admin_user?func=update-password`, passwordData);
+        }
+
+        // 인벤토리 사용여부 업데이트
+        if (hasInventoryChange) {
+
+            if (inventoryCheckbox.checked) {
+                await apiPost(
+                    `/model_inventory_calculate?func=init-runtime`,
+                    {userId: originalUserData?.userId}
+                );
+            }
+        }
+
+        // 제고업데이트
+        await updateInventory(userInfo.userId);
+
+        window.showToast("변경사항이 저장되었습니다.", 3000, "success");
+
+        // 저장 성공 시 삭제 대기 목록 초기화
+        pendingDeleteCategories = [];
+
+        // 저장 성공 시 비밀번호 필드를 ******로 초기화
+        if (passwordInput) {
+            passwordInput.value = "******";
+        }
+
+        // 저장 성공 시 파일 변수 초기화
+        if (logoFile) {
+            logoFile = null;
+            logoBase64 = "";
+        }
+        if (iconFile) {
+            iconFile = null;
+            iconBase64 = "";
+        }
+
+        logoDeleted = false;
+        iconDeleted = false;
+
+        if (originalUserData) {
+            if (logoDeleted) {
+                originalUserData.logoUrl = "";
+                originalUserData.logoBase64 = "";
+            }
+            if (iconDeleted) {
+                originalUserData.iconUrl = "";
+                originalUserData.iconBase64 = "";
+            }
+            if (hasCategoryChanges) {
+                // item 속성을 추가하여 타입 맞춤
+                originalUserData.category = categories.map((cat, index) => ({
+                    ...cat,
+                    item:
+                        originalUserData?.category?.[index]?.item ||
+                        cat.name.toLowerCase().replace(/\s+/g, "_"),
+                }));
+            }
+        }
+    } catch (error) {
+        window.showToast("저장 중 오류가 발생했습니다.", 3000, "error");
+    }
+}
+
+// 제고정보 업데이트
+async function updateInventory(userId: string) {
+    const inventory = collectInventoryFromUI();
+    const spec = collectSpecFromUI();
+    const config = collectConfigFromUI();
+    const soldOut = collectSoldOutFromUI();
+
+    const payload = {
+        userId,
+        inventory,
+        spec,
+        config,
+        soldOut
+    };
+
+    await apiPut(
+        "/model_inventory_calculate?func=update-config",
+        payload
+    );
+}
+
+// 삭제 대기 중인 카테고리들 처리 함수
+async function processPendingCategoryDeletes(userId: string) {
+    for (const pendingCategory of pendingDeleteCategories) {
+        try {
+            console.log(`카테고리 ${pendingCategory.name} 처리 시작`);
+
+            // 전송할 데이터 확인
+            console.log(`전송할 데이터:`, {
+                userId: userId,
+                category: pendingCategory.item,
+                categoryName: pendingCategory.name,
+            });
+
+            //카테고리 사용 여부 확인
+            const checkResponse = await apiGet(
+                `/model_user_setting?func=check-category-usage&userId=${userId}&category=${pendingCategory.item}`
+            );
+
+            console.log(`응답:`, checkResponse.status, checkResponse.ok);
+
+            if (!checkResponse.ok) {
+                throw new Error(
+                    `카테고리 사용 여부 확인 실패: ${checkResponse.status}`
+                );
+            }
+
+            const checkResult = await checkResponse.json();
+            console.log(`결과:`, checkResult);
+
+            if (checkResult.hasAny) {
+                console.log(`카테고리 ${pendingCategory.name} 사용 중`);
+
+                //전체메뉴로 이동
+                const moveResponse = await fetch(
+                    `https://api.narrowroad-model.com/model_user_setting?func=move-category-to-all`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            userId: userId,
+                            category: pendingCategory.item,
+                        }),
+                    }
+                );
+
+                console.log(`응답:`, moveResponse.status, moveResponse.ok);
+
+                if (!moveResponse.ok) {
+                    throw new Error(`카테고리 이동 실패: ${moveResponse.status}`);
+                }
+
+                const moveResult = await moveResponse.json();
+                console.log(`결과:`, moveResult);
+
+                if (!moveResult.success) {
+                    throw new Error("카테고리 이동에 실패했습니다.");
+                }
+            } else {
+                console.log(
+                    `카테고리 ${pendingCategory.name} 사용되지 않음 - 바로 삭제`
+                );
+            }
+
+            console.log(`카테고리 ${pendingCategory.name} 처리 완료`);
+        } catch (error) {
+            console.error(`카테고리 ${pendingCategory.name} 처리 중 오류:`, error);
+
+            // 오류 발생 시 화면 복원
+            const container = document.getElementById("category-container");
+            if (container) {
+                container.appendChild(pendingCategory.element);
+
+                // 번호 재정렬
+                const categories = container.querySelectorAll(".category-item");
+                categories.forEach((item, index) => {
+                    const label = item.querySelector("p");
+                    if (label) label.textContent = `카테고리 ${index + 1}`;
+                });
+            }
+
+            window.showToast(
+                `카테고리 ${pendingCategory.name} 삭제 중 오류가 발생했습니다.`,
+                3000,
+                "error"
+            );
+        }
+    }
+}
+
+// 파일 업로드 핸들러 초기화
+function initFileUploadHandlers() {
+    // 로고 파일 업로드
+    const logoUpload = document.getElementById("logoUpload") as HTMLInputElement;
+    if (logoUpload) {
+        logoUpload.addEventListener("change", handleLogoUpload);
+    }
+
+    // 아이콘 파일 업로드
+    const iconUpload = document.getElementById("iconUpload") as HTMLInputElement;
+    if (iconUpload) {
+        iconUpload.addEventListener("change", handleIconUpload);
+    }
+
+    // 로고 삭제 버튼
+    const logoDeleteBtn = document.querySelector(
+        ".icon-header button"
+    ) as HTMLButtonElement;
+    if (logoDeleteBtn) {
+        logoDeleteBtn.addEventListener("click", handleLogoDelete);
+    }
+    // 아이콘 삭제 버튼
+    const iconDeleteBtns = document.querySelectorAll(".icon-header button");
+    const iconDeleteBtn = iconDeleteBtns[1] as HTMLButtonElement;
+    if (iconDeleteBtn) {
+        iconDeleteBtn.addEventListener("click", handleIconDelete);
+    }
+}
+
+// 이미지 크기 체크 함수
+function checkImageSize(
+    file: File,
+    maxWidth: number,
+    maxHeight: number
+): Promise<boolean> {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            resolve(img.width <= maxWidth && img.height <= maxHeight);
+        };
+        img.src = URL.createObjectURL(file);
+    });
+}
+
+// 파일을 Base64로 변환하는 함수
+function fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const result = reader.result as string;
+            // data:image/png;base64, 부분 제거하고 순수 Base64만 반환
+            const base64Only = result.split(",")[1];
+            resolve(base64Only);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+// 미리보기용 Base64 변환 함수
+function fileToBase64WithHeader(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+// 로고 파일 업로드 처리
+async function handleLogoUpload(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    // 파일 크기 체크
+    if (file.size > 2 * 1024 * 1024) {
+        window.showToast("파일 크기는 2MB 이하여야 합니다.", 3000, "warning");
+        return;
+    }
+
+    // 이미지 크기 체크
+    const isValidSize = await checkImageSize(file, 600, 140);
+    if (!isValidSize) {
+        window.showToast("로고 이미지는 600x140 이하여야 합니다.", 3000, "warning");
+        return;
+    }
+
+    // Base64 변환
+    logoFile = file;
+    logoBase64 = await fileToBase64(file);
+    // 새 파일 업로드 시 삭제 플래그 해제
+    logoDeleted = false;
+
+    // 파일명 표시
+    const fileNameElement = document.getElementById("fileName");
+    if (fileNameElement) {
+        fileNameElement.textContent = file.name;
+    }
+
+    // 미리보기 표시
+    const previewElement = document.getElementById(
+        "logoPreview"
+    ) as HTMLImageElement;
+    if (previewElement) {
+        const previewBase64 = await fileToBase64WithHeader(file);
+        previewElement.src = previewBase64;
+        previewElement.style.display = "block";
+    }
+}
+
+// 아이콘 파일 업로드 처리
+async function handleIconUpload(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    // 파일 크기 체크
+    if (file.size > 2 * 1024 * 1024) {
+        window.showToast("파일 크기는 2MB 이하여야 합니다.", 3000, "warning");
+        return;
+    }
+
+    // 이미지 크기 체크
+    const isValidSize = await checkImageSize(file, 1300, 2000);
+    if (!isValidSize) {
+        window.showToast(
+            "아이콘 이미지는 1300x2000 이하여야 합니다.",
+            3000,
+            "warning"
+        );
+        return;
+    }
+
+    // Base64 변환
+    iconFile = file;
+    iconBase64 = await fileToBase64(file);
+    // 새 파일 업로드 시 삭제 플래그 해제
+    iconDeleted = false;
+
+    // 파일명 표시
+    const iconFileNameElement = document.getElementById("iconFileName");
+    if (iconFileNameElement) {
+        iconFileNameElement.textContent = file.name;
+    }
+
+    // 미리보기 표시
+    const previewElement = document.getElementById(
+        "iconPreview"
+    ) as HTMLImageElement;
+    if (previewElement) {
+        const previewBase64 = await fileToBase64WithHeader(file);
+        previewElement.src = previewBase64;
+        previewElement.style.display = "block";
+    }
+}
+
+// 로고 파일 삭제 처리
+function handleLogoDelete() {
+    // 기존 이미지가 없으면 삭제하지 않음
+    if (!originalUserData?.logoUrl && !originalUserData?.logoBase64) {
+        return;
+    }
+
+    // 파일 변수 초기화
+    logoFile = null;
+    logoBase64 = "";
+
+    logoDeleted = true;
+
+    // 파일 입력 초기화
+    const logoUpload = document.getElementById("logoUpload") as HTMLInputElement;
+    if (logoUpload) {
+        logoUpload.value = "";
+    }
+
+    // 파일명 표시 숨기기
+    const fileNameElement = document.getElementById("fileName");
+    if (fileNameElement) {
+        fileNameElement.textContent = "";
+    }
+
+    // 미리보기 숨기기
+    const previewElement = document.getElementById(
+        "logoPreview"
+    ) as HTMLImageElement;
+    if (previewElement) {
+        previewElement.src = "";
+        previewElement.style.display = "none";
+    }
+
+    if (originalUserData) {
+        originalUserData.logoUrl = "";
+        originalUserData.logoBase64 = "";
+    }
+}
+
+// 아이콘 파일 삭제 처리
+function handleIconDelete() {
+    // 기존 이미지가 없으면 삭제하지 않음
+    if (!originalUserData?.iconUrl && !originalUserData?.iconBase64) {
+        return;
+    }
+
+    // 파일 변수 초기화
+    iconFile = null;
+    iconBase64 = "";
+
+    iconDeleted = true;
+
+    // 파일 입력 초기화
+    const iconUpload = document.getElementById("iconUpload") as HTMLInputElement;
+    if (iconUpload) {
+        iconUpload.value = "";
+    }
+
+    // 파일명 표시 숨기기
+    const iconFileNameElement = document.getElementById("iconFileName");
+    if (iconFileNameElement) {
+        iconFileNameElement.textContent = "";
+    }
+
+    // 미리보기 숨기기
+    const previewElement = document.getElementById(
+        "iconPreview"
+    ) as HTMLImageElement;
+    if (previewElement) {
+        previewElement.src = "";
+        previewElement.style.display = "none";
+    }
+
+    if (originalUserData) {
+        originalUserData.iconUrl = "";
+        originalUserData.iconBase64 = "";
+    }
+}
