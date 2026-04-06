@@ -54,7 +54,7 @@ function initInventoryValidation() {
     }
 
     // 특정 필드에 대해 최대값을 강제하는 헬퍼 (입력값이 허용치를 넘으면 클램프하고 경고)
-    // NOTE: 이 함수는 입력 필터링을 직접 수행하지 않으므로 호출 전 적절한 필터를 바인딩해야 합니다.
+    // NOTE: 주석한글화 - 이 함수는 입력 필터링을 직접 수행하지 않으므로 호출 전 적절한 필터를 바인딩해야 합니다.
     function enforceMaxAllowed(input: HTMLInputElement, maxAllowed: number, label: string) {
         input.addEventListener("input", () => {
             const val = Number(input.value || 0);
@@ -620,7 +620,7 @@ function collectInventoryFromUI() {
             const field = input.dataset.field!;
             const value = Number(input.value || 0);
 
-            // ✅ CUP
+            // ✅ 컵
             if (type === "paper" || type === "plastic") {
                 inventory.cup = inventory.cup || {};
                 inventory.cup[type] = inventory.cup[type] || {};
