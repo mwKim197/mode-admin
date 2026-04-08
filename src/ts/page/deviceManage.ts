@@ -50,11 +50,17 @@ async function loadStoreInfo() {
             originalUserData = data.user as ModelUser;
 
             const allowInventoryUsers = ["model0000", "zero16"];
-
+            const inventory = document.querySelector("#inventory") as HTMLElement;
             if (!allowInventoryUsers.includes(originalUserData.userId)) {
-                const inventory = document.querySelector("#inventory") as HTMLElement;
+
                 if (inventory) inventory.style.display = "none";
             }
+
+            // 인벤토리 비활성화시 미노출
+            if (!data.user.inventoryCheckEnabled) {
+                inventory.style.display = "none";
+            }
+
         }
     } catch (error) {
         showToast("매장 정보 로드 실패", 3000, "error");
@@ -139,7 +145,7 @@ function inventoryChanged(data: InventoryResponse): void {
     if (!data?.inventory) return;
 
     const values = buildInventoryPercents(data.inventory);
-                                                       
+
     function animateProgress(index: number, value: number) {
         const fill = fills[index];
         if (!fill) return;

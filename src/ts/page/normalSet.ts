@@ -27,6 +27,7 @@ export function initNormalSet() {
 
 // 재고 입력값 검증: current <= max, 숫자만 입력 허용, max/perSecond 상한 적용
 function initInventoryValidation() {
+
     // 정수만 입력되도록 필터링 (max, current)
     function filterIntegerInput(input: HTMLInputElement) {
         input.addEventListener("input", () => {
@@ -500,6 +501,13 @@ async function loadStoreInfo() {
             ) as HTMLInputElement;
             if (inventoryCheckbox) {
                 inventoryCheckbox.checked = data.user.inventoryCheckEnabled; // inventory 반대값
+            }
+
+
+            // 재고 숨기기
+            if (!data.user.inventoryCheckEnabled) {
+                const inventory = document.getElementById("inventory") as HTMLInputElement;
+                inventory.style.display = "none";
             }
 
             // 카테고리 데이터
@@ -1000,7 +1008,7 @@ async function saveStoreInfo() {
             // inventory 사용 추가 (변경된 경우만)
             if (
                 inventoryCheckbox &&
-                inventoryCheckbox.checked !== originalUserData?.vcat
+                inventoryCheckbox.checked !== originalUserData?.inventoryCheckEnabled
             ) {
                 updateData.inventoryCheckEnabled = inventoryCheckbox.checked;
             }
@@ -1081,10 +1089,10 @@ async function saveStoreInfo() {
                     {userId: originalUserData?.userId}
                 );
             }
+        } else {
+            // 제고업데이트
+            await updateInventory(userInfo.userId);
         }
-
-        // 제고업데이트
-        await updateInventory(userInfo.userId);
 
         window.showToast("변경사항이 저장되었습니다.", 3000, "success");
 
