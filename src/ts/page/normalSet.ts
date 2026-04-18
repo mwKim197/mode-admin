@@ -1082,16 +1082,30 @@ async function saveStoreInfo() {
 
         // 인벤토리 사용여부 업데이트
         if (hasInventoryChange) {
+            // 1) 재고 기능 ON/OFF 반영
+            await apiPost(
+                `/model_inventory_calculate?func=update-runtime-enabled`,
+                {
+                    userId: userInfo.userId,
+                    enabled: inventoryCheckbox.checked
+                }
+            );
 
+            // 2) ON으로 바꾸는 경우 runtime 없으면 초기 생성만 수행
             if (inventoryCheckbox.checked) {
                 await apiPost(
                     `/model_inventory_calculate?func=init-runtime`,
-                    {userId: originalUserData?.userId}
+                    {userId: userInfo.userId}
                 );
+
+                // OFF -> ON 직후에는 updateInventory 호출 금지
+                // init-runtime 값 그대로 쓰게 둔다
             }
         } else {
-            // 제고업데이트
-            await updateInventory(userInfo.userId);
+            // 3) ON 상태 유지일 때만 재고 상세값 저장
+            if (inventoryCheckbox.checked) {
+                await updateInventory(userInfo.userId);
+            }
         }
 
         window.showToast("변경사항이 저장되었습니다.", 3000, "success");
