@@ -2,7 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 
-const root = path.resolve(__dirname, '..', '..');
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+let root = path.resolve(__dirname, '..', '..');
+if (process.platform === 'win32' && root.startsWith('/')) root = root.slice(1);
 const postmanDir = path.join(root, 'postman');
 
 function loadCollection(name) {
@@ -105,4 +107,4 @@ async function main() {
   await runRequest(collection, reqName, envTemplate, state);
 }
 
-if (require.main === module) main().catch(err => { console.error(err); process.exit(1); });
+main().catch(err => { console.error(err); process.exit(1); });

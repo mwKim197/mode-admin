@@ -1,1 +1,249 @@
-<REPLACE_WITH_UPLOADED_MODELUSER_JSON>
+{
+  "info": {
+    "_postman_id": "0220dcf6-81e8-4ce0-8bb5-9b9461f8c323",
+    "name": "modelUser",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "32432649"
+  },
+  "item": [
+    {
+      "name": "get-users",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://api.narrowroad-model.com/model_user_setting?func=get-users",
+          "protocol": "https",
+          "host": [
+            "api",
+            "narrowroad-model",
+            "com"
+          ],
+          "path": [
+            "model_user_setting"
+          ],
+          "query": [
+            {
+              "key": "func",
+              "value": "get-users"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "update-user",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer ",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"userId\":\"model0000\",\r\n    \"adminId\":\"model0000\",\r\n    \"remoteAddress\": \"1234590780\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.narrowroad-model.com/model_user_setting?func=update-user",
+          "protocol": "https",
+          "host": [
+            "api",
+            "narrowroad-model",
+            "com"
+          ],
+          "path": [
+            "model_user_setting"
+          ],
+          "query": [
+            {
+              "key": "func",
+              "value": "update-user"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "update-password",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer ",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"userId\":\"zero070\",\r\n    \"newPassword\":\"zero070\",\r\n    \"adminId\": \"model0000\"\r\n}"
+        },
+        "url": {
+          "raw": "https://api.narrowroad-model.com/model_user_setting?func=update-password",
+          "protocol": "https",
+          "host": [
+            "api",
+            "narrowroad-model",
+            "com"
+          ],
+          "path": [
+            "model_user_setting"
+          ],
+          "query": [
+            {
+              "key": "func",
+              "value": "update-password"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "set-user",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"userId\": \"test99\",\r\n    \"password\": \"test99\", \r\n    \"storeName\": \"계정생성테스트\", \r\n    \"tel\": \"010-1111-1111\"\r\n\r\n\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.narrowroad-model.com/model_new_store",
+          "protocol": "https",
+          "host": [
+            "api",
+            "narrowroad-model",
+            "com"
+          ],
+          "path": [
+            "model_new_store"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "check-category-menu",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"userId\": \"model0000\",\r\n    \"category\": \"dessert\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.narrowroad-model.com/model_user_setting?func=check-category-usage",
+          "protocol": "https",
+          "host": [
+            "api",
+            "narrowroad-model",
+            "com"
+          ],
+          "path": [
+            "model_user_setting"
+          ],
+          "query": [
+            {
+              "key": "func",
+              "value": "check-category-usage"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "move-category-to-all",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"userId\": \"model0000\",\r\n    \"category\": \"dessert\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.narrowroad-model.com/model_user_setting?func=move-category-to-all",
+          "protocol": "https",
+          "host": [
+            "api",
+            "narrowroad-model",
+            "com"
+          ],
+          "path": [
+            "model_user_setting"
+          ],
+          "query": [
+            {
+              "key": "func",
+              "value": "move-category-to-all"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
