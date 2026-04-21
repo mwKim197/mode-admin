@@ -441,7 +441,7 @@ async function loadStoreInfo() {
             }
 
             // 알림톡 수신번호 설정
-            const kakaoInput = document.querySelector("#"kakao-number"") as HTMLInputElement;
+            const kakaoInput = document.querySelector("#kakao-number") as HTMLInputElement;
             if (kakaoInput) {
                 // 서버 필드명은 '"kakao-number"' 로 사용 (하이픈 포함 필드는 대괄호 표기 사용)
                 kakaoInput.value = data.user.kakaoNumber || "";
@@ -730,7 +730,7 @@ async function saveStoreInfo() {
         ) as HTMLInputElement;
         const telInput = document.querySelector("#tel-input") as HTMLInputElement;
         const addressInput = document.querySelector("#address-input") as HTMLInputElement;
-        const kakaoInput = document.getElementById(""kakao-number"") as HTMLInputElement;
+        const kakaoInput = document.getElementById("kakao-number") as HTMLInputElement;
         const businessNoInput = document.getElementById(
             "businessNo"
         ) as HTMLInputElement;
