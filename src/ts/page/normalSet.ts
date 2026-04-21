@@ -55,7 +55,7 @@ function initInventoryValidation() {
     }
 
     // 특정 필드에 대해 최대값을 강제하는 헬퍼 (입력값이 허용치를 넘으면 클램프하고 경고)
-    // NOTE: 이 함수는 입력 필터링을 직접 수행하지 않으므로 호출 전 적절한 필터를 바인딩해야 합니다.
+    // NOTE: 주석한글화 - 이 함수는 입력 필터링을 직접 수행하지 않으므로 호출 전 적절한 필터를 바인딩해야 합니다.
     function enforceMaxAllowed(input: HTMLInputElement, maxAllowed: number, label: string) {
         input.addEventListener("input", () => {
             const val = Number(input.value || 0);
@@ -444,7 +444,7 @@ async function loadStoreInfo() {
             // 알림톡 수신번호 설정
             const kakaoInput = document.querySelector("#kakao-number") as HTMLInputElement;
             if (kakaoInput) {
-                // 서버 필드명은 'kakao-number' 로 사용 (하이픈 포함 필드는 대괄호 표기 사용)
+                // 서버 필드명은 '"kakao-number"' 로 사용 (하이픈 포함 필드는 대괄호 표기 사용)
                 kakaoInput.value = data.user.kakaoNumber || "";
             }
 
@@ -628,7 +628,7 @@ function collectInventoryFromUI() {
             const field = input.dataset.field!;
             const value = Number(input.value || 0);
 
-            // ✅ CUP
+            // ✅ 컵
             if (type === "paper" || type === "plastic") {
                 inventory.cup = inventory.cup || {};
                 inventory.cup[type] = inventory.cup[type] || {};
@@ -848,7 +848,7 @@ async function saveStoreInfo() {
         }
 
         // 알림톡 수신번호가 수정되었는지 확인
-        if (kakaoInput && kakaoInput.value !== originalUserData?.kakakoNumber) {
+        if (kakaoInput && kakaoInput.value !== originalUserData?.kakaoNumber) {
             hasChanges = true;
         }
 
@@ -971,7 +971,7 @@ async function saveStoreInfo() {
             }
 
             // 알림톡 수신번호 추가 (변경된 경우만)
-            if (kakaoInput && kakaoInput.value !== originalUserData?.kakakoNumber) {
+            if (kakaoInput && kakaoInput.value !== originalUserData?.kakaoNumber) {
                 // 서버 필드명은 'kakaoNumber' 로 전송
                 updateData.kakaoNumber = kakaoInput.value;
             }

@@ -1,0 +1,19 @@
+{
+  "commitMessage": {
+    "language": "ko",
+    "prefix": "한글:"
+  },
+  "typePolicy": {
+    "typesDir": "src/ts/types",
+    "requireBeforeField": true,
+    "warningOnMissing": true
+  },
+  "fieldConventions": {
+    "htmlId": "kebab-case",
+    "apiField": "camelCase"
+  },
+  "kakao": {
+    "apiField": "kakaoNumber",
+    "htmlId": "kakao-number"
+  }
+}

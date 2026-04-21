@@ -19,7 +19,7 @@ export interface ModelUser {
     url?: string;
     payType?: boolean;
     vcat?: boolean;
-    kakakoNumber?: string;
+    kakaoNumber?: string;
     inventoryCheckEnabled?: boolean;
     category?: Array<{
         name: string;

@@ -1,0 +1,86 @@
+{
+  "info": {
+    "_postman_id": "ea9d90ff-cb1e-498f-815c-c8663766cee8",
+    "name": "login",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "32432649"
+  },
+  "item": [
+    {
+      "name": "admin-login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const res = pm.response.json();\r",
+              "\r",
+              "pm.environment.set(\"token\", res.accessToken);\r",
+              "\r",
+              "console.log(\"Saved token:\", res.accessToken);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {}
+      },
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"adminId\": \"{{adminId}}\",\r\n    \"password\": \"{{adminPassword}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.narrowroad-model.com/model_admin_login?func=login",
+          "protocol": "https",
+          "host": [
+            "api",
+            "narrowroad-model",
+            "com"
+          ],
+          "path": [
+            "model_admin_login"
+          ],
+          "query": [
+            {
+              "key": "userId",
+              "value": "{{adminId}}",
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "password",
+              "value": "{{adminPassword}}",
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "func",
+              "value": "login"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

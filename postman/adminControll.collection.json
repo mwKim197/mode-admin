@@ -1,0 +1,329 @@
+{
+  "info": {
+    "_postman_id": "0241febd-c76c-41e1-b7be-01e5dcdfdcae",
+    "name": "adminControll",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "32432649"
+  },
+  "item": [
+    {
+      "name": "로그조회",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://api.narrowroad-model.com/model_admin_controll?func=list-admin-log&userId=zero163",
+          "protocol": "https",
+          "host": [
+            "api",
+            "narrowroad-model",
+            "com"
+          ],
+          "path": [
+            "model_admin_controll"
+          ],
+          "query": [
+            {
+              "key": "func",
+              "value": "list-admin-log"
+            },
+            {
+              "key": "userId",
+              "value": "zero163"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "알림톡",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"userId\": \"model0000\",\r\n  \"storeName\": \"test매장\",\r\n  \"phone\": \"01026165095\",\r\n  \"alerts\": [\r\n    { \"level\": \"soldOut\", \"key\": \"coffee_1\" }\r\n  ],\r\n  \"config\": {\r\n    \"coffee\": {\r\n      \"1\": { \"name\": \"다크 로스트\" },\r\n      \"2\": { \"name\": \"산미\" }\r\n    },\r\n    \"cup\": {\r\n      \"paper\": { \"name\": \"종이컵\" },\r\n      \"plastic\": { \"name\": \"플라스틱컵\" }\r\n    },\r\n    \"garucha\": {\r\n      \"1\": { \"name\": \"초코\" },\r\n      \"2\": { \"name\": \"복숭아\" },\r\n      \"3\": { \"name\": \"딸기\" },\r\n      \"4\": { \"name\": \"바닐라\" },\r\n      \"5\": { \"name\": \"말차\" }\r\n    }\r\n  }\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.narrowroad-model.com/model_aligo",
+          "protocol": "https",
+          "host": [
+            "api",
+            "narrowroad-model",
+            "com"
+          ],
+          "path": [
+            "model_aligo"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "재고조회",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://api.narrowroad-model.com/model_inventory_calculate?func=get-runtime&userId=model0000",
+          "protocol": "https",
+          "host": [
+            "api",
+            "narrowroad-model",
+            "com"
+          ],
+          "path": [
+            "model_inventory_calculate"
+          ],
+          "query": [
+            {
+              "key": "func",
+              "value": "get-runtime"
+            },
+            {
+              "key": "userId",
+              "value": "model0000"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "재고등록",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"userId\": \"model0000\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.narrowroad-model.com/model_inventory_calculate?func=init-runtime",
+          "protocol": "https",
+          "host": [
+            "api",
+            "narrowroad-model",
+            "com"
+          ],
+          "path": [
+            "model_inventory_calculate"
+          ],
+          "query": [
+            {
+              "key": "func",
+              "value": "init-runtime"
+            },
+            {
+              "key": "",
+              "value": "",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "재고계산",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"userId\": \"model0000\",\r\n  \"orderList\": [\r\n    {\r\n      \"menuId\": 512,\r\n      \"count\": 10\r\n    },\r\n    {\r\n      \"menuId\": 583,\r\n      \"count\": 10\r\n    }\r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.narrowroad-model.com/model_inventory_calculate?func=calculate-inventory",
+          "protocol": "https",
+          "host": [
+            "api",
+            "narrowroad-model",
+            "com"
+          ],
+          "path": [
+            "model_inventory_calculate"
+          ],
+          "query": [
+            {
+              "key": "func",
+              "value": "calculate-inventory"
+            },
+            {
+              "key": "",
+              "value": "",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "재고업데이트",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"userId\": \"model0000\",\r\n  \"items\": [\r\n    { \"type\": \"coffee\", \"slot\": \"1\" },\r\n    { \"type\": \"cup\", \"slot\": \"plastic\" }\r\n  ]\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.narrowroad-model.com/model_inventory_calculate?func=refill-inventory",
+          "protocol": "https",
+          "host": [
+            "api",
+            "narrowroad-model",
+            "com"
+          ],
+          "path": [
+            "model_inventory_calculate"
+          ],
+          "query": [
+            {
+              "key": "",
+              "value": "",
+              "disabled": true
+            },
+            {
+              "key": "func",
+              "value": "refill-inventory"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "총량 업데이트(스팩수정)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoibW9kZWwwMDAwIiwiZ3JhZGUiOjQsInNlc3Npb25JZCI6IjgzNzk1ZjZjLTg5YTctNDZlNS1hNGRkLTY5YWQxZTljODNjZSIsImlhdCI6MTc2ODEzODIyMiwiZXhwIjoxNzY4MTQxODIyfQ.WyYlDAXI3z1x3RUmzBkgBIlW7u0wMORzLhjUEmpCQ4I",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"userId\": \"model0000\",\r\n  \"inventory\": {\r\n    \"coffee\": {\r\n      \"1\": { \"max\": 2000 },\r\n      \"2\": { \"max\": 2000 }\r\n    },\r\n    \"garucha\": {\r\n      \"1\": { \"max\": 1800 },\r\n      \"5\": { \"max\": 2000 }\r\n    },\r\n    \"syrup\": {\r\n      \"3\": { \"max\": 1000 }\r\n    }\r\n  },\r\n  \"spec\": {\r\n    \"consumption\": {\r\n      \"coffee\": {\r\n        \"1\": { \"perSecond\": 3.5 },\r\n        \"2\": { \"perSecond\": 3.0 }\r\n      },\r\n      \"garucha\": {\r\n        \"1\": { \"perSecond\": 5 },\r\n        \"5\": { \"perSecond\": 3.8 }\r\n      }\r\n    }\r\n  },\r\n  \"config\": {\r\n    \"coffee\": {\r\n        \"1\": { \"name\": \"다크 로스트\" }\r\n    }\r\n  }\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.narrowroad-model.com/model_inventory_calculate?func=update-config",
+          "protocol": "https",
+          "host": [
+            "api",
+            "narrowroad-model",
+            "com"
+          ],
+          "path": [
+            "model_inventory_calculate"
+          ],
+          "query": [
+            {
+              "key": "",
+              "value": "",
+              "disabled": true
+            },
+            {
+              "key": "func",
+              "value": "update-config"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "재고직접수정(리필)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoibW9kZWwwMDAwIiwiZ3JhZGUiOjQsInNlc3Npb25JZCI6IjgzNzk1ZjZjLTg5YTctNDZlNS1hNGRkLTY5YWQxZTljODNjZSIsImlhdCI6MTc2ODEzODIyMiwiZXhwIjoxNzY4MTQxODIyfQ.WyYlDAXI3z1x3RUmzBkgBIlW7u0wMORzLhjUEmpCQ4I",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"userId\": \"model0000\",\r\n  \"items\": [\r\n    { \"type\": \"garucha\", \"slot\": \"5\", \"current\": 1100 }\r\n  ]\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.narrowroad-model.com/model_inventory_calculate?func=update-current",
+          "protocol": "https",
+          "host": [
+            "api",
+            "narrowroad-model",
+            "com"
+          ],
+          "path": [
+            "model_inventory_calculate"
+          ],
+          "query": [
+            {
+              "key": "",
+              "value": "",
+              "disabled": true
+            },
+            {
+              "key": "func",
+              "value": "update-current"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
