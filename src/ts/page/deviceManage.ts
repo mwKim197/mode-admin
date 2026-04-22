@@ -11,6 +11,59 @@ import {InventoryData, InventoryResponse, RefillItem} from "../types/inventory.t
 let originalUserData: ModelUser | null = null;
 let selectedItems: RefillItem[] = [];
 
+const DRAFT_KEY = "mode-admin:deviceManage:draft";
+let isDirty = false;
+
+function saveDraft() {
+    try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify({selectedItems}));
+        isDirty = true;
+        // 간단한 UI 표시: body에 data-dirty 속성 설정
+        document.body.setAttribute("data-mode-admin-dirty", "1");
+    } catch (e) {
+        console.warn("드래프트 저장 실패", e);
+    }
+}
+
+function loadDraft() {
+    try {
+        const raw = localStorage.getItem(DRAFT_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed.selectedItems) && parsed.selectedItems.length > 0) {
+            selectedItems = parsed.selectedItems;
+            // UI에 반영
+            selectedItems.forEach(si => {
+                const selector = `.refresh-btn[data-type=\"${si.type}\"][data-slot=\"${si.slot}\"]`;
+                const btn = document.querySelector(selector) as HTMLButtonElement | null;
+                if (btn) btn.classList.add("selected");
+                const container = document.querySelector(`.progress-container[data-type=\"${si.type}\"][data-slot=\"${si.slot}\"]`);
+                const fill = container?.querySelector(".progress-fill") as HTMLDivElement | null;
+                if (fill) {
+                    fill.style.transition = "width 0.5s ease";
+                    fill.style.width = "100%";
+                    fill.textContent = "100%";
+                }
+            });
+            isDirty = true;
+            document.body.setAttribute("data-mode-admin-dirty", "1");
+            showToast("임시 저장된 변경사항이 복원되었습니다. 저장이 필요합니다.", 3000, "info");
+        }
+    } catch (e) {
+        console.warn("드래프트 로드 실패", e);
+    }
+}
+
+function clearDraft() {
+    try {
+        localStorage.removeItem(DRAFT_KEY);
+        isDirty = false;
+        document.body.removeAttribute("data-mode-admin-dirty");
+    } catch (e) {
+        console.warn("드래프트 삭제 실패", e);
+    }
+}
+
 /* ===============================
    초기화
 ================================= */
@@ -24,8 +77,11 @@ export function initDeviceManage() {
     bindRefillButtons();
 
     loadStoreInfo();
-    if (userId) {
 
+    // 드래프트 로드(로컬에 저장된 변경사항 복원)
+    loadDraft();
+
+    if (userId) {
         loadInventoryRuntime(userId);
     }
 }
@@ -216,7 +272,11 @@ function bindRefreshButtons() {
                 item => !(item.type === type && item.slot === slot)
             );
             button.classList.remove("selected");
+            // 롤백: 실제 인벤토리 값이 있으면 나중에 리로드되면 반영됨
         }
+
+        // 변경이 있을 때마다 드래프트에 저장
+        saveDraft();
 
     });
 }
@@ -242,22 +302,37 @@ function bindRefillButtons() {
 
         await sendRefillInventory(userId, selectedItems);
 
+        // 성공하면 드래프트 제거
         selectedItems = [];
         document.querySelectorAll(".refresh-btn.selected")
             .forEach(btn => btn.classList.remove("selected"));
+        clearDraft();
     });
 
     refillAllBtn?.addEventListener("click", async () => {
 
-        const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
-        const userId = userInfo.userId;
-
+        // 전채채우기는 로컬 상태만 즉시 변경하고, 서버 호출은 저장 버튼에서만 수행합니다.
         const items = INVENTORY_RENDER_ORDER.map(({type, key}) => ({
             type,
             slot: key
         }));
 
-        await sendRefillInventory(userId, items);
+        // UI 업데이트: 모든 퍼센트를 100%로
+        const fills = Array.from(document.querySelectorAll<HTMLDivElement>(".progress-fill"));
+        fills.forEach(fill => {
+            fill.style.transition = "width 0.5s ease";
+            fill.style.width = "100%";
+            fill.textContent = "100%";
+        });
+
+        // 선택 상태 설정
+        document.querySelectorAll<HTMLButtonElement>(".refresh-btn").forEach(btn => btn.classList.add("selected"));
+
+        selectedItems = items;
+        saveDraft();
+
+        showToast("모든 항목이 100%로 채워졌습니다. 저장 버튼을 눌러 서버에 반영하세요.", 3000, "info");
+
     });
 }
 
