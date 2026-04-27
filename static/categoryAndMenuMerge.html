@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>Category & Menu Merge - Test UI</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; padding: 24px; }
+    label{display:block;margin-top:12px}
+    input, textarea { width: 100%; padding:8px; box-sizing:border-box }
+    button{ margin-top:12px; padding:10px 16px }
+    pre{ background:#f5f5f5; padding:12px; max-height:300px; overflow:auto }
+  </style>
+</head>
+<body>
+  <h1>Category & Menu Merge (테스트)</h1>
+
+  <label>Source User ID
+    <input id="sourceUserId" value="model0001" />
+  </label>
+
+  <label>Target User ID
+    <input id="targetUserId" value="model0000" />
+  </label>
+
+  <label>Menu IDs (comma separated, optional)
+    <input id="menuIds" placeholder="e.g. 227,228" />
+  </label>
+
+  <label>
+    <input type="checkbox" id="includeImages" checked /> Include Images
+  </label>
+
+  <label>
+    <input type="checkbox" id="overwrite" /> Overwrite
+  </label>
+
+  <button id="doMerge">Start Duplicate</button>
+  <button id="clearLog">Clear Log</button>
+
+  <h2>Result</h2>
+  <pre id="log">(waiting)</pre>
+
+  <script>
+    function log(msg){
+      const p = document.getElementById('log');
+      p.textContent = (p.textContent === '(waiting)' ? '' : p.textContent + '\n') + msg;
+    }
+
+    document.getElementById('doMerge').addEventListener('click', async () => {
+      try {
+        const sourceUserId = document.getElementById('sourceUserId').value.trim();
+        const targetUserId = document.getElementById('targetUserId').value.trim();
+        const menuIdsRaw = document.getElementById('menuIds').value.trim();
+        const includeImages = document.getElementById('includeImages').checked;
+        const overwrite = document.getElementById('overwrite').checked;
+
+        if (!sourceUserId || !targetUserId) { alert('sourceUserId and targetUserId are required'); return; }
+
+        const menuIds = menuIdsRaw ? menuIdsRaw.split(',').map(s=>s.trim()).filter(Boolean).map(Number) : null;
+
+        // 토큰 취득: localStorage 'accessToken' 사용
+        const token = localStorage.getItem('accessToken');
+        if (!token) { alert('accessToken not found in localStorage. Please login via app first.'); return; }
+
+        const payload = { sourceUserId, targetUserId, menuIds, includeImages, overwrite };
+
+        log('Sending request...');
+        const resp = await fetch('/model_admin_menu?func=duplicate-categories-and-menu', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const text = await resp.text();
+        try{
+          const json = JSON.parse(text || '{}');
+          log('HTTP ' + resp.status + ' JSON response: ' + JSON.stringify(json, null, 2));
+        }catch(e){
+          log('HTTP ' + resp.status + ' text response: ' + text);
+        }
+      } catch (err) {
+        log('Error: ' + err.message);
+      }
+    });
+
+    document.getElementById('clearLog').addEventListener('click', () => { document.getElementById('log').textContent = '(waiting)'; });
+  </script>
+</body>
+</html>
