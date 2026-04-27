@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/css/reset.css" />
+    <link rel="stylesheet" href="/src/css/common.css" />
+    <link rel="stylesheet" href="/src/css/style.css" />
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body class="menu-merge-page">
+    <div id="main-content">
+      <section class="mt8">
+        <div class="inner">
+          <div class="user-flex">
+            <div class="user">
+              <i class="fa-regular fa-circle-user"></i>
+              <p id="user-name">zero001 님</p>
+              <label class="label manager" id="user-grade"><span>총괄관리자</span></label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="pb20">
+        <div class="inner">
+          <h2 class="mb20">카테고리 & 메뉴 복사 (테스트 UI)</h2>
+
+          <div class="inputWrap">
+            <div class="data_input">
+              <p>보내는 계정 (sourceUserId)</p>
+              <input id="sourceUserId" placeholder="sourceUserId" />
+            </div>
+          </div>
+
+          <img class="account-arrow" src="/img/arrow.svg" alt="아래화살표" />
+
+          <div class="inputWrap">
+            <div class="data_input">
+              <p>받는 계정 (targetUserId)</p>
+              <input id="targetUserId" placeholder="targetUserId" />
+            </div>
+          </div>
+
+          <div class="inputWrap">
+            <div class="data_input">
+              <p>Menu IDs (comma separated, optional)</p>
+              <input id="menuIds" placeholder="e.g. 227,228" />
+            </div>
+          </div>
+
+          <div class="inputWrap">
+            <label><input type="checkbox" id="includeImages" checked /> Include Images</label>
+            <label><input type="checkbox" id="overwrite" /> Overwrite</label>
+          </div>
+        </div>
+      </section>
+
+      <section class="pb20">
+        <div class="inner">
+          <div class="btnFlex mb-4">
+            <button class="btn blue" id="doMerge">Start Duplicate</button>
+            <button class="btn" id="clearLog">Clear Log</button>
+          </div>
+
+          <h3>Result</h3>
+          <pre id="log">(waiting)</pre>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
