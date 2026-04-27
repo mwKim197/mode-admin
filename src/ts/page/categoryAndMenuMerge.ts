@@ -1,56 +1,67 @@
-// categoryAndMenuMerge.ts
-// 간단 UI/헬퍼: Lambda duplicate-categories-and-menu 를 호출하는 클라이언트 유틸
-// 사용법: import { duplicateCategoryAndMenu } from './categoryAndMenuMerge';
+import { apiPost } from "../api/apiHelpers.ts";
+import { getStoredUser } from "../ts/utils/userStorage";
 
-export async function duplicateCategoryAndMenu({ sourceUserId, targetUserId, menuIds = null, includeImages = true, overwrite = false }) {
-  if (!sourceUserId || !targetUserId) throw new Error('sourceUserId and targetUserId are required');
+export function initCategoryAndMenuMerge() {
+  console.log('✅ categoryAndMenuMerge.ts 로드됨');
 
-  // 토큰 획득: localStorage 또는 전역 ENV에서 취득하도록 시도
-  const token = (typeof window !== 'undefined' && (localStorage.getItem('accessToken') || window['__ENV']?.accessToken)) || '';
-  if (!token) throw new Error('Authorization token not found in localStorage or window.__ENV.accessToken');
+  const doMerge = document.getElementById('doMerge');
+  const clearLog = document.getElementById('clearLog');
+  const logEl = document.getElementById('log');
+  const srcEl = document.getElementById('sourceUserId') as HTMLInputElement | null;
+  const tgtEl = document.getElementById('targetUserId') as HTMLInputElement | null;
+  const menuIdsEl = document.getElementById('menuIds') as HTMLInputElement | null;
+  const includeImagesEl = document.getElementById('includeImages') as HTMLInputElement | null;
+  const overwriteEl = document.getElementById('overwrite') as HTMLInputElement | null;
 
-  const payload = { sourceUserId, targetUserId, menuIds, includeImages, overwrite };
-
-  const url = (window && window.location && window.location.origin)
-    ? `${window.location.origin}/model_admin_menu?func=duplicate-categories-and-menu`
-    : '/model_admin_menu?func=duplicate-categories-and-menu';
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
-    body: JSON.stringify(payload),
-  });
-
-  const text = await res.text();
-  try {
-    const json = JSON.parse(text || '{}');
-    if (!res.ok) throw new Error(json.message || json.error || `HTTP ${res.status}`);
-    return json;
-  } catch (err) {
-    // 응답이 JSON이 아닐 경우
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${text}`);
-    return text;
+  function log(msg: string) {
+    if (!logEl) return;
+    if (logEl.textContent === '(waiting)') logEl.textContent = '';
+    logEl.textContent = logEl.textContent + '\n' + msg;
   }
-}
 
-// 간단한 UI 트리거 예시: 버튼에 연결해서 사용
-export function attachDuplicateButton(buttonElem, optsProvider) {
-  if (!buttonElem) return;
-  buttonElem.addEventListener('click', async () => {
-    try {
-      const opts = typeof optsProvider === 'function' ? optsProvider() : optsProvider;
-      buttonElem.disabled = true;
-      const result = await duplicateCategoryAndMenu(opts);
-      console.log('복제 결과:', result);
-      alert('복제 성공: ' + (result?.menuResult?.inserted ?? '완료'));
-    } catch (e) {
-      console.error('복제 실패:', e);
-      alert('복제 실패: ' + (e.message || e));
-    } finally {
-      buttonElem.disabled = false;
-    }
-  });
+  if (doMerge) {
+    doMerge.addEventListener('click', async () => {
+      try {
+        const sourceUserId = srcEl?.value.trim() || '';
+        const targetUserId = tgtEl?.value.trim() || '';
+        const menuIdsRaw = menuIdsEl?.value.trim() || '';
+        const includeImages = includeImagesEl?.checked ?? true;
+        const overwrite = overwriteEl?.checked ?? false;
+
+        if (!sourceUserId || !targetUserId) { alert('sourceUserId and targetUserId are required'); return; }
+
+        const menuIds = menuIdsRaw ? menuIdsRaw.split(',').map(s=>s.trim()).filter(Boolean).map(Number) : null;
+
+        const token = localStorage.getItem('accessToken');
+        if (!token) { alert('accessToken not found in localStorage. Please login via app first.'); return; }
+
+        const payload = { sourceUserId, targetUserId, menuIds, includeImages, overwrite };
+
+        log('Sending request...');
+
+        const res = await fetch('/model_admin_menu?func=duplicate-categories-and-menu', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const text = await res.text();
+        try{
+          const json = JSON.parse(text || '{}');
+          log('HTTP ' + res.status + ' JSON response: ' + JSON.stringify(json, null, 2));
+        }catch(e){
+          log('HTTP ' + res.status + ' text response: ' + text);
+        }
+      } catch (err: any) {
+        log('Error: ' + (err?.message || err));
+      }
+    });
+  }
+
+  if (clearLog) {
+    clearLog.addEventListener('click', () => { if (logEl) logEl.textContent = '(waiting)'; });
+  }
 }
