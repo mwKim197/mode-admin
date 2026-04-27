@@ -48,6 +48,7 @@ export async function checkUserAccess() {
         "/html/noticeList.html": [1, 2, 3, 4],
         "/html/user-register.html": [1, 2],
         "/html/menuMerge.html": [1, 2, 3],
+        "/html/categoryAndMenuMerge.html": [1, 2],
         "/html/notice.html?type=admin": [1, 2],
         "/html/notice.html?type=notice": [1, 2],
         "/html/notice.html?type=store": [1, 2],

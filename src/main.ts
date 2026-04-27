@@ -276,6 +276,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         {href: "/html/noticeList.html", label: "공지사항"},
         {href: "/html/user-register.html", label: "매장계정생성"},
         {href: "/html/menuMerge.html", label: "레시피복사"},
+        {href: "/html/categoryAndMenuMerge.html", label: "카테고리·메뉴 복사"},
         {href: "/html/notice.html?type=admin", label: "관리자 공지사항"},
         {href: "/html/notice.html?type=notice", label: "홈페이지 공지사항"},
         {href: "/html/notice.html?type=store", label: "설치매장"},
