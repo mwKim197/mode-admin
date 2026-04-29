@@ -1,5 +1,4 @@
 import {apiGet, apiPost} from "../api/apiHelpers.ts";
-import {getStoredUser} from "../utils/userStorage.ts";
 import {getUserData} from "../common/auth.ts";
 
 export async function initCategoryAndMenuMerge() {
