@@ -505,7 +505,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else if (path === "/html/menuMerge.html") {
         initMenuMerge();
     } else if (path === "/html/categoryAndMenuMerge.html" || path === "/categoryAndMenuMerge.html") {
-        import("./ts/page/categoryAndMenuMerge.ts").then(m => m.initCategoryAndMenuMerge());
+        import("./ts/page/categoryAndMenuMerge.ts").then((module) => {
+            module.initCategoryAndMenuMerge()
+        });
     } else if (path === "/html/user-register.html") {
         console.log("📌 사용자 등록 - user-register.ts 로드");
         import("./ts/page/user-register.ts").then((module) => {

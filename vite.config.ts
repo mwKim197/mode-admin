@@ -48,6 +48,7 @@ export default defineConfig({
                 adminHome: resolve(__dirname, "html/adminHome.html"), // 추가: 관리자 메인 페이지
                 adminLog: resolve(__dirname, "html/adminLog.html"), // 추가: 관리자 로그 페이지
                 adminLogDetail: resolve(__dirname, "html/adminLogDetail.html"), // 추가: 관리자 로그 상세 페이지
+                categoryAndMenuMerge: resolve(__dirname, "html/categoryAndMenuMerge.html"), // 추가: 카테고리&메뉴 복사
                 // 다른 html들도 여기에 추가 가능
             },
         },
