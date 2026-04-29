@@ -12,12 +12,11 @@ let originalUserData: ModelUser | null = null;
 let selectedItems: RefillItem[] = [];
 
 const DRAFT_KEY = "mode-admin:deviceManage:draft";
-let isDirty = false;
 
 function saveDraft() {
     try {
         localStorage.setItem(DRAFT_KEY, JSON.stringify({selectedItems}));
-        isDirty = true;
+        
         // 간단한 UI 표시: body에 data-dirty 속성 설정
         document.body.setAttribute("data-mode-admin-dirty", "1");
     } catch (e) {
@@ -45,9 +44,8 @@ function loadDraft() {
                     fill.textContent = "100%";
                 }
             });
-            isDirty = true;
             document.body.setAttribute("data-mode-admin-dirty", "1");
-            showToast("임시 저장된 변경사항이 복원되었습니다. 저장이 필요합니다.", 3000, "info");
+            showToast("임시 저장된 변경사항이 복원되었습니다. 저장이 필요합니다.", 3000);
         }
     } catch (e) {
         console.warn("드래프트 로드 실패", e);
@@ -57,7 +55,7 @@ function loadDraft() {
 function clearDraft() {
     try {
         localStorage.removeItem(DRAFT_KEY);
-        isDirty = false;
+
         document.body.removeAttribute("data-mode-admin-dirty");
     } catch (e) {
         console.warn("드래프트 삭제 실패", e);
@@ -331,7 +329,7 @@ function bindRefillButtons() {
         selectedItems = items;
         saveDraft();
 
-        showToast("모든 항목이 100%로 채워졌습니다. 저장 버튼을 눌러 서버에 반영하세요.", 3000, "info");
+        showToast("모든 항목이 100%로 채워졌습니다. 저장 버튼을 눌러 서버에 반영하세요.", 3000);
 
     });
 }
