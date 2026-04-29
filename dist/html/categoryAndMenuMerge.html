@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <script type="module" crossorigin src="../assets/main-Is4DOWvj.js"></script>
+    <link rel="stylesheet" crossorigin href="../assets/main-gsZTbLZ0.css">
+    <link rel="stylesheet" crossorigin href="../assets/style-BWJWr5B5.css">
+    <link rel="stylesheet" crossorigin href="../assets/menuMerge-CxN54c7W.css">
+  </head>
+  <body class="menu-merge-page">
+    <div id="main-content">
+      <section class="mt8">
+        <div class="inner">
+          <div class="user-flex">
+            <div class="user">
+              <i class="fa-regular fa-circle-user"></i>
+              <p id="user-name">zero001 님</p>
+              <label class="label manager" id="user-grade"><span>총괄관리자</span></label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="pb20">
+        <div class="inner">
+          <h2 class="mb20">카테고리 & 메뉴 복사 (테스트 UI)</h2>
+
+          <div class="inputWrap">
+            <div class="data_input">
+              <p>보내는 계정</p>
+              <div class="select">
+                <select id="sourceAccount" class="popup-select mb0" required></select>
+              </div>
+            </div>
+          </div>
+
+          <img class="account-arrow" src="../img/arrow.svg" alt="아래화살표" />
+
+          <div class="inputWrap">
+            <div class="data_input">
+              <p>받는 계정</p>
+              <div class="select">
+                <select id="targetAccount" class="popup-select mb0" required></select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="pb20">
+        <div class="inner">
+          <div class="btnFlex mb-4">
+            <button class="btn blue" id="doMerge">복사</button>
+            <button class="btn" id="clearLog">로그지우기</button>
+          </div>
+
+          <h3>결과</h3>
+          <pre id="log">----</pre>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
