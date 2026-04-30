@@ -400,15 +400,7 @@ async function loadStoreInfo() {
         if (data && data.user) {
             // 원래 데이터 저장 (나중에 비교용)
             originalUserData = data.user as ModelUser;
-
-            const allowInventoryUsers = ["model0000", "zero16"];
-
-            if (!allowInventoryUsers.includes(originalUserData.userId)) {
-                const inventory = document.querySelector("#inventory") as HTMLInputElement;
-                inventory.style.display = "none";
-
-            }
-
+            
             if (originalUserData.inventoryCheckEnabled !== false) {
                 await loadInventoryRuntime(originalUserData.userId);
             }

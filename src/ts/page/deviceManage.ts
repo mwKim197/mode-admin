@@ -1,14 +1,11 @@
 import {apiGet} from "../api/apiHelpers.ts";
 import {showToast} from "../../main.ts";
 import {fetchWithoutLoading} from "../api/api.ts";
-import {ModelUser} from "../types/user.ts";
 import {InventoryData, InventoryResponse, RefillItem} from "../types/inventory.ts";
 
 /* ===============================
    전역 상태
 ================================= */
-
-let originalUserData: ModelUser | null = null;
 let selectedItems: RefillItem[] = [];
 
 const DRAFT_KEY = "mode-admin:deviceManage:draft";
@@ -101,15 +98,9 @@ async function loadStoreInfo() {
         const data = await response.json();
 
         if (data?.user) {
-            originalUserData = data.user as ModelUser;
-
-            const allowInventoryUsers = ["model0000", "zero16"];
+            
             const inventory = document.querySelector("#inventory") as HTMLElement;
-            if (!allowInventoryUsers.includes(originalUserData.userId)) {
-
-                if (inventory) inventory.style.display = "none";
-            }
-
+            
             // 인벤토리 비활성화시 미노출
             if (!data.user.inventoryCheckEnabled) {
                 inventory.style.display = "none";
@@ -346,26 +337,33 @@ export async function sendMachineCommand(
     const res = await apiGet(
         `/model_machine_registry?func=get-machine-status&userId=${userId}`
     );
-
-    const {availableUrl, isOnline} = await res.json();
-
-    if (isOnline && availableUrl) {
-
-        showToast("✅ " + successMessage);
-
-        fetchWithoutLoading("/model_machine_controll", {
-            method: "POST",
-            body: JSON.stringify({
-                ...command,
-                userId,
-            }),
-        }).catch((err) => {
-            console.error("❌ 머신 통신 오류", err);
-        });
-
-    } else {
-        showToast("❌ 머신이 오프라인입니다.", 4000, "error");
+    
+    const data = await res.json();
+    
+    if (!res.ok || data?.message) {
+        showToast(`❌ ${data?.message || "머신 상태 조회 실패"}`, 4000, "error");
+        return;
     }
+    
+    const { availableUrl, isOnline } = data;
+    
+    if (!isOnline || !availableUrl) {
+        showToast("❌ 머신이 오프라인입니다.", 4000, "error");
+        return;
+    }
+    
+    showToast("✅ " + successMessage);
+    
+    fetchWithoutLoading("/model_machine_controll", {
+        method: "POST",
+        body: JSON.stringify({
+            ...command,
+            userId,
+        }),
+    }).catch((err) => {
+        console.error("❌ 머신 통신 오류", err);
+        showToast("❌ 머신 명령 전송 실패", 4000, "error");
+    });
 }
 
 /* ===============================
@@ -377,13 +375,21 @@ export async function sendRefillInventory(
     items: RefillItem[]
 ) {
     try {
-
+        
         const statusRes = await apiGet(
             `/model_machine_registry?func=get-machine-status&userId=${userId}`
         );
+        
+        const data = await statusRes.json();
 
-        const {availableUrl, isOnline} = await statusRes.json();
-
+        // 서버에서 message 내려준 경우
+        if (!statusRes.ok || data.message) {
+            showToast(`❌ ${data.message || "머신 상태 조회 실패"}`, 4000, "error");
+            return;
+        }
+        
+        const { availableUrl, isOnline } = data;
+        
         if (!isOnline || !availableUrl) {
             showToast("❌ 머신이 오프라인입니다.", 4000, "error");
             return;
