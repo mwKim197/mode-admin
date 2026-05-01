@@ -340,7 +340,8 @@ export async function sendMachineCommand(
     
     const data = await res.json();
     
-    if (!res.ok || data?.message) {
+    // HTTP 실패일 때만 message 노출
+    if (!res.ok) {
         showToast(`❌ ${data?.message || "머신 상태 조회 실패"}`, 4000, "error");
         return;
     }
@@ -348,7 +349,7 @@ export async function sendMachineCommand(
     const { availableUrl, isOnline } = data;
     
     if (!isOnline || !availableUrl) {
-        showToast("❌ 머신이 오프라인입니다.", 4000, "error");
+        showToast(`❌ ${data?.message || "머신이 오프라인입니다."}`, 4000, "error");
         return;
     }
     
@@ -365,7 +366,6 @@ export async function sendMachineCommand(
         showToast("❌ 머신 명령 전송 실패", 4000, "error");
     });
 }
-
 /* ===============================
    재고 충전
 ================================= */
@@ -375,26 +375,24 @@ export async function sendRefillInventory(
     items: RefillItem[]
 ) {
     try {
-        
         const statusRes = await apiGet(
             `/model_machine_registry?func=get-machine-status&userId=${userId}`
         );
         
         const data = await statusRes.json();
-
-        // 서버에서 message 내려준 경우
-        if (!statusRes.ok || data.message) {
-            showToast(`❌ ${data.message || "머신 상태 조회 실패"}`, 4000, "error");
+        
+        if (!statusRes.ok) {
+            showToast(`❌ ${data?.message || "머신 상태 조회 실패"}`, 4000, "error");
             return;
         }
         
         const { availableUrl, isOnline } = data;
         
         if (!isOnline || !availableUrl) {
-            showToast("❌ 머신이 오프라인입니다.", 4000, "error");
+            showToast(`❌ ${data?.message || "머신이 오프라인입니다."}`, 4000, "error");
             return;
         }
-
+        
         const res = await fetchWithoutLoading(
             "/model_inventory_calculate?func=refill-inventory",
             {
@@ -405,16 +403,17 @@ export async function sendRefillInventory(
                 }),
             }
         );
-
+        
         if (!res.ok) {
-            showToast("❌ 재고 충전 실패", 4000, "error");
+            const errorData = await res.json().catch(() => ({}));
+            showToast(`❌ ${errorData?.message || "재고 충전 실패"}`, 4000, "error");
             return;
         }
-
+        
         showToast("✅ 재고 충전 완료");
-
+        
         await loadInventoryRuntime(userId);
-
+        
     } catch (err) {
         console.error("❌ 재고 충전 오류", err);
         showToast("❌ 서버 통신 오류", 4000, "error");
