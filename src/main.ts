@@ -531,7 +531,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else if (path === "/html/adminLogDetail.html") {
         console.log("📌 관리자 LOG DEATAIL - adminLogDetail.ts 로드");
         import("./ts/page/adminLogDetail.ts").then((module) => {
-            module.initAdmionDetailLog();
+            module.initAdminDetailLog();
         });
     } else {
         console.log("📌 기본 페이지");
