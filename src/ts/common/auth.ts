@@ -61,6 +61,7 @@ export async function checkUserAccess() {
         "/html/franchise.html": [1, 2],
         "/html/adminLog.html": [1, 2],
         "/html/adminLogDetail.html": [1, 2],
+        "/html/billing.html": [1, 2, 3, 4],
     };
 
     const gradeHome: Record<number, string> = {

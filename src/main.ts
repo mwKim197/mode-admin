@@ -306,6 +306,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // ✅ 쿠폰 메뉴 정의
     const couponMenu: MenuItem = {href: "/html/couponList.html", label: "쿠폰"};
 
+    const billingMenu: MenuItem = {href: "/html/billing.html", label: "후불결제"};
+
     // 3) 메뉴 렌더 함수
     function renderMenu(containerSelector: string, items: MenuItem[]): void {
         const menuList = document.querySelector<HTMLUListElement>(containerSelector);
@@ -381,6 +383,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             menus = upsertMenuItem(menus, couponMenu, {insertAfterLabel: "일반설정"});
         }
 
+        if (user?.billingPay === true) {
+            menus = upsertMenuItem(menus, billingMenu, {insertAfterLabel: "매출"});
+        }
+
         // 렌더링
         renderMenu(".sidemenu .menu", menus);
         highlightActiveMenu(".sidemenu .menu");
@@ -422,6 +428,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.log("📌 포인트 - point.ts 로드");
         import("./ts/page/point.ts").then((module) => {
             module.initPoint();
+        });
+    } else if (path === "/html/billing.html") {
+        console.log("📌 후불결제 전체 관리 - billing.ts 로드");
+        import("./ts/page/billing.ts").then((module) => {
+            module.initBilling();
         });
     } else if (path === "/html/product.html") {
         console.log("📌 상품 - product.ts 로드");
@@ -719,4 +730,3 @@ function redirectToLogin() {
     console.log("➡️ 로그인 페이지로 이동");
     window.location.href = "/html/log.html";
 }
-

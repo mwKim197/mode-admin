@@ -1,5 +1,8 @@
 export interface ModelUser {
     userId: string;
+    franchiseId?: string;
+    billingPay?: boolean;
+    billingType?: "apartment" | "employee";
     storeName?: string;
     tel?: string;
     businessNo?: string; // 추가

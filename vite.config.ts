@@ -28,6 +28,7 @@ export default defineConfig({
                 adminNotice: resolve(__dirname, "html/notice.html"), // ✅ 관리자 공지 등록
                 register: resolve(__dirname, "html/register.html"), // 추가: 회원가입 페이지
                 point: resolve(__dirname, "html/point.html"), // 추가: 포인트(마일리지) 페이지
+                billing: resolve(__dirname, "html/billing.html"), // 후불결제 전체 관리
                 product: resolve(__dirname, "html/product.html"), // 추가: 상품 목록 페이지
                 productDetail: resolve(__dirname, "html/product-detail.html"), // 추가: 상품 상세 페이지
                 productAdd: resolve(__dirname, "html/product-add.html"), // 추가: 상품 등록 페이지
@@ -48,11 +49,11 @@ export default defineConfig({
                 adminHome: resolve(__dirname, "html/adminHome.html"), // 추가: 관리자 메인 페이지
                 adminLog: resolve(__dirname, "html/adminLog.html"), // 추가: 관리자 로그 페이지
                 adminLogDetail: resolve(__dirname, "html/adminLogDetail.html"), // 추가: 관리자 로그 상세 페이지
+                localLogAnalyzer: resolve(__dirname, "html/localLogAnalyzer.html"), // local txt log analyzer
                 categoryAndMenuMerge: resolve(__dirname, "html/categoryAndMenuMerge.html"), // 추가: 카테고리&메뉴 복사
                 // 다른 html들도 여기에 추가 가능
             },
         },
     },
 });
-
 
