@@ -60,9 +60,8 @@ function initSalesTypeRadioHandlers() {
                 if (currentSalesType === "product") {
                     resetSalesStatistics();
 
-                    // 날짜 파라미터 초기화
-                    startDate = "";
-                    endDate = "";
+                    // 날짜 파라미터 초기화 (입력창 값도 함께 초기화)
+                    resetDateInputs();
                 }
 
                 getSalesList(); // 새로운 데이터 로드
@@ -214,6 +213,7 @@ function updateTableHeader() {
     const detailSettingsSection = document.getElementById(
         "detail-settings-section"
     );
+    const paymentSection = document.getElementById("payment-section");
 
     if (!tableHeader || !tableArea) {
         console.error("테이블 요소를 찾을 수 없습니다.");
@@ -239,6 +239,9 @@ function updateTableHeader() {
         if (detailSettingsSection) {
             detailSettingsSection.style.display = "block";
         }
+        if (paymentSection) {
+            paymentSection.style.display = "block";
+        }
     } else {
         // 상품별 헤더
         tableHeader.innerHTML = `
@@ -250,12 +253,16 @@ function updateTableHeader() {
         // 상품별 클래스 추가
         tableArea.classList.add("product-view");
 
-        // 달력 조회, 상세설정 섹션 모두 숨기기
+        // 달력 조회, 상세설정 사용 가능하도록 표시
         if (dateSearchSection) {
-            dateSearchSection.style.display = "none";
+            dateSearchSection.style.display = "flex";
         }
         if (detailSettingsSection) {
-            detailSettingsSection.style.display = "none";
+            detailSettingsSection.style.display = "block";
+        }
+        // 결제방식 필터는 숨김 유지
+        if (paymentSection) {
+            paymentSection.style.display = "none";
         }
     }
 }
@@ -278,6 +285,10 @@ async function getSalesList() {
 
             // 상품별 데이터는 전체 데이터를 한 번에 가져오기
             let apiUrl = `/model_payment?userId=${userId}&func=get-menu-statistics`;
+
+            if (startDate && endDate) {
+                apiUrl += `&startDate=${startDate}&endDate=${endDate}`;
+            }
 
             const response = await apiGet(apiUrl);
             const data = await response.json();
