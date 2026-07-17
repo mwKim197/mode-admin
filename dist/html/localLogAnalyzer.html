@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Local Log Analyzer</title>
+    <style>
+        :root {
+            color: #e8eaed;
+            background: #0f1115;
+            font-family: Arial, "Noto Sans KR", sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background: #0f1115;
+        }
+
+        .page {
+            width: min(1320px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 28px 0 40px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            margin: 0;
+            color: #fff;
+            font-size: 2.4rem;
+            letter-spacing: 0;
+        }
+
+        .file-name {
+            color: #9aa4b2;
+            font-size: 1.2rem;
+            text-align: right;
+            overflow-wrap: anywhere;
+        }
+
+        .drop-zone {
+            display: grid;
+            place-items: center;
+            min-height: 150px;
+            border: 1px dashed #4d5b6c;
+            border-radius: 8px;
+            background: #171b22;
+            cursor: pointer;
+            transition: border-color 0.15s ease, background 0.15s ease;
+        }
+
+        .drop-zone.dragover {
+            border-color: #5da2ff;
+            background: #162233;
+        }
+
+        .drop-zone input {
+            display: none;
+        }
+
+        .drop-text {
+            display: grid;
+            gap: 8px;
+            text-align: center;
+            color: #cad3df;
+            font-size: 1.35rem;
+        }
+
+        .drop-text strong {
+            color: #fff;
+            font-size: 1.7rem;
+        }
+
+        .toolbar {
+            display: grid;
+            grid-template-columns: minmax(240px, 1fr) 160px 170px 170px auto;
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        input,
+        select,
+        button {
+            height: 42px;
+            border-radius: 6px;
+            font-size: 1.25rem;
+        }
+
+        input,
+        select {
+            border: 1px solid #303946;
+            background: #171b22;
+            color: #fff;
+            padding: 0 12px;
+        }
+
+        button {
+            border: 1px solid #3f7dcc;
+            background: #1f6fd1;
+            color: #fff;
+            padding: 0 16px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .summary-grid,
+        .analysis-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .summary-grid {
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            margin-bottom: 12px;
+        }
+
+        .analysis-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .card {
+            border: 1px solid #27303b;
+            border-radius: 8px;
+            background: #171b22;
+            padding: 14px;
+            min-width: 0;
+        }
+
+        .card-title {
+            margin: 0 0 10px;
+            color: #fff;
+            font-size: 1.45rem;
+        }
+
+        .metric {
+            color: #9aa4b2;
+            font-size: 1.15rem;
+        }
+
+        .metric strong {
+            display: block;
+            margin-top: 8px;
+            color: #fff;
+            font-size: 1.85rem;
+            overflow-wrap: anywhere;
+        }
+
+        .rank-list,
+        .line-list,
+        .order-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .diagnosis {
+            margin-bottom: 12px;
+            border-left: 3px solid #5da2ff;
+            padding: 10px 12px;
+            background: #111923;
+            color: #e5edf8;
+            font-size: 1.2rem;
+            line-height: 1.45;
+        }
+
+        .order-row {
+            display: grid;
+            grid-template-columns: minmax(260px, 1.2fr) 110px minmax(220px, 1fr) 110px;
+            gap: 10px;
+            align-items: center;
+            border: 1px solid #26303b;
+            border-radius: 6px;
+            background: #101319;
+            padding: 10px;
+            color: #d9dee7;
+            font-size: 1.1rem;
+            line-height: 1.4;
+        }
+
+        .order-row strong,
+        .order-row span {
+            display: block;
+            overflow-wrap: anywhere;
+        }
+
+        .order-row span {
+            margin-top: 3px;
+            color: #94a3b8;
+        }
+
+        .rank-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+            color: #d4dae3;
+            font-size: 1.15rem;
+            line-height: 1.4;
+        }
+
+        .rank-row span:first-child {
+            overflow-wrap: anywhere;
+        }
+
+        .rank-count {
+            color: #7db5ff;
+            font-weight: 700;
+        }
+
+        .bar {
+            width: 100%;
+            height: 7px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #27303b;
+        }
+
+        .bar span {
+            display: block;
+            height: 100%;
+            border-radius: inherit;
+            background: #5da2ff;
+        }
+
+        .log-line {
+            display: grid;
+            gap: 5px;
+            border: 1px solid #26303b;
+            border-radius: 6px;
+            background: #101319;
+            padding: 10px;
+            color: #d9dee7;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 1.05rem;
+            line-height: 1.45;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .line-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            color: #94a3b8;
+            font-family: Arial, "Noto Sans KR", sans-serif;
+            font-size: 1.05rem;
+        }
+
+        .level-error {
+            color: #ff7979;
+        }
+
+        .level-warn {
+            color: #ffd166;
+        }
+
+        .level-info {
+            color: #7db5ff;
+        }
+
+        .level-debug {
+            color: #9ae6b4;
+        }
+
+        .empty {
+            color: #8b95a3;
+            font-size: 1.2rem;
+        }
+
+        .wide {
+            grid-column: 1 / -1;
+        }
+
+        .span-2 {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 1100px) {
+            .summary-grid,
+            .analysis-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .toolbar {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .wide,
+            .span-2 {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .topbar,
+            .toolbar,
+            .summary-grid,
+            .analysis-grid {
+                grid-template-columns: 1fr;
+                display: grid;
+            }
+
+            .file-name {
+                text-align: left;
+            }
+
+            .order-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+  <script type="module" crossorigin src="../assets/localLogAnalyzer-DKLHuA2C.js"></script>
+  <link rel="modulepreload" crossorigin href="../assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="stylesheet" crossorigin href="../assets/reset-BB7F9ZgL.css">
+</head>
+<body>
+<main class="page">
+    <div class="topbar">
+        <h1>로컬 로그 분석기</h1>
+        <div class="file-name" id="fileName">TXT 로그 파일을 선택하세요.</div>
+    </div>
+
+    <label class="drop-zone" id="dropZone">
+        <input id="logFileInput" type="file" accept=".txt,.log,text/plain"/>
+        <span class="drop-text">
+            <strong>로그 파일 선택 또는 드래그</strong>
+            <span>파일은 업로드되지 않고 브라우저 안에서만 분석됩니다.</span>
+        </span>
+    </label>
+
+    <div class="toolbar">
+        <input id="keywordInput" type="search" placeholder="키워드 필터: error, timeout, orderId, URL 등"/>
+        <select id="levelFilter" aria-label="로그 레벨 필터">
+            <option value="all">전체 레벨</option>
+            <option value="error">ERROR</option>
+            <option value="warn">WARN</option>
+            <option value="info">INFO</option>
+            <option value="debug">DEBUG</option>
+            <option value="unknown">UNKNOWN</option>
+        </select>
+        <select id="focusFilter" aria-label="분석 포커스">
+            <option value="all">전체 보기</option>
+            <option value="problem">문제 라인 중심</option>
+            <option value="machine">제조/장비 패턴</option>
+            <option value="slow">느린 요청 중심</option>
+            <option value="http">HTTP 중심</option>
+            <option value="exception">예외 중심</option>
+        </select>
+        <select id="maxLines" aria-label="표시 라인 수">
+            <option value="50">50줄 표시</option>
+            <option value="100">100줄 표시</option>
+            <option value="300">300줄 표시</option>
+            <option value="1000">1000줄 표시</option>
+        </select>
+        <button id="clearBtn" type="button" disabled>초기화</button>
+    </div>
+
+    <section class="summary-grid" id="summaryGrid"></section>
+    <section class="analysis-grid" id="analysisGrid"></section>
+</main>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="/src/css/reset.css" rel="stylesheet"/>
+    <link href="/src/css/common.css" rel="stylesheet"/>
+    <link href="/src/css/style.css" rel="stylesheet"/>
+    <link href="/src/css/billing.css" rel="stylesheet"/>
+    <script src="/src/main.ts" type="module"></script>
+    <title>후불결제 관리</title>
+</head>
+<body>
+<div id="main-content">
+    <section class="billing-page mt80">
+        <div class="inner">
+            <div class="billing-title-row">
+                <div>
+                    <h2>후불결제 전체 관리</h2>
+                    <p id="billingFranchiseLabel" class="billing-context"></p>
+                </div>
+                <button id="billingSaveBtn" class="btn blue" type="button">설정 저장</button>
+            </div>
+
+            <div class="billing-summary" aria-label="후불결제 설정 요약">
+                <div class="billing-summary-item">
+                    <span>결제 식별방식</span>
+                    <strong id="billingTypeSummary">-</strong>
+                </div>
+                <div class="billing-summary-item">
+                    <span>기본 월 한도</span>
+                    <strong id="billingLimitSummary">-</strong>
+                </div>
+                <div class="billing-summary-item">
+                    <span>사용금액 초기화일</span>
+                    <strong id="billingResetSummary">-</strong>
+                </div>
+            </div>
+
+            <hr class="borderSt-dot"/>
+
+            <div class="billing-form-section">
+                <div class="billing-section-title">
+                    <h3>전체 설정</h3>
+                    <span id="billingUpdatedAt"></span>
+                </div>
+
+                <div class="billing-form-grid">
+                    <label class="billing-field">
+                        <span>관리 대상명</span>
+                        <input id="billingApartmentName" type="text" maxlength="80"/>
+                    </label>
+
+                    <div class="billing-field billing-type-field">
+                        <span>결제 식별방식</span>
+                        <div class="billing-type-control" role="radiogroup" aria-label="결제 식별방식">
+                            <label>
+                                <input type="radio" name="billingType" value="apartment"/>
+                                <span>동호수</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="billingType" value="employee"/>
+                                <span>사원증</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <label class="billing-field">
+                        <span>기본 월 한도</span>
+                        <span class="billing-input-unit">
+                            <input id="billingDefaultLimit" type="text" inputmode="numeric"/>
+                            <em>원</em>
+                        </span>
+                    </label>
+
+                    <label class="billing-field">
+                        <span>사용금액 초기화일</span>
+                        <span class="billing-input-unit">
+                            <select id="billingResetDay"></select>
+                            <em>일</em>
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <div id="billingEmptyContext" class="billing-empty" hidden>
+                관리할 후불결제 대상 정보를 확인할 수 없습니다.
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>
