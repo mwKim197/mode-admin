@@ -1361,6 +1361,10 @@ async function downloadExcel() {
             // 상품별 탭: 새로운 API
             apiUrl = `/model_payment?func=get-menu-statistics-excel&userId=${userId}`;
 
+            if (startDate && endDate) {
+                apiUrl += `&startDate=${startDate}&endDate=${endDate}`;
+            }
+
             // 페이지네이션 키 추가 (1페이지가 아닌 경우에만)
             if (currentPage > 1 && pageKeys.length > 0) {
                 const keyIndex = currentPage - 2;
@@ -1375,6 +1379,10 @@ async function downloadExcel() {
         // API 호출
         const response = await apiGet(apiUrl);
         const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || `Excel request failed (${response.status})`);
+        }
 
         if (!data.excelUrl) {
             throw new Error("엑셀 URL을 받지 못했습니다.");
