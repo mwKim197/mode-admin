@@ -70,6 +70,81 @@
                         </div>
                     </div>
 
+                    <div class="inputWrap">
+                        <div class="data_input">
+                            <p>쿠폰명</p>
+                            <input type="text" id="coupon-name" maxlength="50" placeholder="쿠폰명을 입력해주세요"/>
+                        </div>
+                    </div>
+
+                    <div class="inputWrap">
+                        <div class="data_input">
+                            <p>쿠폰유형</p>
+                            <div class="select">
+                                <select id="coupon-type" class="popup-select mb0">
+                                    <option value="MENU">메뉴 무료쿠폰</option>
+                                    <option value="FIXED">정액 할인쿠폰</option>
+                                    <option value="PERCENT">정률 할인쿠폰</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="inputWrap coupon-type-field" id="menu-field">
+                        <div class="data_input">
+                            <p>적용메뉴</p>
+                            <div class="select">
+                                <select id="sample" class="popup-select mb0"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="inputWrap coupon-type-field is-hidden" id="fixed-field">
+                        <div class="data_input">
+                            <p>할인금액</p>
+                            <div class="unit-input">
+                                <input type="number" id="fixed-amount" min="100" max="10000" step="100" placeholder="100~10,000"/>
+                                <span>원</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="inputWrap coupon-type-field is-hidden" id="percent-field">
+                        <div class="data_input">
+                            <p>할인율</p>
+                            <div class="unit-input">
+                                <input type="number" id="percent-rate" min="1" max="100" step="1" placeholder="1~100"/>
+                                <span>%</span>
+                            </div>
+                        </div>
+                        <div class="data_input sub-field">
+                            <p>최대할인액</p>
+                            <div class="unit-input">
+                                <input type="number" id="max-discount" min="0" step="10" placeholder="미입력 시 제한 없음"/>
+                                <span>원</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="inputWrap">
+                        <div class="data_input">
+                            <p>발행방식</p>
+                            <div class="select">
+                                <select id="issuance-type" class="popup-select mb0">
+                                    <option value="QUANTITY">수량형</option>
+                                    <option value="PERIOD">기간형</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="inputWrap">
+                        <div class="data_input">
+                            <p>발행일시</p>
+                            <input type="text" value="발행 완료 시 자동 기록" readonly/>
+                        </div>
+                    </div>
+
                     <!-- 사용기한 -->
                     <div class="inputWrap">
                         <div class="data_input">
@@ -86,23 +161,30 @@
                     <div class="inputWrap">
                         <div class="data_input">
                             <p>발행매수</p>
-                            <div>
-                                <input type="text" id="issue-count"/>
+                            <div class="unit-input">
+                                <input type="number" id="issue-count" min="1" max="99" step="1" value="1"/>
                                 <span>매</span>
+                            </div>
+                        </div>
+                        <p class="field-help" id="issue-count-help">수량형은 입력한 매수만큼 서로 다른 코드를 생성합니다.</p>
+                    </div>
+
+                    <div class="inputWrap">
+                        <div class="data_input">
+                            <p>총사용한도</p>
+                            <div class="unit-input">
+                                <input type="number" id="total-limit" min="1" step="1" value="1"/>
+                                <span>회</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 쿠폰선택 -->
                     <div class="inputWrap">
                         <div class="data_input">
-                            <p>메뉴선택</p>
-                            <div class="select">
-                                <select
-                                        id="sample"
-                                        class="popup-select mb0"
-                                        required
-                                ></select>
+                            <p>일일한도</p>
+                            <div class="unit-input">
+                                <input type="number" id="daily-limit" min="1" step="1" placeholder="미입력 시 무제한"/>
+                                <span>회</span>
                             </div>
                         </div>
                     </div>
@@ -112,7 +194,7 @@
                         <div class="text_input">
                             <p>메모</p>
                             <textarea
-                                    id="myTextarea"
+                                    id="memo"
                                     maxlength="200"
                                     rows="4"
                                     cols="50"

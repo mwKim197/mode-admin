@@ -11,7 +11,7 @@
       const state = params.get("state");                // ✅ CSRF용 state
       const error = params.get("error") || params.get("error_description");
 
-      const origin = location.origin;                   // "https://zeroadmin.kr"
+      const origin = location.origin;
 
       // 팝업 플로우
       if (window.opener && !window.opener.closed) {
@@ -29,7 +29,7 @@
       }
 
       // 서버 토큰 교환
-      fetch("https://api.narrowroad-model.com/model_admin_login?func=kakao-login", {
+      fetch("%VITE_API_BASE_URL%/model_admin_login?func=kakao-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code, state }),          // ✅ state 함께 전달(선택)

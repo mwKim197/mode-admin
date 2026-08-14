@@ -9,7 +9,8 @@ Read it before editing code.
 platform. It manages stores, menus, products, coupons, mileage/points, sales,
 notices, franchises, admin permissions, device commands, and machine inventory.
 
-It is a browser-only frontend. Backend APIs are hosted at:
+It is primarily a browser frontend, with a Capacitor Android wrapper added for
+mobile app testing. Backend APIs are hosted at:
 
 ```text
 https://api.narrowroad-model.com
@@ -26,6 +27,9 @@ The project builds static files into `dist/` and deploys them to S3/CloudFront.
 - Main entry: `src/main.ts`
 - HTML pages: `html/*.html`
 - Build output: `dist/`
+- Capacitor config: `capacitor.config.ts`
+- Capacitor webDir: `dist`
+- Android native project: `android/`
 
 ## Commands
 
@@ -35,6 +39,29 @@ Use `npm.cmd` in PowerShell.
 npm.cmd run dev
 npm.cmd run build
 npm.cmd run preview
+```
+
+Capacitor Android commands:
+
+```powershell
+npm.cmd run build
+npx.cmd cap sync android
+npx.cmd cap open android
+```
+
+Debug APK build from PowerShell:
+
+```powershell
+cd android
+$env:JAVA_HOME='C:\Program Files\Android\Android Studio\jbr'
+$env:Path="$env:JAVA_HOME\bin;$env:Path"
+.\gradlew.bat assembleDebug
+```
+
+Debug APK output:
+
+```text
+android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
 Verified locally:
@@ -53,6 +80,13 @@ Current build warnings:
 
 - `html/log.html` includes `../public/js/jquery-3.6.0.js` without `type="module"`, so Vite cannot bundle that script.
 - `deviceManage.ts` is both statically and dynamically imported by `main.ts`, so Vite warns it cannot split that module into a separate chunk.
+
+Android debug APK build note:
+
+- Capacitor/Android Gradle currently requires Java 21. The local terminal may
+  default to Java 17, which causes `invalid source release: 21`.
+- Use Android Studio's bundled JBR:
+  `C:\Program Files\Android\Android Studio\jbr`.
 
 ## Deployment
 
@@ -76,6 +110,36 @@ E2F4R34LX88V05
 
 README says not to push directly to `master` for regular work; use feature
 branches such as `feature/name-task`.
+
+## Capacitor Android App
+
+Capacitor has been added to wrap the existing Vite multi-page app.
+
+Files and settings:
+
+- `capacitor.config.ts`
+  - `appId`: `com.narrowroad.model.admin`
+  - `appName`: `Model Admin`
+  - `webDir`: `dist`
+- `android/`
+  - Generated Android native project.
+- `package.json`
+  - `@capacitor/core`
+  - `@capacitor/android`
+  - `@capacitor/cli`
+  - `@capgo/capacitor-native-biometric`
+
+Important rules:
+
+- Keep the existing web build/deploy flow unchanged.
+- Do not edit `dist/` manually.
+- Run `npm.cmd run build` before `npx.cmd cap sync android`.
+- `index.html` is included in Vite inputs and routes to `/html/log.html`, so
+  Capacitor has a valid app entry point.
+- Android Studio should open the `android/` project for running/emulator work.
+- iOS can be added with the same webDir model, but actual iOS build/test
+  requires macOS + Xcode. Add `NSFaceIDUsageDescription` to iOS `Info.plist`
+  before using Face ID.
 
 ## App Architecture
 
@@ -144,8 +208,24 @@ Token storage:
 
 - `accessToken`: `sessionStorage` or `localStorage`
 - `refreshToken`: `localStorage`
+- Capacitor app refresh token: also saved to the app secure store via
+  `@capgo/capacitor-native-biometric`
 - Impersonation mode: `sessionStorage.impersonationMode === "true"`
 - Store/user info: `localStorage.userInfo`
+
+Native biometric auto-login:
+
+- Utility file: `src/ts/utils/biometricAuth.ts`
+- On web, refresh token behavior stays compatible with existing `localStorage`.
+- On Capacitor native platforms, login success stores the refresh token in
+  Android Keystore / iOS Keychain using:
+  `NativeBiometric.setCredentials(..., accessControl: BIOMETRY_ANY)`.
+- On app start/login page entry, saved credentials are read through
+  `NativeBiometric.getSecureCredentials()`, which prompts biometric/device
+  authentication.
+- The retrieved refresh token is then used with
+  `/model_admin_login?func=refresh` to get a new access token.
+- Biometric auth is a local convenience gate, not server-side identity proof.
 
 `fetchWithAuth(endpoint, options, showLoading)`:
 
@@ -508,6 +588,8 @@ Dependencies:
 - `jsbarcode`: barcode rendering
 - `jwt-decode`: token decoding
 - `@aws-sdk/client-s3`: S3 interactions, likely for direct upload helpers
+- `@capacitor/core`, `@capacitor/android`, `@capacitor/cli`: Capacitor app wrapper
+- `@capgo/capacitor-native-biometric`: native biometric prompt and secure credential storage
 
 Global exposure:
 
@@ -552,6 +634,8 @@ Sensitive values should come from environment variables, not committed files.
 - Side menu behavior is hardcoded in `src/main.ts`.
 - HTML entry pages must be listed in `vite.config.ts` to be included in production build.
 - `dist/` is generated output. Do not edit it manually.
+- Android native assets are generated from `dist/` by `npx.cmd cap sync android`;
+  do not edit `android/app/src/main/assets/public` manually.
 
 ## How To Approach Changes
 

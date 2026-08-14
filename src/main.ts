@@ -9,6 +9,8 @@ import Choices from "choices.js";
 import "choices.js/public/assets/styles/choices.min.css";
 import {initMenuMerge} from "./ts/page/menuMerge.ts";
 import {apiGet} from "./ts/api/apiHelpers.ts";
+import {getRefreshTokenForAutoLogin} from "./ts/utils/biometricAuth.ts";
+import {API_BASE_URL} from "./ts/config/apiConfig.ts";
 
 // 글로벌 등록
 declare global {
@@ -305,6 +307,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // ✅ 쿠폰 메뉴 정의
     const couponMenu: MenuItem = {href: "/html/couponList.html", label: "쿠폰"};
 
+    const billingMenu: MenuItem = {href: "/html/billing.html", label: "후불결제"};
+
     // 3) 메뉴 렌더 함수
     function renderMenu(containerSelector: string, items: MenuItem[]): void {
         const menuList = document.querySelector<HTMLUListElement>(containerSelector);
@@ -380,6 +384,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             menus = upsertMenuItem(menus, couponMenu, {insertAfterLabel: "일반설정"});
         }
 
+        if (user?.billingPay === true) {
+            menus = upsertMenuItem(menus, billingMenu, {insertAfterLabel: "매출"});
+        }
+
         // 렌더링
         renderMenu(".sidemenu .menu", menus);
         highlightActiveMenu(".sidemenu .menu");
@@ -421,6 +429,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.log("📌 포인트 - point.ts 로드");
         import("./ts/page/point.ts").then((module) => {
             module.initPoint();
+        });
+    } else if (path === "/html/billing.html") {
+        console.log("📌 후불결제 전체 관리 - billing.ts 로드");
+        import("./ts/page/billing.ts").then((module) => {
+            module.initBilling();
         });
     } else if (path === "/html/product.html") {
         console.log("📌 상품 - product.ts 로드");
@@ -681,8 +694,8 @@ function bindGlobalDeviceEvents() {
 
 // 자동로그인
 async function tryAutoLogin() {
-    const API_URL = "https://api.narrowroad-model.com"; // ✅ 전역 충돌 방지
-    const refreshToken = localStorage.getItem("refreshToken");
+    const API_URL = API_BASE_URL; // ✅ 전역 충돌 방지
+    const refreshToken = await getRefreshTokenForAutoLogin();
     if (!refreshToken) {
         console.log("🔒 자동로그인 스킵: refreshToken 없음");
         return;
@@ -718,4 +731,3 @@ function redirectToLogin() {
     console.log("➡️ 로그인 페이지로 이동");
     window.location.href = "/html/log.html";
 }
-

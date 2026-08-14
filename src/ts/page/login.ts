@@ -1,6 +1,10 @@
 import {setStoredUser} from "../utils/userStorage.ts";
-
-const API_URL = "https://api.narrowroad-model.com"; // ✅ 전역 충돌 방지
+import {
+    deleteSecureRefreshToken,
+    getRefreshTokenForAutoLogin,
+    saveRefreshTokenToSecureStore,
+} from "../utils/biometricAuth.ts";
+import {API_BASE_URL as API_URL, APP_BASE_URL} from "../config/apiConfig.ts"; // ✅ 전역 충돌 방지
 
 export function initLogin() {
     console.log("✅ login.ts 로드됨");
@@ -14,6 +18,8 @@ export function initLogin() {
         console.error("❌ 로그인 폼을 찾을 수 없음");
         return;
     }
+
+    tryStoredLogin();
 
     // ✅ 폼 제출 이벤트 처리
     loginForm.addEventListener("submit", async (event) => {
@@ -69,7 +75,7 @@ export function initLogin() {
 // ✅ 카카오 로그인 처리 함수
 function handleKakaoLogin() {
     const KAKAO_CLIENT_ID = "240886095629b93f9655026145a39487";
-    const KAKAO_REDIRECT_URI = "https://zeroadmin.kr/html/kakao-callback.html";
+    const KAKAO_REDIRECT_URI = `${APP_BASE_URL}/html/kakao-callback.html`;
     // 1) state 생성(보안/상관관계용) + 저장
     const bytes = new Uint8Array(16);
     crypto.getRandomValues(bytes);
@@ -155,18 +161,61 @@ async function handlePostLogin(data: any, autoLoginChecked: boolean = false) {
         if (autoLoginChecked) {
             console.log("✅ 로그인 성공 → 자동로그인 활성화");
             localStorage.setItem("refreshToken", data.refreshToken);
+            await saveRefreshTokenToSecureStore(data.refreshToken);
         } else {
             console.log("✅ 로그인 성공 → 자동로그인 삭제");
             localStorage.removeItem("refreshToken");
+            await deleteSecureRefreshToken();
         }
         console.log("✅ 로그인 성공 → 토큰 저장 완료!");
 
+        await finishLogin(data.accessToken);
+
+    } catch (error) {
+        console.error("❌ postLogin 처리 오류:", error);
+        alert("로그인 후 처리 중 오류가 발생했습니다.");
+    }
+}
+
+async function tryStoredLogin() {
+    if (localStorage.getItem("accessToken")) return;
+
+    const refreshToken = await getRefreshTokenForAutoLogin();
+    if (!refreshToken) return;
+
+    window.showLoading();
+
+    try {
+        const res = await fetch(`${API_URL}/model_admin_login?func=refresh`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({refreshToken}),
+        });
+
+        if (!res.ok) {
+            localStorage.removeItem("refreshToken");
+            await deleteSecureRefreshToken();
+            return;
+        }
+
+        const data = await res.json();
+        localStorage.setItem("accessToken", data.accessToken);
+        await finishLogin(data.accessToken);
+    } catch (error) {
+        console.warn("저장된 로그인 정보로 자동 로그인 실패:", error);
+    } finally {
+        window.hideLoading();
+    }
+}
+
+async function finishLogin(accessToken: string) {
+    try {
         // 🧑‍💻 사용자 정보 조회
         const meRes = await fetch(`${API_URL}/model_admin_login?func=me`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${data.accessToken}`
+                "Authorization": `Bearer ${accessToken}`
             },
             mode: "cors",
         });
@@ -185,7 +234,7 @@ async function handlePostLogin(data: any, autoLoginChecked: boolean = false) {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${data.accessToken}`
+                    "Authorization": `Bearer ${accessToken}`
                 },
                 mode: "cors",
             });
@@ -211,7 +260,7 @@ async function handlePostLogin(data: any, autoLoginChecked: boolean = false) {
         }
 
     } catch (error) {
-        console.error("❌ postLogin 처리 오류:", error);
+        console.error("❌ 로그인 마무리 처리 오류:", error);
         alert("로그인 후 처리 중 오류가 발생했습니다.");
     }
 }
@@ -221,7 +270,7 @@ export async function bootstrapAuth() {
     const accessToken = localStorage.getItem("accessToken");
     if (accessToken) return true;
 
-    const refreshToken = localStorage.getItem("refreshToken");
+    const refreshToken = await getRefreshTokenForAutoLogin();
     if (!refreshToken) return false;
 
     const res = await fetch(`${API_URL}/model_admin_login?func=refresh`, {

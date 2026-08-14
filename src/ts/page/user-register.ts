@@ -1,3 +1,5 @@
+import {API_BASE_URL} from "../config/apiConfig.ts";
+
 export async function initUserRegister() {
   console.log("✅ user-register.ts 로드됨");
 
@@ -54,7 +56,7 @@ export async function initUserRegister() {
 
     try {
       const response = await fetch(
-        "https://api.narrowroad-model.com/model_new_store",
+        `${API_BASE_URL}/model_new_store`,
         {
           method: "POST",
           headers: {

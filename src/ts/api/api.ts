@@ -1,6 +1,5 @@
 import {bootstrapAuth, getToken, logout} from "../common/auth.ts";
-
-const API_URL = "https://api.narrowroad-model.com";
+import {API_BASE_URL as API_URL} from "../config/apiConfig.ts";
 
 export async function fetchWithAuth(
     endpoint: string,

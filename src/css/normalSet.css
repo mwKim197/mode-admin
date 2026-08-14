@@ -72,6 +72,37 @@ section.mt80.pb20 .in-box input[type="text"] {
     opacity: 0.8;
 }
 
+.category-order-actions {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    flex-shrink: 0;
+}
+
+.move-category-up,
+.move-category-down {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    background: var(--white);
+    color: var(--stoke-gray);
+    cursor: pointer;
+    font-size: 1.6rem;
+    font-weight: bold;
+}
+
+.move-category-up:hover:not(:disabled),
+.move-category-down:hover:not(:disabled) {
+    background: #f3f5f7;
+}
+
+.move-category-up:disabled,
+.move-category-down:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+}
+
 .category-actions {
     margin-top: 2rem;
     text-align: center;
