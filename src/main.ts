@@ -495,6 +495,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         import("./ts/page/couponDetail.ts").then((module) => {
             module.initCouponDetail();
         });
+    } else if (path === "/html/couponDetail2.html") {
+        console.log("📌 쿠폰2 테스트 발행 - couponDetail2.ts 로드");
+        import("./ts/page/couponDetail2.ts").then((module) => {
+            module.initCouponDetail2();
+        });
     } else if (path === "/html/noticeList.html") {
         console.log("📌 공지사항목록 - noticeList.ts 로드");
         import("./ts/page/noticeList.ts").then((module) => {
