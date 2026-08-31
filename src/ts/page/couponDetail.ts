@@ -90,6 +90,11 @@ async function submitCouponForm(event: SubmitEvent) {
     const maxDiscountText = valueOf("max-discount");
     const maxDiscountAmount = maxDiscountText ? Number(maxDiscountText) : null;
 
+    // 운영에서는 메뉴 무료 쿠폰만 발행한다. 정액·정률 쿠폰은 개발 검증 완료 후 별도 배포한다.
+    if (String(couponType) !== "MENU") {
+        return showWarning("현재 메뉴 무료쿠폰만 발행할 수 있습니다.");
+    }
+
     if (!name) return showWarning("쿠폰명을 입력해주세요.");
     if (!validateDateRange(startsAt, expiresAt)) return;
     if (!Number.isInteger(issueCount) || issueCount < 1 || issueCount > 99) {
