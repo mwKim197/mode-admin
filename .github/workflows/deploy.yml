@@ -1,4 +1,4 @@
-name: Deploy mode-admin development
+name: Deploy mode-admin production
 
 on:
   push:
@@ -8,10 +8,9 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 concurrency:
-  group: mode-admin-development
+  group: mode-admin-production
   cancel-in-progress: true
 
 jobs:
@@ -31,21 +30,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build with development API
-        run: npm run build:dev
+      - name: Build production admin
+        run: npm run build
 
-      - name: Configure AWS credentials
+      - name: Configure production AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::103930328445:role/mode-admin-deploy-role
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
-          allowed-account-ids: "103930328445"
 
-      - name: Deploy to company S3
-        run: aws s3 sync ./dist/ s3://narrowwayco-model-web-admin --no-progress
+      - name: Deploy to production S3
+        run: aws s3 sync ./dist/ s3://zeroadmin.kr --delete --no-progress
 
-      - name: Invalidate company CloudFront cache
+      - name: Invalidate production CloudFront cache
         run: |
           aws cloudfront create-invalidation \
-            --distribution-id E38GRU2BINWKWA \
+            --distribution-id E2F4R34LX88V05 \
             --paths "/*"
