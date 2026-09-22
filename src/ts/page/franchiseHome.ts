@@ -31,7 +31,11 @@ async function loadStoreList(franchiseId: string = "") {
     let list: any[] = json.stores ?? [];
     // 🔍 검색 기능
     if (keyword) {
-        list = list.filter((u) => u.adminId.includes(keyword));
+        const normalizedKeyword = keyword.toLowerCase();
+        list = list.filter((store) =>
+            [store.adminId, store.userId, store.storeName]
+                .some((value) => String(value ?? "").toLowerCase().includes(normalizedKeyword))
+        );
     }
 
     list.sort((a, b) => {
@@ -60,9 +64,14 @@ function renderStoreTable(list: any[]) {
     tbody.innerHTML = "";
 
     list.forEach((store) => {
+        const accountId = store.userId || store.adminId;
+        const accountLabel = store.storeName
+            ? `${accountId} (${store.storeName})`
+            : accountId;
+
         tbody.innerHTML += `
             <tr>
-                <td>${store.adminId}</td>          
+                <td>${accountLabel}</td>
                 <td>${store.todaySales?.toLocaleString() ?? 0}</td>
                 <td>${store.monthSales?.toLocaleString() ?? 0}</td>
                 <td>${new Date(store.createdAt).toLocaleDateString()}</td>
