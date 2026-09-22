@@ -1,7 +1,8 @@
-import {apiGet} from "../api/apiHelpers.ts";
+import {apiGet, apiPost} from "../api/apiHelpers.ts";
 import {getStoredUser} from "../utils/userStorage.ts";
 import {renderBarcodeToCanvas} from "../utils/barcode.ts";
 import html2canvas from "html2canvas";
+import { IMAGE_BASE_URL } from "../config/apiConfig.ts";
 
 let allCoupons: any[] = [];
 let searchTimeout: NodeJS.Timeout | null = null;
@@ -11,6 +12,94 @@ let pageKeys: any[] = [];
 let totalItems = 0;
 let currentPage = 1;
 const pageLimit = 20;
+const NEW_COUPON_ENABLED_USER_IDS = new Set(["zero189", "zero223"]);
+let enhancedCouponUiEnabled = false;
+let currentStatusFilter = "ACTIVE";
+const campaignStatusById = new Map<string, string>();
+
+type CouponVisualType = "MENU" | "FIXED" | "PERCENT";
+
+const COUPON_OVERLAY_IMAGE_BY_TYPE: Partial<Record<CouponVisualType, string>> = {
+    FIXED: "/img/coupon-fixed-01.png",
+    PERCENT: "/img/coupon-percent-01.png",
+};
+
+function getCouponVisualType(couponData: any): CouponVisualType {
+    const rawType = String(
+        couponData?.discountType
+        ?? couponData?.discount_type
+        ?? couponData?.couponType
+        ?? couponData?.coupon_type
+        ?? couponData?.type
+        ?? couponData?.campaign?.discountType
+        ?? couponData?.campaign?.discount_type
+        ?? ""
+    ).toUpperCase();
+
+    if (["FIXED", "AMOUNT", "FIXED_AMOUNT", "DISCOUNT_AMOUNT"].includes(rawType)) return "FIXED";
+    if (["PERCENT", "PERCENTAGE", "RATE", "DISCOUNT_RATE"].includes(rawType)) return "PERCENT";
+
+    const title = String(couponData?.title ?? couponData?.name ?? "");
+    if (/금액권|정액/.test(title)) return "FIXED";
+    if (/할인율|할인률|정률|\d+\s*%/.test(title)) return "PERCENT";
+    if (couponData?.discountRate != null || couponData?.discount_rate != null) return "PERCENT";
+    if (couponData?.discountAmount != null || couponData?.discount_amount != null) return "FIXED";
+    return "MENU";
+}
+
+function updateCouponBackground(couponData: any) {
+    const couponImage = document.getElementById("coupon-image") as HTMLImageElement | null;
+    if (!couponImage) return;
+    const couponType = getCouponVisualType(couponData);
+    couponImage.src = "/img/coupon.svg";
+    couponImage.alt = couponType === "FIXED"
+        ? "정액 할인쿠폰"
+        : couponType === "PERCENT" ? "정률 할인쿠폰" : "메뉴 무료쿠폰";
+}
+
+function setDiscountCouponImage(couponData: any, title: string): boolean {
+    const imageUrl = COUPON_OVERLAY_IMAGE_BY_TYPE[getCouponVisualType(couponData)];
+    if (!imageUrl) return false;
+    const couponContentImage = document.querySelector(".coupon-menu-image") as HTMLImageElement | null;
+    if (couponContentImage) {
+        couponContentImage.src = imageUrl;
+        couponContentImage.alt = title;
+    }
+    return true;
+}
+
+function getCouponDiscountValue(couponData: any): number {
+    const rawValues = [
+        couponData?.discountValue, couponData?.discount_value,
+        couponData?.discountAmount, couponData?.discount_amount,
+        couponData?.discountRate, couponData?.discount_rate,
+        couponData?.amount, couponData?.rate, couponData?.value,
+        couponData?.campaign?.discountValue, couponData?.campaign?.discount_value,
+        couponData?.campaign?.discountAmount, couponData?.campaign?.discountRate,
+        couponData?.campaign?.amount, couponData?.campaign?.rate,
+    ];
+    for (const rawValue of rawValues) {
+        const value = Number(rawValue);
+        if (rawValue != null && Number.isFinite(value) && value > 0) return value;
+    }
+    const title = String(couponData?.title ?? couponData?.name ?? "");
+    const match = getCouponVisualType(couponData) === "PERCENT"
+        ? title.match(/([\d,.]+)\s*%/)
+        : title.match(/([\d,.]+)\s*원/);
+    if (!match) return 0;
+    const titleValue = Number(match[1].replace(/,/g, ""));
+    return Number.isFinite(titleValue) ? titleValue : 0;
+}
+
+function getCouponBenefitText(couponData: any): string {
+    const couponType = getCouponVisualType(couponData);
+    const discountValue = getCouponDiscountValue(couponData);
+    if (couponType === "FIXED") {
+        return discountValue > 0 ? `${discountValue.toLocaleString("ko-KR")}원 할인` : "정액 할인";
+    }
+    if (couponType === "PERCENT") return discountValue > 0 ? `${discountValue}% 할인` : "정률 할인";
+    return "1잔 무료";
+}
 
 export function initCoupon() {
     console.log("✅ coupon.ts 로드됨");
@@ -30,12 +119,31 @@ export function initCouponList() {
     // 사용자 정보 및 쿠폰 목록 로드
     loadUserInfoAndCoupons();
 
-    // 발급하기 버튼 클릭 시 couponDetail 페이지로 이동
+    // zero189 매장만 신형 쿠폰 발행 화면을 메뉴로 노출한다.
     const openCouponDetailBtn = document.getElementById("open-coupon-detail");
+    const currentUserId = String(getStoredUser()?.userId ?? "").trim().toLowerCase();
+    enhancedCouponUiEnabled = NEW_COUPON_ENABLED_USER_IDS.has(currentUserId);
+
+    if (enhancedCouponUiEnabled) {
+        document.body.classList.add("new-coupon-ui-enabled");
+        const deleteButton = document.getElementById("delete-selected-coupons");
+        const statusFilterWrap = document.getElementById("coupon-status-filter-wrap");
+        if (deleteButton) deleteButton.hidden = false;
+        if (statusFilterWrap) statusFilterWrap.hidden = false;
+        deleteButton?.addEventListener("click", deleteSelectedCouponCampaigns);
+        const statusFilter = document.getElementById("coupon-status-filter") as HTMLSelectElement | null;
+        statusFilter?.addEventListener("change", () => {
+            currentStatusFilter = statusFilter.value;
+            renderCouponTable(getStatusFilteredCoupons(allCoupons));
+        });
+    }
 
     if (openCouponDetailBtn) {
         openCouponDetailBtn.addEventListener("click", function () {
-            window.location.href = "/html/couponDetail.html";
+            const userId = String(getStoredUser()?.userId ?? "").trim().toLowerCase();
+            window.location.href = NEW_COUPON_ENABLED_USER_IDS.has(userId)
+                ? "/html/couponDetail2.html"
+                : "/html/couponDetail.html";
         });
     }
 
@@ -78,6 +186,10 @@ async function loadUserInfoAndCoupons() {
             console.error("사용자 정보 로드 실패");
         }
 
+        const normalizedUserId = String(user.userId).trim().toLowerCase();
+        if (NEW_COUPON_ENABLED_USER_IDS.has(normalizedUserId)) {
+            await loadCampaignStatuses(user.userId);
+        }
         await getCouponList(user.userId);
     } catch (error) {
         console.error("API 호출 오류:", error);
@@ -148,16 +260,16 @@ async function getCouponList(userId: string) {
                     ...(firstData.items || []),
                     ...(secondData.items || []),
                 ];
-                allCoupons = combinedItems;
+                allCoupons = combinedItems.map(withCampaignStatus);
             } else {
-                allCoupons = firstData.items || [];
+                allCoupons = (firstData.items || []).map(withCampaignStatus);
             }
         } else {
             // 두 번째 요청이 불필요한 경우
-            allCoupons = firstData.items || [];
+            allCoupons = (firstData.items || []).map(withCampaignStatus);
         }
 
-        renderCouponTable(allCoupons);
+        renderCouponTable(getStatusFilteredCoupons(allCoupons));
         renderPagination();
     } catch (error) {
         console.error("쿠폰 목록 로드 실패:", error);
@@ -273,7 +385,7 @@ function initSearchFunction() {
     resetBtn.addEventListener("click", () => {
         searchInput.value = "";
         // 실시간 검색으로 전체 데이터 표시
-        renderCouponTable(allCoupons, false);
+        renderCouponTable(getStatusFilteredCoupons(allCoupons), false);
         renderPagination();
     });
 
@@ -303,20 +415,20 @@ function initSearchFunction() {
 //  실시간 검색 실행
 async function performRealTimeSearch(searchValue: string) {
     if (!searchValue.trim()) {
-        renderCouponTable(allCoupons);
+        renderCouponTable(getStatusFilteredCoupons(allCoupons));
         renderPagination();
         return;
     }
 
     const koreanConsonants = /^[ㄱ-ㅎ]+$/;
     if (koreanConsonants.test(searchValue)) {
-        renderCouponTable(allCoupons);
+        renderCouponTable(getStatusFilteredCoupons(allCoupons));
         renderPagination();
         return;
     }
 
     if (searchValue.length < 1) {
-        renderCouponTable(allCoupons);
+        renderCouponTable(getStatusFilteredCoupons(allCoupons));
         renderPagination();
         return;
     }
@@ -339,9 +451,9 @@ async function performRealTimeSearch(searchValue: string) {
         const response = await apiGet(apiUrl);
         if (response.ok) {
             const data = await response.json();
-            const searchResults = data.items || [];
+            const searchResults = (data.items || []).map(withCampaignStatus);
 
-            renderCouponTable(searchResults, true);
+            renderCouponTable(getStatusFilteredCoupons(searchResults), true);
 
             // ✅ 검색 중에는 페이지네이션 숨기기
             const paginationContainer = document.getElementById(
@@ -351,12 +463,11 @@ async function performRealTimeSearch(searchValue: string) {
                 paginationContainer.style.display = "none";
             }
         } else {
-            renderCouponTable(allCoupons, false);
-            renderCouponTable(allCoupons);
+            renderCouponTable(getStatusFilteredCoupons(allCoupons), false);
             renderPagination();
         }
     } catch (error) {
-        renderCouponTable(allCoupons);
+        renderCouponTable(getStatusFilteredCoupons(allCoupons));
         renderPagination();
     }
 }
@@ -447,7 +558,7 @@ function renderCouponTable(coupons: any[], isSearchResult: boolean = false) {
     coupons.forEach((coupon, index) => {
         const row = document.createElement("tr");
         row.classList.add("coupon-row");
-        row.setAttribute("data-coupon-index", index.toString());
+        row.setAttribute("data-coupon-id", String(coupon.couponId || ""));
 
         const formatDate = (dateString: string) => {
             const date = new Date(dateString);
@@ -460,7 +571,9 @@ function renderCouponTable(coupons: any[], isSearchResult: boolean = false) {
         const expiresAt = formatDate(coupon.expiresAt);
         const displayTitle = coupon.title.replace(" 무료", "");
 
-        const useYn = coupon.count === 0 ? '사용' : '미사용';
+        const useYn = enhancedCouponUiEnabled && coupon.campaignStatus === "DELETED"
+            ? "삭제"
+            : coupon.count === 0 ? "사용" : "미사용";
         // ✅ 검색 결과인지에 따라 번호 계산 방식 변경
         const itemNumber = isSearchResult
             ? index + 1
@@ -482,6 +595,10 @@ function renderCouponTable(coupons: any[], isSearchResult: boolean = false) {
             'input[type="checkbox"]'
         ) as HTMLInputElement;
         if (checkbox) {
+            if (enhancedCouponUiEnabled) {
+                checkbox.dataset.campaignId = String(coupon.campaignId || "");
+                checkbox.dataset.couponId = String(coupon.couponId || "");
+            }
             checkbox.addEventListener("change", updateSelectAllCheckbox);
             // 체크박스 클릭 시 이벤트 전파 방지
             checkbox.addEventListener("click", (e) => {
@@ -511,8 +628,126 @@ function showCouponPopup(couponData: any) {
 }
 
 // 메뉴 이미지 로드 함수
+function isValidMenuId(menuId: unknown): boolean {
+    if (menuId === null || menuId === undefined || menuId === "") return false;
+    return Number.isFinite(Number(menuId));
+}
+
+async function loadCampaignStatuses(userId: string) {
+    try {
+        const response = await apiGet(
+            `/model_coupon?func=getCampaigns&userId=${encodeURIComponent(userId)}`
+        );
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.message || "신규 쿠폰 목록을 불러오지 못했습니다.");
+        campaignStatusById.clear();
+        (Array.isArray(data.items) ? data.items : []).forEach((campaign: any) => {
+            if (campaign?.campaignId) {
+                campaignStatusById.set(String(campaign.campaignId), String(campaign.status || "ACTIVE"));
+            }
+        });
+    } catch (error) {
+        console.error("신규 쿠폰 캠페인 목록 로드 실패:", error);
+        campaignStatusById.clear();
+    }
+}
+
+function withCampaignStatus(coupon: any) {
+    if (!enhancedCouponUiEnabled) return coupon;
+    const campaignId = String(coupon?.campaignId || "");
+    return {
+        ...coupon,
+        campaignStatus: campaignId
+            ? campaignStatusById.get(campaignId) || "ACTIVE"
+            : "ACTIVE",
+    };
+}
+
+function getStatusFilteredCoupons(coupons: any[]) {
+    if (!enhancedCouponUiEnabled || currentStatusFilter === "ALL") return coupons;
+    return coupons.filter((coupon) => {
+        if (currentStatusFilter === "DELETED") return coupon.campaignStatus === "DELETED";
+        if (coupon.campaignStatus === "DELETED") return false;
+        if (currentStatusFilter === "USED") return Number(coupon.count) === 0;
+        if (currentStatusFilter === "UNUSED") return Number(coupon.count) !== 0;
+        return true;
+    });
+}
+
+async function deleteSelectedCouponCampaigns() {
+    if (!enhancedCouponUiEnabled) return;
+    const checked = Array.from(document.querySelectorAll<HTMLInputElement>(
+        '#coupon-table-body input[type="checkbox"]:checked'
+    ));
+    const campaignIds = [...new Set(
+        checked
+            .map((checkbox) => checkbox.dataset.campaignId || "")
+            .filter((campaignId) => campaignId && campaignStatusById.get(campaignId) !== "DELETED")
+    )];
+
+    if (campaignIds.length === 0) {
+        window.showToast("삭제 가능한 신규 쿠폰을 선택해주세요.", 3000, "warning");
+        return;
+    }
+    if (!confirm(`선택한 신규 쿠폰 ${campaignIds.length}건을 삭제하시겠습니까?\n삭제 후 발급된 쿠폰은 사용할 수 없습니다.`)) return;
+
+    const userId = String(getStoredUser()?.userId || "");
+    const button = document.getElementById("delete-selected-coupons") as HTMLButtonElement | null;
+    if (button) button.disabled = true;
+    try {
+        for (const campaignId of campaignIds) {
+            const response = await apiPost("/model_coupon?func=deleteCampaign", { userId, campaignId });
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(data.message || "쿠폰 삭제에 실패했습니다.");
+        }
+        window.showToast(`${campaignIds.length}건의 쿠폰이 삭제되었습니다.`, 2500, "success");
+        await loadCampaignStatuses(userId);
+        await getCouponList(userId);
+    } catch (error) {
+        const message = error instanceof Error ? error.message : "쿠폰 삭제 중 오류가 발생했습니다.";
+        window.showToast(message, 3000, "error");
+    } finally {
+        if (button) button.disabled = false;
+    }
+}
+
+function getPublicMenuImageUrl(data: any): string {
+    const imageFile = String(data?.image ?? "")
+        .split("\\").pop()
+        ?.split("/").pop() ?? "";
+    const userId = String(data?.userId ?? getStoredUser()?.userId ?? "").trim();
+    if (!userId || !imageFile) return "";
+    return `${IMAGE_BASE_URL}/model/${encodeURIComponent(userId)}/${encodeURIComponent(imageFile)}`;
+}
+
+function loadImageElement(image: HTMLImageElement, imageUrl: string, title: string): Promise<boolean> {
+    return new Promise((resolve) => {
+        let completed = false;
+        const finish = (loaded: boolean) => {
+            if (completed) return;
+            completed = true;
+            window.clearTimeout(timeoutId);
+            image.onload = null;
+            image.onerror = null;
+            resolve(loaded);
+        };
+        const timeoutId = window.setTimeout(() => finish(false), 10_000);
+
+        image.crossOrigin = "anonymous";
+        image.alt = title;
+        image.onload = () => finish(true);
+        image.onerror = () => finish(false);
+        image.src = imageUrl;
+        if (image.complete && image.naturalWidth > 0) finish(true);
+    });
+}
+
 async function loadMenuImage(menuId: string, title: string) {
     try {
+        if (!isValidMenuId(menuId)) {
+            console.warn("메뉴 이미지 조회 생략: 유효한 menuId가 없습니다.", menuId);
+            return;
+        }
         const user = getStoredUser();
         if (!user) return;
 
@@ -524,16 +759,13 @@ async function loadMenuImage(menuId: string, title: string) {
             const data = await response.json();
 
             if (data.image) {
-                const imageFile = data.image?.split("\\").pop() ?? "";
-                const encodedFile = encodeURIComponent(imageFile);
-                const imageUrl = `https://model-narrow-road.s3.ap-northeast-2.amazonaws.com/model/${data.userId}/${encodedFile}`;
+                const imageUrl = getPublicMenuImageUrl(data);
 
                 const menuImage = document.querySelector(
                     ".coupon-menu-image"
                 ) as HTMLImageElement;
-                if (menuImage) {
-                    menuImage.src = imageUrl;
-                    menuImage.alt = title;
+                if (menuImage && imageUrl) {
+                    await loadImageElement(menuImage, imageUrl, title);
                     console.log("메뉴 이미지 로드 완료:", imageUrl);
                 }
             }
@@ -544,6 +776,8 @@ async function loadMenuImage(menuId: string, title: string) {
 }
 
 function updateCouponOverlay(couponData: any) {
+    updateCouponBackground(couponData);
+
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
         const year = date.getFullYear();
@@ -561,6 +795,7 @@ function updateCouponOverlay(couponData: any) {
     const titleLength = title.length;
     const titleClass = titleLength >= 10 ? "coupon-title small" : "coupon-title";
     const freeClass = titleLength >= 10 ? "coupon-free small" : "coupon-free";
+    const benefitText = getCouponBenefitText(couponData);
 
     const couponOverlay = document.querySelector(
         ".coupon-overlay"
@@ -570,14 +805,16 @@ function updateCouponOverlay(couponData: any) {
       <div class="coupon-period" style="transform: translateY(-7px);">${period}</div>
       <img class="coupon-menu-image" src="" alt="${title}" style="transform: translateY(-7px);" />
       <div class="${titleClass}" style="transform: translateY(-7px);">${title}</div>
-      <div class="${freeClass}" style="transform: translateY(-7px);">1잔 무료</div>
+      <div class="${freeClass}" style="transform: translateY(-7px);">${benefitText}</div>
       <div class="coupon-store" style="transform: translateY(-7px);">${storeName}</div>
       <div class="coupon-id" style="transform: translateY(-7px);">${couponData.couponId}</div>
       <canvas id="coupon-barcode" style="transform: translateY(-7px);"></canvas>  
     `;
 
         // ✅ 메뉴 이미지 로드
-        loadMenuImage(couponData.menuId, title);
+        if (!setDiscountCouponImage(couponData, title)) {
+            loadMenuImage(couponData.menuId, title);
+        }
     }
 
     setTimeout(() => {
@@ -603,6 +840,74 @@ function downloadURI(uri: string, name: string) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+}
+
+function isIOSDevice(): boolean {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent)
+        || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+}
+
+async function dataUrlToFile(image: { uri: string; name: string }): Promise<File> {
+    const blob = await (await fetch(image.uri)).blob();
+    return new File([blob], image.name, { type: "image/png" });
+}
+
+function showIOSShareSheetButton(images: Array<{ uri: string; name: string }>) {
+    document.getElementById("ios-coupon-share-sheet")?.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "ios-coupon-share-sheet";
+    Object.assign(overlay.style, {
+        position: "fixed", inset: "0", zIndex: "100000", display: "flex",
+        alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,.65)", padding: "20px",
+    });
+
+    const panel = document.createElement("div");
+    Object.assign(panel.style, {
+        width: "100%", maxWidth: "380px", borderRadius: "16px", background: "#fff",
+        padding: "24px", textAlign: "center", whiteSpace: "normal",
+        wordBreak: "keep-all", overflowWrap: "anywhere",
+    });
+    panel.innerHTML = `<div style="font-size:18px;font-weight:700;margin-bottom:8px">쿠폰 이미지 생성 완료</div>
+        <div style="font-size:14px;color:#555;line-height:1.5;margin-bottom:20px">선택한 ${images.length}개 이미지를 사진첩에 저장하려면 아래 버튼을 누른 뒤 공유 시트에서 ‘이미지 저장’을 선택하세요.</div>`;
+
+    const shareButton = document.createElement("button");
+    shareButton.id = "ios-coupon-open-share-sheet";
+    shareButton.type = "button";
+    shareButton.textContent = `${images.length}개 사진첩에 저장`;
+    Object.assign(shareButton.style, {
+        width: "100%", border: "0", borderRadius: "10px", padding: "14px",
+        background: "#246bfd", color: "#fff", fontSize: "16px", fontWeight: "700",
+        whiteSpace: "normal", wordBreak: "keep-all", overflowWrap: "anywhere", lineHeight: "1.4",
+    });
+    shareButton.addEventListener("click", async () => {
+        try {
+            const files = await Promise.all(images.map(dataUrlToFile));
+            const shareNavigator = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
+            if (!navigator.share || (shareNavigator.canShare && !shareNavigator.canShare({ files }))) {
+                throw new Error("이 브라우저는 이미지 파일 공유를 지원하지 않습니다.");
+            }
+            await navigator.share({ files, title: "쿠폰 이미지" });
+            overlay.remove();
+        } catch (error) {
+            if ((error as DOMException)?.name === "AbortError") return;
+            console.error("쿠폰 이미지 공유 실패:", error);
+            window.showToast("공유 시트를 열 수 없습니다. Safari에서 다시 시도해 주세요.", 4000, "error");
+        }
+    });
+
+    const closeButton = document.createElement("button");
+    closeButton.type = "button";
+    closeButton.textContent = "닫기";
+    Object.assign(closeButton.style, {
+        width: "100%", border: "0", padding: "12px", marginTop: "8px", background: "transparent", color: "#555",
+    });
+    closeButton.addEventListener("click", () => overlay.remove());
+
+    panel.appendChild(shareButton);
+    panel.appendChild(closeButton);
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
 }
 
 // 쿠폰 팝업 닫기
@@ -662,16 +967,18 @@ async function saveSelectedCouponsAsImages() {
     saveBtn.disabled = true;
 
     try {
-        const selectedIndices: number[] = [];
+        const selectedCouponIds: string[] = [];
         checkedCheckboxes.forEach((checkbox) => {
             const row = checkbox.closest("tr") as HTMLElement;
-            const index = parseInt(row.getAttribute("data-coupon-index") || "0");
-            selectedIndices.push(index);
+            selectedCouponIds.push(row.getAttribute("data-coupon-id") || "");
         });
 
-        const selectedCoupons = selectedIndices
-            .map((index) => allCoupons[index])
+        const selectedCoupons = selectedCouponIds
+            .map((couponId) => allCoupons.find((coupon) => String(coupon.couponId) === couponId))
             .filter(Boolean);
+
+        const iosDevice = isIOSDevice();
+        const iosImages: Array<{ uri: string; name: string }> = [];
 
         // 각 쿠폰에 대해 이미지 생성 및 저장
         for (let i = 0; i < selectedCoupons.length; i++) {
@@ -681,8 +988,11 @@ async function saveSelectedCouponsAsImages() {
             );
 
             // 쿠폰 팝업을 숨겨진 상태로 생성
-            await generateCouponImage(coupon);
+            const generatedImage = await generateCouponImage(coupon, !iosDevice);
+            if (iosDevice) iosImages.push(generatedImage);
         }
+
+        if (iosDevice) showIOSShareSheetButton(iosImages);
 
         window.showToast(
             `${selectedCoupons.length}개의 쿠폰 이미지가 저장되었습니다.`,
@@ -703,8 +1013,11 @@ async function saveSelectedCouponsAsImages() {
 }
 
 // 개별 쿠폰 이미지 생성 함수 수정
-async function generateCouponImage(couponData: any): Promise<void> {
-    return new Promise(async (resolve, reject) => {
+async function generateCouponImage(
+    couponData: any,
+    shouldDownload = true,
+): Promise<{ uri: string; name: string }> {
+    return new Promise<{ uri: string; name: string }>(async (resolve, reject) => {
         try {
             const popup = document.getElementById("coupon-popup") as HTMLElement;
             const couponContainer = popup.querySelector(".coupon-container") as HTMLElement;
@@ -769,14 +1082,15 @@ async function generateCouponImage(couponData: any): Promise<void> {
             const fileName = `${safeTitle}_${couponData.couponCode}.png`;
 
             // 7️⃣ 이미지 저장
-            downloadURI(roundedCanvas.toDataURL("image/png"), fileName);
+            const imageUri = roundedCanvas.toDataURL("image/png");
+            if (shouldDownload) downloadURI(imageUri, fileName);
 
             // 8️⃣ popup 복원
             popup.style.transform = "";
             popup.style.opacity = "1";
             popup.style.display = "none";
 
-            resolve();
+            resolve({ uri: imageUri, name: fileName });
         } catch (error) {
             reject(error);
         }
@@ -786,6 +1100,8 @@ async function generateCouponImage(couponData: any): Promise<void> {
 
 // 캡처용 오버레이 업데이트 함수
 async function updateCouponOverlayForCapture(couponData: any): Promise<void> {
+    updateCouponBackground(couponData);
+
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
         const year = date.getFullYear();
@@ -803,6 +1119,7 @@ async function updateCouponOverlayForCapture(couponData: any): Promise<void> {
     const titleLength = title.length;
     const titleClass = titleLength >= 10 ? "coupon-title small" : "coupon-title";
     const freeClass = titleLength >= 10 ? "coupon-free small" : "coupon-free";
+    const benefitText = getCouponBenefitText(couponData);
 
     const couponOverlay = document.querySelector(
         ".coupon-overlay"
@@ -812,13 +1129,15 @@ async function updateCouponOverlayForCapture(couponData: any): Promise<void> {
       <div class="coupon-period" style="transform: translateY(-15px);">${period}</div>
       <img class="coupon-menu-image" src="" alt="${title}" style="transform: translateY(-7px);" />
       <div class="${titleClass}" style="transform: translateY(-7px);">${title}</div>
-      <div class="${freeClass}" style="transform: translateY(-7px);">1잔 무료</div>
+      <div class="${freeClass}" style="transform: translateY(-7px);">${benefitText}</div>
       <div class="coupon-store" style="transform: translateY(-7px);">${storeName}</div>
       <div class="coupon-id" style="transform: translateY(-7px);">${couponData.couponId}</div>
       <canvas id="coupon-barcode" style="transform: translateY(-7px);"></canvas>  
     `;
 
-        await loadMenuImageForCapture(couponData.menuId, title);
+        if (!setDiscountCouponImage(couponData, title)) {
+            await loadMenuImageForCapture(couponData.menuId, title);
+        }
     }
 }
 
@@ -829,6 +1148,11 @@ async function loadMenuImageForCapture(
 ): Promise<void> {
     return new Promise((resolve) => {
         try {
+            if (!isValidMenuId(menuId)) {
+                console.warn("캡처용 메뉴 이미지 조회 생략: 유효한 menuId가 없습니다.", menuId);
+                resolve();
+                return;
+            }
             const user = getStoredUser();
             if (!user) {
                 console.log("❌ 사용자 정보 없음");
@@ -847,13 +1171,11 @@ async function loadMenuImageForCapture(
                     }
                     throw new Error("API 응답 실패");
                 })
-                .then((data) => {
+                .then(async (data) => {
                     console.log(" API 응답 데이터:", data);
 
                     if (data.image) {
-                        const imageFile = data.image?.split("\\").pop() ?? "";
-                        const encodedFile = encodeURIComponent(imageFile);
-                        const imageUrl = `https://model-narrow-road.s3.ap-northeast-2.amazonaws.com/model/${data.userId}/${encodedFile}`;
+                        const imageUrl = getPublicMenuImageUrl(data);
 
                         console.log("🖼️ 이미지 URL:", imageUrl);
 
@@ -861,10 +1183,9 @@ async function loadMenuImageForCapture(
                         const menuImage = document.querySelector(
                             ".coupon-menu-image"
                         ) as HTMLImageElement;
-                        if (menuImage) {
-                            menuImage.src = imageUrl;
-                            menuImage.alt = title;
-                            console.log("✅ 이미지 설정 완료");
+                        if (menuImage && imageUrl) {
+                            const loaded = await loadImageElement(menuImage, imageUrl, title);
+                            console.log(loaded ? "✅ 이미지 로드 완료" : "❌ 이미지 로드 실패");
                         } else {
                             console.log("❌ 이미지 요소를 찾을 수 없음");
                         }

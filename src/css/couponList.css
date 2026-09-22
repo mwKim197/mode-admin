@@ -194,6 +194,36 @@
     justify-content: center;
 }
 
+#coupon-page.new-coupon-ui-enabled .coupon-list-btn {
+    width: auto !important;
+    min-width: 68px;
+    padding: 0.65rem 0.8rem !important;
+    flex: 0 0 auto;
+    font-size: 1.2rem !important;
+    white-space: nowrap;
+}
+
+#coupon-page.new-coupon-ui-enabled .title-flex .btnFlex {
+    gap: 0.4rem;
+    flex-wrap: nowrap;
+}
+
+#coupon-page.new-coupon-ui-enabled .search-container {
+    display: flex;
+    gap: 10px;
+}
+
+#delete-selected-coupons[hidden],
+#coupon-status-filter-wrap[hidden] {
+    display: none !important;
+}
+
+#coupon-page.new-coupon-ui-enabled .coupon-list-btn img {
+    width: 14px;
+    height: 14px;
+    margin-right: 0.3rem;
+}
+
 /* 페이지네이션 버튼 스타일 */
 .pagination {
     display: flex;

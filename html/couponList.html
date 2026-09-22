@@ -49,11 +49,28 @@
                     >
                         <img src="/img/image_icon.svg" alt=""/>이미지 저장
                     </button>
+                    <button
+                            type="button"
+                            class="btn red coupon-list-btn"
+                            id="delete-selected-coupons"
+                            hidden
+                    >
+                        선택 삭제
+                    </button>
                 </div>
             </div>
 
             <!-- 검색창 추가 -->
             <div class="search-container" style="margin-bottom: 20px">
+                <div id="coupon-status-filter-wrap" class="select" style="min-width: 130px" hidden>
+                    <select id="coupon-status-filter" class="popup-select mb0">
+                        <option value="ALL">전체</option>
+                        <option value="ACTIVE" selected>정상</option>
+                        <option value="UNUSED">미사용</option>
+                        <option value="USED">사용</option>
+                        <option value="DELETED">삭제</option>
+                    </select>
+                </div>
                 <div class="search-box">
                     <input
                             id="searchCoupon"

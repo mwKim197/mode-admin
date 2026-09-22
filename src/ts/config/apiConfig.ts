@@ -16,4 +16,9 @@ export const APP_BASE_URL = requireUrl(
     import.meta.env.VITE_APP_BASE_URL,
 );
 
+export const IMAGE_BASE_URL = requireUrl(
+    "VITE_IMAGE_BASE_URL",
+    import.meta.env.VITE_IMAGE_BASE_URL,
+);
+
 export const API_HOST = new URL(API_BASE_URL).host;
