@@ -12,7 +12,7 @@ let pageKeys: any[] = [];
 let totalItems = 0;
 let currentPage = 1;
 const pageLimit = 20;
-const NEW_COUPON_ENABLED_USER_IDS = new Set(["zero189", "zero223"]);
+const NEW_COUPON_ENABLED_USER_IDS = new Set(["zero189", "zero223", "model001"]);
 let enhancedCouponUiEnabled = false;
 let currentStatusFilter = "ACTIVE";
 const campaignStatusById = new Map<string, string>();
@@ -119,7 +119,7 @@ export function initCouponList() {
     // 사용자 정보 및 쿠폰 목록 로드
     loadUserInfoAndCoupons();
 
-    // zero189 매장만 신형 쿠폰 발행 화면을 메뉴로 노출한다.
+    // 지정된 운영 계정에만 신형 쿠폰 발행·관리 화면을 노출한다.
     const openCouponDetailBtn = document.getElementById("open-coupon-detail");
     const currentUserId = String(getStoredUser()?.userId ?? "").trim().toLowerCase();
     enhancedCouponUiEnabled = NEW_COUPON_ENABLED_USER_IDS.has(currentUserId);
