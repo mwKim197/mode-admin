@@ -36,6 +36,9 @@ export function initSales() {
     // 페이지 로드 시 기본값 설정 (건별이 체크되어 있음)
     currentSalesType = "transaction";
 
+    // 초기 전체 조회로 인한 지연을 줄이기 위해 당월을 기본 조회 기간으로 설정
+    setDateRangeByPeriod(3);
+
     // 통계 정보 초기화
     resetSalesStatistics();
 
