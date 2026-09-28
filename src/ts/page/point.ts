@@ -363,6 +363,26 @@ async function getPointList() {
 
 // 포인트 테이블 렌더러
 async function renderTable(data: PointItem[]) {
+    if (data.length === 0) {
+        const tableBody = document.querySelector("tbody");
+        const selectAllBtn = document.getElementById("selectAllBtn") as HTMLButtonElement | null;
+        if (tableBody) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" style="padding: 2rem 0 0">
+                        표시할 마일리지가 없습니다.
+                    </td>
+                </tr>
+            `;
+        }
+        if (selectAllBtn) {
+            allChecked = false;
+            selectAllBtn.textContent = "전체선택";
+            selectAllBtn.className = "btn-s blue mb10";
+        }
+        return;
+    }
+
     new Pagination<PointItem>({
         data,
         pageSize: 10,
@@ -482,7 +502,7 @@ async function savePoint(mode: PointMode) {
         const mileageNoRaw = (
             document.getElementById("mileageNo") as HTMLInputElement
         ).value.trim();
-        const tel = (
+        const telRaw = (
             document.getElementById("popupTel") as HTMLInputElement
         ).value.trim();
         const password = (
@@ -519,7 +539,9 @@ async function savePoint(mode: PointMode) {
             return;
         }
 
-        const mileageNo = isPhone ? mileageNoRaw.replace(/-/g, "") : mileageNoRaw;
+        // 입력 화면에서는 하이픈을 표시하되 API에는 숫자만 전달한다.
+        const mileageNo = mileageNoRaw.replace(/\D/g, "");
+        const tel = telRaw.replace(/\D/g, "");
 
 
         if (mode === "create") {

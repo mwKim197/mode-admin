@@ -15,6 +15,39 @@ let endDate = "";
 // 결제방식 관련 변수 추가
 let currentPaymentType = "all"; // 'all', 'card', 'point'
 
+function formatAmount(value: unknown): string {
+    const amount = Number(value);
+    return Number.isFinite(amount) ? amount.toLocaleString() : "0";
+}
+
+function formatCouponForSales(coupon: any, sale: any): string {
+    const couponType = String(coupon?.couponType || coupon?.discountType || "").toUpperCase();
+    const couponCode = coupon?.couponCode ?? "번호 없음";
+    const actualDiscount = Number(coupon?.discountAmount ?? coupon?.price ?? 0);
+    const title = coupon?.couponTitle || coupon?.title || coupon?.name || "";
+    const titlePrefix = title ? `${title} · ` : "";
+
+    if (couponType === "FIXED") {
+        const fixedAmount = coupon?.discountValue ?? actualDiscount;
+        return `${titlePrefix}정액 ${formatAmount(fixedAmount)}원 할인 (${couponCode})`;
+    }
+
+    if (couponType === "PERCENT" || couponType === "RATE") {
+        const rate = Number(coupon?.discountValue ?? coupon?.rate ?? 0);
+        return `${titlePrefix}정률 ${formatAmount(rate)}% 할인 · 실제 ${formatAmount(actualDiscount)}원 할인 (${couponCode})`;
+    }
+
+    if (couponType === "MENU" || coupon?.menuId != null) {
+        const menuName = coupon?.menuName
+            || sale?.menuSummary?.find((menu: any) => String(menu?.menuId) === String(coupon?.menuId))?.name
+            || title
+            || "메뉴 쿠폰";
+        return `${menuName} 1잔 무료 (${couponCode}) - ${formatAmount(actualDiscount)}원`;
+    }
+
+    return `${title || "쿠폰"} 할인 (${couponCode}) - ${formatAmount(actualDiscount)}원`;
+}
+
 export function initSales() {
     console.log("✅ sales.ts 로드됨");
 
@@ -772,7 +805,7 @@ async function updatePopupContent(rowIndex: number) {
                 const couponInfos = item.totalPayInfo
                     ?.filter((pay: any) => pay.method === "쿠폰")
                     .flatMap((pay: any) => pay.coupons || [])
-                    .map((c: any) => `${c.name} (${c.couponCode}) - ${c.price.toLocaleString()}`)
+                    .map((c: any) => formatCouponForSales(c, item))
                     .join("<br>") || "사용한 쿠폰 없음";
 
                 //----------쿠폰 내역 HTML
@@ -971,7 +1004,7 @@ async function updatePopupContent(rowIndex: number) {
                 const couponInfos = item.totalPayInfo
                     ?.filter((pay: any) => pay.method === "쿠폰")
                     .flatMap((pay: any) => pay.coupons || [])
-                    .map((c: any) => `${c.name} (${c.couponCode})`)
+                    .map((c: any) => formatCouponForSales(c, item))
                     .join("<br>") || "사용한 쿠폰 없음";
 
                 // ✅ 쿠폰 내역 HTML

@@ -1,6 +1,7 @@
 import { getStoredUser } from "../utils/userStorage.ts";
 import { apiGet } from "../api/apiHelpers.ts";
 import { createItemBlock } from "../components/ItemBlock.ts";
+import { IMAGE_BASE_URL } from "../config/apiConfig.ts";
 
 const logoPreview = document.getElementById("logoPreview") as HTMLImageElement;
 const BASE_URL = "/img/"; // 예: "/img/new1.png"
@@ -92,9 +93,9 @@ function setCategoryOptions(categories: { name: string; item: string }[]) {
 // ✅ 메뉴 데이터 값 세팅
 function applyMenuData(menu: any) {
   // 이미지
-  const imageFile = menu.image?.split("\\").pop();
+  const imageFile = menu.image?.split(/[\\/]/).pop();
   const encodedFileName = encodeURIComponent(imageFile ?? "");
-  const imageUrl = `https://model-narrow-road.s3.ap-northeast-2.amazonaws.com/model/${menu.userId}/${encodedFileName}`;
+  const imageUrl = menu.imageUrl || `${IMAGE_BASE_URL}/model/${menu.userId}/${encodedFileName}`;
   const preview = document.getElementById("logoPreview") as HTMLImageElement;
   if (preview) {
     preview.src = imageUrl;

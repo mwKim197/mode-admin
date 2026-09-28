@@ -1,6 +1,7 @@
 import { getStoredUser } from "../utils/userStorage.ts";
 import { apiGet, apiPost } from "../api/apiHelpers.ts";
 import { MenuItem } from "../types/product.ts";
+import { IMAGE_BASE_URL } from "../config/apiConfig.ts";
 
 const changeList: { menuId: number; empty?: string; delete?: boolean }[] = [];
 let allMenuItems: MenuItem[] = [];
@@ -151,9 +152,11 @@ export function initProduct() {
 
     tbody.innerHTML = items
       .map((item, index) => {
-        const imageFile = item.image?.split("\\").pop() ?? "";
+        const imageFile = item.image?.split(/[\\/]/).pop() ?? "";
         const encodedFile = encodeURIComponent(imageFile);
-        const imageUrl = `https://model-narrow-road.s3.ap-northeast-2.amazonaws.com/model/${item.userId}/${encodedFile}`;
+        const imageUrl =
+          item.imageUrl ||
+          `${IMAGE_BASE_URL}/model/${item.userId}/${encodedFile}`;
 
         return `
       <tr>

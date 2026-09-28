@@ -120,15 +120,28 @@ function initEventListeners() {
                 renameImageWithNewMenuId: false,
                 copyImages: includeImages?.checked ?? true,
                 overwrite: overwrite?.checked ?? false,
+                replaceExisting: true,
             };
 
-            if (!confirm(`계정 ${src} 의 전체 메뉴를 ${tgt} 로 복사하시겠습니까?`)) return;
+            if (!confirm(
+                `대상 계정 ${tgt}의 기존 카테고리·메뉴·메뉴 이미지는 모두 삭제됩니다.\n` +
+                `계정 ${src}의 전체 카테고리와 메뉴로 교체하시겠습니까?`
+            )) return;
 
             try {
                 const res = await apiPost("/model_admin_menu?func=duplicate-categories-and-menu", body);
                 const data = await res.json();
                 if (res.ok) {
-                    window.showToast("전체 카테고리·메뉴 복사가 완료되었습니다.", 3000, "success");
+                    const imageErrors = data?.menuResult?.stats?.s3CopyErrors ?? [];
+                    if (imageErrors.length > 0) {
+                        window.showToast(
+                            `카테고리·메뉴는 교체됐지만 이미지 ${imageErrors.length}건 복사에 실패했습니다.`,
+                            5000,
+                            "warning"
+                        );
+                    } else {
+                        window.showToast("전체 카테고리·메뉴 교체가 완료되었습니다.", 3000, "success");
+                    }
                     if (logEl) logEl.textContent = JSON.stringify(data, null, 2);
                 } else {
                     window.showToast(`복사 실패: ${data.message || '오류' }`, 5000, "error");

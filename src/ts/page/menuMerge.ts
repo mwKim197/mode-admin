@@ -2,6 +2,7 @@ import {apiGet, apiPost} from "../api/apiHelpers.ts";
 import {getStoredUser} from "../utils/userStorage.ts";
 import {MenuItem} from "../types/product.ts";
 import {getUserData} from "../common/auth.ts";
+import {IMAGE_BASE_URL} from "../config/apiConfig.ts";
 
 let allMenuItems: MenuItem[] = [];
 
@@ -230,9 +231,10 @@ function renderMenuTable(items: MenuItem[]) {
 
     tbody.innerHTML = items
         .map((item, index) => {
-            const imageFile = item.image?.split("\\").pop() ?? "";
+            const imageFile = item.image?.split(/[\\/]/).pop() ?? "";
             const encodedFile = encodeURIComponent(imageFile);
-            const imageUrl = `https://model-narrow-road.s3.ap-northeast-2.amazonaws.com/model/${item.userId}/${encodedFile}`;
+            const imageUrl = item.imageUrl ||
+                `${IMAGE_BASE_URL}/model/${item.userId}/${encodedFile}`;
 
             return `
         <tr>
@@ -328,12 +330,18 @@ async function handleCopyMenus() {
         targetUserId: selectedTargetAccount,
         menuIds: selectedMenuIds,
         renameImageWithNewMenuId: isExistingAccount,
+        // 일반 메뉴 복사는 대상 매장의 기존 메뉴를 유지하고 뒤에 추가한다.
+        // 전체 삭제 후 복사는 categoryAndMenuMerge에서만 수행한다.
+        replaceExisting: false,
     };
 
     console.log("복사 요청 데이터:", requestBody);
 
     if (
-        confirm(`선택된 ${selectedMenuIds.length}개의 메뉴를 복사하시겠습니까?`)
+        confirm(
+            `대상 계정의 기존 메뉴는 유지됩니다.\n` +
+            `선택한 ${selectedMenuIds.length}개의 메뉴를 마지막 순번부터 추가하시겠습니까?`
+        )
     ) {
         try {
             const response = await apiPost(
@@ -342,7 +350,17 @@ async function handleCopyMenus() {
             );
 
             if (response.ok) {
-                window.showToast("메뉴 복사가 완료되었습니다.", 3000, "success");
+                const result = await response.json();
+                const imageErrors = result?.stats?.s3CopyErrors ?? [];
+                if (imageErrors.length > 0) {
+                    window.showToast(
+                        `메뉴는 추가됐지만 이미지 ${imageErrors.length}건 복사에 실패했습니다.`,
+                        5000,
+                        "warning"
+                    );
+                } else {
+                    window.showToast("기존 메뉴를 유지하고 선택한 메뉴를 추가했습니다.", 3000, "success");
+                }
 
                 selectedCheckboxes.forEach((checkbox) => (checkbox.checked = false));
                 updateSelectAllCheckbox();
