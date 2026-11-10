@@ -120,6 +120,25 @@
         }
 
 
+        #machine-token-dialog {
+            position: fixed;
+            inset: 0;
+            margin: auto;
+            width: min(420px, calc(100% - 32px));
+            box-sizing: border-box;
+            padding: 24px;
+            border: 1px solid #454b55;
+            border-radius: 16px;
+            background: #20242c;
+            color: #fff;
+        }
+        #machine-token-dialog::backdrop { background: rgb(0 0 0 / 70%); }
+        #machine-token-dialog form { display: grid; gap: 14px; }
+        #machine-token-dialog h2 { font-size: 1.15rem; overflow-wrap: anywhere; }
+        #machine-token-dialog input { width: 100%; box-sizing: border-box; min-height: 44px; padding: 8px 12px; font-size: 16px; }
+        #machine-token-error { color: #ffb4b4; overflow-wrap: anywhere; }
+        .machine-token-actions { display: flex; justify-content: flex-end; gap: 8px; }
+        .machine-token-actions button { min-height: 44px; padding: 0 16px; border-radius: 8px; }
     </style>
 </head>
 
@@ -180,7 +199,19 @@
         </div>
     </section>
 </div>
-</body>
+        <dialog id="machine-token-dialog" aria-labelledby="machine-token-title">
+            <form method="dialog">
+                <h2 id="machine-token-title"><span id="machine-token-target"></span> 머신 토큰 등록</h2>
+                <label for="machine-token-password">매장 비밀번호</label>
+                <input type="password" id="machine-token-password" autocomplete="off" required maxlength="256" autofocus>
+                <p id="machine-token-error" role="alert" hidden></p>
+                <div class="machine-token-actions">
+                    <button type="button" id="machine-token-cancel">취소</button>
+                    <button type="submit" class="btn blue" id="machine-token-submit">등록</button>
+                </div>
+            </form>
+        </dialog>
+    </body>
 
 <script>
 

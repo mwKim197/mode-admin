@@ -1,4 +1,9 @@
 import {apiGet, apiPost} from "../api/apiHelpers";
+import {fetchWithoutLoading} from "../api/api";
+import {showToast} from "../../main";
+
+const installedTokens = new Set<string>();
+let installingToken = false;
 
 let currentPage = 1;
 const pageSize = 20;
@@ -59,18 +64,21 @@ function renderStoreTable(list: any[]) {
     tbody.innerHTML = "";
 
     list.forEach((admin) => {
-        tbody.innerHTML += `
-            <tr>
-                <td>${admin.adminId}</td>          
-                <td>${new Date(admin.createdAt).toLocaleDateString()}</td>
-                <td>
-                    <button 
-                        class="btn blue store-open-btn"
-                        data-admin="${admin.adminId}"
-                    >원격</button>
-                </td>
-            </tr>
-        `;
+        const row = (tbody as HTMLTableSectionElement).insertRow();
+        row.insertCell().textContent = admin.adminId;
+        row.insertCell().textContent = new Date(admin.createdAt).toLocaleDateString();
+        const actions = row.insertCell();
+        const remote = document.createElement("button");
+        remote.type = "button";
+        remote.className = "btn blue store-open-btn";
+        remote.dataset.admin = admin.adminId;
+        remote.textContent = "원격";
+        const token = document.createElement("button");
+        token.type = "button";
+        token.className = "btn blue store-token-btn";
+        token.dataset.admin = admin.adminId;
+        token.textContent = installedTokens.has(admin.adminId) ? "등록 완료" : "토큰 등록";
+        actions.append(remote, " ", token);
     });
 }
 
@@ -78,8 +86,60 @@ function renderStoreTable(list: any[]) {
    4) 매장관리 버튼 클릭 이벤트
 ======================================= */
 function attachRowEvents() {
+    const dialog = document.querySelector<HTMLDialogElement>("#machine-token-dialog")!;
+    const input = document.querySelector<HTMLInputElement>("#machine-token-password")!;
+    const target = document.querySelector<HTMLElement>("#machine-token-target")!;
+    let selectedId = "";
+    const form = dialog.querySelector("form")!;
+    const submit = dialog.querySelector<HTMLButtonElement>("#machine-token-submit")!;
+    const cancel = dialog.querySelector<HTMLButtonElement>("#machine-token-cancel")!;
+    const errorMessage = dialog.querySelector<HTMLElement>("#machine-token-error")!;
+    cancel.onclick = () => dialog.close();
+    dialog.oncancel = (event) => { if (installingToken) event.preventDefault(); };
+    dialog.onclose = () => { input.value = ""; selectedId = ""; };
+    form.onsubmit = async (event) => {
+        event.preventDefault();
+        const password = input.value;
+        const userId = selectedId;
+        if (!password || !userId || installingToken) return;
+        installingToken = true;
+        errorMessage.hidden = true;
+        input.value = "";
+        input.disabled = cancel.disabled = submit.disabled = true;
+        submit.textContent = "등록 중…";
+        try {
+            const res = await fetchWithoutLoading("/model_user_setting?func=admin-install-machine-token", {
+                method: "POST", body: JSON.stringify({userId, password}),
+            });
+            const result = await res.json();
+            if (!res.ok || result?.success !== true) throw new Error(result?.message || "머신 토큰 등록에 실패했습니다.");
+            installedTokens.add(userId);
+            document.querySelectorAll<HTMLButtonElement>(".store-token-btn").forEach((button) => {
+                if (button.dataset.admin === userId) button.textContent = "등록 완료";
+            });
+            dialog.close();
+            showToast(`${userId} 머신에 토큰을 저장했습니다.`, 4000, "success");
+        } catch (error) {
+            errorMessage.textContent = error instanceof Error ? error.message : "머신 토큰 등록에 실패했습니다.";
+            errorMessage.hidden = false;
+        } finally {
+            installingToken = false;
+            input.disabled = cancel.disabled = submit.disabled = false;
+            submit.textContent = "등록";
+            if (dialog.open) input.focus();
+        }
+    };
     document.addEventListener("click", async (e) => {
         const btn = e.target as HTMLElement;
+        if (btn.classList.contains("store-token-btn")) {
+            if (installingToken || dialog.open || selectedId || !btn.dataset.admin) return;
+            selectedId = btn.dataset.admin;
+            target.textContent = selectedId;
+            errorMessage.hidden = true;
+            input.value = "";
+            dialog.showModal();
+            return;
+        }
 
         // 🔹 2) 매장관리 열기 (대리 로그인)
         if (btn.classList.contains("store-open-btn")) {
