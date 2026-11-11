@@ -12,6 +12,23 @@ let currentSalesType = "transaction"; // 'transaction' (건별) 또는 'product'
 let startDate = "";
 let endDate = "";
 
+const salesKstFormatter = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+});
+
+function formatSalesTimestamp(value: unknown) {
+    const raw = typeof value === "string" ? value.trim() : "";
+    if (/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$/.test(raw)) {
+        // Preserve legacy timestamps that carry no timezone information.
+        return { dateStr: raw.slice(0, 10), timeStr: raw.slice(11, 16) };
+    }
+    const date = new Date(raw);
+    if (!Number.isFinite(date.getTime())) return { dateStr: "-", timeStr: "" };
+    const parts = Object.fromEntries(salesKstFormatter.formatToParts(date).map(({type, value}) => [type, value]));
+    return { dateStr: `${parts.year}-${parts.month}-${parts.day}`, timeStr: `${parts.hour}:${parts.minute}` };
+}
+
 // 결제방식 관련 변수 추가
 let currentPaymentType = "all"; // 'all', 'card', 'point'
 
@@ -491,9 +508,7 @@ async function renderSalesTable(data: any[]) {
 
         if (currentSalesType === "transaction") {
             // 건별 데이터 렌더링
-            const date = String(item.timestamp).split("T");
-            const dateStr = date[0];
-            const timeStr = date[1].substring(0, 5);
+            const { dateStr, timeStr } = formatSalesTimestamp(item.timestamp);
 
             const menuName = item.menuSummary[0]?.name || "알 수 없음";
 
@@ -794,9 +809,7 @@ async function updatePopupContent(rowIndex: number) {
                 .map((menu: any) => `${menu.name} / ${menu.count || 1}개`)
                 .join("<br>");
 
-            const date = String(item.timestamp).split("T");
-            const dateStr = date[0];
-            const timeStr = date[1].substring(0, 5);
+            const { dateStr, timeStr } = formatSalesTimestamp(item.timestamp);
             const formattedDate = `${dateStr} ${timeStr}`;
 
 
