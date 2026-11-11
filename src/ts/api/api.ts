@@ -19,12 +19,13 @@ export async function fetchWithAuth(
         };
     }
 
+    try {
     // 🔥 1️⃣ accessToken 없으면 → refresh 시도
     let accessToken = getToken();
     if (!accessToken) {
         const ok = await bootstrapAuth();
         if (!ok) {
-            logout();
+            logout("로그인 정보를 확인할 수 없습니다. 다시 로그인해 주세요.");
             return {
                 ok: false,
                 status: 401,
@@ -45,25 +46,26 @@ export async function fetchWithAuth(
 
     if (showLoading) window.showLoading();
 
-    try {
         const response = await fetch(`${API_URL}${endpoint}`, fetchOptions);
 
         // 🔥 2️⃣ accessToken 만료 → refresh → 재시도
-        if (response.status === 401 || response.status === 403) {
-            const ok = await bootstrapAuth();
+        if (response.status === 401) {
+            const ok = (Boolean(getToken()) && getToken() !== accessToken) || await bootstrapAuth(true);
             if (!ok) {
-                logout();
+                logout("로그인 정보가 만료됐습니다. 다시 로그인해 주세요.");
                 return response;
             }
 
             const newToken = getToken();
-            return fetch(`${API_URL}${endpoint}`, {
+            const retry = await fetch(`${API_URL}${endpoint}`, {
                 ...fetchOptions,
                 headers: {
                     ...(fetchOptions.headers || {}),
                     Authorization: `Bearer ${newToken}`,
                 },
             });
+            if (retry.status === 401) logout("로그인 정보가 만료됐습니다. 다시 로그인해 주세요.");
+            return retry;
         }
 
         return response;

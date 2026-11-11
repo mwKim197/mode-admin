@@ -2,6 +2,7 @@ import { getStoredUser } from "../utils/userStorage.ts";
 import { apiGet, apiPost } from "../api/apiHelpers.ts";
 import { MenuItem } from "../types/product.ts";
 import { IMAGE_BASE_URL } from "../config/apiConfig.ts";
+import { logout } from "../common/auth.ts";
 
 const changeList: { menuId: number; empty?: string; delete?: boolean }[] = [];
 let allMenuItems: MenuItem[] = [];
@@ -11,23 +12,30 @@ export function initProduct() {
   // localstorage에 저장된 user 정보를 불러옴
   const user = getStoredUser();
 
-  if (!user) {
-    window.showToast(`❌ 사용자 정보가 없습니다.`, 3000, "error");
+  const userId = user?.userId;
+  if (typeof userId !== "string" || !userId.trim() || /^(undefined|null)$/i.test(userId.trim())) {
+    logout("매장 정보를 확인할 수 없습니다. 다시 로그인해 주세요.");
     return;
   }
+  const menuUserId = encodeURIComponent(userId.trim());
 
   initSearchFunction();
 
   async function fetchMenuList() {
     const res = await apiGet(
-      `/model_admin_menu?userId=${user?.userId}&func=get-all-menu`
+      `/model_admin_menu?userId=${menuUserId}&func=get-all-menu`
     );
+    if (!res.ok) throw new Error(res.status === 403
+      ? "메뉴를 조회할 권한이 없습니다."
+      : "메뉴를 불러오지 못했습니다. 연결 상태를 확인하고 다시 시도해 주세요.");
     const data = await res.json();
+    if (!Array.isArray(data.items)) throw new Error("메뉴 조회 응답을 확인할 수 없습니다.");
 
     return data.items as MenuItem[];
   }
 
   async function init() {
+    showMenuStatus("메뉴를 불러오는 중입니다.");
     try {
       const menuItems = await fetchMenuList();
       allMenuItems = menuItems;
@@ -53,6 +61,8 @@ export function initProduct() {
       }, 200);
     } catch (err) {
       console.error("❌ 메뉴 목록 불러오기 실패", err);
+      allMenuItems = [];
+      showMenuStatus(err instanceof Error ? err.message : "메뉴를 불러오지 못했습니다.");
     }
   }
 
@@ -146,7 +156,20 @@ export function initProduct() {
     }
   }
 
+  function showMenuStatus(message: string) {
+    const tbody = document.querySelector<HTMLTableSectionElement>("#menu-table-body");
+    if (!tbody) return;
+    tbody.replaceChildren();
+    const cell = tbody.insertRow().insertCell();
+    cell.colSpan = 5;
+    cell.textContent = message;
+  }
+
   function renderMenuTable(items: MenuItem[]) {
+    if (!items.length) {
+      showMenuStatus("표시할 메뉴가 없습니다.");
+      return;
+    }
     const tbody = document.getElementById("menu-table-body");
     if (!tbody) return;
 

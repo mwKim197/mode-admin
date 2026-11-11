@@ -1,4 +1,5 @@
 import {setStoredUser} from "../utils/userStorage.ts";
+import {clearLoginContext} from "../common/auth.ts";
 import {
     deleteSecureRefreshToken,
     getRefreshTokenForAutoLogin,
@@ -10,8 +11,7 @@ export function initLogin() {
     console.log("✅ login.ts 로드됨");
 
     // 로그인정보 삭제
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("userInfo"); // 유저정보 삭제
+    clearLoginContext();
 
     const loginForm = document.getElementById("login-form") as HTMLFormElement;
     if (!loginForm) {
@@ -19,16 +19,14 @@ export function initLogin() {
         return;
     }
 
-    tryStoredLogin();
+    if (!new URLSearchParams(window.location.search).has("reauth")) tryStoredLogin();
 
     // ✅ 폼 제출 이벤트 처리
     loginForm.addEventListener("submit", async (event) => {
         event.preventDefault(); // 기본 제출 방지
 
         // ✅ 기존 토큰 삭제
-        localStorage.removeItem("accessToken");
-        // ✅ 기존 유저정보 삭제
-        localStorage.removeItem("userInfo");
+        clearLoginContext();
         console.log("🗑️ 기존 로그인 토큰 삭제됨");
 
         const adminId = (document.getElementById("adminId") as HTMLInputElement).value.trim();

@@ -27,10 +27,7 @@ export function getUserFromToken(): DecodedToken | null {
 export async function checkUserAccess() {
     const res = await fetchWithAuth("/model_admin_login?func=me");
 
-    if (res.status === 401 || res.status === 403) {
-        console.warn("🚫 인증 실패 - 로그인 페이지로 이동");
-        localStorage.removeItem("accessToken");
-        window.location.href = "/html/log.html";
+    if (!res.ok) {
         return;
     }
 
@@ -129,9 +126,20 @@ export async function getUserInfo(userId: string | undefined) {
 /**
  * ✅ 로그아웃
  */
-export function logout() {
-    localStorage.removeItem("accessToken");
-    window.location.href = "/log.html";
+export function clearLoginContext() {
+    for (const storage of [sessionStorage, localStorage]) {
+        storage.removeItem("accessToken");
+        storage.removeItem("userInfo");
+    }
+}
+
+let leaving = false;
+export function logout(message?: string) {
+    if (leaving) return;
+    leaving = true;
+    clearLoginContext();
+    if (message) alert(message);
+    window.location.replace("/html/log.html?reauth=1");
 }
 
 /**
@@ -145,11 +153,17 @@ export function getToken() {
 /**
  * ✅ 앱 시작 / 토큰 만료 시 자동 로그인 복구
  */
-export async function bootstrapAuth(): Promise<boolean> {
+let refreshInFlight: Promise<boolean> | undefined;
+export function bootstrapAuth(force = false): Promise<boolean> {
     // 1️⃣ accessToken 있으면 그대로 통과
     const accessToken = getToken();
-    if (accessToken) return true;
+    if (accessToken && !force) return Promise.resolve(true);
+    // 대리 로그인 토큰을 원래 관리자 계정의 refreshToken으로 교체하지 않는다.
+    if (sessionStorage.getItem("accessToken")) return Promise.resolve(false);
+    return refreshInFlight ??= refreshAccessToken().finally(() => { refreshInFlight = undefined; });
+}
 
+async function refreshAccessToken(): Promise<boolean> {
     // 2️⃣ refreshToken 없으면 로그인 불가
     const refreshToken = await getRefreshTokenForAutoLogin();
     if (!refreshToken) return false;
@@ -161,14 +175,17 @@ export async function bootstrapAuth(): Promise<boolean> {
         body: JSON.stringify({refreshToken}),
     });
 
-    if (!res.ok) {
+    if ([400, 401, 403].includes(res.status)) {
         localStorage.removeItem("refreshToken");
         return false;
     }
+    if (!res.ok) throw new Error("토큰 갱신 요청 실패");
 
     const data = await res.json();
 
     // 4️⃣ 새 accessToken 저장
+    if (leaving || typeof data.accessToken !== "string" || !data.accessToken) return false;
+    if (sessionStorage.getItem("accessToken")) return false;
     localStorage.setItem("accessToken", data.accessToken);
     return true;
 }
